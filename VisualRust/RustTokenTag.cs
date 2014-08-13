@@ -51,7 +51,7 @@
             {
                 int curLoc = curSpan.Start.GetContainingLine().Start.Position;
                 Debug.WriteLine("TokenTagger: asked to get tags for span " + curSpan.ToString());
-                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, 3));
+                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, 0));
                 if (tokenSpan.IntersectsWith(curSpan))
                     yield return new TagSpan<RustTokenTag>(tokenSpan,
                                                           new RustTokenTag(RustTokenTypes.COMMENT));

@@ -8,6 +8,4 @@ Contributing
 ============
 
 To build this, you'll need the [Visual Studio SDK](http://msdn.microsoft.com/en-us/vstudio/vextend.aspx), 
-otherwise you can't even open the project. You'll also need antlr4 installed 
-and in your CLASSPATH, for the RustLexer project. Nuget will take care of the 
-rest.
+otherwise you can't even open the project. Nuget will take care of the rest.

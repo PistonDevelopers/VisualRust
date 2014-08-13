@@ -9,6 +9,9 @@
         STRING,
         NUMBER,
         CHAR,
-        OP
+        OP,
+        STRUCTURAL,
+        WHITESPACE,
+        KEYWORD,
     }
 }

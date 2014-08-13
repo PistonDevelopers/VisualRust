@@ -1,6 +1,7 @@
 ﻿namespace ArkeIndustries.VisualRust
 {
     using System;
+    using System.Diagnostics;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using Microsoft.VisualStudio.Text;
@@ -57,6 +58,9 @@
             _rustTypes[RustTokenTypes.NUMBER] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Number);
             _rustTypes[RustTokenTypes.OP] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Operator);
             _rustTypes[RustTokenTypes.STRING] = typeService.GetClassificationType(PredefinedClassificationTypeNames.String);
+            _rustTypes[RustTokenTypes.STRUCTURAL] = typeService.GetClassificationType(PredefinedClassificationTypeNames.FormalLanguage);
+            _rustTypes[RustTokenTypes.WHITESPACE] = typeService.GetClassificationType(PredefinedClassificationTypeNames.WhiteSpace);
+            _rustTypes[RustTokenTypes.KEYWORD] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Keyword);
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged
@@ -67,7 +71,13 @@
 
         public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
-            return new List<ITagSpan<ClassificationTag>>();
+            foreach (var tagSpan in this._agg.GetTags(spans))
+            {
+                var tagSpans = tagSpan.Span.GetSpans(spans[0].Snapshot);
+                yield return
+                    new TagSpan<ClassificationTag>(tagSpans[0],
+                                                   new ClassificationTag(_rustTypes[tagSpan.Tag.type]));
+            }
         }
     }
 }

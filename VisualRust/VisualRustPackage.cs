@@ -28,6 +28,7 @@ namespace ArkeIndustries.VisualRust
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [ProvideOptionPageAttribute(typeof(VisualRustOptions), "Visual Rust", "Options", 113, 114, true)]
     [Guid(GuidList.guidVisualRustPkgString)]
     public sealed class VisualRustPackage : Package
     {
@@ -57,7 +58,6 @@ namespace ArkeIndustries.VisualRust
         {
             Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
-
         }
         #endregion
 

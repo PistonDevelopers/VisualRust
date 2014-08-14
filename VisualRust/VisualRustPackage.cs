@@ -28,7 +28,22 @@ namespace ArkeIndustries.VisualRust
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-    [ProvideOptionPageAttribute(typeof(VisualRustOptions), "Visual Rust", "Options", 113, 114, true)]
+    [ProvideLanguageService(typeof(RustLanguage), "Rust", 100, 
+        CodeSense = true, 
+        DefaultToInsertSpaces = true, 
+        EnableCommenting = true,
+        MatchBraces = true,
+        MatchBracesAtCaret = true,
+        ShowCompletion = false,
+        ShowMatchingBrace = true,
+        QuickInfo = false, 
+        AutoOutlining = true,
+        ShowSmartIndent = true, 
+        EnableLineNumbers = true, 
+        EnableFormatSelection = true,
+        SupportCopyPasteOfHTML = false
+    )]
+    [ProvideLanguageExtension(typeof(RustLanguage), ".rs")]
     [Guid(GuidList.guidVisualRustPkgString)]
     public sealed class VisualRustPackage : Package
     {

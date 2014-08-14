@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/cmr/VisualRust.png?label=ready&title=Ready)](https://waffle.io/cmr/VisualRust)
 Visual Studio extension for Rust
 ================================
 

@@ -3,6 +3,8 @@
 Visual Studio extension for Rust
 ================================
 
+![Screenshot](http://i.imgur.com/BKyAnmY.png)
+
 Currently in development, and not feature complete. Once it's released,
 installation and usage instructions will be added here.
 

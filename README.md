@@ -1,5 +1,3 @@
-[![Stories in Ready](https://badge.waffle.io/cmr/VisualRust.png?label=ready&title=Ready)](https://waffle.io/cmr/VisualRust)
-
 Visual Studio extension for Rust
 ================================
 
@@ -16,9 +14,8 @@ To build this, you'll need the [Visual Studio
 SDK](http://msdn.microsoft.com/en-us/vstudio/vextend.aspx), otherwise you
 can't even open the project. Nuget will take care of the rest.
 
-There is a [Waffle board](https://waffle.io/cmr/VisualRust). Feel free to take
-any of the issues in the "Ready" column (corresponds to the "ready" tag on
-issues).
+Feel free to work on any issues tagged "ready", or ask around in
+`#rust-gamedev` on irc.mozilla.org for how you can help.
 
 License
 =======

@@ -30,7 +30,7 @@ namespace ArkeIndustries.VisualRust
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideLanguageService(typeof(RustLanguage), "Rust", 100, 
         CodeSense = true, 
-        DefaultToInsertSpaces = true, 
+        DefaultToInsertSpaces = true,
         EnableCommenting = true,
         MatchBraces = true,
         MatchBracesAtCaret = true,

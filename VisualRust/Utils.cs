@@ -128,5 +128,22 @@ namespace ArkeIndustries.VisualRust
 
             return ty;
         }
+
+        public static IEnumerable<Antlr4.Runtime.IToken> LexString(string text)
+        {
+            var lexer = new RustLexer(text);
+            while (true)
+            {
+                var tok = lexer.NextToken();
+                if (tok.Type == RustLexer.Eof)
+                {
+                    yield break;
+                }
+                else
+                {
+                    yield return tok;
+                }
+            }
+        }
     }
 }

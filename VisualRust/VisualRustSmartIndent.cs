@@ -36,12 +36,17 @@ namespace ArkeIndustries.VisualRust
             var lines = snap.Lines.Reverse().Skip(snap.LineCount - line.LineNumber);
             foreach (ITextSnapshotLine prevLine in lines)
             {
-                var c = prevLine.GetText().Last();
-                if (c == '{')
+                var text = prevLine.GetText();
+                if (text.All(c2 => System.Char.IsWhiteSpace(c2)))
+                {
+                    continue;
+                }
+                var toks = Utils.LexString(text).ToList();
+                if (toks.Last().Type == RustLexer.RustLexer.LBRACE)
                 {
                     return prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count() + 4;
                 }
-                else if (c == '}')
+                else if (toks.Any(tok => tok.Type == RustLexer.RustLexer.RBRACE))
                 {
                     return prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count();
                 }

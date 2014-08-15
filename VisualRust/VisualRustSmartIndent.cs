@@ -8,12 +8,13 @@ using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Operations;
 
 namespace ArkeIndustries.VisualRust
 {
     [Export(typeof(ISmartIndentProvider))]
     [ContentType("rust")]
-    sealed class VisualRustSmartIndentProvider : ISmartIndentProvider
+    class VisualRustSmartIndentProvider : ISmartIndentProvider
     {
         public ISmartIndent CreateSmartIndent(ITextView textView)
         {
@@ -21,12 +22,15 @@ namespace ArkeIndustries.VisualRust
         }
     }
 
-    internal sealed class VisualRustSmartIndent : ISmartIndent
+    class VisualRustSmartIndent : ISmartIndent
     {
+        private IEditorOperations ed;
+
         private ITextView _textView;
         internal VisualRustSmartIndent(ITextView textView)
         {
             _textView = textView;
+            ed = Utils.editorOpFactory.GetEditorOperations(textView);
         }
 
         int? ISmartIndent.GetDesiredIndentation(ITextSnapshotLine line)
@@ -48,6 +52,9 @@ namespace ArkeIndustries.VisualRust
                 }
                 else if (toks.Any(tok => tok.Type == RustLexer.RustLexer.RBRACE))
                 {
+                    ed.MoveLineUp(false);
+                    ed.DecreaseLineIndent();
+                    ed.MoveLineDown(false);
                     return prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count();
                 }
             }

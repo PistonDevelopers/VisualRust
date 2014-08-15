@@ -20,7 +20,7 @@ namespace ArkeIndustries.VisualRust
     using Microsoft.VisualStudio.Text.Tagging;
     using Microsoft.VisualStudio.Utilities;
 
-    internal class RustBraceMatcher : ITagger<TextMarkerTag>
+    internal class VisualRustBraceMatcher : ITagger<TextMarkerTag>
     {
 
         ITextView View { get; set; }
@@ -29,7 +29,7 @@ namespace ArkeIndustries.VisualRust
 
         private Dictionary<char, char> braceList;
 
-        internal RustBraceMatcher(ITextView view, ITextBuffer sourceBuffer)
+        internal VisualRustBraceMatcher(ITextView view, ITextBuffer sourceBuffer)
         {
             //here the keys are the open braces, and the values are the close braces
             braceList = new Dictionary<char, char>();
@@ -99,7 +99,7 @@ namespace ArkeIndustries.VisualRust
             {
                 char closeChar;
                 braceList.TryGetValue(currentText, out closeChar);
-                if (RustBraceMatcher.FindMatchingCloseChar(currentChar, currentText, closeChar, View.TextViewLines.Count, out pairSpan) == true)
+                if (VisualRustBraceMatcher.FindMatchingCloseChar(currentChar, currentText, closeChar, View.TextViewLines.Count, out pairSpan) == true)
                 {
                     yield return new TagSpan<TextMarkerTag>(new SnapshotSpan(currentChar, 1), new TextMarkerTag("bracehighlight"));
                     yield return new TagSpan<TextMarkerTag>(pairSpan, new TextMarkerTag("bracehighlight"));
@@ -110,7 +110,7 @@ namespace ArkeIndustries.VisualRust
                 var open = from n in braceList
                            where n.Value.Equals(lastText)
                            select n.Key;
-                if (RustBraceMatcher.FindMatchingOpenChar(lastChar, (char)open.ElementAt<char>(0), lastText, View.TextViewLines.Count, out pairSpan) == true)
+                if (VisualRustBraceMatcher.FindMatchingOpenChar(lastChar, (char)open.ElementAt<char>(0), lastText, View.TextViewLines.Count, out pairSpan) == true)
                 {
                     yield return new TagSpan<TextMarkerTag>(new SnapshotSpan(lastChar, 1), new TextMarkerTag("bracehighlight"));
                     yield return new TagSpan<TextMarkerTag>(pairSpan, new TextMarkerTag("bracehighlight"));
@@ -245,7 +245,7 @@ namespace ArkeIndustries.VisualRust
             if (textView.TextBuffer != buffer)
                 return null;
 
-            return new RustBraceMatcher(textView, buffer) as ITagger<T>;
+            return new VisualRustBraceMatcher(textView, buffer) as ITagger<T>;
         }
 
     }

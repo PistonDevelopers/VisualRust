@@ -14,7 +14,7 @@
     [Export(typeof(ITaggerProvider))]
     [ContentType("rust")]
     [TagType(typeof(ClassificationTag))]
-    internal sealed class RustClassifierProvider : ITaggerProvider
+    internal sealed class VisualRustClassifierProvider : ITaggerProvider
     {
         [Export]
         [Name("rust")]
@@ -35,17 +35,17 @@
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
             ITagAggregator<RustTokenTag> rustTagAgg = aggregatorFactory.CreateTagAggregator<RustTokenTag>(buffer);
-            return new RustClassifier(buffer, rustTagAgg, ClassificationTypeRegistry) as ITagger<T>;
+            return new VisualRustClassifier(buffer, rustTagAgg, ClassificationTypeRegistry) as ITagger<T>;
         }
     }
 
-    internal sealed class RustClassifier : ITagger<ClassificationTag>
+    internal sealed class VisualRustClassifier : ITagger<ClassificationTag>
     {
         ITextBuffer _buffer;
         ITagAggregator<RustTokenTag> _agg;
         IDictionary<RustTokenTypes, IClassificationType> _rustTypes;
 
-        internal RustClassifier(ITextBuffer buffer, ITagAggregator<RustTokenTag> rustTagAgg, IClassificationTypeRegistryService typeService)
+        internal VisualRustClassifier(ITextBuffer buffer, ITagAggregator<RustTokenTag> rustTagAgg, IClassificationTypeRegistryService typeService)
         {
             _buffer = buffer;
             _agg = rustTagAgg;

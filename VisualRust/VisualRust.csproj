@@ -148,6 +148,7 @@
     <Compile Include="RustTokenTypes.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="RustLanguage.cs" />
+    <Compile Include="VisualRustCommandFilter.cs" />
     <Compile Include="VisualRustPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VisualRustSmartIndent.cs" />

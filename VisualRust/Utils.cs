@@ -4,12 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Text.Operations;
+
 namespace ArkeIndustries.VisualRust
 {
     using RustLexer;
 
     class Utils
     {
+        [Import]
+        public static IEditorOperationsFactoryService editorOpFactory = null;
+
         public static RustTokenTypes LexerTokenToRustToken(string text, int tok)
         {
             // FIXME: this is super slow.

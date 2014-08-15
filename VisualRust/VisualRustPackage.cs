@@ -3,12 +3,14 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
+using System.ComponentModel.Composition;
 using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.Text.Editor;
 
 namespace ArkeIndustries.VisualRust
 {
@@ -47,6 +49,8 @@ namespace ArkeIndustries.VisualRust
     [Guid(GuidList.guidVisualRustPkgString)]
     public sealed class VisualRustPackage : Package
     {
+        [Import]
+        ITextEditorFactoryService factory = null;
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -72,6 +76,9 @@ namespace ArkeIndustries.VisualRust
         protected override void Initialize()
         {
             Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+            var tvcListener = new VisualRustTextVewCreationListener();
+            // FIXME #16
+            factory.TextViewCreated += tvcListener.TextViewCreated;
             base.Initialize();
         }
         #endregion

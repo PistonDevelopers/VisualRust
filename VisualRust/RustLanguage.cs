@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 
-namespace ArkeIndustries.VisualRust
+namespace VisualRust
 {
     internal sealed class RustLanguage : LanguageService
     {

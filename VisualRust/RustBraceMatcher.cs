@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 // like this into your ContentType and not have to write it, especially for something so standard
 // like brace matching!
 
-namespace ArkeIndustries.VisualRust
+namespace VisualRust
 {
     using System;
     using System.Linq;

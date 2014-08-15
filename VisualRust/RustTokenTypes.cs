@@ -1,4 +1,4 @@
-﻿namespace ArkeIndustries.VisualRust
+﻿namespace VisualRust
 {
     public enum RustTokenTypes
     {

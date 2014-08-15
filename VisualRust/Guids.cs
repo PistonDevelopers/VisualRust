@@ -2,7 +2,7 @@
 // MUST match guids.h
 using System;
 
-namespace ArkeIndustries.VisualRust
+namespace VisualRust
 {
     static class GuidList
     {

@@ -1,4 +1,4 @@
-﻿namespace ArkeIndustries.VisualRust
+﻿namespace VisualRust
 {
     using System;
     using System.Diagnostics;

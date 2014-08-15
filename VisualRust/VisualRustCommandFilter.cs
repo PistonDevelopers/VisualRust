@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Text.Operations;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Composition;
 
-namespace ArkeIndustries.VisualRust
+namespace VisualRust
 {
     internal sealed class VisualRustTextVewCreationListener
     {

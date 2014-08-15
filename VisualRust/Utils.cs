@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text.Operations;
 
-namespace ArkeIndustries.VisualRust
+namespace VisualRust
 {
     using RustLexer;
 

@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace ArkeIndustries.VisualRust
+namespace VisualRust
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.

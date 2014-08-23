@@ -4,7 +4,7 @@
     <Identity Id="40c1d2b5-528b-4966-a7b1-1974e3568abe" Version="1.0" Language="en-US" Publisher="The Piston Project" />
     <DisplayName>VisualRust</DisplayName>
     <Description>Visual Studio integration for the Rust programming language (http://www.rust-lang.org/)</Description>
-    <License>..\LICENSE.txt</License>
+    <License>LICENSE.txt</License>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0, 13.0)" />

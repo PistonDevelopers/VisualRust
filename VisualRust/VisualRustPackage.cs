@@ -76,9 +76,6 @@ namespace VisualRust
         protected override void Initialize()
         {
             Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
-            var tvcListener = new VisualRustTextVewCreationListener();
-            // FIXME #16
-            factory.TextViewCreated += tvcListener.TextViewCreated;
             base.Initialize();
         }
         #endregion

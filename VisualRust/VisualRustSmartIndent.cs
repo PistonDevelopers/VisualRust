@@ -9,62 +9,84 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
+using Antlr4.Runtime;
+using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 
 namespace VisualRust
 {
     [Export(typeof(ISmartIndentProvider))]
     [ContentType("rust")]
-    class VisualRustSmartIndentProvider : ISmartIndentProvider
+    public class VisualRustSmartIndentProvider : ISmartIndentProvider
     {
+        [Import]
+        public IEditorOperationsFactoryService OperationsFactory = null;
+
         public ISmartIndent CreateSmartIndent(ITextView textView)
         {
-            return new VisualRustSmartIndent(textView);
+            return new VisualRustSmartIndent(textView, this.OperationsFactory.GetEditorOperations(textView));
         }
     }
 
+    // TODO: this indenter should take comments into consideration
+    // TODO: this indenter should take tabs into consideration
     class VisualRustSmartIndent : ISmartIndent
     {
         private IEditorOperations ed;
 
         private ITextView _textView;
-        internal VisualRustSmartIndent(ITextView textView)
+        internal VisualRustSmartIndent(ITextView textView, IEditorOperations operations)
         {
             _textView = textView;
-            ed = Utils.editorOpFactory.GetEditorOperations(textView);
+            ed = operations;
+        }
+
+        // Check if the last non-whitespace token is left brace
+        private static bool EndsWidthLBrace(List<IToken> tokens)
+        {
+            for(int i = tokens.Count - 1; i >= 0; i--)
+            {
+                if (tokens[i].Type == RustLexer.RustLexer.WHITESPACE)
+                    continue;
+                else if (tokens[i].Type == RustLexer.RustLexer.LBRACE)
+                    return true;
+                else
+                    return false;
+            }
+            throw new InvalidOperationException();
         }
 
         int? ISmartIndent.GetDesiredIndentation(ITextSnapshotLine line)
         {
-            var snap = _textView.TextSnapshot;
+            ITextSnapshot snap = _textView.TextSnapshot;
+            int indentSize = _textView.Options.GetIndentSize();
             // get all of the previous lines
-            var lines = snap.Lines.Reverse().Skip(snap.LineCount - line.LineNumber);
+            IEnumerable<ITextSnapshotLine> lines = snap.Lines.Reverse().Skip(snap.LineCount - line.LineNumber);
             foreach (ITextSnapshotLine prevLine in lines)
             {
                 var text = prevLine.GetText();
-                if (text.All(c2 => System.Char.IsWhiteSpace(c2)))
+                if (String.IsNullOrWhiteSpace(text))
                 {
                     continue;
                 }
-                var toks = Utils.LexString(text).ToList();
-                if (toks.Last().Type == RustLexer.RustLexer.LBRACE)
+                List<IToken> toks = Utils.LexString(text).ToList();
+                // The line before ends with {, we add tab
+                if (EndsWidthLBrace(toks))
                 {
-                    return prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count() + 4;
+                    return prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count() + indentSize;
                 }
+                // The line before contains }, we dedent it
                 else if (toks.Any(tok => tok.Type == RustLexer.RustLexer.RBRACE))
                 {
                     ed.MoveLineUp(false);
                     ed.DecreaseLineIndent();
                     ed.MoveLineDown(false);
-                    return prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count();
+                    return Math.Max(0, prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count() - indentSize);
                 }
             }
             // otherwise, there are no lines ending in braces before us.
             return null;
         }
 
-        public void Dispose()
-        {
-            // why is this required...
-        }
+        public void Dispose() { }
     }
 }

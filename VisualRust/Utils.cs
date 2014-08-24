@@ -11,11 +11,8 @@ namespace VisualRust
 {
     using RustLexer;
 
-    class Utils
+    static class Utils
     {
-        [Import]
-        public static IEditorOperationsFactoryService editorOpFactory = null;
-
         public static RustTokenTypes LexerTokenToRustToken(string text, int tok)
         {
             // FIXME: this is super slow.

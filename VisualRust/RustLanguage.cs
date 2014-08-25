@@ -43,7 +43,7 @@ namespace VisualRust
 
         public override IScanner GetScanner(IVsTextLines buffer)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public override string Name
@@ -53,7 +53,7 @@ namespace VisualRust
 
         public override AuthoringScope ParseSource(ParseRequest req)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

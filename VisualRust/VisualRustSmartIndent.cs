@@ -74,14 +74,6 @@ namespace VisualRust
                 {
                     return prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count() + indentSize;
                 }
-                // The line before contains }, we dedent it
-                else if (toks.Any(tok => tok.Type == RustLexer.RustLexer.RBRACE))
-                {
-                    ed.MoveLineUp(false);
-                    ed.DecreaseLineIndent();
-                    ed.MoveLineDown(false);
-                    return Math.Max(0, prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count() - indentSize);
-                }
             }
             // otherwise, there are no lines ending in braces before us.
             return null;

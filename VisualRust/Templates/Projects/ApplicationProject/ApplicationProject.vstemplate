@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>Rust Application</Name>
+    <Description>A project for creating a Rust application</Description>
+     <Icon>ApplicationProject.ico</Icon>
+     <ProjectType>Rust</ProjectType>
+     <CreateNewFolder>true</CreateNewFolder>
+     <DefaultName>RustApplication</DefaultName>
+     <ProvideDefaultName>true</ProvideDefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="ApplicationProject.rsproj" ReplaceParameters="true">
+      <Folder Name="src">
+          <ProjectItem ReplaceParameters="true" OpenInEditor="true">
+              main.rs
+          </ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="true" OpenInEditor="false">
+         Cargo.toml
+      </ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

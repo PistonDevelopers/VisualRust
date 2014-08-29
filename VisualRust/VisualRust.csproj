@@ -144,6 +144,8 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="RustBraceMatcher.cs" />
     <Compile Include="RustClassifier.cs" />
+    <Compile Include="Project\RustProjectFactory.cs" />
+    <Compile Include="Project\RustProjectNode.cs" />
     <Compile Include="RustTokenTag.cs" />
     <Compile Include="RustTokenTypes.cs" />
     <Compile Include="Utils.cs" />
@@ -168,6 +170,11 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
+    <ZipProject Include="Templates\Projects\ApplicationProject\main.rs" />
+    <ZipProject Include="Templates\Projects\ApplicationProject\Cargo.toml" />
+    <ZipProject Include="Templates\Projects\ApplicationProject\ApplicationProject.rsproj">
+      <SubType>Designer</SubType>
+    </ZipProject>
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
@@ -178,6 +185,9 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Resources\Package.ico" />
+    <ZipProject Include="Templates\Projects\ApplicationProject\ApplicationProject.vstemplate" />
+    <ZipProject Include="Templates\Projects\ApplicationProject\ApplicationProject.ico" />
+    <VSCTCompile Include="VisualRust.vsct" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">

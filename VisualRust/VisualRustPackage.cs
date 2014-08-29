@@ -11,6 +11,8 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
+using VisualRust.Project;
+using Microsoft.VisualStudio.Project;
 
 namespace VisualRust
 {
@@ -45,12 +47,18 @@ namespace VisualRust
         EnableFormatSelection = true,
         SupportCopyPasteOfHTML = false
     )]
+    [ProvideProjectFactory(
+        typeof(RustProjectFactory),
+        "Rust",
+        "Rust Project Files (*.rsproj);*.rsproj",
+        "rsproj",
+        "rsproj",
+        ".\\NullPath",
+        LanguageVsTemplate="Rust")]
     [ProvideLanguageExtension(typeof(RustLanguage), ".rs")]
     [Guid(GuidList.guidVisualRustPkgString)]
-    public sealed class VisualRustPackage : Package
+    public class VisualRustPackage : ProjectPackage
     {
-        [Import]
-        ITextEditorFactoryService factory = null;
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -62,8 +70,6 @@ namespace VisualRust
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
-
-
 
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
@@ -77,8 +83,10 @@ namespace VisualRust
         {
             Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
+            this.RegisterProjectFactory(new RustProjectFactory(this));
         }
         #endregion
 
+        public override string ProductUserContext { get { return ""; } }
     }
 }

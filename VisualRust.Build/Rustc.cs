@@ -6,12 +6,15 @@ using System.Diagnostics;
 using System.Text;
 using System.IO;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace VisualRust.Build
 {
-    // TODO: Properly log errors and warnings
     public class Rustc : Microsoft.Build.Utilities.Task
     {
+        private static readonly Regex defectRegex = new Regex(@"^([^:^]+):(\d+):(\d+):\s+(\d+):(\d+)\s+(.*)$", RegexOptions.Multiline | RegexOptions.CultureInvariant);
+        private static readonly Regex errorCodeRegex = new Regex(@"\[[A-Z]\d\d\d\d\]$", RegexOptions.CultureInvariant);
+
         private string[] libPaths = new string[0];
         /// <summary>
         /// Sets -L option.
@@ -157,7 +160,7 @@ namespace VisualRust.Build
             }
             catch (Exception ex)
             {
-                this.Log.LogErrorFromException(ex, true, true, null);
+                this.Log.LogErrorFromException(ex, true);
                 return false;
             }
         }
@@ -206,27 +209,66 @@ namespace VisualRust.Build
                 UseShellExecute = false,
                 WorkingDirectory = WorkingDirectory,
                 Arguments = sb.ToString(),
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
+                RedirectStandardError = true
             };
             try
             {
                 Process process = Process.Start(psi);
                 process.WaitForExit();
-                string output = process.StandardOutput.ReadToEnd();
-                this.Log.LogMessagesFromStream(process.StandardOutput, MessageImportance.Normal);
-                this.Log.LogError(process.StandardError.ReadToEnd());
-                if (process.ExitCode != 0)
+                string errorOutput = process.StandardError.ReadToEnd();
+                MatchCollection errorMatches = defectRegex.Matches(errorOutput);
+                // We found some warning or errors in the output, print them out
+                foreach(Match match in errorMatches)
                 {
-                    this.Log.LogError(process.StandardError.ReadToEnd());
+                    LogParsedDefect(match);
+                }
+                // rustc failed but we couldn't sniff anything from stderr, probabaly internal error
+                if (process.ExitCode != 0 && errorMatches.Count == 0)
+                {
+                    this.Log.LogError(errorOutput);
                     return false;
                 }
-                return true;
+                return process.ExitCode == 0;
             }
             catch(Exception ex)
             {
-                Log.LogErrorFromException(ex);
+                Log.LogErrorFromException(ex, true);
                 return false;
+            }
+        }
+
+        private void LogParsedDefect(Match match)
+        {
+            Match errorMatch = errorCodeRegex.Match(match.Groups[6].Value);
+            string errorCode = errorMatch.Success ? errorMatch.Groups[0].Value : null;
+            if (match.Groups[6].Value.StartsWith("warning: "))
+            {
+                string msg = match.Groups[6].Value.Substring(9, match.Groups[6].Value.Length - 9 - (errorCode != null ? 8 : 0));
+                this.Log.LogWarning(
+                    null,
+                    errorCode,
+                    null,
+                    match.Groups[1].Value,
+                    Int32.Parse(match.Groups[2].Value, System.Globalization.NumberStyles.None),
+                    Int32.Parse(match.Groups[3].Value, System.Globalization.NumberStyles.None),
+                    Int32.Parse(match.Groups[4].Value, System.Globalization.NumberStyles.None),
+                    Int32.Parse(match.Groups[5].Value, System.Globalization.NumberStyles.None),
+                    msg);
+            }
+            else
+            {
+                bool startsWithError = match.Groups[6].Value.StartsWith("error: ");
+                string msg = match.Groups[6].Value.Substring((startsWithError ? 7 : 0), match.Groups[6].Value.Length - (startsWithError ? 7 : 0) - (errorCode != null ? 8 : 0));
+                this.Log.LogError(
+                    null,
+                    errorCode,
+                    null,
+                    match.Groups[1].Value,
+                    Int32.Parse(match.Groups[2].Value, System.Globalization.NumberStyles.None),
+                    Int32.Parse(match.Groups[3].Value, System.Globalization.NumberStyles.None),
+                    Int32.Parse(match.Groups[4].Value, System.Globalization.NumberStyles.None),
+                    Int32.Parse(match.Groups[5].Value, System.Globalization.NumberStyles.None),
+                    msg);
             }
         }
     }

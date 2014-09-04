@@ -15,6 +15,16 @@ namespace VisualRust.Build
         private static readonly Regex defectRegex = new Regex(@"^([^:^]+):(\d+):(\d+):\s+(\d+):(\d+)\s+(.*)$", RegexOptions.Multiline | RegexOptions.CultureInvariant);
         private static readonly Regex errorCodeRegex = new Regex(@"\[[A-Z]\d\d\d\d\]$", RegexOptions.CultureInvariant);
 
+        private string[] configFlags = new string[0];
+        /// <summary>
+        /// Sets --cfg option.
+        /// </summary>
+        public string[] ConfigFlags
+        {
+            get { return configFlags; }
+            set { configFlags = value; }
+        }
+
         private string[] libPaths = new string[0];
         /// <summary>
         /// Sets -L option.
@@ -168,6 +178,8 @@ namespace VisualRust.Build
         private bool ExecuteInner()
         {
             StringBuilder sb = new StringBuilder();
+            if (ConfigFlags.Length > 0)
+                sb.AppendFormat(" --cfg {0}", String.Join(",", ConfigFlags));
             if (AdditionalLibPaths.Length > 0)
                 sb.AppendFormat(" -L {0}", String.Join(",", AdditionalLibPaths));
             if(CrateType.Length > 0)

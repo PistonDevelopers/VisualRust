@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <Target Name="CoreCompile">
+    <Exec Command="echo. > $(TargetDir)obj\$(Configuration)\$(TargetName).exe"/>
+  </Target>
+  <Target Name="CreateManifestResourceNames"></Target>
+</Project>

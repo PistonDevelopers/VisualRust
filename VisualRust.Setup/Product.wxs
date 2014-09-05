@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:vs="http://schemas.microsoft.com/wix/VSExtension">
+  <Product Id="{2F72A669-3627-4D83-B8A3-954DB2A12539}"
+           Name="VisualRust"
+           Language="1033"
+           Version="1.0.0.0"
+           Manufacturer="The Piston Project"
+           UpgradeCode="{B5CC88F7-BC23-4400-95D8-9EE3FA95CC3F}">
+    <Package InstallerVersion="400"
+             Compressed="yes"
+             InstallScope="perMachine" />
+
+    <UIRef Id="WixUI_Minimal" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of VisualRust is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="Ftr_MSBuild_Integration"
+             Title="MSBuild integration"
+             Description="MSBuild tasks and targets. This feature is required for building VisualRust projects from command line and Visual Studio."
+             Level="1">
+      <ComponentGroupRef Id="CmpGroup_MSBuild_Integration" />
+    </Feature>
+
+    <Feature Id="Ftr_VisualRust"
+         Title="Visual Studio 2013 extension"
+         Description="Extension for Visual Studio 2013. Provides support for Rust projects."
+         Level="1">
+      <ComponentRef Id="Cmp_VisualRust_Vsix" />
+    </Feature>
+
+    <Directory Id="TARGETDIR"
+               Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="Dir_MSBuild"
+                   Name="MSBuild" >
+          <Directory Id="Dir_MSBuild_InstallLocation"
+                     Name="VisualRust" />
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <ComponentGroup Id="CmpGroup_MSBuild_Integration"
+                    Directory="Dir_MSBuild_InstallLocation">
+      <Component Id="Cmp_VisualRust_Targets"
+                 Guid="{9A42A0F4-1CB0-4524-886E-E99BE752FE4E}">
+        <File Id="File_VisualRust_Rust_Targets"
+              Source="$(var.VisualRust.Build.TargetDir)VisualRust.Rust.targets"
+              KeyPath="yes" />
+      </Component>
+      <Component Id="Cmp_VisualRust_Build_dll"
+                 Guid="{47E8386B-BAA4-40B2-A0F3-36A0BE69901C}">
+        <File Id="File_VisualRust_Build_dll"
+              Source="$(var.VisualRust.Build.TargetDir)VisualRust.Build.dll"
+              KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!--
+     Note, the method below works for now but is slightly problematic:
+     * VisualRust.vsix is left lying in Program Files/VisualRust
+     * User can uninstall extension from "Extensions and Updates" window without going through installer
+     Proper solution would be marking .vsix with InstalledByMsi="true" and handling installation ourselves
+     (including copying/regediting all package/template stuff to the right places).
+    -->
+    <Component Id="Cmp_VisualRust_Vsix"
+               Guid="{21118443-AA96-4A51-A004-95510168742E}"
+               Directory="Dir_MSBuild_InstallLocation">
+      <File Id="File_VisualRust_Vsix"
+            Source="$(var.VisualRust.TargetDir)VisualRust.vsix">
+        <vs:VsixPackage PackageId="40c1d2b5-528b-4966-a7b1-1974e3568abe"/>
+      </File>
+    </Component>
+  </Product>
+</Wix>

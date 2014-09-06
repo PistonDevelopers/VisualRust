@@ -1,8 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <PropertyGroup>
+    <VisualRustTasksPath>$(MSBuildExtensionsPath)\VisualRust</VisualRustTasksPath>
+  </PropertyGroup>
+
+  <UsingTask AssemblyFile="$(VisualRustTasksPath)\VisualRust.Build.dll"
+             TaskFactory="RustcFactory"
+             TaskName="Rustc"/>
+
   <Target Name="CoreCompile">
-    <Exec Command="echo. > $(TargetDir)obj\$(Configuration)\$(TargetName).exe"/>
+    <PropertyGroup>
+      <EntryPoint Condition="'$(EntryPoint)'=='' and '$(OutputType)'=='library'">src\lib.rs</EntryPoint>
+      <EntryPoint Condition="'$(EntryPoint)'=='' and ('$(OutputType)'=='exe' or '$(OutputType)'=='winexe')">src\main.rs</EntryPoint>
+      <CompilerOutput Condition="'$(OutputType)'=='library'">$(CompilerOutput);lib</CompilerOutput>
+      <CompilerOutput Condition="'$(OutputType)'=='exe' or '$(OutputType)'=='winexe'">$(CompilerOutput);bin</CompilerOutput>
+    </PropertyGroup>
+    <Rustc Input="$(EntryPoint)"
+           OutputFile="$(IntermediateOutputPath)$(TargetFileName)"
+           WorkingDirectory="$(ProjectDir)"
+           CrateType="$(CompilerOutput)"/>
   </Target>
-  <Target Name="CreateManifestResourceNames"></Target>
+  <Target Name="CreateManifestResourceNames"/>
 </Project>

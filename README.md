@@ -1,7 +1,7 @@
 Visual Studio extension for Rust
 ================================
 
-![Screenshot](http://i.imgur.com/BKyAnmY.png)
+![Screenshot](http://i.imgur.com/T06C5wH.png)
 
 Currently in development, and not feature complete. Available [on the Visual
 Studio extension
@@ -11,11 +11,15 @@ Contributing
 ============
 
 To build this, you'll need the [Visual Studio
-SDK](http://msdn.microsoft.com/en-us/vstudio/vextend.aspx), otherwise you
-can't even open the project. Nuget will take care of the rest.
+SDK](http://msdn.microsoft.com/en-us/vstudio/vextend.aspx) for the VS plugin and
+[WiX Toolset 3.9](http://wixtoolset.org/) for the setup project. Nuget will
+take care of the rest.
 
-Feel free to work on any issues tagged "ready", or ask around in
-`#rust-gamedev` on irc.mozilla.org for how you can help.
+This project is currently maintained by [vosen](https://github.com/vosen/).
+
+Feel free to work on any issues tagged "ready". Alternatively you can mail
+the maintainer or ask in `#rust-gamedev` on irc.mozilla.org for how you can
+help.
 
 License
 =======

@@ -12,59 +12,106 @@ namespace VisualRust.Test.Project
         public class ParseImports
         {
             [Test]
-            public void ParseModBlock()
+            public void MergeModBlocks()
             {
-                List<ModuleImport> importMods = ModuleParser.ParseImports(@"fn foo { }  mod asd { mod ext; }").Children;
+                ModuleImport importMods = ModuleParser.ParseImports(@"fn foo { }  mod asd { mod ext; } mod asd { mod bar { mod ext1; } } mod asd { mod bar { mod ext2; } }");
                 Assert.AreEqual(1, importMods.Count);
+                Assert.AreEqual(2, importMods["asd"].Count);
+                Assert.AreEqual(0, importMods["asd"]["ext"].Count);
+                Assert.AreEqual(2, importMods["asd"]["bar"].Count);
+                Assert.AreEqual(0, importMods["asd"]["bar"]["ext1"].Count);
+                Assert.AreEqual(0, importMods["asd"]["bar"]["ext2"].Count);
             }
 
             [Test]
-            public void ParseCommentNewLine()
+            public void ParseModBlock()
             {
-                List<ModuleImport> importMods = ModuleParser.ParseImports(@"// mod ext;").Children;
-                Assert.AreEqual(0, importMods.Count);
+                ModuleImport importMods = ModuleParser.ParseImports(@"fn foo { }  mod asd { mod ext; }");
+                Assert.AreEqual(1, importMods.Count);
+                Assert.AreEqual(1, importMods["asd"].Count);
+                Assert.AreEqual(0, importMods["asd"]["ext"].Count);
             }
 
             [Test]
             public void ParseCommentBlock()
             {
-                List<ModuleImport> importMods = ModuleParser.ParseImports(@"/* mod ext; */").Children;
+                ModuleImport importMods = ModuleParser.ParseImports(@"/* mod ext; */");
+                Assert.AreEqual(0, importMods.Count);
+            }
+
+            [Test]
+            public void ParseInnerModBlock()
+            {
+                ModuleImport importMods = ModuleParser.ParseImports(@"mod foo { mod inner; }");
+                Assert.AreEqual(1, importMods.Count);
+                Assert.AreEqual(1, importMods["foo"].Count);
+                Assert.AreEqual(0, importMods["foo"]["inner"].Count);
+            }
+
+            [Test]
+            public void ParseLargeInnerModBlock()
+            {
+                ModuleImport importMods = ModuleParser.ParseImports(@"mod asd { mod bar { } mod baz { mod inner; } mod ext1; mod ext2; mod ext3; }");
+                Assert.AreEqual(1, importMods.Count);
+                Assert.AreEqual(4, importMods["asd"].Count);
+                Assert.AreEqual(1, importMods["asd"]["baz"].Count);
+            }
+
+            [Test]
+            public void EmptyModBlock()
+            {
+                ModuleImport importMods = ModuleParser.ParseImports(@"mod asd { foo(); }");
+                Assert.AreEqual(0, importMods.Count);
+            }
+
+            [Test]
+            public void MergeModules()
+            {
+                ModuleImport importMods = ModuleParser.ParseImports(@"mod asd { mod foo; } mod asd { mod bar; }");
+                Assert.AreEqual(1, importMods.Count);
+                Assert.AreEqual(2, importMods["asd"].Count);
+            }
+
+            [Test]
+            public void ParseCommentNewLine()
+            {
+                ModuleImport importMods = ModuleParser.ParseImports(@"// mod ext;");
                 Assert.AreEqual(0, importMods.Count);
             }
 
             [Test]
             public void ParsesServoLayoutLib()
             {
-                List<ModuleImport> importMods = ModuleParser.ParseImports(Utils.LoadResource(@"External\servo\components\layout\lib.rs")).Children;
+                ModuleImport importMods = ModuleParser.ParseImports(Utils.LoadResource(@"External\servo\components\layout\lib.rs"));
                 Assert.AreEqual(26, importMods.Count);
-                Assert.True(importMods.Any(m => m.Ident == "layout_debug" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "construct" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "context" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "floats" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "flow" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "flow_list" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "flow_ref" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "fragment" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "layout_task" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "inline" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "model" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "parallel" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "table_wrapper" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "table" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "table_caption" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "table_colgroup" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "table_rowgroup" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "table_row" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "table_cell" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "text" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "util" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "incremental" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "wrapper" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "extra" && m.Children.Count == 0));
-                Assert.True(importMods.Any(m => m.Ident == "css" && m.Children.Count == 3));
-                Assert.True(importMods.First(m => m.Ident == "css").Children.Any(m => m.Ident == "node_util" && m.Children.Count == 0));
-                Assert.True(importMods.First(m => m.Ident == "css").Children.Any(m => m.Ident == "matching" && m.Children.Count == 0));
-                Assert.True(importMods.First(m => m.Ident == "css").Children.Any(m => m.Ident == "node_style" && m.Children.Count == 0));
+                Assert.True(importMods["layout_debug"].Count == 0);
+                Assert.True(importMods["construct"].Count == 0);
+                Assert.True(importMods["context"].Count == 0);
+                Assert.True(importMods["floats"].Count == 0);
+                Assert.True(importMods["flow"].Count == 0);
+                Assert.True(importMods["flow_list"].Count == 0);
+                Assert.True(importMods["flow_ref"].Count == 0);
+                Assert.True(importMods["fragment"].Count == 0);
+                Assert.True(importMods["layout_task"].Count == 0);
+                Assert.True(importMods["inline"].Count == 0);
+                Assert.True(importMods["model"].Count == 0);
+                Assert.True(importMods["parallel"].Count == 0);
+                Assert.True(importMods["table_wrapper"].Count == 0);
+                Assert.True(importMods["table"].Count == 0);
+                Assert.True(importMods["table_caption"].Count == 0);
+                Assert.True(importMods["table_colgroup"].Count == 0);
+                Assert.True(importMods["table_rowgroup"].Count == 0);
+                Assert.True(importMods["table_row"].Count == 0);
+                Assert.True(importMods["table_cell"].Count == 0);
+                Assert.True(importMods["text"].Count == 0);
+                Assert.True(importMods["util"].Count == 0);
+                Assert.True(importMods["incremental"].Count == 0);
+                Assert.True(importMods["wrapper"].Count == 0);
+                Assert.True(importMods["extra"].Count == 0);
+                Assert.True(importMods["css"].Count == 3);
+                Assert.True(importMods["css"]["node_util"].Count == 0);
+                Assert.True(importMods["css"]["matching"].Count == 0);
+                Assert.True(importMods["css"]["node_style"].Count == 0);
             }
         }
     }

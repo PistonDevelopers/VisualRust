@@ -14,7 +14,6 @@
   <ItemGroup>
     <Folder Include="src\" />
     <None Include="src\main.rs" />
-    <None Include="Cargo.toml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\VisualRust\VisualRust.Rust.targets"></Import>
   <Target Name="BeforeBuild">

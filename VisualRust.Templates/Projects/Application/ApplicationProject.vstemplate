@@ -12,7 +12,6 @@
   <TemplateContent>
     <Project File="ApplicationProject.rsproj" ReplaceParameters="true">
       <ProjectItem TargetFileName="src\main.rs" ReplaceParameters="true" OpenInEditor="true">main.rs</ProjectItem>
-      <ProjectItem ReplaceParameters="true">Cargo.toml</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>

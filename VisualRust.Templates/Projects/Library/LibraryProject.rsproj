@@ -3,7 +3,7 @@
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>$guid1$</ProjectGuid>
-    <OutputType>exe</OutputType>
+    <OutputType>library</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>
@@ -14,7 +14,6 @@
   <ItemGroup>
     <Folder Include="src\" />
     <None Include="src\lib.rs" />
-    <None Include="Cargo.toml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\VisualRust\VisualRust.Rust.targets"></Import>
   <Target Name="BeforeBuild">

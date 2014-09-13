@@ -1,6 +1,6 @@
 /*
  * Very simple module parsing grammar.
- * Servers the same purpose as rustc --dep-info, but handles broken files.
+ * Works like rustc --dep-info, but handles broken files.
  */
 
 grammar Module;

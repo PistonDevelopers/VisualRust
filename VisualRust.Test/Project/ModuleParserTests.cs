@@ -18,6 +18,19 @@ namespace VisualRust.Test.Project
                 Assert.AreEqual(1, importMods.Count);
             }
 
+            [Test]
+            public void ParseCommentNewLine()
+            {
+                List<ModuleImport> importMods = ModuleParser.ParseImports(@"// mod ext;").Children;
+                Assert.AreEqual(0, importMods.Count);
+            }
+
+            [Test]
+            public void ParseCommentBlock()
+            {
+                List<ModuleImport> importMods = ModuleParser.ParseImports(@"/* mod ext; */").Children;
+                Assert.AreEqual(0, importMods.Count);
+            }
 
             [Test]
             public void ParsesServoLayoutLib()

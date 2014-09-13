@@ -144,8 +144,6 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="RustBraceMatcher.cs" />
     <Compile Include="RustClassifier.cs" />
-    <Compile Include="Project\RustProjectFactory.cs" />
-    <Compile Include="Project\RustProjectNode.cs" />
     <Compile Include="RustTokenTag.cs" />
     <Compile Include="RustTokenTypes.cs" />
     <Compile Include="Utils.cs" />
@@ -170,11 +168,6 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
-    <ZipProject Include="Templates\Projects\ApplicationProject\main.rs" />
-    <ZipProject Include="Templates\Projects\ApplicationProject\Cargo.toml" />
-    <ZipProject Include="Templates\Projects\ApplicationProject\ApplicationProject.rsproj">
-      <SubType>Designer</SubType>
-    </ZipProject>
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
@@ -185,8 +178,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Resources\Package.ico" />
-    <ZipProject Include="Templates\Projects\ApplicationProject\ApplicationProject.vstemplate" />
-    <ZipProject Include="Templates\Projects\ApplicationProject\ApplicationProject.ico" />
     <VSCTCompile Include="VisualRust.vsct" />
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +188,17 @@
     <ProjectReference Include="..\RustLexer\RustLexer.csproj">
       <Project>{e983e989-f83a-4643-896a-ad496bf647d0}</Project>
       <Name>RustLexer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Project\VisualRust.Project.csproj">
+      <Project>{475c4df2-4d4b-4f2c-9f27-414148dd6f11}</Project>
+      <Name>VisualRust.Project</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Templates\VisualRust.Templates.csproj">
+      <Project>{59D94B96-1AF7-46F2-8790-AAB6DFAE8D9A}</Project>
+      <Name>VisualRust.Templates</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

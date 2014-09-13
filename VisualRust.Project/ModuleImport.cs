@@ -6,29 +6,23 @@ using System.Threading.Tasks;
 
 namespace VisualRust.Project
 {
-    public struct ModuleImport
+    public class ModuleImport : Dictionary<string, ModuleImport>
     {
-        public string Ident { get; private set; }
-        public List<ModuleImport> Children { get; private set; }
+        public ModuleImport() : base(StringComparer.InvariantCulture) { }
 
-        public ModuleImport(string ident)
-            : this()
+        public void Merge(Dictionary<string, ModuleImport> obj)
         {
-            Ident = ident;
-            Children = new List<ModuleImport>(0);
-        }
-
-        public ModuleImport(List<ModuleImport> children)
-            : this()
-        {
-            Children = children;
-        }
-
-        public ModuleImport(string ident, List<ModuleImport> children)
-            : this()
-        {
-            Ident = ident;
-            Children = children;
+            foreach(var kvp in obj)
+            {
+                if(this.ContainsKey(kvp.Key))
+                {
+                    this[kvp.Key].Merge(kvp.Value);
+                }
+                else
+                {
+                    this.Add(kvp.Key, kvp.Value);
+                }
+            }
         }
     }
 }

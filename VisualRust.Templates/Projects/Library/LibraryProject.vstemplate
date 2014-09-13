@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>Rust Library</Name>
+    <Description>A project for creating a Rust library</Description>
+     <Icon>LibraryProject.ico</Icon>
+     <ProjectType>Rust</ProjectType>
+     <CreateNewFolder>true</CreateNewFolder>
+     <DefaultName>RustLibrary</DefaultName>
+     <ProvideDefaultName>true</ProvideDefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="LibraryProject.rsproj" ReplaceParameters="true">
+      <ProjectItem TargetFileName="src\lib.rs" ReplaceParameters="true" OpenInEditor="true">lib.rs</ProjectItem>
+      <ProjectItem ReplaceParameters="true">Cargo.toml</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

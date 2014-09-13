@@ -61,7 +61,6 @@
       <CustomToolNamespace>RustLexer</CustomToolNamespace>
       <Listener>True</Listener>
     </Antlr4>
-    <None Include="Key.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

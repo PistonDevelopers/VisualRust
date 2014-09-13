@@ -12,6 +12,14 @@ namespace VisualRust.Test.Project
         public class ParseImports
         {
             [Test]
+            public void ParseModBlock()
+            {
+                List<ModuleImport> importMods = ModuleParser.ParseImports(@"fn foo { }  mod asd { mod ext; }").Children;
+                Assert.AreEqual(1, importMods.Count);
+            }
+
+
+            [Test]
             public void ParsesServoLayoutLib()
             {
                 List<ModuleImport> importMods = ModuleParser.ParseImports(Utils.LoadResource(@"External\servo\components\layout\lib.rs")).Children;

@@ -24,7 +24,7 @@ namespace VisualRust.Project
                 var child = node.GetChild(i) as IRuleNode;
                 if (child == null)
                     continue;
-                if(child.RuleContext.RuleIndex == ModuleParser.RULE_block)
+                if(child.RuleContext.RuleIndex == ModuleParser.RULE_block && child.ChildCount == 5)
                 {
                     var blockImport = new ModuleImport(child.GetChild(1).GetText(), new List<ModuleImport>());
                     current.Children.Add(blockImport);

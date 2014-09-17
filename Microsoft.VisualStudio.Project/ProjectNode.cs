@@ -5964,7 +5964,7 @@ namespace Microsoft.VisualStudio.Project
         /// </summary>
         /// <param name="item">Item to add</param>
         /// <returns>Added node</returns>
-        private HierarchyNode AddIndependentFileNode(MSBuild.ProjectItem item)
+        protected virtual HierarchyNode AddIndependentFileNode(MSBuild.ProjectItem item)
         {
             HierarchyNode currentParent = GetItemParentNode(item);
             return AddFileNodeToNode(item, currentParent);

@@ -24,5 +24,33 @@ namespace VisualRust.Project
                 }
             }
         }
+
+        public IEnumerable<string[]> GetTerminalImports()
+        {
+            return GetTerminalImports(this, new Queue<string>());
+        }
+
+        private IEnumerable<string[]> GetTerminalImports(ModuleImport current, Queue<string> queue)
+        {
+            foreach(var kvp in current)
+            {
+                if(kvp.Value.Count == 0)
+                {
+                    string[] result = new string[queue.Count + 1];
+                    queue.CopyTo(result, 0);
+                    result[result.Length - 1] = kvp.Key;
+                    yield return result;
+                }
+                else
+                {
+                    queue.Enqueue(kvp.Key);
+                    foreach(var value in GetTerminalImports(kvp.Value, queue))
+                    {
+                        yield return value;
+                    }
+                    queue.Dequeue();
+                }
+            }
+        }
     }
 }

@@ -13,9 +13,9 @@ namespace VisualRust.Project
          * mod bar { mod a; } mod bar { mod b; }
          * We will merget this to mod bar { mod a; mod b; }, but rustc will error out.
          */
-        public static ModuleImport ParseImports(string text)
+        public static ModuleImport ParseImports(ICharStream stream)
         {
-            var lexer = new ModuleLexer(text);
+            var lexer = new ModuleLexer(stream);
             var tokens = new CommonTokenStream(lexer);
             var parser = new ModuleParser(tokens);
             BodyContext root = parser.body();

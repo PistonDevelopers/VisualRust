@@ -267,6 +267,20 @@ namespace VisualRust.Build
                     Int32.Parse(match.Groups[5].Value, System.Globalization.NumberStyles.None),
                     msg);
             }
+            else if (match.Groups[6].Value.StartsWith("note: "))
+            {
+                string msg = match.Groups[6].Value.Substring(6, match.Groups[6].Value.Length - 6 - (errorCode != null ? 8 : 0));
+                this.Log.LogWarning(
+                    null,
+                    errorCode,
+                    null,
+                    match.Groups[1].Value,
+                    Int32.Parse(match.Groups[2].Value, System.Globalization.NumberStyles.None),
+                    Int32.Parse(match.Groups[3].Value, System.Globalization.NumberStyles.None),
+                    Int32.Parse(match.Groups[4].Value, System.Globalization.NumberStyles.None),
+                    Int32.Parse(match.Groups[5].Value, System.Globalization.NumberStyles.None),
+                    msg);
+            }
             else
             {
                 bool startsWithError = match.Groups[6].Value.StartsWith("error: ");

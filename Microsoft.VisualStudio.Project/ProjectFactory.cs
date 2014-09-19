@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.Project
         #region fields
         private Microsoft.VisualStudio.Shell.Package package;
         private System.IServiceProvider site;
-        private static readonly Lazy<IVsTaskSchedulerService> taskSchedulerService = new Lazy<IVsTaskSchedulerService>(() => Package.GetGlobalService(typeof(SVsTaskSchedulerService)) as IVsTaskSchedulerService);
+        private static readonly Lazy<IVsTaskSchedulerService> taskSchedulerService = new Lazy<IVsTaskSchedulerService>(() => Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SVsTaskSchedulerService)) as IVsTaskSchedulerService);
 
         /// <summary>
         /// The msbuild engine that we are going to use.

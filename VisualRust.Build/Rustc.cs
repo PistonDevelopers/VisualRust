@@ -12,8 +12,10 @@ namespace VisualRust.Build
 {
     public class Rustc : Microsoft.Build.Utilities.Task
     {
-        private static readonly Regex defectRegex = new Regex(@"^([^:^]+):(\d+):(\d+):\s+(\d+):(\d+)\s+(.*)$", RegexOptions.Multiline | RegexOptions.CultureInvariant);
-        private static readonly Regex errorCodeRegex = new Regex(@"\[[A-Z]\d\d\d\d\]$", RegexOptions.CultureInvariant);
+        private static readonly Regex defectRegex = new Regex(@"^([^\n:^]+):(\d+):(\d+):\s+(\d+):(\d+)\s+(.*)$", RegexOptions.Multiline | RegexOptions.CultureInvariant);
+
+        // FIXME: This currently does not handle errors with descriptions, e.g. "unreachable pattern [E0001] (pass `--explain E0001` to see a detailed explanation)"
+        private static readonly Regex errorCodeRegex = new Regex(@"\[([A-Z]\d\d\d\d)\]$", RegexOptions.CultureInvariant);
 
         private string[] configFlags = new string[0];
         /// <summary>
@@ -252,7 +254,7 @@ namespace VisualRust.Build
         private void LogParsedDefect(Match match)
         {
             Match errorMatch = errorCodeRegex.Match(match.Groups[6].Value);
-            string errorCode = errorMatch.Success ? errorMatch.Groups[0].Value : null;
+            string errorCode = errorMatch.Success ? errorMatch.Groups[1].Value : null;
             if (match.Groups[6].Value.StartsWith("warning: "))
             {
                 string msg = match.Groups[6].Value.Substring(9, match.Groups[6].Value.Length - 9 - (errorCode != null ? 8 : 0));

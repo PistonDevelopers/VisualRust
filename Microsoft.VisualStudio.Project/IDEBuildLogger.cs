@@ -469,6 +469,9 @@ namespace Microsoft.VisualStudio.Project
                     throw new NotImplementedException();
                 }
 
+                if (span.iEndLine == -1) span.iEndLine = span.iStartLine;
+                if (span.iEndIndex == -1) span.iEndIndex = span.iStartIndex;
+
                 IVsUIShellOpenDocument openDoc = serviceProvider.GetService(typeof(IVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
                 if (openDoc == null)
                     throw new NotImplementedException(); // TODO

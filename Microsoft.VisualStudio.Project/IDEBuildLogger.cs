@@ -52,6 +52,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Diagnostics.CodeAnalysis;
@@ -64,6 +65,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.Win32;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+using Microsoft.VisualStudio.Package;
 
 namespace Microsoft.VisualStudio.Project
 {
@@ -91,7 +93,7 @@ namespace Microsoft.VisualStudio.Project
         private bool haveCachedVerbosity = false;
 
         // Queues to manage Tasks and Error output plus message logging
-        private ConcurrentQueue<Func<ErrorTask>> taskQueue;
+        private ConcurrentQueue<Func<DocumentTask>> taskQueue;
         private ConcurrentQueue<string> outputQueue;
 
         #endregion
@@ -189,7 +191,7 @@ namespace Microsoft.VisualStudio.Project
                 throw new ArgumentNullException("eventSource");
             }
 
-            this.taskQueue = new ConcurrentQueue<Func<ErrorTask>>();
+            this.taskQueue = new ConcurrentQueue<Func<DocumentTask>>();
             this.outputQueue = new ConcurrentQueue<string>();
 
             eventSource.BuildStarted += new BuildStartedEventHandler(BuildStartedHandler);
@@ -427,29 +429,89 @@ namespace Microsoft.VisualStudio.Project
 
         protected void QueueTaskEvent(BuildEventArgs errorEvent)
         {
+            // This enqueues a function that will later be run on the main (UI) thread
             this.taskQueue.Enqueue(() =>
             {
-                ErrorTask task = new ErrorTask();
+                TextSpan span;
+                string file;
+                MARKERTYPE marker;
+                TaskErrorCategory category;
 
                 if (errorEvent is BuildErrorEventArgs)
                 {
                     BuildErrorEventArgs errorArgs = (BuildErrorEventArgs)errorEvent;
-                    task.Document = errorArgs.File;
-                    task.ErrorCategory = TaskErrorCategory.Error;
-                    task.Line = errorArgs.LineNumber - 1; // The task list does +1 before showing this number.
-                    task.Column = errorArgs.ColumnNumber;
-                    task.Priority = TaskPriority.High;
+                    span = new TextSpan();
+                    // spans require zero-based indices
+                    span.iStartLine = errorArgs.LineNumber - 1;
+                    span.iEndLine = errorArgs.EndLineNumber - 1;
+                    span.iStartIndex = errorArgs.ColumnNumber - 1;
+                    span.iEndIndex = errorArgs.EndColumnNumber - 1;
+                    file = Path.Combine(Path.GetDirectoryName(errorArgs.ProjectFile), errorArgs.File);
+                    marker = MARKERTYPE.MARKER_CODESENSE_ERROR; // red squiggles
+                    category = TaskErrorCategory.Error;
+
                 }
                 else if (errorEvent is BuildWarningEventArgs)
                 {
                     BuildWarningEventArgs warningArgs = (BuildWarningEventArgs)errorEvent;
-                    task.Document = warningArgs.File;
-                    task.ErrorCategory = TaskErrorCategory.Warning;
-                    task.Line = warningArgs.LineNumber - 1; // The task list does +1 before showing this number.
-                    task.Column = warningArgs.ColumnNumber;
-                    task.Priority = TaskPriority.Normal;
+                    span = new TextSpan();
+                    // spans require zero-based indices
+                    span.iStartLine = warningArgs.LineNumber - 1;
+                    span.iEndLine = warningArgs.EndLineNumber - 1;
+                    span.iStartIndex = warningArgs.ColumnNumber - 1;
+                    span.iEndIndex = warningArgs.EndColumnNumber - 1;
+                    file = Path.Combine(Path.GetDirectoryName(warningArgs.ProjectFile), warningArgs.File);
+                    marker = MARKERTYPE.MARKER_COMPILE_ERROR; // blue squiggles
+                    category = TaskErrorCategory.Warning;
+                }
+                else
+                {
+                    throw new NotImplementedException();
                 }
 
+                if (span.iEndLine == -1) span.iEndLine = span.iStartLine;
+                if (span.iEndIndex == -1) span.iEndIndex = span.iStartIndex;
+
+                IVsUIShellOpenDocument openDoc = serviceProvider.GetService(typeof(IVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
+                if (openDoc == null)
+                    throw new NotImplementedException(); // TODO
+
+                IVsWindowFrame frame;
+                IOleServiceProvider sp;
+                IVsUIHierarchy hier;
+                uint itemid;
+                Guid logicalView = VSConstants.LOGVIEWID_Code;
+
+                IVsTextLines buffer = null;
+
+                // Notes about acquiring the buffer:
+                // If the file physically exists then this will open the document in the current project. It doesn't matter if the file is a member of the project.
+                // Also, it doesn't matter if this is a Rust file. For example, an error in Microsoft.Common.targets will cause a file to be opened here.
+                // However, opening the document does not mean it will be shown in VS. 
+                if (!Microsoft.VisualStudio.ErrorHandler.Failed(openDoc.OpenDocumentViaProject(file, ref logicalView, out sp, out hier, out itemid, out frame)) && frame != null)
+                {
+                    object docData;
+                    frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out docData);
+
+                    // Get the text lines
+                    buffer = docData as IVsTextLines;
+
+                    if (buffer == null)
+                    {
+                        IVsTextBufferProvider bufferProvider = docData as IVsTextBufferProvider;
+                        if (bufferProvider != null)
+                        {
+                            bufferProvider.GetTextBuffer(out buffer);
+                        }
+                    }
+                }
+
+                DocumentTask task = new DocumentTask(serviceProvider, buffer, marker, span, file);
+                task.ErrorCategory = category;
+                task.Document = file;
+                task.Line = span.iStartLine;
+                task.Column = span.iStartIndex;
+                task.Priority = category == TaskErrorCategory.Error ? TaskPriority.High : TaskPriority.Normal;
                 task.Text = errorEvent.Message;
                 task.Category = TaskCategory.BuildCompile;
                 task.HierarchyItem = hierarchy;
@@ -470,7 +532,7 @@ namespace Microsoft.VisualStudio.Project
                 this.taskProvider.SuspendRefresh();
                 try
                 {
-                    Func<ErrorTask> taskFunc;
+                    Func<DocumentTask> taskFunc;
 
                     while (this.taskQueue.TryDequeue(out taskFunc))
                     {
@@ -491,7 +553,7 @@ namespace Microsoft.VisualStudio.Project
         private void ClearQueuedTasks()
         {
             // NOTE: This may run on a background thread!
-            this.taskQueue = new ConcurrentQueue<Func<ErrorTask>>();
+            this.taskQueue = new ConcurrentQueue<Func<DocumentTask>>();
 
             if (this.InteractiveBuild)
             {

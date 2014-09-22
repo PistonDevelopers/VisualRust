@@ -69,6 +69,7 @@
     <Compile Include="ModuleLexer.g4.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="PathSegment.cs" />
     <Compile Include="ModuleTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModuleParser.g4.cs">

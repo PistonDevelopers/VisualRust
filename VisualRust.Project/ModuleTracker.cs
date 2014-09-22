@@ -105,9 +105,9 @@ namespace VisualRust.Project
                                                     Func<string, ModuleImport> importReader) // the last argument is there just to make unit-testing possible
         {
             ModuleImport imports = importReader(importPath);
-            foreach(string[] import in imports.GetTerminalImports())
+            foreach(PathSegment[] import in imports.GetTerminalImports())
             {
-                string terminalImportPath = Path.Combine(Path.GetDirectoryName(importPath), Path.Combine(import)) + ".rs";
+                string terminalImportPath = Path.Combine(Path.GetDirectoryName(importPath), Path.Combine(import.Select(i => i.Name).ToArray()));
                 if (!roots.Contains(terminalImportPath) && !reachable.Contains(terminalImportPath))
                 {
                     reachable.Add(terminalImportPath);
@@ -162,8 +162,8 @@ namespace VisualRust.Project
                     var importPath = @"C:\dev\app\src\foo.rs";
                     var imports = new ModuleImport()
                     {
-                        { "bar.rs", new ModuleImport() },
-                        { "baz.rs", new ModuleImport() }
+                        { new PathSegment("bar.rs"), new ModuleImport() },
+                        { new PathSegment("baz.rs"), new ModuleImport() }
                     };
                     ExtractReachableModules(reachable, roots, importPath, (s) => s.EndsWith("foo.rs") ? imports : new ModuleImport());
                     Assert.AreEqual(2, reachable.Count);
@@ -181,14 +181,14 @@ namespace VisualRust.Project
                     var importPath = @"C:\dev\app\src\foo.rs";
                     var imports = new ModuleImport()
                     {
-                        { "bar.rs", new ModuleImport() },
-                        { "baz.rs", new ModuleImport() },
-                        { "frob.rs", new ModuleImport() },
+                        { new PathSegment("bar.rs"), new ModuleImport() },
+                        { new PathSegment("baz.rs"), new ModuleImport() },
+                        { new PathSegment("frob.rs"), new ModuleImport() },
                     };
                     var frobImports = new ModuleImport()
                     {
-                        { "in1", new ModuleImport() {
-                            { "in2.rs", new ModuleImport() }
+                        { new PathSegment("in1"), new ModuleImport() {
+                            { new PathSegment("in2.rs"), new ModuleImport() }
                         }}
                     };
                     ExtractReachableModules(reachable, roots, importPath, (s) => s.EndsWith("foo.rs") ? imports : s.EndsWith("frob.rs") ? frobImports : new ModuleImport());

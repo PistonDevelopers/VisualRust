@@ -13,21 +13,21 @@ namespace VisualRust.Test.Project
         [TestFixture]
         public class GetTerminalImports
         {
-            private class ModulePathComparer : IEqualityComparer<string[]>
+            private class ModulePathComparer : IEqualityComparer<PathSegment[]>
             {
-                public bool Equals(string[] x, string[] y)
+                public bool Equals(PathSegment[] x, PathSegment[] y)
                 {
                     if(x.Length != y.Length)
                         return false;
                     for(int i =0; i < x.Length; i++)
                     {
-                        if (x[i] != y[i])
+                        if (x[i].Name != y[i].Name || x[i].IsAuthorative != y[i].IsAuthorative)
                             return false;
                     }
                     return true;
                 }
 
-                public int GetHashCode(string[] obj)
+                public int GetHashCode(PathSegment[] obj)
                 {
                     return obj.Aggregate(0, (acc, str) => acc ^ str.GetHashCode());
                 }
@@ -47,13 +47,13 @@ namespace VisualRust.Test.Project
             {
                 var empty = new ModuleImport()
                 {
-                    { "foo", new ModuleImport() },
-                    { "bar", new ModuleImport() }
+                    { new PathSegment("foo"), new ModuleImport() },
+                    { new PathSegment("bar"), new ModuleImport() }
                 };
                 var terminals = empty.GetTerminalImports().ToArray();
                 Assert.AreEqual(2, terminals.Length);
-                Assert.True(terminals.Contains(new string[] { "foo" }, pathComparer));
-                Assert.True(terminals.Contains(new string[] { "bar" }, pathComparer));
+                Assert.True(terminals.Contains(new PathSegment[] { new PathSegment("foo") }, pathComparer));
+                Assert.True(terminals.Contains(new PathSegment[] { new PathSegment("bar") }, pathComparer));
             }
 
             [Test]
@@ -61,25 +61,25 @@ namespace VisualRust.Test.Project
             {
                 var empty = new ModuleImport()
                 {
-                    { "foo", new ModuleImport()
+                    { new PathSegment("foo"), new ModuleImport()
                         { 
-                            { "baz", new ModuleImport() },
-                            { "m1", new ModuleImport()
+                            { new PathSegment("baz"), new ModuleImport() },
+                            { new PathSegment("m1"), new ModuleImport()
                                 {
-                                    { "m21", new ModuleImport() },
-                                    { "m22", new ModuleImport() }
+                                    { new PathSegment("m21"), new ModuleImport() },
+                                    { new PathSegment("m22"), new ModuleImport() }
                                 }
                             }
                         }
                     },
-                    { "bar", new ModuleImport() }
+                    { new PathSegment("bar"), new ModuleImport() }
                 };
                 var terminals = empty.GetTerminalImports().ToArray();
                 Assert.AreEqual(4, terminals.Length);
-                Assert.True(terminals.Contains(new string[] { "foo", "baz" }, pathComparer));
-                Assert.True(terminals.Contains(new string[] { "foo", "m1", "m21" }, pathComparer));
-                Assert.True(terminals.Contains(new string[] { "foo", "m1", "m22" }, pathComparer));
-                Assert.True(terminals.Contains(new string[] { "bar" }, pathComparer));
+                Assert.True(terminals.Contains(new PathSegment[] { new PathSegment("foo"), new PathSegment("baz") }, pathComparer));
+                Assert.True(terminals.Contains(new PathSegment[] { new PathSegment("foo"), new PathSegment("m1"), new PathSegment("m21") }, pathComparer));
+                Assert.True(terminals.Contains(new PathSegment[] { new PathSegment("foo"), new PathSegment("m1"), new PathSegment("m22") }, pathComparer));
+                Assert.True(terminals.Contains(new PathSegment[] { new PathSegment("bar") }, pathComparer));
             }
         }
     }

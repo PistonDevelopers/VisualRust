@@ -39,12 +39,13 @@ namespace VisualRust.Project
                 var child = node.GetChild(i) as IRuleNode;
                 if (child == null)
                     continue;
-                if(child.RuleContext.RuleIndex == ModuleParser.RULE_block && child.ChildCount == 5)
+                if(child.RuleContext.RuleIndex == ModuleParser.RULE_mod_block)
                 {
+                    int identIndex = child.ChildCount == 5 ? 1 : 2;
                     var blockChildren = new ModuleImport();
                     var blockImport = new ModuleImport()
                     {
-                        {child.GetChild(1).GetText(), blockChildren }
+                        { GetModIdent(child, 6), blockChildren }
                     };
                     if (TraverseForImports(child, blockChildren))
                     {
@@ -55,10 +56,9 @@ namespace VisualRust.Project
                 else if (child.RuleContext.RuleIndex == ModuleParser.RULE_mod_import)
                 {
                     isContainedInBlock = true;
-                    string ident = child.GetChild(1).GetText();
-                    current.Merge(new Dictionary<string, ModuleImport>()
+                    current.Merge(new Dictionary<PathSegment, ModuleImport>()
                     {
-                        { ident, new ModuleImport() }
+                        { GetModIdent(child, 4), new ModuleImport() }
                     });
                 }
                 else
@@ -68,6 +68,24 @@ namespace VisualRust.Project
                 }
             }
             return isContainedInBlock;
+        }
+
+        private static PathSegment GetModIdent(IRuleNode modNode, int lengthWithAttrNode)
+        {
+            if (modNode.ChildCount == lengthWithAttrNode)
+            {
+                ITree attrRoot = modNode.GetChild(0);
+                for(int i = 0; i < attrRoot.ChildCount; i++)
+                {
+                    IRuleNode attrNode = (IRuleNode)attrRoot.GetChild(i);
+                    if(attrNode.GetChild(2).GetText() == "path")
+                    {
+                        string rawString = attrNode.GetChild(4).GetText();
+                        return new PathSegment(rawString.Substring(1, rawString.Length - 2), true);
+                    }
+                }
+            }
+            return new PathSegment(modNode.GetChild(modNode.ChildCount == lengthWithAttrNode ? 2 : 1).GetText(), false);
         }
     }
 }

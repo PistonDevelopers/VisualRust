@@ -11,11 +11,13 @@ namespace VisualRust.Project
     class RustProjectNode : ProjectNode
     {
         private Microsoft.VisualStudio.Shell.Package package;
+        private bool containsEntryPoint;
         private ModuleTracker modTracker;
 
         public RustProjectNode(Microsoft.VisualStudio.Shell.Package package)
         {
             this.package = package;
+            this.CanProjectDeleteItems = true;
         }
         public override System.Guid ProjectGuid
         {
@@ -30,9 +32,16 @@ namespace VisualRust.Project
         protected override void Reload()
         {
             string outputType = GetProjectProperty(ProjectFileConstants.OutputType, false);
-            string entryPoint = Path.Combine(Path.GetDirectoryName(this.FileName), outputType == "library" ? @"\src\lib.rs" : @"\src\main.rs");
-            modTracker = new ModuleTracker(Path.GetDirectoryName(this.FileName) + entryPoint);
+            string entryPoint = Path.Combine(Path.GetDirectoryName(this.FileName), outputType == "library" ? @"src\lib.rs" : @"src\main.rs");
+            containsEntryPoint = false;
+            modTracker = new ModuleTracker(entryPoint);
             base.Reload();
+            // This project for some reason doesn't include entrypoint node, add it
+            if (!containsEntryPoint)
+            {
+                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(entryPoint));
+                parent.AddChild(this.CreateFileNode(entryPoint));
+            }
             foreach (string file in modTracker.ParseReachableNonRootModules())
             {
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file));
@@ -46,6 +55,8 @@ namespace VisualRust.Project
             if(node.GetRelationNameExtension() == ".rs")
             {
                 modTracker.AddRoot(node.Url);
+                if (node.Url == modTracker.EntryPoint)
+                    containsEntryPoint = true;
             }
             return node;
         }

@@ -80,11 +80,11 @@ namespace Microsoft.VisualStudio.Project
             get
             {
                 // Use LinkedIntoProjectAt property if available
-                string caption = this.ItemNode.GetMetadata(ProjectFileConstants.LinkedIntoProjectAt);
+                string caption = this.ItemNode != null ? this.ItemNode.GetMetadata(ProjectFileConstants.LinkedIntoProjectAt) : null;
                 if(caption == null || caption.Length == 0)
                 {
                     // Otherwise use filename
-                    caption = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
+                    caption = this.FilePath;
                     caption = Path.GetFileName(caption);
                 }
                 return caption;
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.Project
         {
             get
             {
-                string path = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
+                string path = FilePath;
                 if(String.IsNullOrEmpty(path))
                 {
                     return String.Empty;
@@ -204,7 +204,7 @@ namespace Microsoft.VisualStudio.Project
         public FileNode(ProjectNode root, ProjectElement element)
             : base(root, element)
         {
-            if(this.ProjectMgr.NodeHasDesigner(this.ItemNode.GetMetadata(ProjectFileConstants.Include)))
+            if(this.ItemNode != null && this.ProjectMgr.NodeHasDesigner(this.ItemNode.GetMetadata(ProjectFileConstants.Include)))
             {
                 this.HasDesigner = true;
             }
@@ -301,7 +301,7 @@ namespace Microsoft.VisualStudio.Project
             }
 
             // Verify that the file extension is unchanged
-            string strRelPath = Path.GetFileName(this.ItemNode.GetMetadata(ProjectFileConstants.Include));
+            string strRelPath = Path.GetFileName(this.FilePath);
             if(String.Compare(Path.GetExtension(strRelPath), Path.GetExtension(label), StringComparison.OrdinalIgnoreCase) != 0)
             {
                 // Prompt to confirm that they really want to change the extension of the file
@@ -396,11 +396,11 @@ namespace Microsoft.VisualStudio.Project
             string oldName = this.Url;
             // must update the caption prior to calling RenameDocument, since it may
             // cause queries of that property (such as from open editors).
-            string oldrelPath = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
+            string oldrelPath = this.FilePath;
 
             try
             {
-                if(!RenameDocument(oldName, newName))
+                if(!RenameDocument(oldName, newName) && this.ItemNode != null)
                 {
                     this.ItemNode.Rename(oldrelPath);
                     this.ItemNode.RefreshProperties();
@@ -542,7 +542,7 @@ namespace Microsoft.VisualStudio.Project
                 }
                 if((VsCommands2K)cmd == VsCommands2K.RUNCUSTOMTOOL)
                 {
-                    if(string.IsNullOrEmpty(this.ItemNode.GetMetadata(ProjectFileConstants.DependentUpon)) && (this.NodeProperties is SingleFileGeneratorNodeProperties))
+                    if((this.NodeProperties is SingleFileGeneratorNodeProperties) && this.ItemNode != null && string.IsNullOrEmpty(this.ItemNode.GetMetadata(ProjectFileConstants.DependentUpon)))
                     {
                         result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                         return VSConstants.S_OK;
@@ -634,7 +634,7 @@ namespace Microsoft.VisualStudio.Project
             Debug.Assert(targetContainer != null, "We should have found a target node by now");
 
             //Suspend file changes while we rename the document
-            string oldrelPath = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
+            string oldrelPath = this.FilePath;
             string oldName = Path.Combine(this.ProjectMgr.ProjectFolder, oldrelPath);
             SuspendFileChanges sfc = new SuspendFileChanges(this.ProjectMgr.Site, oldName);
             sfc.Suspend();
@@ -697,6 +697,11 @@ namespace Microsoft.VisualStudio.Project
             {
                 this.SetEditLabel(value);
             }
+        }
+
+        public virtual string FilePath
+        {
+            get { return this.ItemNode.GetMetadata(ProjectFileConstants.Include); }
         }
 
         /// <summary>
@@ -770,17 +775,20 @@ namespace Microsoft.VisualStudio.Project
             // We want to link to the newly created node to the existing item node and addd the new include.
 
             //temporarily keep properties from new itemnode since we are going to overwrite it
-            string newInclude = childAdded.ItemNode.Item.EvaluatedInclude;
-            string dependentOf = childAdded.ItemNode.GetMetadata(ProjectFileConstants.DependentUpon);
-            childAdded.ItemNode.RemoveFromProjectFile();
+            if (childAdded.ItemNode != null)
+            {
+                string newInclude = childAdded.ItemNode.Item.EvaluatedInclude;
+                string dependentOf = childAdded.ItemNode.GetMetadata(ProjectFileConstants.DependentUpon);
+                childAdded.ItemNode.RemoveFromProjectFile();
 
-            // Assign existing msbuild item to the new childnode
-            childAdded.ItemNode = this.ItemNode;
-            childAdded.ItemNode.Item.ItemType = this.ItemNode.ItemName;
-            childAdded.ItemNode.Item.Xml.Include = newInclude;
-            if(!string.IsNullOrEmpty(dependentOf))
-                childAdded.ItemNode.SetMetadata(ProjectFileConstants.DependentUpon, dependentOf);
-            childAdded.ItemNode.RefreshProperties();
+                // Assign existing msbuild item to the new childnode
+                childAdded.ItemNode = this.ItemNode;
+                childAdded.ItemNode.Item.ItemType = this.ItemNode.ItemName;
+                childAdded.ItemNode.Item.Xml.Include = newInclude;
+                if (!string.IsNullOrEmpty(dependentOf))
+                    childAdded.ItemNode.SetMetadata(ProjectFileConstants.DependentUpon, dependentOf);
+                childAdded.ItemNode.RefreshProperties();
+            }
 
             //Update the new document in the RDT.
             DocumentManager.RenameDocument(this.ProjectMgr.Site, oldFileName, newFileName, childAdded.ID);
@@ -836,10 +844,13 @@ namespace Microsoft.VisualStudio.Project
 
                 //We must update the DependsUpon property since the rename operation will not do it if the childNode is not renamed
                 //which happens if the is no name relation between the parent and the child
-                string dependentOf = childNode.ItemNode.GetMetadata(ProjectFileConstants.DependentUpon);
-                if(!string.IsNullOrEmpty(dependentOf))
+                if (childNode.ItemNode != null)
                 {
-                    childNode.ItemNode.SetMetadata(ProjectFileConstants.DependentUpon, childNode.Parent.ItemNode.GetMetadata(ProjectFileConstants.Include));
+                    string dependentOf = childNode.ItemNode.GetMetadata(ProjectFileConstants.DependentUpon);
+                    if (!string.IsNullOrEmpty(dependentOf))
+                    {
+                        childNode.ItemNode.SetMetadata(ProjectFileConstants.DependentUpon, childNode.Parent.ItemNode.GetMetadata(ProjectFileConstants.Include));
+                    }
                 }
             }
         }
@@ -1018,19 +1029,22 @@ namespace Microsoft.VisualStudio.Project
         /// <param name="newFileName">The new file name.</param>
         private void RenameCaseOnlyChange(string newFileName)
         {
-            //Update the include for this item.
-            string include = this.ItemNode.Item.EvaluatedInclude;
-            if(String.Compare(include, newFileName, StringComparison.OrdinalIgnoreCase) == 0)
+            if (this.ItemNode != null)
             {
-                this.ItemNode.Item.Xml.Include = newFileName;
-            }
-            else
-            {
-                string includeDir = Path.GetDirectoryName(include);
-                this.ItemNode.Item.Xml.Include = Path.Combine(includeDir, newFileName);
-            }
+                //Update the include for this item.
+                string include = this.ItemNode.Item.EvaluatedInclude;
+                if (String.Compare(include, newFileName, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    this.ItemNode.Item.Xml.Include = newFileName;
+                }
+                else
+                {
+                    string includeDir = Path.GetDirectoryName(include);
+                    this.ItemNode.Item.Xml.Include = Path.Combine(includeDir, newFileName);
+                }
 
-            this.ItemNode.RefreshProperties();
+                this.ItemNode.RefreshProperties();
+            }
 
             this.ReDraw(UIHierarchyElement.Caption);
             this.RenameChildNodes(this);

@@ -65,6 +65,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileNode.cs" />
+    <Compile Include="FileNodeProperties.cs" />
     <Compile Include="ModuleImport.cs" />
     <Compile Include="ModuleLexer.g4.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -75,6 +77,7 @@
     <Compile Include="ModuleParser.g4.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="ReferencedFileNode.cs" />
     <Compile Include="RustProjectFactory.cs" />
     <Compile Include="RustProjectNode.cs" />
   </ItemGroup>

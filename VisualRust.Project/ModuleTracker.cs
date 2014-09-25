@@ -13,20 +13,15 @@ using NUnit.Framework;
 
 namespace VisualRust.Project
 {
-    /*
-     * This class keeps track of modules.
-     * Order of operations:
-     * Create: .ctor()
-     * Add roots: AddRoot(...)
-     * Trim duplicate roots: Normalize()
-     * Find modules that are not part of the project: GetReachableModules()
-     */
     public class ModuleTracker
     {
+        public string EntryPoint { get; private set; }
+
         private HashSet<string> fileRoots = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         public ModuleTracker(string root)
         {
+            EntryPoint = root;
             fileRoots.Add(Path.GetFullPath(root));
         }
 

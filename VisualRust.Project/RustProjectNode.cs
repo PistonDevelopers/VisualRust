@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BaseFileNode = Microsoft.VisualStudio.Project.FileNode;
 
 namespace VisualRust.Project
 {
@@ -45,8 +46,19 @@ namespace VisualRust.Project
             foreach (string file in modTracker.ParseReachableNonRootModules())
             {
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file));
-                parent.AddChild(this.CreateFileNode(file));
+                parent.AddChild(new ReferencedFileNode(this, file));
             }
+        }
+
+        public override BaseFileNode CreateFileNode(ProjectElement item)
+        {
+            return new FileNode(this, item);
+        }
+
+        public override BaseFileNode CreateFileNode(string file)
+        {
+            ProjectElement item = this.AddFileToMsBuild(file);
+            return this.CreateFileNode(item);
         }
 
         protected override HierarchyNode AddIndependentFileNode(Microsoft.Build.Evaluation.ProjectItem item)

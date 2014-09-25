@@ -41,7 +41,9 @@ namespace VisualRust.Project
             if (!containsEntryPoint)
             {
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(entryPoint));
-                parent.AddChild(this.CreateFileNode(entryPoint));
+                BaseFileNode node = this.CreateFileNode(entryPoint);
+                ((FileNode)node).IsEntryPoint = true;
+                parent.AddChild(node);
             }
             foreach (string file in modTracker.ParseReachableNonRootModules())
             {
@@ -68,7 +70,10 @@ namespace VisualRust.Project
             {
                 modTracker.AddRoot(node.Url);
                 if (node.Url == modTracker.EntryPoint)
+                {
+                    ((FileNode)node).IsEntryPoint = true;
                     containsEntryPoint = true;
+                }
             }
             return node;
         }

@@ -9,6 +9,26 @@ using BaseFileNode = Microsoft.VisualStudio.Project.FileNode;
 
 namespace VisualRust.Project
 {
+    /*
+     * From the perspective of VisualRust files can be split into three categories:
+     * # Tracked files (stored in .rsproj)
+     *   # Module roots
+     *     Files that are marked with "Automatically track module imports"
+     *   # Others
+     *     Files that are not marked with "Automatically track module imports"
+     * # Untracked files (not stored in .rsproj, calculated ad-hoc)
+     *   Code files that were reached from module roots by automatic tracking
+     * This is good but there are few things to consider:
+     * # What if we want to disable automatic tracking of module imports from untracked file?
+     *   Can't be done, properties field for auto mod tracking is read-only True.
+     *   This behaviour will be explained in the Description pane
+     * # What if we want to "promote" untracked file to a tracked file?
+     *   "Include in project"
+     * # What if we want to "demote" tracked file to an untracked file?
+     *   "Exclude from project"
+     * # What about broken files (this will happen often when writing new modules top-down style)?
+     *   We need a new command for this
+     */
     class RustProjectNode : ProjectNode
     {
         private Microsoft.VisualStudio.Shell.Package package;

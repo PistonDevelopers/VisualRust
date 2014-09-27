@@ -51,7 +51,7 @@ namespace VisualRust.Project
                 && ((cmdGroup == VsMenus.guidStandardCommandSet97 && ((VsCommands)cmd == VsCommands.Rename || (VsCommands)cmd == VsCommands.Cut))
                     || (cmdGroup == VsMenus.guidStandardCommandSet2K && ((VsCommands2K)cmd == VsCommands2K.EXCLUDEFROMPROJECT || (VsCommands2K)cmd == VsCommands2K.RUNCUSTOMTOOL))))
             {
-                        result |= QueryStatusResult.NOTSUPPORTED | QueryStatusResult.INVISIBLE | QueryStatusResult.NINCHED;
+                        result |= QueryStatusResult.NOTSUPPORTED;
                         return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
             }
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);

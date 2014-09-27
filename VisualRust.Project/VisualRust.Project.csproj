@@ -63,6 +63,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileNode.cs" />
@@ -80,6 +83,7 @@
     <Compile Include="ReferencedFileNode.cs" />
     <Compile Include="RustProjectFactory.cs" />
     <Compile Include="RustProjectNode.cs" />
+    <Compile Include="RustProjectNodeProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">

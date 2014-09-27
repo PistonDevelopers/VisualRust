@@ -97,5 +97,10 @@ namespace VisualRust.Project
             }
             return node;
         }
+
+        protected override NodeProperties CreatePropertiesObject()
+        {
+            return new RustProjectNodeProperties(this);
+        }
     }
 }

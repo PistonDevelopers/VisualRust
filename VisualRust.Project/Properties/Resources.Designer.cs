@@ -79,7 +79,7 @@ namespace VisualRust.Project.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Automatically import modules.
+        ///   Looks up a localized string similar to Import modules.
         /// </summary>
         internal static string TrackModules {
             get {

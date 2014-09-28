@@ -63,19 +63,32 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileNode.cs" />
+    <Compile Include="FileNodeProperties.cs" />
     <Compile Include="ModuleImport.cs" />
     <Compile Include="ModuleLexer.g4.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="PathSegment.cs" />
     <Compile Include="ModuleTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModuleParser.g4.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ReferencedFileNode.cs" />
     <Compile Include="RustProjectFactory.cs" />
     <Compile Include="RustProjectNode.cs" />
+    <Compile Include="RustProjectNodeProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">
@@ -89,6 +102,12 @@
       <CustomToolNamespace>VisualRust.Project</CustomToolNamespace>
     </Antlr4>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

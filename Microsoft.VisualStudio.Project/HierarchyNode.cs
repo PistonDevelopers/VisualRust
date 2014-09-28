@@ -2517,7 +2517,7 @@ namespace Microsoft.VisualStudio.Project
 
             for(HierarchyNode child = this.FirstChild; child != null; child = child.NextSibling)
             {
-                if(!child.ItemNode.IsVirtual && child.ItemNode == node)
+                if(child.ItemNode != null && !child.ItemNode.IsVirtual && child.ItemNode == node)
                 {
                     return child;
                 }

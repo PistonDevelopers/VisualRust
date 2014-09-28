@@ -36,6 +36,14 @@ namespace VisualRust.Project
                 return base.GetEditLabel();
         }
 
+        public override int SetEditLabel(string label)
+        {
+            if (IsEntryPoint)
+                throw new InvalidOperationException(Properties.Resources.ErrorRenameEntrypoint);
+            else
+                return base.SetEditLabel(label);
+        }
+
         // Disable deletion
         protected override bool CanDeleteItem(Microsoft.VisualStudio.Shell.Interop.__VSDELETEITEMOPERATION deleteOperation)
         {

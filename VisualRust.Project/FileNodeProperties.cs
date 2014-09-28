@@ -37,6 +37,12 @@ namespace VisualRust.Project
         }
 
         [Browsable(false)]
+        public string URL
+        {
+            get { return this.Node.Url; }
+        }
+
+        [Browsable(false)]
         public string Extension
         {
             get

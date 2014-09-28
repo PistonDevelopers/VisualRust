@@ -30,6 +30,23 @@ namespace VisualRust.Project
             return new FileNodeProperties(this);
         }
 
+        // Disable rename
+        public override string GetEditLabel()
+        {
+            return null;
+        }
+
+        public override int SetEditLabel(string label)
+        {
+            throw new InvalidOperationException(Properties.Resources.ErrorRenameReference);
+        }
+
+        // Disable deletion
+        protected override bool CanDeleteItem(Microsoft.VisualStudio.Shell.Interop.__VSDELETEITEMOPERATION deleteOperation)
+        {
+            return false;
+        }
+
         protected override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             if (cmdGroup == Microsoft.VisualStudio.Project.VsMenus.guidStandardCommandSet2K && (VsCommands2K)cmd == VsCommands2K.INCLUDEINPROJECT)

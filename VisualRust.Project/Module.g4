@@ -6,6 +6,7 @@
 grammar Module;
 
 
+PUB             : 'pub';
 MOD             : 'mod';
 LBRACE          : '{' ;
 RBRACE          : '}' ;
@@ -35,8 +36,8 @@ LIT_STR             : '"' ('\\\n' | '\\\r\n' | '\\' CHAR_ESCAPE | .)*? '"' ;
 ANY_CHAR: . { Skip(); };
 
 body: (mod_import | mod_block | item)*;
-mod_block: attrs? MOD IDENT LBRACE body RBRACE;
-mod_import: attrs? MOD IDENT SEMI;
+mod_block: attrs? PUB? MOD IDENT LBRACE body RBRACE;
+mod_import: attrs? PUB? MOD IDENT SEMI;
 item: ( IDENT | SEMI | LBRACE | RBRACE | POUND | LBRACKET | IDENT | EQ | LIT_STR | RBRACKET);
 attrs: attr+;
 attr: POUND LBRACKET IDENT EQ LIT_STR RBRACKET;

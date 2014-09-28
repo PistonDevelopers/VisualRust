@@ -23,6 +23,14 @@ namespace VisualRust.Test.Project
                 Assert.False(importMods[new PathSegment("task_files", true)].ContainsKey(new PathSegment("tls.rs", false)));
             }
 
+            [Test]
+            public void ParsePubModifier()
+            {
+                ModuleImport importMods = ModuleParser.ParseImports(new AntlrInputStream(
+                    "pub mod foo { pub mod bar; } #[path=\"foo\"] pub mod ex { mod baz; }"));
+                Assert.AreEqual(1, importMods.Count);
+            }
+
 
             [Test]
             public void MergeAuthorative()

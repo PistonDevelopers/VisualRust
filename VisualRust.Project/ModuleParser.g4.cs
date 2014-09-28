@@ -41,11 +41,10 @@ namespace VisualRust.Project
                     continue;
                 if(child.RuleContext.RuleIndex == ModuleParser.RULE_mod_block)
                 {
-                    int identIndex = child.ChildCount == 5 ? 1 : 2;
                     var blockChildren = new ModuleImport();
                     var blockImport = new ModuleImport()
                     {
-                        { GetModIdent(child, 6), blockChildren }
+                        { GetModIdent(child), blockChildren }
                     };
                     if (TraverseForImports(child, blockChildren))
                     {
@@ -58,7 +57,7 @@ namespace VisualRust.Project
                     isContainedInBlock = true;
                     current.Merge(new Dictionary<PathSegment, ModuleImport>()
                     {
-                        { GetModIdent(child, 4), new ModuleImport() }
+                        { GetModIdent(child), new ModuleImport() }
                     });
                 }
                 else
@@ -70,10 +69,13 @@ namespace VisualRust.Project
             return isContainedInBlock;
         }
 
-        private static PathSegment GetModIdent(IRuleNode modNode, int lengthWithAttrNode)
+        private static PathSegment GetModIdent(IRuleNode modNode)
         {
-            if (modNode.ChildCount == lengthWithAttrNode)
+            var firstNode = modNode.GetChild(0) as IRuleNode;
+            int currentChild = 0;
+            if (firstNode != null)
             {
+                currentChild = 1;
                 ITree attrRoot = modNode.GetChild(0);
                 for(int i = 0; i < attrRoot.ChildCount; i++)
                 {
@@ -85,7 +87,9 @@ namespace VisualRust.Project
                     }
                 }
             }
-            return new PathSegment(modNode.GetChild(modNode.ChildCount == lengthWithAttrNode ? 2 : 1).GetText(), false);
+            var pubOrMod = (ITerminalNode)modNode.GetChild(currentChild);
+            IParseTree identNode = modNode.GetChild(pubOrMod.Symbol.Type == ModuleParser.PUB ? currentChild + 2 : currentChild + 1);
+            return new PathSegment(identNode.GetText(), false);
         }
     }
 }

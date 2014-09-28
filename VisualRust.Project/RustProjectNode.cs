@@ -70,6 +70,7 @@ namespace VisualRust.Project
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file));
                 parent.AddChild(new ReferencedFileNode(this, file));
             }
+            this.BuildProject.Save();
         }
 
         public override BaseFileNode CreateFileNode(ProjectElement item)

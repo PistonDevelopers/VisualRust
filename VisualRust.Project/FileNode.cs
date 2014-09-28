@@ -15,11 +15,14 @@ namespace VisualRust.Project
 {
     class FileNode : BaseFileNode
     {
+        private const string ModuleTrackingKey = "AutoImportModules";
+
+        private bool tracksModules = true;
         public bool IsEntryPoint { get; set; }
 
         public FileNode(ProjectNode root, ProjectElement elm) : base(root, elm)
         {
-
+            SetModuleTracking(true);
         }
 
         protected override NodeProperties CreatePropertiesObject()
@@ -63,6 +66,24 @@ namespace VisualRust.Project
                         return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
             }
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
+
+        private static bool ParseBool(string name)
+        {
+            bool retValue;
+            if (!Boolean.TryParse(name, out retValue))
+                return false;
+            return retValue;
+        }
+
+        public bool GetModuleTracking()
+        {
+            return ParseBool(this.ItemNode.GetEvaluatedMetadata(ModuleTrackingKey));
+        }
+
+        public void SetModuleTracking(bool value)
+        {
+            this.ItemNode.SetMetadata(ModuleTrackingKey, value.ToString());
         }
     }
 }

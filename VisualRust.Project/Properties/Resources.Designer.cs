@@ -77,5 +77,32 @@ namespace VisualRust.Project.Properties {
                 return ResourceManager.GetString("ErrorRenameReference", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically import modules.
+        /// </summary>
+        internal static string TrackModules {
+            get {
+                return ResourceManager.GetString("TrackModules", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies whether modules referenced by this file (eg. &quot;mod foo;&quot;) should be automatically added to the project..
+        /// </summary>
+        internal static string TrackModulesDescription {
+            get {
+                return ResourceManager.GetString("TrackModulesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies whether modules referenced by this file (eg. &quot;mod foo;&quot;) should be automatically added to the project. If you want to disable it in this file include this file in the project..
+        /// </summary>
+        internal static string TrackModulesReferencedDescription {
+            get {
+                return ResourceManager.GetString("TrackModulesReferencedDescription", resourceCulture);
+            }
+        }
     }
 }

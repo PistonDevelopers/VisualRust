@@ -123,4 +123,13 @@
   <data name="ErrorRenameReference" xml:space="preserve">
     <value>Cannot rename automatically referenced module file.</value>
   </data>
+  <data name="TrackModules" xml:space="preserve">
+    <value>Automatically import modules</value>
+  </data>
+  <data name="TrackModulesDescription" xml:space="preserve">
+    <value>Specifies whether modules referenced by this file (eg. "mod foo;") should be automatically added to the project.</value>
+  </data>
+  <data name="TrackModulesReferencedDescription" xml:space="preserve">
+    <value>Specifies whether modules referenced by this file (eg. "mod foo;") should be automatically added to the project. If you want to disable it in this file include this file in the project.</value>
+  </data>
 </root>

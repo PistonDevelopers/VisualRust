@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 namespace VisualRust.Project
 {
     [CLSCompliant(false), ComVisible(true)]
-    public class FileNodeProperties : NodeProperties
+    abstract public class FileNodePropertiesBase : NodeProperties
     {
         [SRCategoryAttribute(SR.Misc)]
         [LocDisplayName(SR.FileName)]
@@ -51,13 +51,56 @@ namespace VisualRust.Project
             }
         }
 
-        public FileNodeProperties(HierarchyNode node)
+        public FileNodePropertiesBase(HierarchyNode node)
             : base(node)
         { }
 
         public override string GetClassName()
         {
             return SR.GetString(SR.FileProperties, CultureInfo.CurrentUICulture);
+        }
+    }
+
+    [CLSCompliant(false), ComVisible(true)]
+    public class FileNodeProperties : FileNodePropertiesBase
+    {
+        [CategoryAttribute("Advanced")]
+        [ResourceDisplayName("TrackModules")]
+        [ResourceDescription("TrackModulesDescription")]
+        public bool TrackModules
+        {
+            get { return ((FileNode)this.Node).GetModuleTracking(); }
+            set { ((FileNode)this.Node).SetModuleTracking(value); }
+        }
+
+        internal FileNodeProperties(FileNode node)
+            : base(node)
+        { }
+
+        public override string GetClassName()
+        {
+            return "VisualRust.Project.TrackedFileNodeProperties";
+        }
+    }
+
+    [CLSCompliant(false), ComVisible(true)]
+    public class ReferencedFileNodeProperties : FileNodePropertiesBase
+    {
+        [CategoryAttribute("Advanced")]
+        [ResourceDisplayName("TrackModules")]
+        [ResourceDescription("TrackModulesReferencedDescription")]
+        public bool TrackModules
+        {
+            get { return true; }
+        }
+
+        internal ReferencedFileNodeProperties(ReferencedFileNode node)
+            : base(node)
+        { }
+
+        public override string GetClassName()
+        {
+            return "VisualRust.Project.UntrackedFileNodeProperties";
         }
     }
 }

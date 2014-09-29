@@ -65,11 +65,12 @@ namespace VisualRust.Project
                 ((FileNode)node).IsEntryPoint = true;
                 parent.AddChild(node);
             }
-            foreach (string file in modTracker.ParseReachableNonRootModules())
+            foreach (string file in modTracker.ExtractReachableAndMakeIncremental())
             {
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file));
                 parent.AddChild(new ReferencedFileNode(this, file));
             }
+            this.BuildProject.Save();
         }
 
         public override BaseFileNode CreateFileNode(ProjectElement item)
@@ -88,7 +89,7 @@ namespace VisualRust.Project
             HierarchyNode node = base.AddIndependentFileNode(item);
             if(node.GetRelationNameExtension() == ".rs")
             {
-                modTracker.AddRoot(node.Url);
+                modTracker.AddRootModule(node.Url);
                 if (node.Url == modTracker.EntryPoint)
                 {
                     ((FileNode)node).IsEntryPoint = true;

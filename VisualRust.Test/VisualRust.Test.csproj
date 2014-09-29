@@ -47,12 +47,17 @@
   <ItemGroup>
     <Compile Include="Project\ModuleImportTests.cs" />
     <Compile Include="Project\ModuleParserTests.cs" />
+    <Compile Include="Project\ModuleTrackerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TemporaryDirectory.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Internal\mod_paths.rs" />
     <EmbeddedResource Include="External\image\src\lib.rs" />
+    <EmbeddedResource Include="Internal\mod_paths.rs" />
+    <EmbeddedResource Include="Internal\SimpleChain\baz.rs" />
+    <EmbeddedResource Include="Internal\SimpleChain\foo.rs" />
+    <EmbeddedResource Include="Internal\SimpleChain\main.rs" />
     <None Include="packages.config" />
     <EmbeddedResource Include="External\servo\components\layout\lib.rs" />
   </ItemGroup>

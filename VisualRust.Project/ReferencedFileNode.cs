@@ -27,7 +27,7 @@ namespace VisualRust.Project
 
         protected override NodeProperties CreatePropertiesObject()
         {
-            return new FileNodeProperties(this);
+            return new ReferencedFileNodeProperties(this);
         }
 
         // Disable rename

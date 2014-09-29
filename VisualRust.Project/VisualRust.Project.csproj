@@ -86,6 +86,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ReferencedFileNode.cs" />
+    <Compile Include="ResourceDescriptionAttribute.cs" />
+    <Compile Include="ResourceDisplayNameAttribute.cs" />
     <Compile Include="RustProjectFactory.cs" />
     <Compile Include="RustProjectNode.cs" />
     <Compile Include="RustProjectNodeProperties.cs" />

@@ -150,6 +150,22 @@ namespace VisualRust.Test.Project
                 Assert.True(importMods[new PathSegment("css")][new PathSegment("matching")].Count == 0);
                 Assert.True(importMods[new PathSegment("css")][new PathSegment("node_style")].Count == 0);
             }
+
+            [Test]
+            public void ParsesPistonImageLib()
+            {
+                ModuleImport importMods = ModuleParser.ParseImports(new AntlrInputStream(Utils.LoadResource(@"External\image\src\lib.rs")));
+                Assert.AreEqual(9, importMods.Count);
+                Assert.True(importMods[new PathSegment("imageops")].Count == 0);
+                Assert.True(importMods[new PathSegment("webp")].Count == 0);
+                Assert.True(importMods[new PathSegment("ppm")].Count == 0);
+                Assert.True(importMods[new PathSegment("png")].Count == 0);
+                Assert.True(importMods[new PathSegment("jpeg")].Count == 0);
+                Assert.True(importMods[new PathSegment("gif")].Count == 0);
+                Assert.True(importMods[new PathSegment("image")].Count == 0);
+                Assert.True(importMods[new PathSegment("dynimage")].Count == 0);
+                Assert.True(importMods[new PathSegment("color")].Count == 0);
+            }
         }
     }
 }

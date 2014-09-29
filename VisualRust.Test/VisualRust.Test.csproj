@@ -53,6 +53,7 @@
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="External\image\src\lib.rs" />
     <EmbeddedResource Include="Internal\mod_paths.rs" />
     <EmbeddedResource Include="Internal\SimpleChain\baz.rs" />
     <EmbeddedResource Include="Internal\SimpleChain\foo.rs" />

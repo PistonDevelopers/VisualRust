@@ -42,22 +42,26 @@ namespace VisualRust.Project
         // This function extracts all reachable modules and moves to incremental mode
         public HashSet<string> ExtractReachableAndMakeIncremental()
         {
-            HashSet<string> currentRoots = this.fileRoots;
+            IsIncremental = true;
+            return AddModulesInternal(this.fileRoots);
+        }
+
+        private HashSet<string> AddModulesInternal(HashSet<string> modulesToParse)
+        {
             HashSet<string> reachedAuthorative = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-            while(currentRoots.Count > 0)
+            while (modulesToParse.Count > 0)
             {
                 Dictionary<string, HashSet<string>> reached = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCultureIgnoreCase);
-                foreach (string root in currentRoots)
+                foreach (string root in modulesToParse)
                 {
                     ExtractReachableModules(reached, reachedAuthorative, key => this.fileRoots.Contains(key), root, ReadImports);
                 }
-                currentRoots = FixNonAuthorativeImports(reached, reachedAuthorative);
+                modulesToParse = FixNonAuthorativeImports(reached, reachedAuthorative);
             }
-            foreach(var kvp in moduleImportMap)
+            foreach (var kvp in moduleImportMap)
             {
                 this.fileRoots.Add(kvp.Key);
             }
-            IsIncremental = true;
             return reachedAuthorative;
         }
 
@@ -237,7 +241,7 @@ namespace VisualRust.Project
         {
             if (!IsIncremental)
                 throw new InvalidOperationException();
-            throw new NotImplementedException();
+            return AddModulesInternal(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { path });
         }
 
         // Call if content of module changed
@@ -245,7 +249,6 @@ namespace VisualRust.Project
         {
             if (!IsIncremental)
                 throw new InvalidOperationException();
-            throw new NotImplementedException();
         }
 
 #if TEST

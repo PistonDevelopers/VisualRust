@@ -8,7 +8,7 @@ using VisualRust.Project;
 
 namespace VisualRust.Test.Project
 {
-    class ModuleImportTests
+    public class ModuleImportTests
     {
         [TestFixture]
         public class GetTerminalImports

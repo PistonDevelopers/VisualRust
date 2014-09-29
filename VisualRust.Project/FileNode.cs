@@ -17,7 +17,6 @@ namespace VisualRust.Project
     {
         private const string ModuleTrackingKey = "AutoImportModules";
 
-        private bool tracksModules = true;
         public bool IsEntryPoint { get; set; }
 
         public FileNode(ProjectNode root, ProjectElement elm) : base(root, elm)

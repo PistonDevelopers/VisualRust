@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Microsoft.Build.Framework;
 
 namespace VisualRust.Build
@@ -225,9 +226,31 @@ namespace VisualRust.Build
             };
             try
             {
-                Process process = Process.Start(psi);
-                process.WaitForExit();
-                string errorOutput = process.StandardError.ReadToEnd();
+                Process process = new Process();
+                process.StartInfo = psi;
+                StringBuilder error = new StringBuilder();
+
+                using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
+                {
+                    process.ErrorDataReceived += (sender, e) =>
+                    {
+                        if (e.Data == null)
+                        {
+                            errorWaitHandle.Set();
+                        }
+                        else
+                        {
+                            error.AppendLine(e.Data);
+                        }
+                    };
+
+                    process.Start();
+                    process.BeginErrorReadLine();
+                    process.WaitForExit();
+                    errorWaitHandle.WaitOne();
+                }
+
+                string errorOutput = error.ToString();
                 // We found some warning or errors in the output, print them out
                 IEnumerable<RustcParsedMessage> messages = ParseOutput(errorOutput);
                 // We found some warning or errors in the output, print them out

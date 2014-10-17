@@ -29,6 +29,17 @@ namespace VisualRust.Test.Project
                     CollectionAssert.Contains(orphans, Path.Combine(temp.DirPath, "baz.rs"));
                 }
             }
+
+            [Test]
+            public void Circular()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\Circular"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "foo.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(2, reached.Count);
+                }
+            }
         }
     }
 }

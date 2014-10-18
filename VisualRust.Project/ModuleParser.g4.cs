@@ -102,33 +102,49 @@ namespace VisualRust.Project
             {
                 if(text[i] == '\\')
                 {
+                    bool unescaped = false;
                     if(i < text.Length - 1)
                     {
                         switch(text[i+1])
                         {
                             case '\\':
-                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\\'); break;
+                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\\');
+                                unescaped = true;
+                                break;
                             case 'n':
-                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\n'); break;
+                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\n');
+                                unescaped = true;
+                                break;
                             case 'r':
-                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\r'); break;
+                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\r');
+                                unescaped = true;
+                                break;
                             case 't':
-                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\t'); break;
+                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\t');
+                                unescaped = true;
+                                break;
                             case '0':
-                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\0'); break;
+                                AppendSingleChar(text, b, ref spottedEscape, ref i, '\0');
+                                unescaped = true;
+                                break;
                             case 'x':
                                 if(i < text.Length - 3)
-                                    AppendHex(text, b, ref spottedEscape, ref i, 2); break;
+                                    unescaped = AppendHex(text, b, ref spottedEscape, ref i, 2); break;
                             case 'u':
                                 if (i < text.Length - 5)
-                                    AppendHex(text, b, ref spottedEscape, ref i, 4); break;
+                                    unescaped = AppendHex(text, b, ref spottedEscape, ref i, 4); break;
                             case 'U':
                                 if (i < text.Length - 9)
-                                    AppendHex(text, b, ref spottedEscape, ref i, 8); break;
+                                    unescaped = AppendHex(text, b, ref spottedEscape, ref i, 8); break;
                         }
                     }
+                    if (!unescaped)
+                        b.Append(text[i]);
                 }
-
+                else if (spottedEscape)
+                {
+                    b.Append(text[i]);
+                }
             }
             if (!spottedEscape)
                 return text;
@@ -151,14 +167,15 @@ namespace VisualRust.Project
             }
         }
 
-        private static void AppendHex(string text, StringBuilder b, ref bool spotted, ref int idx, int length)
+        private static bool AppendHex(string text, StringBuilder b, ref bool spotted, ref int idx, int length)
         {
             uint value;
             if (!uint.TryParse(text.Substring(idx + 2, length), System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out value))
-                return;
+                return false;
             HandleFirstEscape(text, b, ref spotted, idx);
             b.Append((char)value);
             idx += (length + 1);
+            return true;
         }
     }
 }

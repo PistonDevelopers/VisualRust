@@ -38,6 +38,7 @@ namespace VisualRust.Test.Project
                     var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
                     var reached = tracker.ExtractReachableAndMakeIncremental();
                     Assert.AreEqual(1, reached.Count);
+                    CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "in\\foo.rs"));
                 }
             }
         }

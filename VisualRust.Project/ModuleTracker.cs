@@ -58,10 +58,6 @@ namespace VisualRust.Project
                 }
                 modulesToParse = FixNonAuthorativeImports(reached, reachedAuthorative, this.fileRoots);
             }
-            foreach (var kvp in moduleImportMap)
-            {
-                this.fileRoots.Add(kvp.Key);
-            }
             return reachedAuthorative;
         }
 
@@ -176,7 +172,7 @@ namespace VisualRust.Project
             ModuleImport imports = importReader(importPath);
             foreach(PathSegment[] import in imports.GetTerminalImports())
             {
-                string terminalImportPath = Path.Combine(Path.GetDirectoryName(importPath), Path.Combine(import.Select(i => i.Name).ToArray()));
+                string terminalImportPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(importPath), Path.Combine(import.Select(i => i.Name).ToArray())));
                 if (import[import.Length - 1].IsAuthorative)
                 {
                     AddToSet(moduleImportMap, importPath, terminalImportPath);
@@ -221,11 +217,13 @@ namespace VisualRust.Project
                 }
             }
             HashSet<string> reverseImports;
-            this.reverseModuleImportMap.TryGetValue(path, out reverseImports);
-            // Go through all the modules that reference our module
-            foreach(string import in reverseImports)
+            if (this.reverseModuleImportMap.TryGetValue(path, out reverseImports))
             {
-                this.moduleImportMap[import].Remove(path);
+                // Go through all the modules that reference our module
+                foreach (string import in reverseImports)
+                {
+                    this.moduleImportMap[import].Remove(path);
+                }
             }
             this.moduleImportMap.Remove(path);
             this.reverseModuleImportMap.Remove(path);
@@ -246,7 +244,29 @@ namespace VisualRust.Project
         {
             if (!IsIncremental)
                 throw new InvalidOperationException();
-            return AddModulesInternal(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { path });
+            HashSet<string> result = AddModulesInternal(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { path });
+            return result;
+        }
+
+        private static void RemoveIntersection(HashSet<string> s1, HashSet<string> s2)
+        {
+            if (s1.Count > s2.Count)
+            {
+                HashSet<string> temp = s1;
+                s1 = s2;
+                s2 = temp;
+            }
+            // s1 is smaller now
+            HashSet<string> common = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            foreach(string str in s1)
+            {
+                if (s2.Contains(str))
+                {
+                    s2.Remove(str);
+                    common.Add(str);
+                }
+            }
+            s1.ExceptWith(common);
         }
 
         // Call if content of module changed
@@ -254,6 +274,11 @@ namespace VisualRust.Project
         {
             if (!IsIncremental)
                 throw new InvalidOperationException();
+            HashSet<string> removals = this.RemoveModule(path);
+            HashSet<string> additions = this.AddModule(path);
+            RemoveIntersection(removals, additions);
+            removed = removals;
+            added = additions;
         }
 
 #if TEST
@@ -353,6 +378,36 @@ namespace VisualRust.Project
                 CollectionAssert.Contains(orphanSet, @"C:\dev\app\src\in1\in2.rs");
                 CollectionAssert.Contains(orphanSet, @"C:\dev\app\src\in1\ext1.rs");
                 CollectionAssert.Contains(orphanSet, @"C:\dev\app\src\in1\ext2.rs");
+            }
+
+            [Test]
+            public void RemoveCircular()
+            {
+                var reachable = new HashSet<string>();
+                var roots = new HashSet<string>() { @"C:\dev\app\src\main.rs", @"C:\dev\app\src\foo.rs"};
+                var imports = new ModuleImport()
+                    {
+                        { new PathSegment("frob.rs", true), new ModuleImport() },
+                    };
+                var frobImports = new ModuleImport()
+                    {
+                        { new PathSegment("in1", true), new ModuleImport() {
+                            { new PathSegment("in2.rs", true), new ModuleImport() }
+                        }}
+                    };
+                var in2Imports = new ModuleImport()
+                    {
+                        { new PathSegment("ext1.rs", true), new ModuleImport() },
+                        { new PathSegment("ext2.rs", true), new ModuleImport() },
+                        { new PathSegment(@"..\frob.rs", true), new ModuleImport() },
+                        { new PathSegment(@"..\main.rs", true), new ModuleImport() },
+                        { new PathSegment(@"..\foo.rs", true), new ModuleImport() },
+                    };
+                var tracker = new ModuleTracker(@"C:\dev\app\src\main.rs");
+                foreach(string path in roots)
+                    tracker.AddRootModule(path);
+                tracker.ExtractReachableAndMakeIncremental();
+                var orphanSet = tracker.RemoveModule(@"C:\dev\app\src\in1\in2.rs");
             }
         }
 #endif

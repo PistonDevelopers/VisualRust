@@ -31,7 +31,7 @@ namespace VisualRust.Test.Project
             }
 
             [Test]
-            public void Circular()
+            public void EscapedPaths()
             {
                 using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularNested"))
                 {
@@ -39,6 +39,21 @@ namespace VisualRust.Test.Project
                     var reached = tracker.ExtractReachableAndMakeIncremental();
                     Assert.AreEqual(1, reached.Count);
                     CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "in\\foo.rs"));
+                }
+            }
+
+            [Test]
+            public void CircularAddRemove()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularAdd"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(0, reached.Count);
+                    HashSet<string> added = tracker.AddModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    CollectionAssert.Contains(added, Path.Combine(temp.DirPath, "bar.rs"));
+                    HashSet<string> rem = tracker.RemoveModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    CollectionAssert.Contains(rem, Path.Combine(temp.DirPath, "bar.rs"));
                 }
             }
         }

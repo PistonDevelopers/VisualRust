@@ -63,6 +63,9 @@
     <EmbeddedResource Include="Internal\SimpleChain\baz.rs" />
     <EmbeddedResource Include="Internal\SimpleChain\foo.rs" />
     <EmbeddedResource Include="Internal\SimpleChain\main.rs" />
+    <EmbeddedResource Include="Internal\CircularAdd\main.rs" />
+    <EmbeddedResource Include="Internal\CircularAdd\foo.rs" />
+    <EmbeddedResource Include="Internal\CircularAdd\bar.rs" />
     <None Include="packages.config" />
     <EmbeddedResource Include="External\servo\components\layout\lib.rs" />
   </ItemGroup>

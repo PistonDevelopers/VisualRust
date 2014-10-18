@@ -234,7 +234,7 @@ namespace VisualRust.Project
         }
 
         // Returns set of modules orphaned by this deletion (except the module itself)
-        // and if the module is still referenced by anything
+        // and if the module is still referenced by another non-removed module
         public ModuleDeletionResult DeleteModule(string path)
         {
             if (!IsIncremental)
@@ -253,6 +253,20 @@ namespace VisualRust.Project
             HashSet<string> result = AddModulesInternal(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { path });
             fileRoots.Add(path);
             return result;
+        }
+
+        public HashSet<string> UnrootModule(string path)
+        {
+            if (!IsIncremental)
+                throw new InvalidOperationException();
+            fileRoots.Remove(path);
+            if(!reverseModuleImportMap.ContainsKey(path))
+            {
+                var orphans= DeleteModule(path).Orphans;
+                orphans.Add(path);
+                return orphans;
+            }
+            return new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         private static void RemoveIntersection(HashSet<string> s1, HashSet<string> s2)

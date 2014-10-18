@@ -58,6 +58,23 @@ namespace VisualRust.Test.Project
                 }
             }
 
+
+            [Test]
+            public void CircularAddUnroot()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularAdd"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(0, reached.Count);
+                    HashSet<string> added = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "foo.rs"));
+                    CollectionAssert.Contains(added, Path.Combine(temp.DirPath, "bar.rs"));
+                    var rem = tracker.UnrootModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    CollectionAssert.Contains(rem, Path.Combine(temp.DirPath, "foo.rs"));
+                    CollectionAssert.Contains(rem, Path.Combine(temp.DirPath, "bar.rs"));
+                }
+            }
+
             [Test]
             public void ExplicitlyAddRemoveExisting()
             {
@@ -68,6 +85,24 @@ namespace VisualRust.Test.Project
                     Assert.AreEqual(2, reached.Count);
                     HashSet<string> added = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "foo.rs"));
                     Assert.AreEqual(0, added.Count);
+                    var del = tracker.DeleteModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(1, del.Orphans.Count);
+                    Assert.True(del.IsReferenced);
+                }
+            }
+
+            [Test]
+            public void ExplicitlyAddUnrootExisting()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularDowngrade"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(2, reached.Count);
+                    HashSet<string> added = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(0, added.Count);
+                    var unr = tracker.UnrootModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(0, unr.Count);
                     var del = tracker.DeleteModule(Path.Combine(temp.DirPath, "foo.rs"));
                     Assert.AreEqual(1, del.Orphans.Count);
                     Assert.True(del.IsReferenced);

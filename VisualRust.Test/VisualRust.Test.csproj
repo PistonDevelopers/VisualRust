@@ -69,6 +69,9 @@
     <EmbeddedResource Include="Internal\CircularDowngrade\bar.rs" />
     <EmbeddedResource Include="Internal\CircularDowngrade\foo.rs" />
     <EmbeddedResource Include="Internal\CircularDowngrade\main.rs" />
+    <EmbeddedResource Include="Internal\CircularAddClosed\bar.rs" />
+    <EmbeddedResource Include="Internal\CircularAddClosed\foo.rs" />
+    <EmbeddedResource Include="Internal\CircularAddClosed\main.rs" />
     <None Include="packages.config" />
     <EmbeddedResource Include="External\servo\components\layout\lib.rs" />
   </ItemGroup>

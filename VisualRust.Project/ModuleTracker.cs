@@ -54,6 +54,8 @@ namespace VisualRust.Project
                 Dictionary<string, HashSet<string>> reached = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCultureIgnoreCase);
                 foreach (string root in modulesToParse)
                 {
+                    if (this.moduleImportMap.ContainsKey(root))
+                        continue;
                     ExtractReachableModules(reached, reachedAuthorative, key => this.fileRoots.Contains(key), root, ReadImports);
                 }
                 modulesToParse = FixNonAuthorativeImports(reached, reachedAuthorative, this.fileRoots);
@@ -191,12 +193,12 @@ namespace VisualRust.Project
             }
         }
 
-        private void RemoveOrphanedReverseModule(string path, string import, HashSet<string> resultSet)
+        private void DeleteOrphanedReverseModule(string path, string import, HashSet<string> resultSet)
         {
             var reverseSet = reverseModuleImportMap[import];
             if (reverseSet.Count == 1)
             {
-                RemoveModuleInner(import, resultSet);
+                DeleteModuleInner(import, resultSet);
                 resultSet.Add(import);
             }
             else
@@ -205,7 +207,7 @@ namespace VisualRust.Project
             }
         }
 
-        private void RemoveModuleInner(string path, HashSet<string> resultSet)
+        private bool DeleteModuleInner(string path, HashSet<string> resultSet)
         {
             HashSet<string> imports;
             this.moduleImportMap.TryGetValue(path, out imports);
@@ -213,11 +215,12 @@ namespace VisualRust.Project
             {
                 foreach (string import in imports.ToArray()) // copy required to avoid iterator invalidation
                 {
-                    RemoveOrphanedReverseModule(path, import, resultSet);
+                    DeleteOrphanedReverseModule(path, import, resultSet);
                 }
             }
             HashSet<string> reverseImports;
-            if (this.reverseModuleImportMap.TryGetValue(path, out reverseImports))
+            bool isReferenced = this.reverseModuleImportMap.TryGetValue(path, out reverseImports);
+            if (isReferenced)
             {
                 // Go through all the modules that reference our module
                 foreach (string import in reverseImports)
@@ -227,24 +230,28 @@ namespace VisualRust.Project
             }
             this.moduleImportMap.Remove(path);
             this.reverseModuleImportMap.Remove(path);
+            return isReferenced;
         }
-        
-        // Returns set of modules orphaned by this removal (except the module itself)
-        public HashSet<string> RemoveModule(string path)
+
+        // Returns set of modules orphaned by this deletion (except the module itself)
+        // and if the module is still referenced by anything
+        public ModuleDeletionResult DeleteModule(string path)
         {
             if (!IsIncremental)
                 throw new InvalidOperationException();
             var orphanSet = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-            RemoveModuleInner(path, orphanSet);
-            return orphanSet;
+            bool isReferenced = DeleteModuleInner(path, orphanSet);
+            this.fileRoots.Remove(path);
+            return new ModuleDeletionResult(orphanSet, isReferenced);
         }
 
         // Returns set of new modules referenced by this addition (except the module itself)
-        public HashSet<string> AddModule(string path)
+        public HashSet<string> AddRootModuleIncremental(string path)
         {
             if (!IsIncremental)
                 throw new InvalidOperationException();
             HashSet<string> result = AddModulesInternal(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { path });
+            fileRoots.Add(path);
             return result;
         }
 
@@ -274,8 +281,8 @@ namespace VisualRust.Project
         {
             if (!IsIncremental)
                 throw new InvalidOperationException();
-            HashSet<string> removals = this.RemoveModule(path);
-            HashSet<string> additions = this.AddModule(path);
+            HashSet<string> removals = this.DeleteModule(path).Orphans;
+            HashSet<string> additions = this.AddRootModuleIncremental(path);
             RemoveIntersection(removals, additions);
             removed = removals;
             added = additions;
@@ -370,7 +377,7 @@ namespace VisualRust.Project
                 var tracker = new ModuleTracker(@"C:\dev\app\src\main.rs");
                 tracker.ExtractReachableModules(new Dictionary<string, HashSet<string>>(), reachable, key => roots.Contains(key), importPath, (s) => s.EndsWith("foo.rs") ? imports : s.EndsWith("frob.rs") ? frobImports : s.EndsWith("in2.rs") ? in2Imports : new ModuleImport());
                 var orphanSet = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-                tracker.RemoveModuleInner(@"C:\dev\app\src\frob.rs", orphanSet);
+                tracker.DeleteModuleInner(@"C:\dev\app\src\frob.rs", orphanSet);
                 Assert.AreEqual(1, tracker.moduleImportMap.Count);
                 Assert.AreEqual(2, tracker.reverseModuleImportMap.Count);
                 Assert.AreEqual(2, tracker.moduleImportMap[@"C:\dev\app\src\foo.rs"].Count);
@@ -407,7 +414,7 @@ namespace VisualRust.Project
                 foreach(string path in roots)
                     tracker.AddRootModule(path);
                 tracker.ExtractReachableAndMakeIncremental();
-                var orphanSet = tracker.RemoveModule(@"C:\dev\app\src\in1\in2.rs");
+                var orphanSet = tracker.DeleteModule(@"C:\dev\app\src\in1\in2.rs");
             }
         }
 #endif

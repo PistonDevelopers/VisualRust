@@ -24,9 +24,9 @@ namespace VisualRust.Test.Project
                     Assert.AreEqual(2, reached.Count);
                     CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "foo.rs"));
                     CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "baz.rs"));
-                    var orphans = tracker.RemoveModule(Path.Combine(temp.DirPath, "foo.rs"));
-                    Assert.AreEqual(1, orphans.Count);
-                    CollectionAssert.Contains(orphans, Path.Combine(temp.DirPath, "baz.rs"));
+                    var res = tracker.DeleteModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(1, res.Orphans.Count);
+                    CollectionAssert.Contains(res.Orphans, Path.Combine(temp.DirPath, "baz.rs"));
                 }
             }
 
@@ -50,10 +50,27 @@ namespace VisualRust.Test.Project
                     var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
                     var reached = tracker.ExtractReachableAndMakeIncremental();
                     Assert.AreEqual(0, reached.Count);
-                    HashSet<string> added = tracker.AddModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    HashSet<string> added = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "foo.rs"));
                     CollectionAssert.Contains(added, Path.Combine(temp.DirPath, "bar.rs"));
-                    HashSet<string> rem = tracker.RemoveModule(Path.Combine(temp.DirPath, "foo.rs"));
-                    CollectionAssert.Contains(rem, Path.Combine(temp.DirPath, "bar.rs"));
+                    var rem = tracker.DeleteModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    CollectionAssert.Contains(rem.Orphans, Path.Combine(temp.DirPath, "bar.rs"));
+                    Assert.False(rem.IsReferenced);
+                }
+            }
+
+            [Test]
+            public void ExplicitlyAddRemoveExisting()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularDowngrade"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(2, reached.Count);
+                    HashSet<string> added = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(0, added.Count);
+                    var del = tracker.DeleteModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(1, del.Orphans.Count);
+                    Assert.True(del.IsReferenced);
                 }
             }
         }

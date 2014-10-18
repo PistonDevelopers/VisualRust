@@ -108,6 +108,20 @@ namespace VisualRust.Test.Project
                     Assert.True(del.IsReferenced);
                 }
             }
+
+            [Test]
+            public void NonIncrRootRemoval()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularMultiRoot"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "lib.rs"));
+                    tracker.AddRootModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(1, reached.Count);
+                    HashSet<string> orphans =  tracker.UnrootModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(2, orphans.Count);
+                }
+            }
         }
     }
 }

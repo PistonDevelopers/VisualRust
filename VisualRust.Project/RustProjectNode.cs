@@ -103,5 +103,16 @@ namespace VisualRust.Project
         {
             return new RustProjectNodeProperties(this);
         }
+
+        internal void UnrootFileNode(FileNode fileNode)
+        {
+            HashSet<string> orphans = modTracker.UnrootModule(fileNode.Url);
+            foreach(string path in orphans)
+            {
+                uint item;
+                this.ParseCanonicalName(path, out item);
+            }
+
+        }
     }
 }

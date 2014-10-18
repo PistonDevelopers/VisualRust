@@ -82,45 +82,45 @@ namespace VisualRust.Project
             {
                 string filePath = kvp.Key + ".rs";
                 string subfolderPath = Path.Combine(kvp.Key, "mod.rs");
-                if (authorative.Contains(filePath)
-                    || authorative.Contains(subfolderPath)
-                    || roots.Contains(filePath)
-                    || roots.Contains(subfolderPath))
+                if (authorative.Contains(filePath) || roots.Contains(filePath))
                 {
-                    continue;
+                    AddToModuleSets(kvp, filePath);
+                }
+                else if( roots.Contains(subfolderPath) || authorative.Contains(subfolderPath))
+                {
+                    AddToModuleSets(kvp, subfolderPath);
                 }
                 else if (File.Exists(filePath))
                 {
                     authorative.Add(filePath);
                     newlyAuth.Add(filePath);
-                    foreach (string terminalImportPath in kvp.Value)
-                    {
-                        AddToSet(moduleImportMap, terminalImportPath, filePath);
-                        AddToSet(reverseModuleImportMap, filePath, terminalImportPath);
-                    }
+                    AddToModuleSets(kvp, filePath);
                 }
                 else if (File.Exists(subfolderPath))
                 {
                     authorative.Add(subfolderPath);
                     newlyAuth.Add(subfolderPath);
-                    foreach (string terminalImportPath in kvp.Value)
-                    {
-                        AddToSet(moduleImportMap, terminalImportPath, subfolderPath);
-                        AddToSet(reverseModuleImportMap, subfolderPath, terminalImportPath);
-                    }
+                    AddToModuleSets(kvp, subfolderPath);
                 }
                 else
                 {
                     authorative.Add(filePath);
                     newlyAuth.Add(filePath);
-                    foreach (string terminalImportPath in kvp.Value)
-                    {
-                        AddToSet(moduleImportMap, terminalImportPath, filePath);
-                        AddToSet(reverseModuleImportMap, filePath, terminalImportPath);
-                    }
+                    AddToModuleSets(kvp, filePath);
                 }
             }
             return newlyAuth;
+        }
+
+        private void AddToModuleSets(KeyValuePair<string, HashSet<string>> kvp, string filePath)
+        {
+            foreach (string terminalImportPath in kvp.Value)
+            {
+                if (String.Equals(terminalImportPath, filePath, StringComparison.OrdinalIgnoreCase))
+                    continue;
+                AddToSet(moduleImportMap, terminalImportPath, filePath);
+                AddToSet(reverseModuleImportMap, filePath, terminalImportPath);
+            }
         }
 
         private static ModuleImport ReadImports(string path)
@@ -193,17 +193,18 @@ namespace VisualRust.Project
             }
         }
 
-        private void DeleteOrphanedReverseModule(string path, string import, HashSet<string> resultSet)
+        private void DeleteOrphanedReverseModule(string parent, string child, HashSet<string> resultSet)
         {
-            var reverseSet = reverseModuleImportMap[import];
-            if (reverseSet.Count == 1)
+            var reverseSet = reverseModuleImportMap[child];
+            // Continue deleting if calling module is the only owner and this module is non-root
+            if (reverseSet.Count == 1 && !fileRoots.Contains(child))
             {
-                DeleteModuleInner(import, resultSet);
-                resultSet.Add(import);
+                DeleteModuleInner(child, resultSet);
+                resultSet.Add(child);
             }
             else
             {
-                reverseSet.Remove(path);
+                reverseSet.Remove(parent);
             }
         }
 

@@ -56,7 +56,7 @@ namespace VisualRust.Project
                 {
                     ExtractReachableModules(reached, reachedAuthorative, key => this.fileRoots.Contains(key), root, ReadImports);
                 }
-                modulesToParse = FixNonAuthorativeImports(reached, reachedAuthorative);
+                modulesToParse = FixNonAuthorativeImports(reached, reachedAuthorative, this.fileRoots);
             }
             foreach (var kvp in moduleImportMap)
             {
@@ -75,14 +75,19 @@ namespace VisualRust.Project
          * Check on the disk for foo/bar/mod.rs
          * If all of the above fails go with broken foo/bar.rs
          */
-        private HashSet<string> FixNonAuthorativeImports(Dictionary<string, HashSet<string>> nonAuth, HashSet<string> authorative)
+        private HashSet<string> FixNonAuthorativeImports(Dictionary<string, HashSet<string>> nonAuth,
+                                                         HashSet<string> authorative,
+                                                         HashSet<string> roots)
         {
             HashSet<string> newlyAuth = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var kvp in nonAuth)
             {
                 string filePath = kvp.Key + ".rs";
                 string subfolderPath = Path.Combine(kvp.Key, "mod.rs");
-                if (authorative.Contains(filePath) || authorative.Contains(subfolderPath))
+                if (authorative.Contains(filePath)
+                    || authorative.Contains(subfolderPath)
+                    || roots.Contains(filePath)
+                    || roots.Contains(subfolderPath))
                 {
                     continue;
                 }

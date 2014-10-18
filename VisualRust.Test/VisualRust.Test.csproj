@@ -48,6 +48,8 @@
     <EmbeddedResource Include="Internal\Circular\baz.rs" />
     <EmbeddedResource Include="Internal\Circular\bar.rs" />
     <EmbeddedResource Include="Internal\Circular\foo.rs" />
+    <EmbeddedResource Include="Internal\CircularNested\in\foo.rs" />
+    <EmbeddedResource Include="Internal\CircularNested\main.rs" />
     <Compile Include="Project\ModuleImportTests.cs" />
     <Compile Include="Project\ModuleParserTests.cs" />
     <Compile Include="Project\ModuleTrackerTests.cs" />

@@ -33,11 +33,11 @@ namespace VisualRust.Test.Project
             [Test]
             public void Circular()
             {
-                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\Circular"))
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularNested"))
                 {
-                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "foo.rs"));
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
                     var reached = tracker.ExtractReachableAndMakeIncremental();
-                    Assert.AreEqual(2, reached.Count);
+                    Assert.AreEqual(1, reached.Count);
                 }
             }
         }

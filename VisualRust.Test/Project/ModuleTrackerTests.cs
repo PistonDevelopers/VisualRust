@@ -14,6 +14,7 @@ namespace VisualRust.Test.Project
         [TestFixture]
         public class ExtractReachableAndMakeIncremental
         {
+            // main --> foo --> baz
             [Test]
             public void ChainedRemoval()
             {
@@ -30,6 +31,10 @@ namespace VisualRust.Test.Project
                 }
             }
 
+            /*
+             * main --> foo
+             *  ^--------┘
+             */
             [Test]
             public void EscapedPaths()
             {
@@ -42,6 +47,10 @@ namespace VisualRust.Test.Project
                 }
             }
 
+            /*
+             * main     foo --> bar
+             *  ^---------------┘
+             */
             [Test]
             public void CircularAddRemove()
             {
@@ -53,12 +62,17 @@ namespace VisualRust.Test.Project
                     HashSet<string> added = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "foo.rs"));
                     CollectionAssert.Contains(added, Path.Combine(temp.DirPath, "bar.rs"));
                     var rem = tracker.DeleteModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(2, rem.Orphans.Count);
                     CollectionAssert.Contains(rem.Orphans, Path.Combine(temp.DirPath, "bar.rs"));
+                    CollectionAssert.Contains(rem.Orphans, Path.Combine(temp.DirPath, "foo.rs"));
                     Assert.False(rem.IsReferenced);
                 }
             }
 
-
+            /*
+             * main     foo --> bar
+             *  ^---------------┘
+             */
             [Test]
             public void CircularAddUnroot()
             {
@@ -75,6 +89,10 @@ namespace VisualRust.Test.Project
                 }
             }
 
+            /*
+             * main --> foo --> bar
+             *  ^---------------┘
+             */
             [Test]
             public void ExplicitlyAddRemoveExisting()
             {
@@ -91,6 +109,10 @@ namespace VisualRust.Test.Project
                 }
             }
 
+            /*
+             * main --> foo --> bar
+             *  ^---------------┘
+             */
             [Test]
             public void ExplicitlyAddUnrootExisting()
             {
@@ -109,6 +131,10 @@ namespace VisualRust.Test.Project
                 }
             }
 
+            /*
+             * lib --> foo --> bar
+             *  ^---------------┘
+             */
             [Test]
             public void NonIncrRootRemoval()
             {
@@ -120,6 +146,26 @@ namespace VisualRust.Test.Project
                     Assert.AreEqual(1, reached.Count);
                     HashSet<string> orphans =  tracker.UnrootModule(Path.Combine(temp.DirPath, "foo.rs"));
                     Assert.AreEqual(2, orphans.Count);
+                }
+            }
+
+            /*
+             * lib <-> foo <-> bar
+             *  ^---------------^
+             */
+            [Test]
+            public void CircularHard()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\Circular"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(0, reached.Count);
+                    var added = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(2, added.Count);
+                    var del = tracker.DeleteModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(3, del.Orphans.Count);
+                    Assert.False(del.IsReferenced);
                 }
             }
         }

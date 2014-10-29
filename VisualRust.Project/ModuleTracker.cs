@@ -9,6 +9,7 @@ using System.Diagnostics.Contracts;
 
 #if TEST
 using NUnit.Framework;
+using System.Diagnostics;
 #endif
 
 namespace VisualRust.Project
@@ -16,8 +17,10 @@ namespace VisualRust.Project
     public class ModuleTracker
     {
         public string EntryPoint { get; private set; }
-
+        // Set of tracked files with enabled auto-imports
         private HashSet<string> fileRoots = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        // Set of modules with disabled auto-imports, this is relevant in some cases
+        private HashSet<string> blockingRoots = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         // We keep track of which modules can reach which modules and which modules are reachable from which modules.
         // This saves us from reparsing everything when a file is added/removed.
         private Dictionary<string, HashSet<string>> moduleImportMap = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCultureIgnoreCase);
@@ -33,8 +36,8 @@ namespace VisualRust.Project
 
         public void AddRootModule(string root)
         {
-            if (IsIncremental)
-                throw new InvalidOperationException();
+            Contract.Requires(!IsIncremental);
+            Contract.Requires(root != null);
             string normalized = Path.GetFullPath(root);
             fileRoots.Add(normalized);
         }
@@ -42,6 +45,7 @@ namespace VisualRust.Project
         // This function extracts all reachable modules and moves to incremental mode
         public HashSet<string> ExtractReachableAndMakeIncremental()
         {
+            Contract.Requires(!IsIncremental);
             IsIncremental = true;
             return AddModulesInternal(this.fileRoots);
         }
@@ -123,8 +127,10 @@ namespace VisualRust.Project
             }
         }
 
-        private static ModuleImport ReadImports(string path)
+        private ModuleImport ReadImports(string path)
         {
+            if (blockingRoots.Contains(path))
+                return new ModuleImport();
             try
             {
                 using(var stream = File.OpenRead(path))
@@ -201,12 +207,13 @@ namespace VisualRust.Project
         }
 
         // Returns all the module that are reachable only from the given root
-        private HashSet<string> CalculateDependants(string root, ref int circles)
+        private HashSet<string> CalculateDependants(string root, out bool isStronglyConnected)
         {
             // We simply traverse the graph starting from the passed root, storing all traversed edges.
             // Then we return all nodes whose incoming degree is equal to the one in the reverse map.
             HashSet<string> seen = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             Dictionary<string, int> degrees = new Dictionary<string,int>(StringComparer.InvariantCultureIgnoreCase);
+            int circles = 0;
             CalculateDependantsInner(seen, degrees, root, root, ref circles);
             HashSet<string> result = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var kvp in degrees)
@@ -214,6 +221,17 @@ namespace VisualRust.Project
                 if (kvp.Value == this.reverseModuleImportMap[kvp.Key].Count)
                     result.Add(kvp.Key);
             }
+            HashSet<string> modulesReferencingRootPath;
+            if (reverseModuleImportMap.TryGetValue(root, out modulesReferencingRootPath))
+            {
+                isStronglyConnected = !(modulesReferencingRootPath.Count == circles);
+            }
+            else
+            {
+                isStronglyConnected = false;
+            }
+            if (!isStronglyConnected)
+                result.Add(root);
             return result;
         }
 
@@ -229,81 +247,57 @@ namespace VisualRust.Project
             {
                 foreach(string child in children)
                 {
+                    if (String.Equals(root, child, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        circles++;
+                        continue;
+                    }
                     if (this.fileRoots.Contains(child))
                         continue;
                     Increment(degrees, child);
                     if(!seen.Contains(child))
-                    {
                         CalculateDependantsInner(seen, degrees, child, root, ref circles);
-                    }
-                    else if(String.Equals(root, child, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        circles++;
-                    }
                 }
             }
             return children;
         }
 
-        // Returns set of modules orphaned by this deletion (except the module itself)
-        // and if the module is still referenced by another non-removed module
-        public ModuleDeletionResult DeleteModule(string path)
+        private void DeleteModuleData(string mod)
         {
-            if (!IsIncremental)
-                throw new InvalidOperationException();
-            this.fileRoots.Remove(path);
-            int removedReverseReferences = 0;
-            HashSet<string> markedForRemoval = CalculateDependants(path, ref removedReverseReferences);
-            HashSet<string> modulesReferencingThisPath;
-            bool referencedFromOutside = true; // true if there are no references or all the references come from removed modules
-            if(reverseModuleImportMap.TryGetValue(path, out modulesReferencingThisPath))
+            HashSet<string> reverseSet;
+            if (!reverseModuleImportMap.TryGetValue(mod, out reverseSet))
+                return;
+            foreach (string parent in reverseSet)
             {
-                referencedFromOutside = !(modulesReferencingThisPath.Count == removedReverseReferences);
+                this.moduleImportMap.Remove(mod);
             }
-            else
-            {
-                referencedFromOutside = false;
-            }
-            if (referencedFromOutside)
-                markedForRemoval.Remove(path);
-            else
-                markedForRemoval.Add(path);
+            reverseModuleImportMap.Remove(mod);
+        }
+
+        // Returns set of modules orphaned by this deletion (including the module itself)
+        // and if the module is still referenced by another non-removed module
+        public RootRemovalResult DeleteModule(string path)
+        {
+            Contract.Requires(IsIncremental);
+            Contract.Requires(path != null);
+            bool referencedFromOutside;
+            HashSet<string> markedForRemoval = CalculateDependants(path, out referencedFromOutside);
             foreach(string mod in markedForRemoval)
             {
-                HashSet<string> reverseSet;
-                if (!reverseModuleImportMap.TryGetValue(mod, out reverseSet))
-                    continue;
-                foreach(string parent in reverseSet)
-                {
-                    this.moduleImportMap.Remove(mod);
-                }
-                reverseModuleImportMap.Remove(mod);
+                DeleteModuleData(mod);
             }
-            return new ModuleDeletionResult(markedForRemoval, referencedFromOutside);
+            this.fileRoots.Remove(path);
+            return new RootRemovalResult(markedForRemoval, referencedFromOutside);
         }
 
         // Returns set of new modules referenced by this addition (except the module itself)
         public HashSet<string> AddRootModuleIncremental(string path)
         {
-            if (!IsIncremental)
-                throw new InvalidOperationException();
+            Contract.Requires(IsIncremental);
+            Contract.Requires(path != null);
             fileRoots.Add(path);
             HashSet<string> result = AddModulesInternal(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { path });
             return result;
-        }
-
-        public HashSet<string> UnrootModule(string path)
-        {
-            if (!IsIncremental)
-                throw new InvalidOperationException();
-            fileRoots.Remove(path);
-            if(!reverseModuleImportMap.ContainsKey(path))
-            {
-                var orphans= DeleteModule(path).Orphans;
-                orphans.Add(path);
-                return orphans;
-            }
-            return new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         private static void RemoveIntersection(HashSet<string> s1, HashSet<string> s2)
@@ -327,16 +321,47 @@ namespace VisualRust.Project
             s1.ExceptWith(common);
         }
 
-        // Call if content of module changed
-        public void Reparse(string path, ref HashSet<string> added, ref HashSet<string> removed)
+        public void UpgradeModule(string path)
         {
-            if (!IsIncremental)
-                throw new InvalidOperationException();
-            HashSet<string> removals = this.DeleteModule(path).Orphans;
-            HashSet<string> additions = this.AddRootModuleIncremental(path);
-            RemoveIntersection(removals, additions);
-            removed = removals;
-            added = additions;
+            Contract.Requires(IsIncremental);
+            Contract.Requires(path != null);
+            Contract.Assert(!this.fileRoots.Contains(path));
+            fileRoots.Add(path);
+        }
+
+        // When a module and all its children form a strongly connected component
+        // downgrading a module can orphan some modules
+        public RootRemovalResult DowngradeModule(string path)
+        {
+            Contract.Requires(IsIncremental);
+            Contract.Requires(path != null);
+            Contract.Assert(this.fileRoots.Contains(path));
+            bool referencedFromOutside;
+            HashSet<string> dependingOnRoot = CalculateDependants(path, out referencedFromOutside);
+            if (referencedFromOutside)
+                return new RootRemovalResult(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase), true);
+            foreach(string mod in dependingOnRoot)
+            {
+                DeleteModuleData(mod);
+            }
+            this.fileRoots.Remove(path);
+            return new RootRemovalResult(dependingOnRoot, false);
+        }
+
+        public HashSet<string> DisableTracking(string path)
+        {
+            Contract.Requires(!IsIncremental);
+            Contract.Requires(path != null);
+            Contract.Assert(this.fileRoots.Contains(path));
+            throw new NotImplementedException();
+        }
+
+        public HashSet<string> EnableTracking(string path)
+        {
+            Contract.Requires(IsIncremental);
+            Contract.Requires(path != null);
+            Contract.Assert(this.fileRoots.Contains(path));
+            throw new NotImplementedException();
         }
 
 #if TEST

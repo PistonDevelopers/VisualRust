@@ -75,7 +75,11 @@
     <EmbeddedResource Include="Internal\CircularMultiRoot\bar.rs" />
     <EmbeddedResource Include="Internal\CircularMultiRoot\foo.rs" />
     <EmbeddedResource Include="Internal\CircularMultiRoot\lib.rs" />
-    <None Include="Internal\Circular\main.rs" />
+    <EmbeddedResource Include="Internal\CircularConnected\bar.rs" />
+    <EmbeddedResource Include="Internal\CircularConnected\baz.rs" />
+    <EmbeddedResource Include="Internal\CircularConnected\foo.rs" />
+    <EmbeddedResource Include="Internal\CircularConnected\main.rs" />
+    <EmbeddedResource Include="Internal\Circular\main.rs" />
     <None Include="packages.config" />
     <EmbeddedResource Include="External\servo\components\layout\lib.rs" />
   </ItemGroup>

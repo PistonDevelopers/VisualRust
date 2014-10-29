@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace VisualRust.Project
 {
-    public struct ModuleDeletionResult
+    public struct RootRemovalResult
     {
         public HashSet<string> Orphans { get; private set; }
         public bool IsReferenced { get; private set; }
 
-        public ModuleDeletionResult(HashSet<string> o, bool isRef) : this()
+        public RootRemovalResult(HashSet<string> o, bool isRef) : this()
         {
             Orphans = o;
             IsReferenced = isRef;

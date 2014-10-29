@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Project;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -132,38 +133,92 @@ namespace VisualRust.Project
             return new RustProjectNodeProperties(this);
         }
 
-        internal void UnrootFileNode(FileNode srcNode)
-        {
-            HashSet<string> orphans = modTracker.UnrootModule(srcNode.Url);
-            RemoveTrackedOrphans(orphans);
-
-        }
 
         internal void DeleteFileNode(BaseFileNode srcNode)
         {
             var result = modTracker.DeleteModule(srcNode.Url);
-            RemoveTrackedOrphans(result.Orphans);
-            if(result.IsReferenced)
-            {
-
-            }
-            else
-            {
-            }
-        }
-
-        private void RemoveTrackedOrphans(HashSet<string> orphans)
-        {
-            foreach (string path in orphans)
+            foreach (string path in result.Orphans)
             {
                 uint item;
                 this.ParseCanonicalName(path, out item);
                 if (item != (uint)VSConstants.VSITEMID.Nil)
                 {
                     HierarchyNode node = this.NodeFromItemId(item);
-                    node.Remove(false);
+                    node.Remove((!result.IsReferenced) && node == srcNode);
                 }
             }
+            if (result.IsReferenced)
+            {
+                // TODO: Mark node of deleted file as a zombie
+            }
+            this.BuildProject.Save();
+        }
+
+        private void ReplaceAndSelect(HierarchyNode old, HierarchyNode newN)
+        {
+            HierarchyNode parent = old.Parent;
+            old.Remove(false);
+            parent.AddChild(newN);
+            // Adjust UI
+            IVsUIHierarchyWindow uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(this.ProjectMgr.Site, SolutionExplorer);
+            if (uiWindow != null)
+            {
+                ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(this.ProjectMgr.InteropSafeIVsUIHierarchy, newN.ID, EXPANDFLAGS.EXPF_SelectItem));
+            }
+        }
+
+        internal void IncludeFileNode(ReferencedFileNode node)
+        {
+            modTracker.UpgradeModule(node.FilePath);
+            ReplaceAndSelect(node, CreateFileNode(node.FilePath));
+        }
+
+        internal void ExcludeFileNode(BaseFileNode srcNode)
+        {
+            // Ask mod tracker for a professional opinion
+            string fullPath = GetAbsolutePath(srcNode);
+            RootRemovalResult downgradeResult = modTracker.DowngradeModule(fullPath);
+            if (downgradeResult.IsReferenced)
+            {
+                ReplaceAndSelect(srcNode, new ReferencedFileNode(this, fullPath));
+            }
+            else
+            {
+                foreach (string path in downgradeResult.Orphans)
+                {
+                    uint item;
+                    this.ParseCanonicalName(path, out item);
+                    if (item != (uint)VSConstants.VSITEMID.Nil)
+                    {
+                        HierarchyNode node = this.NodeFromItemId(item);
+                        node.Remove(false);
+                    }
+                }
+            }
+        }
+
+        private string GetAbsolutePath(BaseFileNode node)
+        {
+            string path = node.FilePath;
+            if (Path.IsPathRooted(path))
+            {
+                return path;
+            }
+            else
+            {
+                // Path is relative, so make it relative to project path
+                return Path.Combine(this.ProjectMgr.BaseURI.AbsoluteUrl, path);
+            }
+        }
+
+        internal void DisableAutoImport(HierarchyNode node)
+        {
+
+        }
+
+        internal void EnableAutoImport(HierarchyNode node)
+        {
+
         }
     }
 }

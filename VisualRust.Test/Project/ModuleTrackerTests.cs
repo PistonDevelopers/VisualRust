@@ -12,9 +12,9 @@ namespace VisualRust.Test.Project
     public class ModuleTrackerTests
     {
         [TestFixture]
-        public class ExtractReachableAndMakeIncremental
+        public class DeleteModule
         {
-            // main --> foo --> baz
+            // [main] --> foo --> baz
             [Test]
             public void ChainedRemoval()
             {
@@ -32,8 +32,8 @@ namespace VisualRust.Test.Project
             }
 
             /*
-             * main --> foo
-             *  ^--------┘
+             * [main] --> foo
+             *   ^---------┘
              */
             [Test]
             public void EscapedPaths()
@@ -48,8 +48,8 @@ namespace VisualRust.Test.Project
             }
 
             /*
-             * main     foo --> bar
-             *  ^---------------┘
+             * [main]     [foo] --> bar
+             *   ^-------------------┘
              */
             [Test]
             public void CircularAddRemove()
@@ -70,8 +70,8 @@ namespace VisualRust.Test.Project
             }
 
             /*
-             * main     foo --> bar
-             *  ^---------------┘
+             * [main]     [foo] --> bar
+             *   ^-------------------┘
              */
             [Test]
             public void CircularAddUnroot()
@@ -83,15 +83,15 @@ namespace VisualRust.Test.Project
                     Assert.AreEqual(0, reached.Count);
                     HashSet<string> added = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "foo.rs"));
                     CollectionAssert.Contains(added, Path.Combine(temp.DirPath, "bar.rs"));
-                    var rem = tracker.UnrootModule(Path.Combine(temp.DirPath, "foo.rs"));
-                    CollectionAssert.Contains(rem, Path.Combine(temp.DirPath, "foo.rs"));
-                    CollectionAssert.Contains(rem, Path.Combine(temp.DirPath, "bar.rs"));
+                    var rem = tracker.DowngradeModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    CollectionAssert.Contains(rem.Orphans, Path.Combine(temp.DirPath, "foo.rs"));
+                    CollectionAssert.Contains(rem.Orphans, Path.Combine(temp.DirPath, "bar.rs"));
                 }
             }
 
             /*
-             * main --> foo --> bar
-             *  ^---------------┘
+             * [main] --> foo --> bar
+             *   ^-----------------┘
              */
             [Test]
             public void ExplicitlyAddRemoveExisting()
@@ -110,8 +110,8 @@ namespace VisualRust.Test.Project
             }
 
             /*
-             * main --> foo --> bar
-             *  ^---------------┘
+             * [main] --> foo --> bar
+             *   ^-----------------┘
              */
             [Test]
             public void ExplicitlyAddUnrootExisting()
@@ -123,8 +123,8 @@ namespace VisualRust.Test.Project
                     Assert.AreEqual(2, reached.Count);
                     HashSet<string> added = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "foo.rs"));
                     Assert.AreEqual(0, added.Count);
-                    var unr = tracker.UnrootModule(Path.Combine(temp.DirPath, "foo.rs"));
-                    Assert.AreEqual(0, unr.Count);
+                    var unr = tracker.DowngradeModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(0, unr.Orphans.Count);
                     var del = tracker.DeleteModule(Path.Combine(temp.DirPath, "foo.rs"));
                     Assert.AreEqual(1, del.Orphans.Count);
                     Assert.True(del.IsReferenced);
@@ -132,8 +132,8 @@ namespace VisualRust.Test.Project
             }
 
             /*
-             * lib --> foo --> bar
-             *  ^---------------┘
+             * [lib] --> [foo] --> bar
+             *   ^------------------┘
              */
             [Test]
             public void NonIncrRootRemoval()
@@ -144,14 +144,14 @@ namespace VisualRust.Test.Project
                     tracker.AddRootModule(Path.Combine(temp.DirPath, "foo.rs"));
                     var reached = tracker.ExtractReachableAndMakeIncremental();
                     Assert.AreEqual(1, reached.Count);
-                    HashSet<string> orphans =  tracker.UnrootModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    HashSet<string> orphans = tracker.DowngradeModule(Path.Combine(temp.DirPath, "foo.rs")).Orphans;
                     Assert.AreEqual(2, orphans.Count);
                 }
             }
 
             /*
-             * lib <-> foo <-> bar
-             *  ^---------------^
+             * [main]     [lib] <-> foo <-> bar
+             *              ^----------------^
              */
             [Test]
             public void CircularHard()
@@ -166,6 +166,33 @@ namespace VisualRust.Test.Project
                     var del = tracker.DeleteModule(Path.Combine(temp.DirPath, "foo.rs"));
                     Assert.AreEqual(3, del.Orphans.Count);
                     Assert.False(del.IsReferenced);
+                }
+            }
+        }
+
+        [TestFixture]
+        public class DowngradeModule
+        {
+            /*
+             * [main] ---> [lib] <-> foo <-> bar
+             *              ^----------------^
+             */
+            [Test]
+            public void UpgradeAndDowngrade()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularConnected"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    tracker.AddRootModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(2, reached.Count);
+                    CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "baz.rs"));
+                    CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "bar.rs"));
+                    tracker.DowngradeModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    tracker.UpgradeModule(Path.Combine(temp.DirPath, "baz.rs"));
+                    var res = tracker.DowngradeModule(Path.Combine(temp.DirPath, "baz.rs"));
+                    Assert.AreEqual(0, res.Orphans.Count);
+                    Assert.True(res.IsReferenced);
                 }
             }
         }

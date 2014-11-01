@@ -35,7 +35,7 @@ namespace VisualRust.Test
                 string relPath = resName.Substring(pathStart.Length, resName.Length - pathStart.Length);
                 int extDot = relPath.LastIndexOf('.');
                 int fileDot = relPath.LastIndexOf('.', extDot - 1);
-                string subDir = relPath.Substring(0, fileDot);
+                string subDir = relPath.Substring(1, fileDot);
                 string currDir = actualRoot.DirPath;
                 if(subDir.Length > 0)
                 {

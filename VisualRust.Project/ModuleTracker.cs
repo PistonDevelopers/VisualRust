@@ -12,8 +12,23 @@ using NUnit.Framework;
 using System.Diagnostics;
 #endif
 
+using ImportsChange = VisualRust.Project.CollectionChange<System.Collections.Generic.HashSet<string>>;
+using ImportsDifference = VisualRust.Project.CollectionDifference<System.Collections.Generic.HashSet<string>>;
+
 namespace VisualRust.Project
 {
+    struct CollectionChange<T>
+    {
+        public T Old { get; private set; }
+        public T New { get; private set; }
+        public CollectionChange(T old, T @new)
+            : this()
+        {
+            Old = old;
+            New = @new;
+        }
+    }
+
     public class ModuleTracker
     {
         public string EntryPoint { get; private set; }
@@ -25,6 +40,8 @@ namespace VisualRust.Project
         // This saves us from reparsing everything when a file is added/removed.
         private Dictionary<string, HashSet<string>> moduleImportMap = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCultureIgnoreCase);
         private Dictionary<string, HashSet<string>> reverseModuleImportMap = new Dictionary<string, HashSet<string>>(StringComparer.InvariantCultureIgnoreCase);
+        // I'm not very happy about this but we keep it to avoid molesting disk on every reparse
+        private Dictionary<string, ModuleImport> lastParseResult = new Dictionary<string, ModuleImport>(StringComparer.InvariantCultureIgnoreCase);
 
         public bool IsIncremental { get; private set; }
 
@@ -62,7 +79,7 @@ namespace VisualRust.Project
                         continue;
                     ExtractReachableModules(reached, reachedAuthorative, key => this.fileRoots.Contains(key), root, ReadImports);
                 }
-                modulesToParse = FixNonAuthorativeImports(reached, reachedAuthorative, this.fileRoots);
+                modulesToParse = FixNonAuthorativeImports(reached, reachedAuthorative);
             }
             return reachedAuthorative;
         }
@@ -78,47 +95,59 @@ namespace VisualRust.Project
          * If all of the above fails go with broken foo/bar.rs
          */
         private HashSet<string> FixNonAuthorativeImports(Dictionary<string, HashSet<string>> nonAuth,
-                                                         HashSet<string> authorative,
-                                                         HashSet<string> roots)
+                                                         HashSet<string> justParsed)
         {
             HashSet<string> newlyAuth = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var kvp in nonAuth)
             {
-                string filePath = kvp.Key + ".rs";
-                string subfolderPath = Path.Combine(kvp.Key, "mod.rs");
-                if (authorative.Contains(filePath) || roots.Contains(filePath))
+                string authPath;
+                if(!ResolveAuthorativeImport(kvp.Key, justParsed, out authPath))
                 {
-                    AddToModuleSets(kvp, filePath);
+                    justParsed.Add(authPath);
+                    newlyAuth.Add(authPath);
                 }
-                else if( roots.Contains(subfolderPath) || authorative.Contains(subfolderPath))
-                {
-                    AddToModuleSets(kvp, subfolderPath);
-                }
-                else if (File.Exists(filePath))
-                {
-                    authorative.Add(filePath);
-                    newlyAuth.Add(filePath);
-                    AddToModuleSets(kvp, filePath);
-                }
-                else if (File.Exists(subfolderPath))
-                {
-                    authorative.Add(subfolderPath);
-                    newlyAuth.Add(subfolderPath);
-                    AddToModuleSets(kvp, subfolderPath);
-                }
-                else
-                {
-                    authorative.Add(filePath);
-                    newlyAuth.Add(filePath);
-                    AddToModuleSets(kvp, filePath);
-                }
+                AddToModuleSets(kvp.Value, authPath);
             }
             return newlyAuth;
         }
 
-        private void AddToModuleSets(KeyValuePair<string, HashSet<string>> kvp, string filePath)
+        // return value indicates if resolution found module in existing modules
+        private bool ResolveAuthorativeImport(string nonAuthPath,
+                                              HashSet<string> justParsed,
+                                              out string path)
         {
-            foreach (string terminalImportPath in kvp.Value)
+            string filePath = nonAuthPath + ".rs";
+            string subfolderPath = Path.Combine(nonAuthPath, "mod.rs");
+            if (justParsed.Contains(filePath) || fileRoots.Contains(filePath) || reverseModuleImportMap.ContainsKey(filePath))
+            {
+                path = filePath;
+                return true;
+            }
+            else if (justParsed.Contains(subfolderPath) || fileRoots.Contains(subfolderPath) || reverseModuleImportMap.ContainsKey(subfolderPath))
+            {
+                path = subfolderPath;
+                return true;
+            }
+            else if (File.Exists(filePath))
+            {
+                path = filePath;
+                return false;
+            }
+            else if (File.Exists(subfolderPath))
+            {
+                path = subfolderPath;
+                return false;
+            }
+            else
+            {
+                path = filePath;
+                return false;
+            }
+        }
+
+        private void AddToModuleSets(HashSet<string> set, string filePath)
+        {
+            foreach (string terminalImportPath in set)
             {
                 if (String.Equals(terminalImportPath, filePath, StringComparison.OrdinalIgnoreCase))
                     continue;
@@ -135,7 +164,9 @@ namespace VisualRust.Project
             {
                 using(var stream = File.OpenRead(path))
                 {
-                    return ModuleParser.ParseImports(new AntlrInputStream(stream));
+                    ModuleImport imports = ModuleParser.ParseImports(new AntlrInputStream(stream));
+                    lastParseResult[path] = imports;
+                    return imports;
                 }
             }
             catch(PathTooLongException)
@@ -272,11 +303,12 @@ namespace VisualRust.Project
                 this.moduleImportMap.Remove(mod);
             }
             reverseModuleImportMap.Remove(mod);
+            lastParseResult.Remove(mod);
         }
 
         // Returns set of modules orphaned by this deletion (including the module itself)
         // and if the module is still referenced by another non-removed module
-        public RootRemovalResult DeleteModule(string path)
+        public ModuleRemovalResult DeleteModule(string path)
         {
             Contract.Requires(IsIncremental);
             Contract.Requires(path != null);
@@ -287,7 +319,7 @@ namespace VisualRust.Project
                 DeleteModuleData(mod);
             }
             this.fileRoots.Remove(path);
-            return new RootRemovalResult(markedForRemoval, referencedFromOutside);
+            return new ModuleRemovalResult(markedForRemoval, referencedFromOutside);
         }
 
         // Returns set of new modules referenced by this addition (except the module itself)
@@ -300,27 +332,6 @@ namespace VisualRust.Project
             return result;
         }
 
-        private static void RemoveIntersection(HashSet<string> s1, HashSet<string> s2)
-        {
-            if (s1.Count > s2.Count)
-            {
-                HashSet<string> temp = s1;
-                s1 = s2;
-                s2 = temp;
-            }
-            // s1 is smaller now
-            HashSet<string> common = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-            foreach(string str in s1)
-            {
-                if (s2.Contains(str))
-                {
-                    s2.Remove(str);
-                    common.Add(str);
-                }
-            }
-            s1.ExceptWith(common);
-        }
-
         public void UpgradeModule(string path)
         {
             Contract.Requires(IsIncremental);
@@ -331,7 +342,7 @@ namespace VisualRust.Project
 
         // When a module and all its children form a strongly connected component
         // downgrading a module can orphan some modules
-        public RootRemovalResult DowngradeModule(string path)
+        public ModuleRemovalResult DowngradeModule(string path)
         {
             Contract.Requires(IsIncremental);
             Contract.Requires(path != null);
@@ -339,13 +350,13 @@ namespace VisualRust.Project
             bool referencedFromOutside;
             HashSet<string> dependingOnRoot = CalculateDependants(path, out referencedFromOutside);
             if (referencedFromOutside)
-                return new RootRemovalResult(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase), true);
+                return new ModuleRemovalResult(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase), true);
             foreach(string mod in dependingOnRoot)
             {
                 DeleteModuleData(mod);
             }
             this.fileRoots.Remove(path);
-            return new RootRemovalResult(dependingOnRoot, false);
+            return new ModuleRemovalResult(dependingOnRoot, false);
         }
 
         public HashSet<string> DisableTracking(string path)
@@ -362,6 +373,70 @@ namespace VisualRust.Project
             Contract.Requires(path != null);
             Contract.Assert(this.fileRoots.Contains(path));
             throw new NotImplementedException();
+        }
+
+        // HACK ALERT: We exploit the fact that passed pair of sets is not used afterwards
+        private static ImportsDifference DiffReparseSets(string root, ImportsChange change)
+        {
+            HashSet<string> removed = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            foreach(string path in change.Old)
+            {
+                if (!change.New.Remove(path))
+                {
+                    removed.Add(path);
+                }
+            }
+            return new ImportsDifference(change.New, removed);
+        }
+
+        private void NormalizeSingleImport(string rootDir, PathSegment[] segs, HashSet<string> added, bool addResolved)
+        {
+            string rootedPath = Path.Combine(rootDir, String.Join(Path.DirectorySeparatorChar.ToString(), segs));
+            if (!segs[segs.Length - 1].IsAuthorative)
+            {
+                string validImport;
+                ResolveAuthorativeImport(rootedPath, added, out validImport);
+                added.Add(validImport);
+            }
+        }
+
+        private ImportsChange NormalizeImports(string root, ModuleImport oldI, ModuleImport newI)
+        {
+            string rootDir = Path.GetDirectoryName(root);
+            HashSet<string> added = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            foreach(PathSegment[] segs in oldI.GetTerminalImports())
+            {
+                NormalizeSingleImport(rootDir, segs, added, true);
+            }
+            HashSet<string> removed = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            foreach (PathSegment[] segs in newI.GetTerminalImports())
+            {
+                NormalizeSingleImport(rootDir, segs, removed, false);
+            }
+            return new ImportsChange(added, removed);
+        }
+
+        public ImportsDifference Reparse(string path)
+        {
+            ModuleImport oldImports = lastParseResult[path];
+            ModuleImport newImports = ReadImports(path);
+            ImportsChange normalized = NormalizeImports(path, oldImports, newImports);
+            ImportsDifference diff = DiffReparseSets(path, normalized);
+            HashSet<string> removedFromProject = new HashSet<string>(diff.Removed, StringComparer.InvariantCultureIgnoreCase);
+            if(diff.Removed.Count > 0)
+            {
+                // Get a set of modules that depend solely on the one being reparsed
+                bool referencedFromOutside;
+                HashSet<string> stronglyConnected = CalculateDependants(path, out referencedFromOutside);
+                foreach(string mod in diff.Removed)
+                {
+                    if (!fileRoots.Contains(mod) && stronglyConnected.Contains(mod))
+                        removedFromProject.UnionWith(DeleteModule(mod).Orphans);
+                }
+            }
+            HashSet<string> addedFromParsing = AddModulesInternal(diff.Added);
+            diff.Added.UnionWith(addedFromParsing);
+            return new ImportsDifference(diff.Added, removedFromProject);
         }
 
 #if TEST

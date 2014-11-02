@@ -169,6 +169,31 @@ namespace VisualRust.Test.Project
                 }
             }
         }
+        [TestFixture]
+        public class AddRootModuleIncremental
+        {
+            /*
+             * [main.rs] ---> bar/mod.rs <--- [baz]
+             */
+            [Test]
+            public void ResolveToAlreadyExisting()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\ResolveNonAuthImport"))
+                {
+                    // main file points to bar/mod.rs. project gets loaded
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(1, reached.Count);
+                    CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, @"bar\mod.rs"));
+                    // in the mean time bar.rs gets created
+                    File.Create(Path.Combine(temp.DirPath, "bar.rs")).Close();
+                    // newly added baz.rs should import existing bar\mod.rs
+                    // instead of touching the disk
+                    var rootAdd = tracker.AddRootModuleIncremental(Path.Combine(temp.DirPath, "baz.rs"));
+                    Assert.AreEqual(0, rootAdd.Count);
+                }
+            }
+        }
 
         [TestFixture]
         public class DowngradeModule
@@ -193,6 +218,53 @@ namespace VisualRust.Test.Project
                     var res = tracker.DowngradeModule(Path.Combine(temp.DirPath, "baz.rs"));
                     Assert.AreEqual(0, res.Orphans.Count);
                     Assert.True(res.IsReferenced);
+                }
+            }
+        }
+
+        [TestFixture]
+        public class Reparse
+        {
+            [Test]
+            public void ClearCircularRoot()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\Circular"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    tracker.AddRootModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(2, reached.Count);
+                    CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "baz.rs"));
+                    CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "bar.rs"));
+                    File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
+                    File.Create(Path.Combine(temp.DirPath, "foo.rs")).Close();
+                    var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(0, diff.Added.Count);
+                    Assert.AreEqual(2, diff.Removed.Count);
+                }
+            }
+
+            [Test]
+            public void AddCircularRoot()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\Circular"))
+                {
+                    File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
+                    File.Create(Path.Combine(temp.DirPath, "foo.rs")).Close();
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    tracker.AddRootModule(Path.Combine(temp.DirPath, "foo.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(0, reached.Count);
+                    using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.Open))
+                    {
+                        using (var textStream = new StreamWriter(stream))
+                        {
+                            textStream.Write("mod bar;");
+                        }
+                    }
+                    var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(2, diff.Added.Count);
+                    Assert.AreEqual(0, diff.Removed.Count);
                 }
             }
         }

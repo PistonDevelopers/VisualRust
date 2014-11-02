@@ -74,9 +74,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CollectionDifference.cs" />
     <Compile Include="FileNode.cs" />
     <Compile Include="FileNodeProperties.cs" />
-    <Compile Include="ModuleDeletionResult.cs" />
+    <Compile Include="ModuleRemovalResult.cs" />
     <Compile Include="ModuleImport.cs" />
     <Compile Include="ModuleLexer.g4.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

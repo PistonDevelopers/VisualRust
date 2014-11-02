@@ -80,6 +80,9 @@
     <EmbeddedResource Include="Internal\CircularConnected\foo.rs" />
     <EmbeddedResource Include="Internal\CircularConnected\main.rs" />
     <EmbeddedResource Include="Internal\Circular\main.rs" />
+    <EmbeddedResource Include="Internal\ResolveNonAuthImport\main.rs" />
+    <EmbeddedResource Include="Internal\ResolveNonAuthImport\bar\mod.rs" />
+    <EmbeddedResource Include="Internal\ResolveNonAuthImport\baz.rs" />
     <None Include="packages.config" />
     <EmbeddedResource Include="External\servo\components\layout\lib.rs" />
   </ItemGroup>

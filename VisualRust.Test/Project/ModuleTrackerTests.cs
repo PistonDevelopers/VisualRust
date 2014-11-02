@@ -255,7 +255,8 @@ namespace VisualRust.Test.Project
                     tracker.AddRootModule(Path.Combine(temp.DirPath, "foo.rs"));
                     var reached = tracker.ExtractReachableAndMakeIncremental();
                     Assert.AreEqual(0, reached.Count);
-                    using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.Open))
+                    File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
+                    using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.CreateNew))
                     {
                         using (var textStream = new StreamWriter(stream))
                         {
@@ -264,6 +265,28 @@ namespace VisualRust.Test.Project
                     }
                     var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
                     Assert.AreEqual(2, diff.Added.Count);
+                    Assert.AreEqual(0, diff.Removed.Count);
+                }
+            }
+
+            [Test]
+            public void RemoveLimited()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularConnected"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(3, reached.Count);
+                    File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
+                    using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.CreateNew))
+                    {
+                        using (var textStream = new StreamWriter(stream))
+                        {
+                            textStream.Write("mod bar;");
+                        }
+                    }
+                    var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(0, diff.Added.Count);
                     Assert.AreEqual(0, diff.Removed.Count);
                 }
             }

@@ -416,22 +416,65 @@ namespace VisualRust.Project
             return new ImportsChange(added, removed);
         }
 
+        /* 
+         * This function is called when during reparsing
+         * a set of module imports is removed.
+         * We have to check if it's safe to remove those node,
+         * that is if there is no other path through which this node
+         * can reach a root. For example:
+         * [main] ---> (bar) <--- foo <--- (baz)
+         *   └---------------------^--------^
+         * Main is a reparsed file and bar and baz have been "removed".
+         * We start by removing references main --> bar and main --> baz
+         * (this is done by an outside function):
+         * [main]      (bar) <--- foo <--- (baz)
+         *   └---------------------^
+         * Then, for every node in the set of removed nodes we backtrack.
+         * If we can reach the target node or a root, that means the node is not removed.
+         * For example with bar we go through foo, then reach main, which means that it stays.
+         * For baz we can't find such path (or in fact any other) which means that baz goes away.
+         */
+        private bool AdditionalImportPathExists(string current, string target, HashSet<string> removed, HashSet<string> seen)
+        {
+            if (!seen.Add(current))
+                return false;
+            HashSet<string> children;
+            if(reverseModuleImportMap.TryGetValue(current, out children))
+            {
+                foreach(string child in children)
+                {
+                    if (removed.Contains(child))
+                        continue;
+                    if (String.Equals(child, target, StringComparison.InvariantCultureIgnoreCase) || fileRoots.Contains(child))
+                        return true;
+                }
+                return children.Any(child => AdditionalImportPathExists(child, target, removed, seen));
+            }
+            return false;
+        }
+
         public ImportsDifference Reparse(string path)
         {
             ModuleImport oldImports = lastParseResult[path];
             ModuleImport newImports = ReadImports(path);
             ImportsChange normalized = NormalizeImports(path, oldImports, newImports);
             ImportsDifference diff = DiffReparseSets(path, normalized);
-            HashSet<string> removedFromProject = new HashSet<string>(diff.Removed, StringComparer.InvariantCultureIgnoreCase);
+            HashSet<string> removedFromProject = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             if(diff.Removed.Count > 0)
             {
-                // Get a set of modules that depend solely on the one being reparsed
-                bool referencedFromOutside;
-                HashSet<string> stronglyConnected = CalculateDependants(path, out referencedFromOutside);
+                foreach (string mod in diff.Removed)
+                {
+                    this.moduleImportMap[path].Remove(mod);
+                    this.reverseModuleImportMap[mod].Remove(path);
+                }
                 foreach(string mod in diff.Removed)
                 {
-                    if (!fileRoots.Contains(mod) && stronglyConnected.Contains(mod))
-                        removedFromProject.UnionWith(DeleteModule(mod).Orphans);
+                    if (!AdditionalImportPathExists(mod, path, diff.Removed, new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)))
+                        removedFromProject.Add(mod);
+                }
+                foreach(string mod in removedFromProject)
+                {
+                    DeleteModuleData(mod);
                 }
             }
             HashSet<string> addedFromParsing = AddModulesInternal(diff.Added);

@@ -465,7 +465,9 @@ namespace VisualRust.Project
                 foreach (string mod in diff.Removed)
                 {
                     this.moduleImportMap[path].Remove(mod);
-                    this.reverseModuleImportMap[mod].Remove(path);
+                    HashSet<string> reverseImports;
+                    if(this.reverseModuleImportMap.TryGetValue(mod, out reverseImports))
+                        reverseImports.Remove(path);
                 }
                 foreach(string mod in diff.Removed)
                 {
@@ -477,9 +479,16 @@ namespace VisualRust.Project
                     DeleteModuleData(mod);
                 }
             }
-            HashSet<string> addedFromParsing = AddModulesInternal(diff.Added);
-            diff.Added.UnionWith(addedFromParsing);
-            return new ImportsDifference(diff.Added, removedFromProject);
+            HashSet<string> addedFromParsing = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            foreach(string mod in diff.Added)
+            {
+                if(!lastParseResult.ContainsKey(mod))
+                {
+                    addedFromParsing.Add(mod);
+                }
+            }
+            addedFromParsing.UnionWith(AddModulesInternal(diff.Added));
+            return new ImportsDifference(addedFromParsing, removedFromProject);
         }
 
 #if TEST

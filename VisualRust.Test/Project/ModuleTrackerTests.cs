@@ -290,6 +290,73 @@ namespace VisualRust.Test.Project
                     Assert.AreEqual(0, diff.Removed.Count);
                 }
             }
+
+            [Test]
+            public void RemoveAndAdd()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\CircularConnected"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(3, reached.Count);
+                    File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
+                    using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.CreateNew))
+                    {
+                        using (var textStream = new StreamWriter(stream))
+                        {
+                            textStream.Write("mod bar;");
+                        }
+                    }
+                    var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(0, diff.Added.Count);
+                    Assert.AreEqual(0, diff.Removed.Count);
+                    File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
+                    using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.CreateNew))
+                    {
+                        using (var textStream = new StreamWriter(stream))
+                        {
+                            textStream.Write("mod bar; mod baz;");
+                        }
+                    }
+                    diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(0, diff.Added.Count);
+                    Assert.AreEqual(0, diff.Removed.Count);
+                }
+            }
+
+            [Test]
+            public void RemoveZombie()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\SimpleChain"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(2, reached.Count);
+                    File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
+                    File.Delete(Path.Combine(temp.DirPath, "baz.rs"));
+                    using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.CreateNew))
+                    {
+                        using (var textStream = new StreamWriter(stream))
+                        {
+                            textStream.Write("mod bar;");
+                        }
+                    }
+                    var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(1, diff.Added.Count);
+                    Assert.AreEqual(1, diff.Removed.Count);
+                    File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
+                    using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.CreateNew))
+                    {
+                        using (var textStream = new StreamWriter(stream))
+                        {
+                            textStream.Write("mod baz;");
+                        }
+                    }
+                    diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    Assert.AreEqual(1, diff.Added.Count);
+                    Assert.AreEqual(1, diff.Removed.Count);
+                }
+            }
         }
     }
 }

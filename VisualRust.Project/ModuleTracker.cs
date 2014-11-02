@@ -191,6 +191,19 @@ namespace VisualRust.Project
                 dict[key].Add(value);
         }
 
+        private static bool DeleteFromSet(Dictionary<string, HashSet<string>> dict, string key, string value)
+        {
+            HashSet<string> s;
+            if(dict.TryGetValue(key, out s))
+            {
+                bool wasRemoved = s.Remove(value);
+                if(wasRemoved && s.Count == 0)
+                    dict.Remove(key);
+                return wasRemoved;
+            }
+            return false;
+        }
+
         /*
          * General algorithm is:
          * # Parse given module (passed as 'importPath') and traverse its imports
@@ -295,13 +308,25 @@ namespace VisualRust.Project
 
         private void DeleteModuleData(string mod)
         {
-            HashSet<string> reverseSet;
-            if (!reverseModuleImportMap.TryGetValue(mod, out reverseSet))
-                return;
-            foreach (string parent in reverseSet)
+            HashSet<string> importSet;
+            moduleImportMap.TryGetValue(mod, out importSet);
+            if(importSet != null)
             {
-                this.moduleImportMap.Remove(mod);
+                foreach(string child in importSet)
+                {
+                    DeleteFromSet(reverseModuleImportMap, child, mod);
+                }
             }
+            HashSet<string> reverseImportSet;
+            reverseModuleImportMap.TryGetValue(mod, out reverseImportSet);
+            if(reverseImportSet != null)
+            {
+                foreach(string parent in reverseImportSet)
+                {
+                    DeleteFromSet(moduleImportMap, mod, parent);
+                }
+            }
+            moduleImportMap.Remove(mod);
             reverseModuleImportMap.Remove(mod);
             lastParseResult.Remove(mod);
         }
@@ -462,12 +487,16 @@ namespace VisualRust.Project
             HashSet<string> removedFromProject = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             if(diff.Removed.Count > 0)
             {
+                HashSet<string> allImports = moduleImportMap[path];
                 foreach (string mod in diff.Removed)
                 {
-                    this.moduleImportMap[path].Remove(mod);
-                    HashSet<string> reverseImports;
-                    if(this.reverseModuleImportMap.TryGetValue(mod, out reverseImports))
-                        reverseImports.Remove(path);
+                    if (allImports.Remove(mod))
+                    {
+                        bool removed = DeleteFromSet(reverseModuleImportMap, mod, path);
+                        Debug.Assert(removed);
+                    }
+                    if(allImports.Count == 0)
+                        moduleImportMap.Remove(path);
                 }
                 foreach(string mod in diff.Removed)
                 {

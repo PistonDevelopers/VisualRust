@@ -248,8 +248,11 @@ namespace VisualRust.Test.Project
                     File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
                     File.Create(Path.Combine(temp.DirPath, "foo.rs")).Close();
                     var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    // Return check
                     Assert.AreEqual(0, diff.Added.Count);
                     Assert.AreEqual(2, diff.Removed.Count);
+                    // Model check
+                    ModelCheck(tracker, Path.Combine(temp.DirPath, "main.rs"), Path.Combine(temp.DirPath, "foo.rs"));
                 }
             }
 

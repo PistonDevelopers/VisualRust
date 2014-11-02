@@ -8,6 +8,25 @@ namespace VisualRust.Project
 {
     public class ModuleImport : Dictionary<PathSegment, ModuleImport>
     {
+        private class SegmentComparer : IEqualityComparer<PathSegment>
+        {
+            public bool Equals(PathSegment x, PathSegment y)
+            {
+                return x.IsAuthorative == y.IsAuthorative 
+                    && String.Equals(x.Name, y.Name, StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            public int GetHashCode(PathSegment obj)
+            {
+                return obj.GetHashCode();
+            }
+        }
+
+        private static SegmentComparer moduleComparer = new SegmentComparer();
+
+        public ModuleImport()
+            : base(moduleComparer) { }
+
         public void Merge(Dictionary<PathSegment, ModuleImport> obj)
         {
             foreach(var kvp in obj)

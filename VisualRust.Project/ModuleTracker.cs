@@ -482,6 +482,8 @@ namespace VisualRust.Project
             HashSet<string> addedFromParsing = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             foreach(string mod in diff.Added)
             {
+                AddToSet(moduleImportMap, path, mod);
+                AddToSet(reverseModuleImportMap, mod, path);
                 if(!lastParseResult.ContainsKey(mod))
                 {
                     addedFromParsing.Add(mod);
@@ -492,6 +494,45 @@ namespace VisualRust.Project
         }
 
 #if TEST
+
+        private static bool AreEqual<T>(Dictionary<string, ModuleImport> d1, Dictionary<string, ModuleImport> d2)
+        {
+            return d1.Count == d2.Count && d1.All(x => AreEqual(x.Value, d2[x.Key]));
+        }
+
+        private static bool AreEqual(ModuleImport m1, ModuleImport m2)
+        {
+            return m1.Count == m2.Count && m1.All(x => AreEqual(x.Value, m2[x.Key]));
+        }
+
+        private static bool AreEqual<T>(Dictionary<string, HashSet<T>> d1, Dictionary<string, HashSet<T>> d2)
+        {
+            return d1.Count == d2.Count && d1.All(x => AreEqual(x.Value, d2[x.Key]));
+        }
+
+        private static bool AreEqual<T>(HashSet<T> s1, HashSet<T> s2)
+        {
+            return s1.Count == s2.Count && s1.All(x => s2.Contains(x));
+        }
+
+        // It's formatted this way to make unit test failures more readable
+        public bool IsEquivalnet(ModuleTracker other)
+        {
+            if (EntryPoint != other.EntryPoint)
+                return false;
+            if (!AreEqual(this.fileRoots, other.fileRoots))
+                return false;
+            if (!AreEqual(this.blockingRoots, other.blockingRoots))
+                return false;
+            if (!AreEqual(this.moduleImportMap, other.moduleImportMap))
+                return false;
+            if (!AreEqual(this.reverseModuleImportMap, other.reverseModuleImportMap))
+                return false;
+            if (!AreEqual<string>(this.lastParseResult, other.lastParseResult))
+                return false;
+            return true;
+        }
+
         [TestFixture]
         private class Test
         {

@@ -11,6 +11,15 @@ namespace VisualRust.Test.Project
 {
     public class ModuleTrackerTests
     {
+        private static void ModelCheck(ModuleTracker t, string root, params string[] additionalRoots)
+        {
+            ModuleTracker model = new ModuleTracker(root);
+            foreach (string r in additionalRoots)
+                model.AddRootModule(r);
+            model.ExtractReachableAndMakeIncremental();
+            Assert.True(t.IsEquivalnet(model));
+        }
+
         [TestFixture]
         public class DeleteModule
         {
@@ -264,8 +273,11 @@ namespace VisualRust.Test.Project
                         }
                     }
                     var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    // Return check
                     Assert.AreEqual(2, diff.Added.Count);
                     Assert.AreEqual(0, diff.Removed.Count);
+                    // Model check
+                    ModelCheck(tracker, Path.Combine(temp.DirPath, "main.rs"), Path.Combine(temp.DirPath, "foo.rs"));
                 }
             }
 
@@ -286,8 +298,11 @@ namespace VisualRust.Test.Project
                         }
                     }
                     var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    // Return check
                     Assert.AreEqual(0, diff.Added.Count);
                     Assert.AreEqual(0, diff.Removed.Count);
+                    // Model check
+                    ModelCheck(tracker, Path.Combine(temp.DirPath, "main.rs"));
                 }
             }
 
@@ -308,8 +323,11 @@ namespace VisualRust.Test.Project
                         }
                     }
                     var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    // Return check
                     Assert.AreEqual(0, diff.Added.Count);
                     Assert.AreEqual(0, diff.Removed.Count);
+                    // Model check
+                    ModelCheck(tracker, Path.Combine(temp.DirPath, "main.rs"));
                     File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
                     using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.CreateNew))
                     {
@@ -319,8 +337,11 @@ namespace VisualRust.Test.Project
                         }
                     }
                     diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    // Return check
                     Assert.AreEqual(0, diff.Added.Count);
                     Assert.AreEqual(0, diff.Removed.Count);
+                    // Model check
+                    ModelCheck(tracker, Path.Combine(temp.DirPath, "main.rs"));
                 }
             }
 
@@ -342,8 +363,11 @@ namespace VisualRust.Test.Project
                         }
                     }
                     var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    // Return check
                     Assert.AreEqual(1, diff.Added.Count);
                     Assert.AreEqual(1, diff.Removed.Count);
+                    // Model check
+                    ModelCheck(tracker, Path.Combine(temp.DirPath, "main.rs"));
                     File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
                     using (var stream = File.Open(Path.Combine(temp.DirPath, "foo.rs"), FileMode.CreateNew))
                     {
@@ -353,8 +377,11 @@ namespace VisualRust.Test.Project
                         }
                     }
                     diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    // Return check
                     Assert.AreEqual(1, diff.Added.Count);
                     Assert.AreEqual(1, diff.Removed.Count);
+                    // Model check
+                    ModelCheck(tracker, Path.Combine(temp.DirPath, "main.rs"));
                 }
             }
         }

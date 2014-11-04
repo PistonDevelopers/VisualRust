@@ -250,33 +250,53 @@ namespace VisualRust.Project
             dict[key] = current + 1;
         }
 
-        // Returns all the module that are reachable only from the given root
-        private HashSet<string> CalculateDependants(string root, out bool isStronglyConnected)
+        private static IEnumerable<string> GetSetFromDictionary(Dictionary<string, HashSet<string>> dict, string key)
         {
-            // We simply traverse the graph starting from the passed root, storing all traversed edges.
-            // Then we return all nodes whose incoming degree is equal to the one in the reverse map.
-            HashSet<string> seen = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-            Dictionary<string, int> degrees = new Dictionary<string,int>(StringComparer.InvariantCultureIgnoreCase);
-            int circles = 0;
-            CalculateDependantsInner(seen, degrees, root, root, ref circles);
-            HashSet<string> result = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-            foreach (var kvp in degrees)
-            {
-                if (kvp.Value == this.reverseModuleImportMap[kvp.Key].Count)
-                    result.Add(kvp.Key);
-            }
-            HashSet<string> modulesReferencingRootPath;
-            if (reverseModuleImportMap.TryGetValue(root, out modulesReferencingRootPath))
-            {
-                isStronglyConnected = !(modulesReferencingRootPath.Count == circles);
-            }
+            HashSet<string> set;
+            if(dict.TryGetValue(key, out set))
+                return set;
             else
+                return new string[0] { };
+        }
+
+        private void TraverseForDependants(string current, string root, HashSet<string> nodes, bool delete, ref bool refFromOutside)
+        {
+            if (refFromOutside && !delete)
+                return;
+            if (String.Equals(current, root, StringComparison.InvariantCultureIgnoreCase))
             {
-                isStronglyConnected = false;
+                refFromOutside = true;
+                return;
             }
-            if (!isStronglyConnected)
-                result.Add(root);
-            return result;
+            if(fileRoots.Contains(current)
+                || !nodes.Remove(current))
+                return;
+            foreach (string mod in GetSetFromDictionary(moduleImportMap, current))
+                TraverseForDependants(mod, root, nodes, delete, ref refFromOutside);
+        }
+
+        // Returns all the module that are reachable only from the given root
+        private HashSet<string> CalculateDependants(string source, bool delete, out bool refFromOutside)
+        {
+            // FIXME: that could use some optimization
+            // We simply traverse the graph starting from the the other roots, storing all traversed edges.
+            // All untraversed nodes depend on this root
+            HashSet<string> nodes = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            foreach(var pair in reverseModuleImportMap)
+            {
+                if (!fileRoots.Contains(pair.Key))
+                    nodes.Add(pair.Key);
+            }
+            refFromOutside = false;
+            foreach (string mod in fileRoots.Where(s => !s.Equals(source, StringComparison.InvariantCultureIgnoreCase)).SelectMany(r => GetSetFromDictionary(moduleImportMap, r)))
+            {
+                TraverseForDependants(mod, source, nodes, delete, ref refFromOutside);
+            }
+            if (delete && refFromOutside)
+                nodes.Remove(source);
+            if (!refFromOutside)
+                nodes.Add(source);
+            return nodes;
         }
 
         private HashSet<string> CalculateDependantsInner(HashSet<string> seen,
@@ -338,11 +358,13 @@ namespace VisualRust.Project
             Contract.Requires(IsIncremental);
             Contract.Requires(path != null);
             bool referencedFromOutside;
-            HashSet<string> markedForRemoval = CalculateDependants(path, out referencedFromOutside);
+            HashSet<string> markedForRemoval = CalculateDependants(path, true, out referencedFromOutside);
             foreach(string mod in markedForRemoval)
             {
                 DeleteModuleData(mod);
             }
+            moduleImportMap.Remove(path);
+            lastParseResult.Remove(path);
             this.fileRoots.Remove(path);
             return new ModuleRemovalResult(markedForRemoval, referencedFromOutside);
         }
@@ -373,14 +395,14 @@ namespace VisualRust.Project
             Contract.Requires(path != null);
             Contract.Assert(this.fileRoots.Contains(path));
             bool referencedFromOutside;
-            HashSet<string> dependingOnRoot = CalculateDependants(path, out referencedFromOutside);
+            HashSet<string> dependingOnRoot = CalculateDependants(path, false, out referencedFromOutside);
+            fileRoots.Remove(path);
             if (referencedFromOutside)
                 return new ModuleRemovalResult(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase), true);
             foreach(string mod in dependingOnRoot)
             {
                 DeleteModuleData(mod);
             }
-            this.fileRoots.Remove(path);
             return new ModuleRemovalResult(dependingOnRoot, false);
         }
 

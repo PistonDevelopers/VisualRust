@@ -51,15 +51,7 @@ namespace VisualRust.Project
         {
             if (cmdGroup == Microsoft.VisualStudio.Project.VsMenus.guidStandardCommandSet2K && (VsCommands2K)cmd == VsCommands2K.INCLUDEINPROJECT)
             {
-                HierarchyNode parent = this.Parent;
-                parent.RemoveChild(this);
-                BaseFileNode node = this.ProjectMgr.CreateFileNode(this.FilePath);
-                parent.AddChild(node);
-                IVsUIHierarchyWindow uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(this.ProjectMgr.Site, SolutionExplorer);
-                if (uiWindow != null)
-                {
-                    ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(this.ProjectMgr.InteropSafeIVsUIHierarchy, this.ID, EXPANDFLAGS.EXPF_SelectItem));
-                }
+                ((RustProjectNode)this.ProjectMgr).IncludeFileNode(this);
                 return VSConstants.S_OK;
             }
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);

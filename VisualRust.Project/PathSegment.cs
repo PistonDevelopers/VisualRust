@@ -23,5 +23,10 @@ namespace VisualRust.Project
             Name = name;
             IsAuthorative = auth;
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

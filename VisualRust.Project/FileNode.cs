@@ -84,5 +84,11 @@ namespace VisualRust.Project
         {
             this.ItemNode.SetMetadata(ModuleTrackingKey, value.ToString());
         }
+
+        protected override int ExcludeFromProject()
+        {
+            ((RustProjectNode)this.ProjectMgr).ExcludeFileNode(this);
+            return VSConstants.S_OK;
+        }
     }
 }

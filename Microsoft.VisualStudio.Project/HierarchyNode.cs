@@ -1013,7 +1013,8 @@ namespace Microsoft.VisualStudio.Project
 
             // We save here the path to delete since this.Url might call the Include which will be deleted by the RemoveFromProjectFile call.
             string pathToDelete = this.GetMkDocument();
-            this.itemNode.RemoveFromProjectFile();
+            if(this.itemNode != null)
+                this.itemNode.RemoveFromProjectFile();
 
             if(removeFromStorage)
             {

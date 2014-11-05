@@ -259,6 +259,29 @@ namespace VisualRust.Test.Project
         public class Reparse
         {
             [Test]
+            public void MultipleBackReferenced()
+            {
+                using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\ClosedCircle"))
+                {
+                    var tracker = new ModuleTracker(Path.Combine(temp.DirPath, "main.rs"));
+                    var reached = tracker.ExtractReachableAndMakeIncremental();
+                    Assert.AreEqual(3, reached.Count);
+                    CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "baz.rs"));
+                    CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "bar.rs"));
+                    CollectionAssert.Contains(reached, Path.Combine(temp.DirPath, "foo.rs"));
+                    File.Delete(Path.Combine(temp.DirPath, "foo.rs"));
+                    File.Create(Path.Combine(temp.DirPath, "foo.rs")).Close();
+                    var diff = tracker.Reparse(Path.Combine(temp.DirPath, "foo.rs"));
+                    // Return check
+                    Assert.AreEqual(0, diff.Added.Count);
+                    Assert.AreEqual(2, diff.Removed.Count);
+                    // Model check
+                    ModelCheck(tracker, Path.Combine(temp.DirPath, "main.rs"));
+                }
+            }
+
+
+            [Test]
             public void ClearCircularRoot()
             {
                 using (TemporaryDirectory temp = Utils.LoadResourceDirectory(@"Internal\Circular"))

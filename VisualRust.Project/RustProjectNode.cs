@@ -90,24 +90,24 @@ namespace VisualRust.Project
             if (!containsEntryPoint)
             {
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(entryPoint));
-                BaseFileNode node = this.CreateFileNode(entryPoint);
-                ((FileNode)node).IsEntryPoint = true;
+                FileNode node = this.CreateFileNode(entryPoint);
+                ((TrackedFileNode)node).IsEntryPoint = true;
                 parent.AddChild(node);
             }
             foreach (string file in modTracker.ExtractReachableAndMakeIncremental())
             {
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file));
-                parent.AddChild(new ReferencedFileNode(this, file));
+                parent.AddChild(new UntrackedFileNode(this, file));
             }
             this.BuildProject.Save();
         }
 
-        public override BaseFileNode CreateFileNode(ProjectElement item)
+        public override FileNode CreateFileNode(ProjectElement item)
         {
-            return new FileNode(this, item);
+            return new TrackedFileNode(this, item);
         }
 
-        public override BaseFileNode CreateFileNode(string file)
+        public override FileNode CreateFileNode(string file)
         {
             ProjectElement item = this.AddFileToMsBuild(file);
             return this.CreateFileNode(item);
@@ -121,7 +121,7 @@ namespace VisualRust.Project
                 modTracker.AddRootModule(node.Url);
                 if (node.Url == modTracker.EntryPoint)
                 {
-                    ((FileNode)node).IsEntryPoint = true;
+                    ((TrackedFileNode)node).IsEntryPoint = true;
                     containsEntryPoint = true;
                 }
             }
@@ -167,7 +167,7 @@ namespace VisualRust.Project
             }
         }
 
-        internal void IncludeFileNode(ReferencedFileNode node)
+        internal void IncludeFileNode(UntrackedFileNode node)
         {
             modTracker.UpgradeModule(node.FilePath);
             ReplaceAndSelect(node, CreateFileNode(node.FilePath));
@@ -176,11 +176,11 @@ namespace VisualRust.Project
         internal void ExcludeFileNode(BaseFileNode srcNode)
         {
             // Ask mod tracker for a professional opinion
-            string fullPath = GetAbsolutePath(srcNode);
-            RootRemovalResult downgradeResult = modTracker.DowngradeModule(fullPath);
+            string fullPath = srcNode.AbsoluteFilePath;
+            ModuleRemovalResult downgradeResult = modTracker.DowngradeModule(fullPath);
             if (downgradeResult.IsReferenced)
             {
-                ReplaceAndSelect(srcNode, new ReferencedFileNode(this, fullPath));
+                ReplaceAndSelect(srcNode, new UntrackedFileNode(this, fullPath));
             }
             else
             {
@@ -197,20 +197,6 @@ namespace VisualRust.Project
             }
         }
 
-        private string GetAbsolutePath(BaseFileNode node)
-        {
-            string path = node.FilePath;
-            if (Path.IsPathRooted(path))
-            {
-                return path;
-            }
-            else
-            {
-                // Path is relative, so make it relative to project path
-                return Path.Combine(this.ProjectMgr.BaseURI.AbsoluteUrl, path);
-            }
-        }
-
         internal void DisableAutoImport(HierarchyNode node)
         {
 
@@ -219,6 +205,40 @@ namespace VisualRust.Project
         internal void EnableAutoImport(HierarchyNode node)
         {
 
+        }
+
+        internal void ReparseFileNode(BaseFileNode n)
+        {
+            var diff = modTracker.Reparse(n.AbsoluteFilePath);
+            foreach(string mod in diff.Added)
+            {
+                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(mod));
+                parent.AddChild(new UntrackedFileNode(this, mod));
+            }
+            foreach(string mod in diff.Removed)
+            {
+                uint item;
+                this.ParseCanonicalName(mod, out item);
+                if (item != (uint)VSConstants.VSITEMID.Nil)
+                {
+                    HierarchyNode node = this.NodeFromItemId(item);
+                    node.Remove(false);
+                }
+            }
+        }
+
+        public override int SaveItem(VSSAVEFLAGS saveFlag, string silentSaveAsName, uint itemid, IntPtr docData, out int cancelled)
+        {
+            int result = base.SaveItem(saveFlag, silentSaveAsName, itemid, docData, out cancelled);
+            if(result == VSConstants.S_OK)
+            {
+                HierarchyNode node = this.NodeFromItemId(itemid);
+                if(node is TrackedFileNode || node is UntrackedFileNode)
+                {
+                    ReparseFileNode((BaseFileNode)node);
+                }
+            }
+            return result;
         }
     }
 }

@@ -525,9 +525,10 @@ namespace VisualRust.Project
                     if (!AdditionalImportPathExists(mod, path, diff.Removed, new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)))
                         removedFromProject.Add(mod);
                 }
-                foreach(string mod in removedFromProject)
+                foreach(string mod in removedFromProject.ToArray())
                 {
-                    DeleteModuleData(mod);
+                    foreach (string removedMod in DeleteModule(mod).Orphans)
+                        removedFromProject.Add(removedMod);
                 }
             }
             HashSet<string> addedFromParsing = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);

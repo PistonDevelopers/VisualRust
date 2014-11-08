@@ -435,7 +435,7 @@ namespace Microsoft.VisualStudio.Project
     /// <summary>
     /// Event args class for triggering file change event arguments.
     /// </summary>
-    internal class FileChangedOnDiskEventArgs : EventArgs
+    public class FileChangedOnDiskEventArgs : EventArgs
     {
         #region Private fields
         /// <summary>
@@ -459,7 +459,7 @@ namespace Microsoft.VisualStudio.Project
         /// </summary>
         /// <param name="fileName">File name that was changed on disk.</param>
         /// <param name="id">The item id of the file that was changed on disk.</param>
-        internal FileChangedOnDiskEventArgs(string fileName, uint id, _VSFILECHANGEFLAGS flag)
+        public FileChangedOnDiskEventArgs(string fileName, uint id, _VSFILECHANGEFLAGS flag)
         {
             this.fileName = fileName;
             this.itemID = id;
@@ -470,7 +470,7 @@ namespace Microsoft.VisualStudio.Project
         /// Gets the file name that was changed on disk.
         /// </summary>
         /// <value>The file that was changed on disk.</value>
-        internal string FileName
+        public string FileName
         {
             get
             {
@@ -482,7 +482,7 @@ namespace Microsoft.VisualStudio.Project
         /// Gets item id of the file that has changed
         /// </summary>
         /// <value>The file that was changed on disk.</value>
-        internal uint ItemID
+        public uint ItemID
         {
             get
             {
@@ -494,7 +494,7 @@ namespace Microsoft.VisualStudio.Project
         /// The reason while the file has chnaged on disk.
         /// </summary>
         /// <value>The reason while the file has chnaged on disk.</value>
-        internal _VSFILECHANGEFLAGS FileChangeFlag
+        public _VSFILECHANGEFLAGS FileChangeFlag
         {
             get
             {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace VisualRust.Project
 {
     abstract class BaseFileNode : FileNode
     {
+        private bool isDeleted = false;
         protected abstract bool CanUserMove { get; }
         public string AbsoluteFilePath { get; private set; }
         public new RustProjectNode ProjectMgr { get; private set; }
@@ -26,6 +28,16 @@ namespace VisualRust.Project
         }
 
         public override string FilePath { get { return this.AbsoluteFilePath; } }
+
+        protected virtual void OnFileDeleted()
+        {
+            ProjectMgr.DeleteFileNode(this);
+        }
+
+        protected virtual void OnFileCreated()
+        {
+            ProjectMgr.ReparseFileNode(this);
+        }
 
         // Disable rename
         public override string GetEditLabel()

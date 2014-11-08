@@ -158,15 +158,20 @@ namespace VisualRust.Project
 
         private ModuleImport ReadImports(string path)
         {
+            ModuleImport imports = ReadImportsRaw(path);
+            lastParseResult[path] = imports;
+            return imports;
+        }
+
+        private ModuleImport ReadImportsRaw(string path)
+        {
             if (blockingRoots.Contains(path))
                 return new ModuleImport();
             try
             {
                 using(var stream = File.OpenRead(path))
                 {
-                    ModuleImport imports = ModuleParser.ParseImports(new AntlrInputStream(stream));
-                    lastParseResult[path] = imports;
-                    return imports;
+                    return ModuleParser.ParseImports(new AntlrInputStream(stream));
                 }
             }
             catch(PathTooLongException)
@@ -364,7 +369,10 @@ namespace VisualRust.Project
                 DeleteModuleData(mod);
             }
             moduleImportMap.Remove(path);
-            lastParseResult.Remove(path);
+            if (!referencedFromOutside)
+                lastParseResult.Remove(path);
+            else
+                lastParseResult[path] = new ModuleImport();
             this.fileRoots.Remove(path);
             return new ModuleRemovalResult(markedForRemoval, referencedFromOutside);
         }

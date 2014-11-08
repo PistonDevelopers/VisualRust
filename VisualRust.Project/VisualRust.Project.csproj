@@ -74,8 +74,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseFileNode.cs" />
     <Compile Include="CollectionDifference.cs" />
-    <Compile Include="FileNode.cs" />
+    <Compile Include="TrackedFileNode.cs" />
     <Compile Include="FileNodeProperties.cs" />
     <Compile Include="ModuleRemovalResult.cs" />
     <Compile Include="ModuleImport.cs" />
@@ -93,7 +94,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ReferencedFileNode.cs" />
+    <Compile Include="UntrackedFileNode.cs" />
     <Compile Include="ResourceDescriptionAttribute.cs" />
     <Compile Include="ResourceDisplayNameAttribute.cs" />
     <Compile Include="RustProjectFactory.cs" />

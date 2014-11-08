@@ -69,11 +69,11 @@ namespace VisualRust.Project
         [ResourceDescription("TrackModulesDescription")]
         public bool TrackModules
         {
-            get { return ((FileNode)this.Node).GetModuleTracking(); }
-            set { ((FileNode)this.Node).SetModuleTracking(value); }
+            get { return ((TrackedFileNode)this.Node).GetModuleTracking(); }
+            set { ((TrackedFileNode)this.Node).SetModuleTracking(value); }
         }
 
-        internal FileNodeProperties(FileNode node)
+        internal FileNodeProperties(TrackedFileNode node)
             : base(node)
         { }
 
@@ -94,7 +94,7 @@ namespace VisualRust.Project
             get { return true; }
         }
 
-        internal ReferencedFileNodeProperties(ReferencedFileNode node)
+        internal ReferencedFileNodeProperties(UntrackedFileNode node)
             : base(node)
         { }
 

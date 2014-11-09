@@ -1,11 +1,15 @@
 Visual Studio extension for Rust
 ================================
+[![Build Status](http://visualrust.cloudapp.net/buildStatus/icon?job=Visual Rust)](http://visualrust.cloudapp.net/job/Visual%20Rust/)
 
 ![Screenshot](http://i.imgur.com/T06C5wH.png)
 
-Currently in development, and not feature complete. Available [on the Visual
-Studio extension
-gallery](http://visualstudiogallery.msdn.microsoft.com/dcd9075c-46da-4164-be4a-4d09589efcad).
+Currently in development, and not feature complete. Stable versions are
+available [on the Visual Studio extension gallery](http://visualstudiogallery.msdn.microsoft.com/dcd9075c-46da-4164-be4a-4d09589efcad).
+
+Unstable, but more recent builds are downloadable from our
+[Jenkins server](http://visualrust.cloudapp.net/job/Visual%20Rust/)
+(choose "Latest Azure Artifacts").
 
 Contributing
 ============

@@ -78,10 +78,12 @@ namespace VisualRust
             _tt[RustLexer.DOC_COMMENT] = RustTokenTypes.DOC_COMMENT;
             _tt[RustLexer.COMMENT] = RustTokenTypes.COMMENT;
 
+            // These keywords are from rustc /src/libsyntax/parse/token.rs, module keywords
             var _kws = new HashSet<string> {
                 "as",
                 "box",
                 "break",
+                "const",
                 "continue",
                 "crate",
                 "else",
@@ -97,8 +99,8 @@ namespace VisualRust
                 "loop",
                 "match",
                 "mod",
+                "move",
                 "mut",
-                "priv",
                 "proc",
                 "pub",
                 "ref",
@@ -112,6 +114,8 @@ namespace VisualRust
                 "type",
                 "unsafe",
                 "use",
+                "virtual",
+                "where",
                 "while"
             };
 

@@ -13,12 +13,15 @@ namespace VisualRust.Test.Project
     {
         private static void ModelCheck(ModuleTracker t, string root, params string[] additionalRoots)
         {
+#if TEST // Dirty hack
             ModuleTracker model = new ModuleTracker(root);
             foreach (string r in additionalRoots)
                 model.AddRootModule(r);
             model.ExtractReachableAndMakeIncremental();
             Assert.True(t.IsEquivalnet(model));
+#endif
         }
+
 
         [TestFixture]
         public class DeleteModule

@@ -7,7 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BaseFileNode = Microsoft.VisualStudio.Project.FileNode;
+using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
+using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
+using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
 namespace VisualRust.Project
 {
@@ -324,6 +326,32 @@ namespace VisualRust.Project
         protected override ReferenceContainerNode CreateReferenceContainerNode()
         {
             return null;
+        }
+
+        protected override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
+        { 
+            if (cmdGroup == VsMenus.guidStandardCommandSet2K && (VsCommands2K)cmd == VsCommands2K.ADDCOMPONENTS
+                || cmdGroup == VSConstants.CMDSETID.StandardCommandSet12_guid && (VSConstants.VSStd12CmdID)cmd == VSConstants.VSStd12CmdID.AddReferenceProjectOnly)
+            {
+                result |= QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
+                return (int)VSConstants.S_OK;
+            }
+            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
+
+        public override int AddProjectReference()
+        {
+            return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
+        }
+
+        public override IReferenceContainer GetReferenceContainer()
+        {
+            return null;
+        }
+
+        public override int AddComponent(VSADDCOMPOPERATION dwAddCompOperation, uint cComponents, IntPtr[] rgpcsdComponents, IntPtr hwndDialog, VSADDCOMPRESULT[] pResult)
+        {
+            return VSConstants.E_NOTIMPL;
         }
     }
 }

@@ -5679,7 +5679,7 @@ namespace Microsoft.VisualStudio.Project
         /// Returns the reference container node.
         /// </summary>
         /// <returns></returns>
-        public IReferenceContainer GetReferenceContainer()
+        public virtual IReferenceContainer GetReferenceContainer()
         {
             return this.FindChild(ReferenceContainerNode.ReferencesNodeVirtualName) as IReferenceContainer;
         }

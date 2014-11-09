@@ -320,5 +320,10 @@ namespace VisualRust.Project
             }
             return base.SaveItem(saveFlag, silentSaveAsName, itemid, docData, out cancelled);
         }
+
+        protected override ReferenceContainerNode CreateReferenceContainerNode()
+        {
+            return null;
+        }
     }
 }

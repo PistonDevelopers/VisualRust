@@ -420,7 +420,8 @@ namespace VisualRust.Project
             Contract.Requires(!IsIncremental);
             Contract.Requires(path != null);
             Contract.Assert(this.fileRoots.Contains(path));
-            throw new NotImplementedException();
+            Contract.Assert(this.blockingRoots.Add(path));
+            return Reparse(path).Removed;
         }
 
         public HashSet<string> EnableTracking(string path)
@@ -428,7 +429,8 @@ namespace VisualRust.Project
             Contract.Requires(IsIncremental);
             Contract.Requires(path != null);
             Contract.Assert(this.fileRoots.Contains(path));
-            throw new NotImplementedException();
+            Contract.Assert(this.blockingRoots.Remove(path));
+            return Reparse(path).Added;
         }
 
         // HACK ALERT: We exploit the fact that passed pair of sets is not used afterwards
@@ -453,6 +455,10 @@ namespace VisualRust.Project
                 string validImport;
                 ResolveAuthorativeImport(rootedPath, added, out validImport);
                 added.Add(validImport);
+            }
+            else
+            {
+                added.Add(rootedPath);
             }
         }
 

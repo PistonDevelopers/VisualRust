@@ -274,14 +274,23 @@ namespace VisualRust.Project
             }
         }
 
-        internal void DisableAutoImport(HierarchyNode node)
+        internal void DisableAutoImport(BaseFileNode node)
         {
-
+            var orphans = modTracker.DisableTracking(node.AbsoluteFilePath);
+            foreach (string mod in orphans)
+            {
+                RemoveNode(mod, false);
+            }
         }
 
-        internal void EnableAutoImport(HierarchyNode node)
+        internal void EnableAutoImport(BaseFileNode node)
         {
-
+            var newMods = modTracker.EnableTracking(node.AbsoluteFilePath);
+            foreach (string mod in newMods)
+            {
+                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(mod));
+                parent.AddChild(CreateUntrackedNode(mod));
+            }
         }
 
         internal void ReparseFileNode(BaseFileNode n)

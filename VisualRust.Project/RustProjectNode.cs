@@ -174,9 +174,11 @@ namespace VisualRust.Project
             return this.CreateFileNode(item);
         }
 
-        void RemoveFileNode(BaseFileNode node)
+        protected override ProjectElement AddFileToMsBuild(string file)
         {
-
+            string itemPath = Microsoft.VisualStudio.Shell.PackageUtilities.MakeRelativeIfRooted(file, this.BaseURI);
+            System.Diagnostics.Debug.Assert(!Path.IsPathRooted(itemPath), "Cannot add item with full path.");
+            return this.CreateMsBuildFileItem(itemPath, "File");
         }
 
         // This functions adds node with data that comes from parsing the .rsproj file

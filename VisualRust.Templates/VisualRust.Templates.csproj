@@ -84,6 +84,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Items\Module\module.rs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -111,6 +112,12 @@
   </ItemGroup>
   <ItemGroup>
     <VSTemplate Include="Projects\Library\LibraryProject.vstemplate">
+      <SubType>Designer</SubType>
+    </VSTemplate>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Items\Module\Module.ico" />
+    <VSTemplate Include="Items\Module\Module.vstemplate">
       <SubType>Designer</SubType>
     </VSTemplate>
   </ItemGroup>

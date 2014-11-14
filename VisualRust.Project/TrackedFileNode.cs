@@ -21,7 +21,6 @@ namespace VisualRust.Project
         public TrackedFileNode(RustProjectNode root, ProjectElement elm)
             : base(root, elm, elm.GetFullPathForElement())
         {
-            SetModuleTracking(true);
         }
 
         protected override NodeProperties CreatePropertiesObject()
@@ -39,12 +38,22 @@ namespace VisualRust.Project
 
         public bool GetModuleTracking()
         {
-            return ParseBool(this.ItemNode.GetEvaluatedMetadata(ModuleTrackingKey));
+            string value = this.ItemNode.GetEvaluatedMetadata(ModuleTrackingKey);
+            if (String.IsNullOrWhiteSpace(value))
+                return true;
+            bool retValue;
+            if(!Boolean.TryParse(value, out retValue))
+                return true;
+            return retValue;
         }
 
         public void SetModuleTracking(bool value)
         {
             this.ItemNode.SetMetadata(ModuleTrackingKey, value.ToString());
+            if (value)
+                this.ProjectMgr.EnableAutoImport(this);
+            else
+                this.ProjectMgr.DisableAutoImport(this);
         }
 
         protected override int ExcludeFromProject()

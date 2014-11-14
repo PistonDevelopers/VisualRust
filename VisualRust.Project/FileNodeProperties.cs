@@ -67,6 +67,7 @@ namespace VisualRust.Project
         [CategoryAttribute("Advanced")]
         [ResourceDisplayName("TrackModules")]
         [ResourceDescription("TrackModulesDescription")]
+        [DefaultValue(true)]
         public bool TrackModules
         {
             get { return ((TrackedFileNode)this.Node).GetModuleTracking(); }

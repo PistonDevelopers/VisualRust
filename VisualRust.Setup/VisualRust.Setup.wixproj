@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />
+    <Compile Include="vsx2013.wxs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VisualRust.Build\VisualRust.Build.csproj">

@@ -1,7 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Fragment>
-    <ComponentGroup Id="CmpGroup_vsx2013" Directory="Dir_MSBuild_InstallLocation">
+    <PropertyRef Id="VS2013_EXTENSIONS_DIR" />
+    <DirectoryRef Id="TARGETDIR">
+      <Directory Id="VS2013_EXTENSIONS_DIR">
+        <Directory Id="Dir_vsx2013" Name="Visual Rust"/>
+      </Directory>
+    </DirectoryRef>
+    <ComponentGroup Id="CmpGroup_vsx2013" Directory="Dir_vsx2013">
       <Component Id="Cmp_Antlr4_Runtime_net45_dll" Guid="{762AC9CD-9E49-4498-AD43-6FA96DDA5252}">
         <File Id="File_Antlr4_Runtime_net45_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Antlr4.Runtime.net45.dll" />
       </Component>

@@ -25,6 +25,8 @@ Feel free to work on any issues tagged "ready". Alternatively you can mail
 the maintainer or ask in `#rust-gamedev` on irc.mozilla.org for how you can
 help.
 
+[How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
+
 License
 =======
 

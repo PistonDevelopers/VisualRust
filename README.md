@@ -15,9 +15,9 @@ Contributing
 ============
 
 To build this, you'll need the [Visual Studio
-SDK](http://msdn.microsoft.com/en-us/vstudio/vextend.aspx) for the VS plugin and
-[WiX Toolset 3.9](http://wixtoolset.org/) for the setup project. Nuget will
-take care of the rest.
+SDK](http://msdn.microsoft.com/en-us/vstudio/vextend.aspx) for the VS plugin,
+[WiX Toolset 3.9](http://wixtoolset.org/) for the setup project and [Java RE](https://www.java.com/en/download/manual.jsp).
+Nuget will take care of the rest.
 
 This project is currently maintained by [vosen](https://github.com/vosen/).
 

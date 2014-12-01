@@ -29,9 +29,6 @@
       <Component Id="Cmp_VisualRust_Project_dll" Guid="{28F566C7-23AD-439B-8AF9-E924C45EE715}">
         <File Id="File_VisualRust_Project_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Project.dll" />
       </Component>
-      <Component Id="Cmp_VisualRust_vsix" Guid="{48899E88-9B07-4F02-A704-EC0167D06284}">
-        <File Id="File_VisualRust_vsix" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.vsix" />
-      </Component>
     </ComponentGroup>
   </Fragment>
 </Wix>

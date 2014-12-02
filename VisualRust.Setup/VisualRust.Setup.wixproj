@@ -21,12 +21,22 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Product.wxs" />
+    <Compile Include="templates2013.wxs" />
+    <Compile Include="VisualRust.wxs" />
+    <Compile Include="vsx2013.wxs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VisualRust.Build\VisualRust.Build.csproj">
       <Name>VisualRust.Build</Name>
       <Project>{9cf556ab-76fe-4c3d-ad0a-b64b3b9989b4}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Templates\VisualRust.Templates.csproj">
+      <Name>VisualRust.Templates</Name>
+      <Project>{59d94b96-1af7-46f2-8790-aab6dfae8d9a}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>

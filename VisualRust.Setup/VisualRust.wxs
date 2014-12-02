@@ -1,33 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-     xmlns:vs="http://schemas.microsoft.com/wix/VSExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Id="{2F72A669-3627-4D83-B8A3-954DB2A12539}"
-           Name="VisualRust"
+           Name="Visual Rust"
            Language="1033"
-           Version="1.0.0.0"
+           Version="0.1.0.0"
            Manufacturer="The Piston Project"
            UpgradeCode="{B5CC88F7-BC23-4400-95D8-9EE3FA95CC3F}">
     <Package InstallerVersion="400"
              Compressed="yes"
              InstallScope="perMachine" />
 
-    <UIRef Id="WixUI_Minimal" />
+    <UIRef Id="WixUI_FeatureTree" />
 
-    <MajorUpgrade DowngradeErrorMessage="A newer version of VisualRust is already installed." />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Visual Rust is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
     <Feature Id="Ftr_MSBuild_Integration"
              Title="MSBuild integration"
-             Description="MSBuild tasks and targets. This feature is required for building VisualRust projects from command line and Visual Studio."
-             Level="1">
+             Description="MSBuild tasks and targets. This feature is required for building Visual Rust projects from command line and Visual Studio."
+             Level="1"
+             Absent="disallow">
       <ComponentGroupRef Id="CmpGroup_MSBuild_Integration" />
     </Feature>
 
+
+    <PropertyRef Id="VS2013DEVENV" />
     <Feature Id="Ftr_VisualRust"
          Title="Visual Studio 2013 extension"
          Description="Extension for Visual Studio 2013. Provides support for Rust projects."
-         Level="1">
-      <ComponentRef Id="Cmp_VisualRust_Vsix" />
+         Level="1000">
+      <Condition Level="1">
+        <!-- This is not fully satisfying because the user can still enable it, but I hope most of our users are smarter than that  -->
+        <![CDATA[Installed OR VS2013DEVENV]]>
+      </Condition>
+      <ComponentGroupRef Id="CmpGroup_vsx2013"/>
+      <ComponentGroupRef Id="CmpGroup_item_templates2013"/>
+      <ComponentGroupRef Id="CmpGroup_proj_templates2013"/>
     </Feature>
 
     <Directory Id="TARGETDIR"
@@ -56,21 +64,5 @@
               KeyPath="yes" />
       </Component>
     </ComponentGroup>
-
-    <!--
-     Note, the method below works for now but is slightly problematic:
-     * VisualRust.vsix is left lying in Program Files/VisualRust
-     * User can uninstall extension from "Extensions and Updates" window without going through installer
-     Proper solution would be marking .vsix with InstalledByMsi="true" and handling installation ourselves
-     (including copying/regediting all package/template stuff to the right places).
-    -->
-    <Component Id="Cmp_VisualRust_Vsix"
-               Guid="{21118443-AA96-4A51-A004-95510168742E}"
-               Directory="Dir_MSBuild_InstallLocation">
-      <File Id="File_VisualRust_Vsix"
-            Source="$(var.VisualRust.TargetDir)VisualRust.vsix">
-        <vs:VsixPackage PackageId="40c1d2b5-528b-4966-a7b1-1974e3568abe"/>
-      </File>
-    </Component>
   </Product>
 </Wix>

@@ -19,6 +19,7 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <CopyVsixManifestToOutput>true</CopyVsixManifestToOutput>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,6 +29,8 @@
     <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+	<!-- Don't explicitly set DeployExtension to true, or you will break CI -->
+    <CreateVsixContainer>true</CreateVsixContainer>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,8 +39,23 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <DeployExtension>false</DeployExtension>
+    <CreateVsixContainer>false</CreateVsixContainer>
   </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <Content Include="..\VisualRust.Templates\bin\Debug\ProjectTemplates\Rust\1033\ApplicationProject.zip">
+      <Link>ProjectTemplates\ApplicationProject.zip</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\VisualRust.Templates\bin\Debug\ProjectTemplates\Rust\1033\LibraryProject.zip">
+      <Link>ProjectTemplates\LibraryProject.zip</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\VisualRust.Templates\bin\Debug\ItemTemplates\Rust\1033\Module.zip">
+      <Link>ItemTemplates\Module.zip</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="Antlr4.Runtime.net45">
       <HintPath>..\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
@@ -165,9 +183,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="source.extension.vsixmanifest">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="source.extension.debug.vsixmanifest" />
+    <None Include="source.extension.release.vsixmanifest" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
@@ -189,16 +206,14 @@
       <Project>{e983e989-f83a-4643-896a-ad496bf647d0}</Project>
       <Name>RustLexer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VisualRust.Project\VisualRust.Project.csproj">
-      <Project>{475c4df2-4d4b-4f2c-9f27-414148dd6f11}</Project>
-      <Name>VisualRust.Project</Name>
-    </ProjectReference>
     <ProjectReference Include="..\VisualRust.Templates\VisualRust.Templates.csproj">
       <Project>{59D94B96-1AF7-46F2-8790-AAB6DFAE8D9A}</Project>
       <Name>VisualRust.Templates</Name>
-      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Project\VisualRust.Project.csproj">
+      <Project>{475c4df2-4d4b-4f2c-9f27-414148dd6f11}</Project>
+      <Name>VisualRust.Project</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
@@ -208,9 +223,16 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="BeforeClean">
+    <Delete Files="$(TargetDir)source.extension.vsixmanifest" />
+  </Target>
+  <Target Name="BeforeBuild">
+    <Copy SourceFiles="source.extension.$(Configuration).vsixmanifest" DestinationFiles="$(TargetDir)source.extension.vsixmanifest" />
+    <ItemGroup>
+      <None Include="$(TargetDir)source.extension.vsixmanifest" />
+    </ItemGroup>
+  </Target>
 </Project>

@@ -80,7 +80,7 @@ namespace VisualRust.Project
 
         public override System.Guid ProjectGuid
         {
-            get { return new System.Guid("F8DE8B7D-BE47-4D31-900E-F9576A926EB3"); }
+            get { return typeof(RustProjectFactory).GUID; }
         }
 
         public override string ProjectType

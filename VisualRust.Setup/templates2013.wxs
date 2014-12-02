@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+
+    <PropertyRef Id="VS2013_ITEMTEMPLATES_DIR" />
+    <DirectoryRef Id="TARGETDIR">
+      <Directory Id="VS2013_ITEMTEMPLATES_DIR">
+        <Directory Id="Dir_item_templates2013" Name="Rust">
+          <Directory Id="Dir_item_templates2013_locale" Name="1033"/>
+        </Directory>
+      </Directory>
+    </DirectoryRef>
+    
+    <ComponentGroup Id="CmpGroup_item_templates2013" Directory="Dir_item_templates2013_locale">
+      <Component Id="Cmp_Module_zip" Guid="{9FD1BD33-AC1F-4DED-8568-EC4CF0A0C158}">
+        <File Id="File_Module_zip" KeyPath="yes" Source="$(var.VisualRust.Templates.TargetDir)ItemTemplates\Rust\1033\Module.zip" />
+      </Component>
+    </ComponentGroup>
+
+    <PropertyRef Id="VS2013_PROJECTTEMPLATES_DIR" />
+    <DirectoryRef Id="TARGETDIR">
+      <Directory Id="VS2013_PROJECTTEMPLATES_DIR">
+        <Directory Id="Dir_proj_templates2013" Name="Rust">
+          <Directory Id="Dir_proj_templates2013_locale" Name="1033"/>
+        </Directory>
+      </Directory>
+    </DirectoryRef>
+    
+    <ComponentGroup Id="CmpGroup_proj_templates2013" Directory="Dir_proj_templates2013_locale">
+      <Component Id="Cmp_ApplicationProject_zip" Guid="{3368331A-253C-450E-A126-2B0F9ACF2CC2}">
+        <File Id="File_ApplicationProject_zip" KeyPath="yes" Source="$(var.VisualRust.Templates.TargetDir)ProjectTemplates\Rust\1033\ApplicationProject.zip" />
+      </Component>
+      <Component Id="Cmp_LibraryProject_zip" Guid="{BEF7749B-3EDD-42EF-AE06-161D541275CE}">
+        <File Id="File_LibraryProject_zip" KeyPath="yes" Source="$(var.VisualRust.Templates.TargetDir)ProjectTemplates\Rust\1033\LibraryProject.zip" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

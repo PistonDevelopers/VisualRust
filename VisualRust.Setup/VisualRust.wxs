@@ -18,14 +18,21 @@
     <Feature Id="Ftr_MSBuild_Integration"
              Title="MSBuild integration"
              Description="MSBuild tasks and targets. This feature is required for building Visual Rust projects from command line and Visual Studio."
-             Level="1">
+             Level="1"
+             Absent="disallow">
       <ComponentGroupRef Id="CmpGroup_MSBuild_Integration" />
     </Feature>
 
+
+    <PropertyRef Id="VS2013DEVENV" />
     <Feature Id="Ftr_VisualRust"
          Title="Visual Studio 2013 extension"
          Description="Extension for Visual Studio 2013. Provides support for Rust projects."
-         Level="1">
+         Level="1000">
+      <Condition Level="1">
+        <!-- This is not fully satisfying because the user can still enable it, but I hope most of our users are smarter than that  -->
+        <![CDATA[Installed OR VS2013DEVENV]]>
+      </Condition>
       <ComponentGroupRef Id="CmpGroup_vsx2013"/>
       <ComponentGroupRef Id="CmpGroup_item_templates2013"/>
       <ComponentGroupRef Id="CmpGroup_proj_templates2013"/>

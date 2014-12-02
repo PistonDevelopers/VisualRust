@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust", "VisualRust\VisualRust.csproj", "{8B7B30F7-17C1-4CE8-BAF4-88B086AF7B25}"
 EndProject
@@ -76,7 +76,6 @@ Global
 		{9CF556AB-76FE-4C3D-AD0A-B64B3B9989B4}.Release|x86.ActiveCfg = Release|Any CPU
 		{272707AC-4E61-460E-B925-762E7FEB1CDD}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{272707AC-4E61-460E-B925-762E7FEB1CDD}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{272707AC-4E61-460E-B925-762E7FEB1CDD}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{272707AC-4E61-460E-B925-762E7FEB1CDD}.Debug|x86.ActiveCfg = Debug|x86
 		{272707AC-4E61-460E-B925-762E7FEB1CDD}.Debug|x86.Build.0 = Debug|x86
 		{272707AC-4E61-460E-B925-762E7FEB1CDD}.Release|Any CPU.ActiveCfg = Release|x86
@@ -112,7 +111,6 @@ Global
 		{C68F80B6-62AC-44EB-8557-88761524B495}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C68F80B6-62AC-44EB-8557-88761524B495}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C68F80B6-62AC-44EB-8557-88761524B495}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{C68F80B6-62AC-44EB-8557-88761524B495}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{C68F80B6-62AC-44EB-8557-88761524B495}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution

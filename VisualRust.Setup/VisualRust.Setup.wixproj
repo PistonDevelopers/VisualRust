@@ -22,7 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="templates2013.wxs" />
-    <Compile Include="Product.wxs" />
+    <Compile Include="VisualRust.wxs" />
     <Compile Include="vsx2013.wxs" />
   </ItemGroup>
   <ItemGroup>

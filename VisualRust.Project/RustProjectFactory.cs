@@ -11,6 +11,7 @@ using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace VisualRust.Project
 {
+    [Guid("78C9907C-C22D-4F8D-B13A-49F213FF1631")]
     public class RustProjectFactory : ProjectFactory
     {
         public RustProjectFactory(ProjectPackage pkg) : base(pkg) { }

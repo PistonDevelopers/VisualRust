@@ -10,6 +10,8 @@
              Compressed="yes"
              InstallScope="perMachine" />
 
+    <WixVariable Id="WixUILicenseRtf" Value="..\LICENSE.rtf" />
+
     <UIRef Id="WixUI_FeatureTree" />
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of Visual Rust is already installed." />

@@ -30,5 +30,16 @@
         <File Id="File_VisualRust_Project_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Project.dll" />
       </Component>
     </ComponentGroup>
+    <!--
+      These custom actions are taken pretty much verbatim from the WiX source
+      One difference is that we check if the vsx23013 got installed
+    -->
+    <PropertyRef Id="VS2013DEVENV" />
+    <CustomAction Id="VS2013Setup_Custom" Property="VS2013DEVENV" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
+    <CustomAction Id="VS2013InstallVSTemplates_Custom" Property="VS2013DEVENV" ExeCommand="/InstallVSTemplates" Execute="deferred" Return="ignore" Impersonate="no" />
+    <InstallExecuteSequence>
+      <Custom Action="VS2013Setup_Custom" Before="InstallFinalize"><![CDATA[VS2013DEVENV AND &Ftr_VisualRust=3]]></Custom>
+      <Custom Action="VS2013InstallVSTemplates_Custom" Before="InstallFinalize"><![CDATA[VS2013DEVENV AND &Ftr_VisualRust=3]]></Custom>
+    </InstallExecuteSequence>
   </Fragment>
 </Wix>

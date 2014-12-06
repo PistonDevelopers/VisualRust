@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="{2F72A669-3627-4D83-B8A3-954DB2A12539}"
+  <Product Id="*"
            Name="Visual Rust"
            Language="1033"
            Version="0.1.0.0"
@@ -9,6 +9,8 @@
     <Package InstallerVersion="400"
              Compressed="yes"
              InstallScope="perMachine" />
+
+    <WixVariable Id="WixUILicenseRtf" Value="..\LICENSE.rtf" />
 
     <UIRef Id="WixUI_FeatureTree" />
 

@@ -30,5 +30,17 @@
         <File Id="File_VisualRust_Project_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Project.dll" />
       </Component>
     </ComponentGroup>
+    <PropertyRef Id="VS2013DEVENV" />
+    <!--
+      This custom actions is taken pretty much verbatim from the WiX source. One differences is that we check if the vsx23013 feature was selected (or is being uninstalled).
+    -->
+    <CustomAction Id="CA_VS2013Setup" Property="VS2013DEVENV" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
+    <CustomAction Id="CA_Set_VSIXINSTALLER2013" Property="VSIXINSTALLER2013" Value="[VS2013DEVENV]\..\VsixInstaller.exe"/>
+    <CustomAction Id="CA_Remove_Ancient_Version" Property="VSIXINSTALLER2013" ExeCommand="/q /u:40c1d2b5-528b-4966-a7b1-1974e3568abe" Execute="deferred" Return="ignore" Impersonate="yes"/>
+    <InstallExecuteSequence>
+      <Custom Action="CA_Set_VSIXINSTALLER2013" Before="CA_Remove_Ancient_Version"></Custom>
+      <Custom Action="CA_Remove_Ancient_Version" Before="CA_VS2013Setup"><![CDATA[VS2013DEVENV AND &Ftr_VisualRust=3]]></Custom>
+      <Custom Action="CA_VS2013Setup" Before="InstallFinalize"><![CDATA[(VS2013DEVENV AND &Ftr_VisualRust=3) OR ((NOT UPGRADINGPRODUCTCODE) AND (&Ftr_VisualRust=2) AND (!Ftr_VisualRust=3))]]></Custom>
+    </InstallExecuteSequence>
   </Fragment>
 </Wix>

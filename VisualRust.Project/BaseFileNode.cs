@@ -39,6 +39,16 @@ namespace VisualRust.Project
             ProjectMgr.ReparseFileNode(this);
         }
 
+        public override int ImageIndex
+        {
+            get
+            {
+                if (String.Equals(".rs", Path.GetExtension(AbsoluteFilePath), StringComparison.OrdinalIgnoreCase))
+                    return 52;
+                return base.ImageIndex;
+            }
+        }
+
         // Disable rename
         public override string GetEditLabel()
         {

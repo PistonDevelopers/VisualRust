@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Operations;
 
 namespace VisualRust
@@ -158,6 +162,23 @@ namespace VisualRust
         public static IEnumerable<string> Keywords
         {
             get { return _kws; }
+        }
+        
+        [Conditional("DEBUG")]
+        internal static void DebugPrintToOutput(string s, params object[] args)
+        {        
+            PrintToOutput("[DEBUG] "+s, args);
+        }
+
+        internal static void PrintToOutput(string s, params object[] args)
+        {
+            IVsOutputWindow outWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+            Guid paneGuid = VSConstants.GUID_OutWindowGeneralPane;
+            IVsOutputWindowPane pane;
+            ErrorHandler.ThrowOnFailure(outWindow.CreatePane(paneGuid, "General", 1, 0));            
+            outWindow.GetPane(ref paneGuid, out pane);
+            pane.OutputString(string.Format("[VisualRust]: " + s, args) + "\n");
+            pane.Activate();
         }
     }
 

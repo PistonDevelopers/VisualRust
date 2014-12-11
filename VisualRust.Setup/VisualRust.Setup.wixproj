@@ -21,6 +21,7 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="racer.wxs" />
     <Compile Include="templates2013.wxs" />
     <Compile Include="VisualRust.wxs" />
     <Compile Include="vsx2013.wxs" />

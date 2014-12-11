@@ -1,23 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Windows.Media;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Utilities;
 
 namespace VisualRust
 {
-    [Export(typeof (ICompletionSourceProvider))]
+    [Export(typeof(ICompletionSourceProvider))]
     [ContentType("rust")]
     [Name("rustCompletion")]
     internal class RustCompletionSourceProvider : ICompletionSourceProvider
@@ -33,6 +26,7 @@ namespace VisualRust
             return new RustCompletionSource(textBuffer, GlyphService);
         }
     }
+
 
     internal class RustCompletionSource : ICompletionSource
     {
@@ -51,13 +45,13 @@ namespace VisualRust
             Type,
             FnArg,
             Trait,
+            Static,
         }
 
-        private const int TimeoutMillis = 3000;
         private readonly IGlyphService glyphService;
         private readonly ITextBuffer buffer;
         private bool disposed;
-        
+
         private readonly IEnumerable<Completion> keywordCompletions =
             Utils.Keywords.Select(k => new Completion(k, k + " ", "", null, null));
 
@@ -97,10 +91,12 @@ namespace VisualRust
                 case CompletableLanguageElement.Trait:
                     return glyphService.GetGlyph(StandardGlyphGroup.GlyphGroupInterface,
                         StandardGlyphItem.GlyphItemPublic);
+                case CompletableLanguageElement.Static:
+                    return null;
                 case CompletableLanguageElement.FnArg:
                     return null;
                 default:
-                    DebugWrite("Unhandled language element found in racer autocomplete response: {0}", elType);
+                    Utils.DebugPrintToOutput("Unhandled language element found in racer autocomplete response: {0}", elType);
                     return null;
             }
         }
@@ -149,11 +145,11 @@ namespace VisualRust
                     new SnapshotPoint(snapshot, activeToken.StartIndex + line.Start.Position),
                     triggerPoint),
                 tokenType != RustTokenTypes.WHITESPACE);
-            
+
             var span = snapshot.CreateTrackingSpan(extent.Span, SpanTrackingMode.EdgeInclusive);
 
             // Fetch racer completions & return in a completion set.
-            var completions = GetCompletions(tokenType, activeToken.Text, RunRacer(snapshot, triggerPoint)).ToList();                       
+            var completions = GetCompletions(tokenType, activeToken.Text, RunRacer(snapshot, triggerPoint)).ToList();
             completions.AddRange(keywordCompletions);
 
             completionSets.Add(new RustCompletionSet("All", "All", span, completions, null));
@@ -174,60 +170,16 @@ namespace VisualRust
                 int lineNumber = point.GetContainingLine().LineNumber;
                 int charNumber = GetColumn(point);
                 string args = string.Format("complete {0} {1} {2}", lineNumber + 1, charNumber, tmpFile.Path);
-
-                var binDir = Path.GetDirectoryName(Assembly.GetAssembly(typeof (RustCompletionSource)).Location);
-                string racerPath = Path.Combine(binDir, "racer.exe");
-
-                return RunAndGetStdOut(racerPath, args);
+                return Racer.AutoCompleter.Run(args);
             }
         }
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern int SetErrorMode(int wMode);
-
-        private static string RunAndGetStdOut(string exePath, string args)
-        {
-            // Suppress windows' error dialog if process crashes (With a mature racer.exe this shouldn't happen).         
-            int oldErrorMode = SetErrorMode(3);
-            try
-            {
-                using (Process process = new Process())
-                {
-                    process.StartInfo.FileName = exePath;
-                    process.StartInfo.Arguments = args;
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.StartInfo.CreateNoWindow = true;
-                    process.Start();
-
-                    string result = process.StandardOutput.ReadToEnd();
-
-                    // Don't want to hang waiting for the results.
-                    if (!process.WaitForExit(TimeoutMillis))
-                    {
-                        DebugWrite("Autocomplete timed out");
-                        return "";
-                    }
-
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                DebugWrite("Error executing racer.exe: {0}", ex);
-                return "";
-            }
-            finally
-            {
-                SetErrorMode(oldErrorMode);
-            }
-        }
 
         // Parses racer output into completions.
         private IEnumerable<Completion> GetCompletions(RustTokenTypes tokenType, string tokenText, string racerResponse)
         {
             // Completions from racer.
-            var lines = racerResponse.Split(new[] {'\n'}, StringSplitOptions.None).Where(l => l.StartsWith("MATCH"));
+            var lines = racerResponse.Split(new[] { '\n' }, StringSplitOptions.None).Where(l => l.StartsWith("MATCH"));
             foreach (var line in lines)
             {
                 var tokens = line.Substring(6).Split(',');
@@ -238,18 +190,15 @@ namespace VisualRust
 
                 if (!Enum.TryParse(langElemText, out elType))
                 {
-                    DebugWrite("Failed to parse language element found in racer autocomplete response: {0}", elType);
+                    Utils.DebugPrintToOutput("Failed to parse language element found in racer autocomplete response: {0}", langElemText);
                     continue;
                 }
 
                 string insertionText = tokenType == RustTokenTypes.STRUCTURAL ? tokenText + text : text;
-                if (elType == CompletableLanguageElement.Function)
-                    insertionText += "(";
-
                 var icon = GetCompletionIcon(elType);
 
                 yield return new Completion(text, insertionText, description, icon, null);
-            }                     
+            }
         }
 
         public void Dispose()
@@ -261,17 +210,7 @@ namespace VisualRust
             }
         }
 
-        // Helper to log debug messages to VS Output window when in debug build.
-        [Conditional("DEBUG")]
-        internal static void DebugWrite(string s, params object[] args)
-        {
-            IVsOutputWindow outWindow = Package.GetGlobalService(typeof (SVsOutputWindow)) as IVsOutputWindow;
-            Guid debugPaneGuid = VSConstants.GUID_OutWindowDebugPane;
-            IVsOutputWindowPane dPane;
-            outWindow.GetPane(ref debugPaneGuid, out dPane);
-            dPane.OutputString(string.Format("VisualRust [DEBUG]: " + s, args) + "\n");
-            dPane.Activate();
-        }
+
     }
 
     internal class RustCompletionSet : CompletionSet

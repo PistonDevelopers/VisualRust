@@ -88,7 +88,16 @@ namespace Microsoft.VisualStudio.Project
             {
                 throw new ArgumentNullException("resourceStream");
             }
-            imageList = Utilities.GetImageList(resourceStream);
+            imageList = Utilities.GetImageList(new Bitmap(resourceStream));
+        }
+
+        public ImageHandler(Bitmap bitmap)
+        {
+            if (null == bitmap)
+            {
+                throw new ArgumentNullException("bitmap");
+            }
+            imageList = Utilities.GetImageList(bitmap);
         }
 
         /// <summary>

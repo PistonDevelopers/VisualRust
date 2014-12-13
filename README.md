@@ -18,8 +18,30 @@ Contributing
 
 ## How to contribute?
 
-We use the same model as the main Piston project. Read their [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md) for 
-an explanation and some pointers.
+### Issues
+
+Feel free to open issues, post comments about progress, questions, new ideas,
+brain storming etc. You can remove and edit comments as a way of refining ideas
+in the issue tracker. This is very helpful because many concerns in this
+project are very complex. Many issues needs to be broken down into new
+issues before they can be implemented.
+
+Issues marked *Ready* represent tasks that have a clear design and
+deliverables. They are recommended starting points if you don't
+want to spend time discussing and evaluating implementation.
+
+Issues marked *Information* require some wider perspective and discussion.
+They are perfect if you want to have an impact on the project but don't have
+the time to spend coding.
+
+### Code
+
+1. Fork the main repository
+2. Work on a feature in your own private branch
+3. Once you are finished with you work or want someone to you, open a pull
+   request
+4. Someone will review your code and merge it. Some fixes might be required on
+   your side.
 
 ## Prerequisites
 

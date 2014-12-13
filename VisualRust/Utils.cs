@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Operations;
 
 namespace VisualRust
@@ -13,6 +18,48 @@ namespace VisualRust
 
     static class Utils
     {
+
+        // These keywords are from rustc /src/libsyntax/parse/token.rs, module keywords
+        private static readonly HashSet<string> _kws = new HashSet<string> {
+                "as",
+                "box",
+                "break",
+                "const",
+                "continue",
+                "crate",
+                "else",
+                "enum",
+                "extern",
+                "false",
+                "fn",
+                "for",
+                "if",
+                "impl",
+                "in",
+                "let",
+                "loop",
+                "match",
+                "mod",
+                "move",
+                "mut",
+                "proc",
+                "pub",
+                "ref",
+                "return",
+                "self",
+                "static",
+                "struct",
+                "super",
+                "true",
+                "trait",
+                "type",
+                "unsafe",
+                "use",
+                "virtual",
+                "where",
+                "while"
+            };
+
         public static RustTokenTypes LexerTokenToRustToken(string text, int tok)
         {
             // FIXME: this is super slow.
@@ -77,48 +124,7 @@ namespace VisualRust
             _tt[RustLexer.WHITESPACE] = RustTokenTypes.WHITESPACE;
             _tt[RustLexer.DOC_COMMENT] = RustTokenTypes.DOC_COMMENT;
             _tt[RustLexer.COMMENT] = RustTokenTypes.COMMENT;
-
-            // These keywords are from rustc /src/libsyntax/parse/token.rs, module keywords
-            var _kws = new HashSet<string> {
-                "as",
-                "box",
-                "break",
-                "const",
-                "continue",
-                "crate",
-                "else",
-                "enum",
-                "extern",
-                "false",
-                "fn",
-                "for",
-                "if",
-                "impl",
-                "in",
-                "let",
-                "loop",
-                "match",
-                "mod",
-                "move",
-                "mut",
-                "proc",
-                "pub",
-                "ref",
-                "return",
-                "self",
-                "static",
-                "struct",
-                "super",
-                "true",
-                "trait",
-                "type",
-                "unsafe",
-                "use",
-                "virtual",
-                "where",
-                "while"
-            };
-
+            
             RustTokenTypes ty = _tt[tok];
             if (ty == RustTokenTypes.IDENT)
             {
@@ -152,5 +158,59 @@ namespace VisualRust
                 }
             }
         }
+
+        public static IEnumerable<string> Keywords
+        {
+            get { return _kws; }
+        }
+        
+        [Conditional("DEBUG")]
+        internal static void DebugPrintToOutput(string s, params object[] args)
+        {        
+            PrintToOutput("[DEBUG] "+s, args);
+        }
+
+        internal static void PrintToOutput(string s, params object[] args)
+        {
+            IVsOutputWindow outWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+            Guid paneGuid = VSConstants.GUID_OutWindowGeneralPane;
+            IVsOutputWindowPane pane;
+            ErrorHandler.ThrowOnFailure(outWindow.CreatePane(paneGuid, "General", 1, 0));            
+            outWindow.GetPane(ref paneGuid, out pane);
+            pane.OutputString(string.Format("[VisualRust]: " + s, args) + "\n");
+            pane.Activate();
+        }
     }
+
+    public class TemporaryFile : IDisposable
+    {
+        public string Path { get; private set; }
+
+        /// <summary>
+        ///  Creates a new, empty temporary file
+        /// </summary>
+        public TemporaryFile()
+        {
+            Path = System.IO.Path.GetTempFileName();            
+        }
+
+        /// <summary>
+        ///  Creates a new temporary file with the argument string as UTF-8 content.
+        /// </summary>
+        public TemporaryFile(string content)
+            : this()
+        {
+            using (var sw = new StreamWriter(Path, false, new UTF8Encoding(false)))
+            {
+                sw.Write(content);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!File.Exists(Path))                      
+                File.Delete(Path);            
+        }
+    }
+
 }

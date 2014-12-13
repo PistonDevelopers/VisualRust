@@ -84,6 +84,8 @@ namespace VisualRust
             Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
             this.RegisterProjectFactory(new RustProjectFactory(this));
+
+            Racer.AutoCompleter.Init();
         }
         #endregion
 

@@ -62,6 +62,7 @@ namespace VisualRust.Project
      */
     class RustProjectNode : ProjectNode
     {
+        private ImageHandler handler;
         private Microsoft.VisualStudio.Shell.Package package;
         private bool containsEntryPoint;
         private ModuleTracker modTracker;
@@ -86,6 +87,30 @@ namespace VisualRust.Project
         public override string ProjectType
         {
             get { return "Rust"; }
+        }
+
+        public ImageHandler RustImageHandler
+        {
+            get
+            {
+                if (null == handler)
+                {
+                    handler = new ImageHandler(VisualRust.Project.Properties.Resources.IconList);
+                }
+                return handler;
+            }
+        }
+
+        public override object GetProperty(int propId)
+        {
+            if(propId == (int)__VSHPROPID.VSHPROPID_IconImgList)
+                return RustImageHandler.ImageList.Handle;
+            return base.GetProperty(propId);
+        }
+
+        public override int ImageIndex
+        {
+            get { return 0; }
         }
 
         protected override int UnloadProject()

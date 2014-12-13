@@ -29,6 +29,11 @@ namespace VisualRust.Project
 
         public override string FilePath { get { return this.AbsoluteFilePath; } }
 
+        public bool IsRustFile
+        {
+            get { return String.Equals(".rs", Path.GetExtension(this.AbsoluteFilePath), StringComparison.OrdinalIgnoreCase); }
+        }
+
         protected virtual void OnFileDeleted()
         {
             ProjectMgr.DeleteFileNode(this);
@@ -39,14 +44,11 @@ namespace VisualRust.Project
             ProjectMgr.ReparseFileNode(this);
         }
 
-        public override int ImageIndex
+        public override object GetIconHandle(bool open)
         {
-            get
-            {
-                if (String.Equals(".rs", Path.GetExtension(AbsoluteFilePath), StringComparison.OrdinalIgnoreCase))
-                    return 52;
-                return base.ImageIndex;
-            }
+            if (IsRustFile)
+                return this.ProjectMgr.RustImageHandler.GetIconHandle(1);
+            return base.GetIconHandle(open);
         }
 
         // Disable rename

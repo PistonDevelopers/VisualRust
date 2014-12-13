@@ -30,6 +30,13 @@ namespace VisualRust.Project
             return new ReferencedFileNodeProperties(this);
         }
 
+        public override object GetIconHandle(bool open)
+        {
+            if (IsRustFile)
+                return this.ProjectMgr.RustImageHandler.GetIconHandle(2);
+            return base.GetIconHandle(open);
+        }
+
         protected override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             if (cmdGroup == Microsoft.VisualStudio.Project.VsMenus.guidStandardCommandSet2K && (VsCommands2K)cmd == VsCommands2K.INCLUDEINPROJECT)

@@ -323,6 +323,11 @@ namespace VisualRust.Project
             return base.SaveItem(saveFlag, silentSaveAsName, itemid, docData, out cancelled);
         }
 
+        protected override bool IsItemTypeFileType(string type)
+        {
+            return String.Equals("file", type, StringComparison.OrdinalIgnoreCase);
+        }
+
 #region Disable "Add references..."
         protected override ReferenceContainerNode CreateReferenceContainerNode()
         {

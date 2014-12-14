@@ -23,6 +23,15 @@ namespace VisualRust.Project
         {
         }
 
+        public override object GetIconHandle(bool open)
+        {
+            if (IsRustFile || GetModuleTracking())
+            {
+                return ProjectMgr.RustImageHandler.GetIconHandle((int)IconIndex.RustFile);
+            }
+            return base.GetIconHandle(open);
+        }
+
         protected override NodeProperties CreatePropertiesObject()
         {
             return new FileNodeProperties(this);
@@ -54,6 +63,7 @@ namespace VisualRust.Project
                 this.ProjectMgr.EnableAutoImport(this);
             else
                 this.ProjectMgr.DisableAutoImport(this);
+            this.ReDraw(UIHierarchyElement.Icon);
         }
 
         protected override int ExcludeFromProject()

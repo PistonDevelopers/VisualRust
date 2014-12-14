@@ -33,7 +33,7 @@ namespace VisualRust.Project
         public override object GetIconHandle(bool open)
         {
             if (IsRustFile)
-                return this.ProjectMgr.RustImageHandler.GetIconHandle(2);
+                return this.ProjectMgr.RustImageHandler.GetIconHandle((int)IconIndex.UntrackedRustFile);
             return base.GetIconHandle(open);
         }
 

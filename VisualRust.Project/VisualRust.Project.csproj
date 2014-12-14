@@ -77,6 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseFileNode.cs" />
+    <Compile Include="IconIndex.cs" />
     <Compile Include="CollectionDifference.cs" />
     <Compile Include="TrackedFileNode.cs" />
     <Compile Include="FileNodeProperties.cs" />
@@ -96,12 +97,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="TreeOperations.cs" />
     <Compile Include="UntrackedFileNode.cs" />
     <Compile Include="ResourceDescriptionAttribute.cs" />
     <Compile Include="ResourceDisplayNameAttribute.cs" />
     <Compile Include="RustProjectFactory.cs" />
     <Compile Include="RustProjectNode.cs" />
     <Compile Include="RustProjectNodeProperties.cs" />
+    <Compile Include="UntrackedFolderNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">

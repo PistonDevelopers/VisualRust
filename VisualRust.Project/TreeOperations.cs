@@ -18,9 +18,8 @@ namespace VisualRust.Project
     {
          // Mass delete all sbunodes that were orphaned by the 
          // removal of a subnode with path `rootPath`
-        public static void DeleteSubnode(RustProjectNode root, BaseFileNode srcNode)
+        public static void DeleteSubnode(RustProjectNode root, string srcpath)
         {
-            string srcpath = srcNode.AbsoluteFilePath;
             var forRemoval = root.ModuleTracker.DeleteModule(srcpath);
             foreach (string path in forRemoval.Orphans)
             {

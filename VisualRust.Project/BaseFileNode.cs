@@ -36,7 +36,7 @@ namespace VisualRust.Project
 
         protected virtual void OnFileDeleted()
         {
-            TreeOperations.DeleteSubnode(ProjectMgr, this);
+            TreeOperations.DeleteSubnode(ProjectMgr, this.AbsoluteFilePath);
         }
 
         protected virtual void OnFileCreated()

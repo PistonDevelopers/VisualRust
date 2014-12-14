@@ -158,14 +158,9 @@ namespace VisualRust.Project
                 case _VSFILECHANGEFLAGS.VSFILECHG_Del:
                     // For some reason VSFILECHG_Del sometimes gets raised on file change
                     if (e.ItemID != (uint)VSConstants.VSITEMID.Nil && !File.Exists(e.FileName))
-                        OnFileDeleted(e.ItemID);
+                        TreeOperations.DeleteSubnode(this, e.FileName);
                     break;
             }
-        }
-
-        internal void OnFileDeleted(uint id)
-        {
-            TreeOperations.DeleteSubnode(this, (BaseFileNode)this.NodeFromItemId(id));
         }
 
         internal void OnFileDirty(uint id)
@@ -177,6 +172,21 @@ namespace VisualRust.Project
         {
             var node = new TrackedFileNode(this, elm);
             fileWatcher.ObserveItem(node.AbsoluteFilePath, node.ID);
+            if (!node.GetModuleTracking())
+                ModuleTracker.DisableTracking(node.AbsoluteFilePath);
+            if (!ModuleTracker.IsIncremental)
+            {
+                ModuleTracker.AddRootModule(node.AbsoluteFilePath);
+            }
+            else
+            {
+                HashSet<string> children = ModuleTracker.AddRootModuleIncremental(node.AbsoluteFilePath);
+                foreach(string child in children)
+                {
+                    HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(child));
+                    parent.AddChild(CreateUntrackedNode(child));
+                }
+            }
             return node;
         }
 
@@ -212,7 +222,6 @@ namespace VisualRust.Project
             var node = (TrackedFileNode)base.AddIndependentFileNode(item);
             if(node.GetModuleTracking())
             {
-                ModuleTracker.AddRootModule(node.AbsoluteFilePath);
                 if(node.AbsoluteFilePath.Equals(ModuleTracker.EntryPoint, StringComparison.InvariantCultureIgnoreCase))
                 {
                     node.IsEntryPoint = true;

@@ -54,8 +54,10 @@ namespace VisualRust.Project
 
         public void AddRootModule(string root)
         {
-            Contract.Requires(!IsIncremental);
-            Contract.Requires(root != null);
+            if (IsIncremental)
+                throw new InvalidOperationException();
+            if (root == null)
+                throw new ArgumentNullException("root");
             string normalized = Path.GetFullPath(root);
             fileRoots.Add(normalized);
         }
@@ -63,7 +65,8 @@ namespace VisualRust.Project
         // This function extracts all reachable modules and moves to incremental mode
         public HashSet<string> ExtractReachableAndMakeIncremental()
         {
-            Contract.Requires(!IsIncremental);
+            if (IsIncremental)
+                throw new InvalidOperationException();
             IsIncremental = true;
             return AddModulesInternal(this.fileRoots);
         }
@@ -361,8 +364,10 @@ namespace VisualRust.Project
         // and if the module is still referenced by another non-removed module
         public ModuleRemovalResult DeleteModule(string path)
         {
-            Contract.Requires(IsIncremental);
-            Contract.Requires(path != null);
+            if (!IsIncremental)
+                throw new InvalidOperationException();
+            if (path == null)
+                throw new ArgumentNullException("path");
             bool referencedFromOutside;
             HashSet<string> markedForRemoval = CalculateDependants(path, true, out referencedFromOutside);
             foreach(string mod in markedForRemoval)
@@ -381,8 +386,10 @@ namespace VisualRust.Project
         // Returns set of new modules referenced by this addition (except the module itself)
         public HashSet<string> AddRootModuleIncremental(string path)
         {
-            Contract.Requires(IsIncremental);
-            Contract.Requires(path != null);
+            if (!IsIncremental)
+                throw new InvalidOperationException();
+            if (path == null)
+                throw new ArgumentNullException("path");
             fileRoots.Add(path);
             HashSet<string> result = AddModulesInternal(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { path });
             return result;
@@ -390,8 +397,10 @@ namespace VisualRust.Project
 
         public void UpgradeModule(string path)
         {
-            Contract.Requires(IsIncremental);
-            Contract.Requires(path != null);
+            if (!IsIncremental)
+                throw new InvalidOperationException();
+            if (path == null)
+                throw new ArgumentNullException("path");
             Contract.Assert(!this.fileRoots.Contains(path));
             fileRoots.Add(path);
         }
@@ -400,8 +409,10 @@ namespace VisualRust.Project
         // downgrading a module can orphan some modules
         public ModuleRemovalResult DowngradeModule(string path)
         {
-            Contract.Requires(IsIncremental);
-            Contract.Requires(path != null);
+            if (!IsIncremental)
+                throw new InvalidOperationException();
+            if (path == null)
+                throw new ArgumentNullException("path");
             Contract.Assert(this.fileRoots.Contains(path));
             bool referencedFromOutside;
             HashSet<string> dependingOnRoot = CalculateDependants(path, false, out referencedFromOutside);
@@ -417,8 +428,10 @@ namespace VisualRust.Project
 
         public HashSet<string> DisableTracking(string path)
         {
-            Contract.Requires(!IsIncremental);
-            Contract.Requires(path != null);
+            if (!IsIncremental)
+                throw new InvalidOperationException();
+            if (path == null)
+                throw new ArgumentNullException("path");
             Contract.Assert(this.fileRoots.Contains(path));
             Contract.Assert(this.blockingRoots.Add(path));
             return Reparse(path).Removed;
@@ -426,8 +439,10 @@ namespace VisualRust.Project
 
         public HashSet<string> EnableTracking(string path)
         {
-            Contract.Requires(IsIncremental);
-            Contract.Requires(path != null);
+            if (!IsIncremental)
+                throw new InvalidOperationException();
+            if (path == null)
+                throw new ArgumentNullException("path");
             Contract.Assert(this.fileRoots.Contains(path));
             Contract.Assert(this.blockingRoots.Remove(path));
             return Reparse(path).Added;

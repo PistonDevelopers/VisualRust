@@ -36,7 +36,7 @@ namespace VisualRust.Project
 
         protected virtual void OnFileDeleted()
         {
-            ProjectMgr.DeleteFileNode(this);
+            TreeOperations.DeleteSubnode(ProjectMgr, this);
         }
 
         protected virtual void OnFileCreated()
@@ -47,7 +47,7 @@ namespace VisualRust.Project
         public override object GetIconHandle(bool open)
         {
             if (IsRustFile)
-                return this.ProjectMgr.RustImageHandler.GetIconHandle(1);
+                return this.ProjectMgr.RustImageHandler.GetIconHandle((int)IconIndex.RustFile);
             return base.GetIconHandle(open);
         }
 

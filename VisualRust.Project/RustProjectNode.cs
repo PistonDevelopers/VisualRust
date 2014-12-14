@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio;
+﻿ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -65,7 +65,7 @@ namespace VisualRust.Project
         private ImageHandler handler;
         private Microsoft.VisualStudio.Shell.Package package;
         private bool containsEntryPoint;
-        private ModuleTracker modTracker;
+        internal ModuleTracker ModuleTracker { get; private set; }
         private FileChangeManager fileWatcher;
 
         public RustProjectNode(Microsoft.VisualStudio.Shell.Package package)
@@ -110,7 +110,7 @@ namespace VisualRust.Project
 
         public override int ImageIndex
         {
-            get { return 0; }
+            get { return (int)IconIndex.RustProject; }
         }
 
         protected override int UnloadProject()
@@ -126,7 +126,7 @@ namespace VisualRust.Project
             string outputType = GetProjectProperty(ProjectFileConstants.OutputType, false);
             string entryPoint = Path.Combine(Path.GetDirectoryName(this.FileName), outputType == "library" ? @"src\lib.rs" : @"src\main.rs");
             containsEntryPoint = false;
-            modTracker = new ModuleTracker(entryPoint);
+            ModuleTracker = new ModuleTracker(entryPoint);
             base.Reload();
             // This project for some reason doesn't include entrypoint node, add it
             if (!containsEntryPoint)
@@ -136,7 +136,7 @@ namespace VisualRust.Project
                 node.IsEntryPoint = true;
                 parent.AddChild(node);
             }
-            foreach (string file in modTracker.ExtractReachableAndMakeIncremental())
+            foreach (string file in ModuleTracker.ExtractReachableAndMakeIncremental())
             {
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file));
                 parent.AddChild(CreateUntrackedNode(file));
@@ -165,7 +165,7 @@ namespace VisualRust.Project
 
         internal void OnFileDeleted(uint id)
         {
-            DeleteFileNode((BaseFileNode)this.NodeFromItemId(id));
+            TreeOperations.DeleteSubnode(this, (BaseFileNode)this.NodeFromItemId(id));
         }
 
         internal void OnFileDirty(uint id)
@@ -212,8 +212,8 @@ namespace VisualRust.Project
             var node = (TrackedFileNode)base.AddIndependentFileNode(item);
             if(node.GetModuleTracking())
             {
-                modTracker.AddRootModule(node.AbsoluteFilePath);
-                if(node.AbsoluteFilePath.Equals(modTracker.EntryPoint, StringComparison.InvariantCultureIgnoreCase))
+                ModuleTracker.AddRootModule(node.AbsoluteFilePath);
+                if(node.AbsoluteFilePath.Equals(ModuleTracker.EntryPoint, StringComparison.InvariantCultureIgnoreCase))
                 {
                     node.IsEntryPoint = true;
                     containsEntryPoint = true;
@@ -221,7 +221,7 @@ namespace VisualRust.Project
             }
             else
             {
-                modTracker.DisableTracking(node.AbsoluteFilePath);
+                ModuleTracker.DisableTracking(node.AbsoluteFilePath);
             }
             return node;
         }
@@ -231,88 +231,43 @@ namespace VisualRust.Project
             return new RustProjectNodeProperties(this);
         }
 
-        internal void DeleteFileNode(BaseFileNode srcNode)
-        {
-            var result = modTracker.DeleteModule(srcNode.AbsoluteFilePath);
-            foreach (string path in result.Orphans)
-            {
-                RemoveNode(path, (!result.IsReferenced) && path.Equals(srcNode.AbsoluteFilePath, StringComparison.InvariantCultureIgnoreCase));
-            }
-            if (result.IsReferenced)
-            {
-                // TODO: Mark node of deleted file as a zombie
-            }
-        }
-
-        private void RemoveNode(BaseFileNode node, bool deleteFromStorage)
-        {
-            fileWatcher.StopObservingItem(node.AbsoluteFilePath);
-            node.Remove(false);
-        }
-
-        private void RemoveNode(string path, bool deleteFromStorage)
-        {
-            uint item;
-            this.ParseCanonicalName(path, out item);
-            if (item != (uint)VSConstants.VSITEMID.Nil)
-            {
-                HierarchyNode node = this.NodeFromItemId(item);
-                if (node != null)
-                    RemoveNode((BaseFileNode)node, deleteFromStorage);
-            }
-        }
-
-        private void ReplaceAndSelect(BaseFileNode old, Func<HierarchyNode> newN)
-        {
-            var parent = old.Parent;
-            RemoveNode(old, false);
-            HierarchyNode newNode = newN();
-            parent.AddChild(newNode);
-            // Adjust UI
-            IVsUIHierarchyWindow uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(this.ProjectMgr.Site, SolutionExplorer);
-            if (uiWindow != null)
-            {
-                ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(this.ProjectMgr.InteropSafeIVsUIHierarchy, newNode.ID, EXPANDFLAGS.EXPF_SelectItem));
-            }
-        }
-
         internal void IncludeFileNode(UntrackedFileNode node)
         {
             string path = node.AbsoluteFilePath;
-            modTracker.UpgradeModule(path);
-            ReplaceAndSelect(node, () => CreateFileNode(path));
+            ModuleTracker.UpgradeModule(path);
+            TreeOperations.ReplaceAndSelect(this, node, () => CreateFileNode(path));
         }
 
         internal void ExcludeFileNode(BaseFileNode srcNode)
         {
             // Ask mod tracker for a professional opinion
             string fullPath = srcNode.AbsoluteFilePath;
-            ModuleRemovalResult downgradeResult = modTracker.DowngradeModule(fullPath);
+            ModuleRemovalResult downgradeResult = ModuleTracker.DowngradeModule(fullPath);
             if (downgradeResult.IsReferenced)
             {
-                ReplaceAndSelect(srcNode, () => CreateUntrackedNode(fullPath));
+                TreeOperations.ReplaceAndSelect(this, srcNode, () => CreateUntrackedNode(fullPath));
             }
             else
             {
                 foreach (string path in downgradeResult.Orphans)
                 {
-                    RemoveNode(path, false);
+                    TreeOperations.RemoveSubnode(this, path, false);
                 }
             }
         }
 
         internal void DisableAutoImport(BaseFileNode node)
         {
-            var orphans = modTracker.DisableTracking(node.AbsoluteFilePath);
+            var orphans = ModuleTracker.DisableTracking(node.AbsoluteFilePath);
             foreach (string mod in orphans)
             {
-                RemoveNode(mod, false);
+                TreeOperations.RemoveSubnode(this, mod, false);
             }
         }
 
         internal void EnableAutoImport(BaseFileNode node)
         {
-            var newMods = modTracker.EnableTracking(node.AbsoluteFilePath);
+            var newMods = ModuleTracker.EnableTracking(node.AbsoluteFilePath);
             foreach (string mod in newMods)
             {
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(mod));
@@ -322,10 +277,10 @@ namespace VisualRust.Project
 
         internal void ReparseFileNode(BaseFileNode n)
         {
-            var diff = modTracker.Reparse(n.AbsoluteFilePath);
+            var diff = ModuleTracker.Reparse(n.AbsoluteFilePath);
             foreach(string mod in diff.Removed)
             {
-                RemoveNode(mod, false);
+                TreeOperations.RemoveSubnode(this, mod, false);
             }
             foreach (string mod in diff.Added)
             {
@@ -359,6 +314,7 @@ namespace VisualRust.Project
             return base.SaveItem(saveFlag, silentSaveAsName, itemid, docData, out cancelled);
         }
 
+#region Disable "Add references..."
         protected override ReferenceContainerNode CreateReferenceContainerNode()
         {
             return null;
@@ -389,5 +345,6 @@ namespace VisualRust.Project
         {
             return VSConstants.E_NOTIMPL;
         }
+#endregion
     }
 }

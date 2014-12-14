@@ -9,7 +9,8 @@ namespace VisualRust.Project
     // Strong typing for indexes of images in Resources/IconList.bmp
     enum IconIndex
     {
-        RustProject,
+        NoIcon = -1,
+        RustProject = 0,
         RustFile,
         UntrackedRustFile,
         UntrackedFolder,

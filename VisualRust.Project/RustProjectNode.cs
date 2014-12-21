@@ -131,14 +131,14 @@ namespace VisualRust.Project
             // This project for some reason doesn't include entrypoint node, add it
             if (!containsEntryPoint)
             {
-                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(entryPoint));
+                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(entryPoint), true);
                 TrackedFileNode node = (TrackedFileNode)this.CreateFileNode(entryPoint);
                 node.IsEntryPoint = true;
                 parent.AddChild(node);
             }
             foreach (string file in ModuleTracker.ExtractReachableAndMakeIncremental())
             {
-                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file));
+                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file), false);
                 parent.AddChild(CreateUntrackedNode(file));
             }
             fileWatcher.FileChangedOnDisk += OnFileChangedOnDisk;
@@ -183,7 +183,7 @@ namespace VisualRust.Project
                 HashSet<string> children = ModuleTracker.AddRootModuleIncremental(node.AbsoluteFilePath);
                 foreach(string child in children)
                 {
-                    HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(child));
+                    HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(child), false);
                     parent.AddChild(CreateUntrackedNode(child));
                 }
             }
@@ -279,7 +279,7 @@ namespace VisualRust.Project
             var newMods = ModuleTracker.EnableTracking(node.AbsoluteFilePath);
             foreach (string mod in newMods)
             {
-                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(mod));
+                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(mod), false);
                 parent.AddChild(CreateUntrackedNode(mod));
             }
         }
@@ -293,7 +293,7 @@ namespace VisualRust.Project
             }
             foreach (string mod in diff.Added)
             {
-                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(mod));
+                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(mod), false);
                 parent.AddChild(CreateUntrackedNode(mod));
             }
         }
@@ -326,6 +326,18 @@ namespace VisualRust.Project
         protected override bool IsItemTypeFileType(string type)
         {
             return String.Equals("file", type, StringComparison.OrdinalIgnoreCase);
+        }
+
+        protected override FolderNode CreateFolderNode(string path, ProjectElement element, bool tracked)
+        {
+            if (tracked && element == null)
+                throw new ArgumentException("tracked and element");
+            if (!tracked && element != null)
+                throw new ArgumentException("tracked and element");
+            if (tracked)
+                return new FolderNode(this, path, element);
+            else
+                return new UntrackedFolderNode(this, path);
         }
 
 #region Disable "Add references..."

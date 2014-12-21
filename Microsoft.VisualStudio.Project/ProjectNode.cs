@@ -2560,7 +2560,7 @@ namespace Microsoft.VisualStudio.Project
         /// Walks the subpaths of a project relative path and checks if the folder nodes hierarchy is already there, if not creates it.
         /// </summary>
         /// <param name="strPath">Path of the folder, can be relative to project or absolute</param>
-        public virtual HierarchyNode CreateFolderNodes(string path)
+        public virtual HierarchyNode CreateFolderNodes(string path, bool tracked = true)
         {
             if (String.IsNullOrEmpty(path))
             {
@@ -2589,7 +2589,7 @@ namespace Microsoft.VisualStudio.Project
                 if (parts[i].Length > 0)
                 {
                     path += parts[i] + "\\";
-                    curParent = VerifySubFolderExists(path, curParent);
+                    curParent = VerifySubFolderExists(path, curParent, tracked);
                 }
             }
             return curParent;
@@ -2641,7 +2641,7 @@ namespace Microsoft.VisualStudio.Project
         /// <param name="parent">the parent node where to add the subfolder if it does not exist.</param>
         /// <returns>the foldernode correcsponding to the path.</returns>
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubFolder")]
-        protected virtual FolderNode VerifySubFolderExists(string path, HierarchyNode parent)
+        protected virtual FolderNode VerifySubFolderExists(string path, HierarchyNode parent, bool tracked)
         {
             FolderNode folderNode = null;
             uint uiItemId;
@@ -2669,9 +2669,9 @@ namespace Microsoft.VisualStudio.Project
                     }
                 }
                 // If MSBuild did not know about it, create a new one
-                if (item == null)
+                if (item == null && tracked)
                     item = this.AddFolderToMsBuild(path);
-                folderNode = this.CreateFolderNode(path, item);
+                folderNode = this.CreateFolderNode(path, item, tracked);
                 parent.AddChild(folderNode);
             }
 
@@ -2684,7 +2684,7 @@ namespace Microsoft.VisualStudio.Project
         /// <param name="path">Path to store for this folder</param>
         /// <param name="element">Element corresponding to the folder</param>
         /// <returns>A FolderNode that can then be added to the hierarchy</returns>
-        protected internal virtual FolderNode CreateFolderNode(string path, ProjectElement element)
+        protected internal virtual FolderNode CreateFolderNode(string path, ProjectElement element, bool tracked)
         {
             FolderNode folderNode = new FolderNode(this, path, element);
             return folderNode;
@@ -4126,10 +4126,10 @@ namespace Microsoft.VisualStudio.Project
         /// </summary>
         /// <param name="path">Path to folder</param>
         /// <returns>FolderNode created that can be added to the hierarchy</returns>
-        protected internal FolderNode CreateFolderNode(string path)
+        protected internal FolderNode CreateFolderNode(string path, bool tracked)
         {
             ProjectElement item = this.AddFolderToMsBuild(path);
-            FolderNode folderNode = CreateFolderNode(path, item);
+            FolderNode folderNode = CreateFolderNode(path, item, tracked);
             return folderNode;
         }
 

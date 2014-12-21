@@ -534,6 +534,8 @@ namespace VisualRust.Project
         {
             ModuleImport oldImports = lastParseResult[path];
             ModuleImport newImports = ReadImports(path);
+            if (oldImports.Count == 0 && newImports.Count == 0)
+                return new ImportsDifference(new HashSet<string>(StringComparer.InvariantCultureIgnoreCase), new HashSet<string>(StringComparer.InvariantCultureIgnoreCase));
             ImportsChange normalized = NormalizeImports(path, oldImports, newImports);
             ImportsDifference diff = DiffReparseSets(path, normalized);
             HashSet<string> removedFromProject = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);

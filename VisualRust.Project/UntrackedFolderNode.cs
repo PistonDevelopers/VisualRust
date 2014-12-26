@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Project;
+﻿using Microsoft.VisualStudioTools.Project;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +21,7 @@ namespace VisualRust.Project
      * # If tracked node is added it gets changes to tracked
      * # If all its nodes are removed from the project, it gets removed too
      */
-    class UntrackedFolderNode : FolderNode
+    class UntrackedFolderNode : CommonFolderNode
     {
 
         private class SuspendChildrenTrackingCookie : IDisposable
@@ -43,10 +43,10 @@ namespace VisualRust.Project
         private int untrackedChildren = 0;
         public new RustProjectNode ProjectMgr { get; private set; }
 
-        public UntrackedFolderNode(RustProjectNode node, string relativePath)
-            : base(node, relativePath, null)
+        public UntrackedFolderNode(RustProjectNode root, ProjectElement elm)
+            : base(root, elm)
         {
-            ProjectMgr = node;
+            ProjectMgr = root;
         }
 
         public override object GetIconHandle(bool open)

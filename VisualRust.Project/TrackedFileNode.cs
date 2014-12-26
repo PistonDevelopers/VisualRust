@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Project;
+using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio.OLE.Interop;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace VisualRust.Project
         public bool IsEntryPoint { get; set; }
 
         public TrackedFileNode(RustProjectNode root, ProjectElement elm)
-            : base(root, elm, elm.GetFullPathForElement())
+            : base(root, elm, elm.GetMetadata(ProjectFileConstants.Include))
         {
         }
 
@@ -47,7 +47,7 @@ namespace VisualRust.Project
 
         public bool GetModuleTracking()
         {
-            string value = this.ItemNode.GetEvaluatedMetadata(ModuleTrackingKey);
+            string value = this.ItemNode.GetMetadata(ModuleTrackingKey);
             if (String.IsNullOrWhiteSpace(value))
                 return true;
             bool retValue;
@@ -63,10 +63,10 @@ namespace VisualRust.Project
                 this.ProjectMgr.EnableAutoImport(this);
             else
                 this.ProjectMgr.DisableAutoImport(this);
-            this.ReDraw(UIHierarchyElement.Icon);
+            this.ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
         }
 
-        protected override int ExcludeFromProject()
+        internal override int ExcludeFromProject()
         {
             ((RustProjectNode)this.ProjectMgr).ExcludeFileNode(this);
             return VSConstants.S_OK;

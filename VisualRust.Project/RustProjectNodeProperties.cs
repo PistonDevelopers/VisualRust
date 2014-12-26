@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Project;
+﻿using Microsoft.VisualStudioTools.Project;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +12,7 @@ namespace VisualRust.Project
     [CLSCompliant(false), ComVisible(true)]
     public class RustProjectNodeProperties : ProjectNodeProperties
     {
-        internal RustProjectNodeProperties(ProjectNode node)
+        internal RustProjectNodeProperties(CommonProjectNode node)
             : base(node)
         { }
 

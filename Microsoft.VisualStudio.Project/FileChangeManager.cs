@@ -1,50 +1,18 @@
-/********************************************************************************************
-
-Copyright (c) Microsoft Corporation 
-All rights reserved. 
-
-Microsoft Public License: 
-
-This license governs use of the accompanying software. If you use the software, you 
-accept this license. If you do not accept the license, do not use the software. 
-
-1. Definitions 
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the 
-same meaning here as under U.S. copyright law. 
-A "contribution" is the original software, or any additions or changes to the software. 
-A "contributor" is any person that distributes its contribution under this license. 
-"Licensed patents" are a contributor's patent claims that read directly on its contribution. 
-
-2. Grant of Rights 
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions 
-and limitations in section 3, each contributor grants you a non-exclusive, worldwide, 
-royalty-free copyright license to reproduce its contribution, prepare derivative works of 
-its contribution, and distribute its contribution or any derivative works that you create. 
-(B) Patent Grant- Subject to the terms of this license, including the license conditions 
-and limitations in section 3, each contributor grants you a non-exclusive, worldwide, 
-royalty-free license under its licensed patents to make, have made, use, sell, offer for 
-sale, import, and/or otherwise dispose of its contribution in the software or derivative 
-works of the contribution in the software. 
-
-3. Conditions and Limitations 
-(A) No Trademark License- This license does not grant you rights to use any contributors' 
-name, logo, or trademarks. 
-(B) If you bring a patent claim against any contributor over patents that you claim are 
-infringed by the software, your patent license from such contributor to the software ends 
-automatically. 
-(C) If you distribute any portion of the software, you must retain all copyright, patent, 
-trademark, and attribution notices that are present in the software. 
-(D) If you distribute any portion of the software in source code form, you may do so only 
-under this license by including a complete copy of this license with your distribution. 
-If you distribute any portion of the software in compiled or object code form, you may only 
-do so under a license that complies with this license. 
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give 
-no express warranties, guarantees or conditions. You may have additional consumer rights 
-under your local laws which this license cannot change. To the extent permitted under your 
-local laws, the contributors exclude the implied warranties of merchantability, fitness for 
-a particular purpose and non-infringement.
-
-********************************************************************************************/
+//*********************************************************//
+//    Copyright (c) Microsoft. All rights reserved.
+//    
+//    Apache 2.0 License
+//    
+//    You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//    
+//    Unless required by applicable law or agreed to in writing, software 
+//    distributed under the License is distributed on an "AS IS" BASIS, 
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
+//    implied. See the License for the specific language governing 
+//    permissions and limitations under the License.
+//
+//*********************************************************//
 
 using System;
 using System.Collections.Generic;
@@ -53,19 +21,16 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using IServiceProvider = System.IServiceProvider;
 
-namespace Microsoft.VisualStudio.Project
-{
+namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
     /// This object is in charge of reloading nodes that have file monikers that can be listened to changes
     /// </summary>
-    public class FileChangeManager : IVsFileChangeEvents
-    {
+    internal class FileChangeManager : IVsFileChangeEvents {
         #region nested objects
         /// <summary>
         /// Defines a data structure that can link a item moniker to the item and its file change cookie.
         /// </summary>
-        private struct ObservedItemInfo
-        {
+        private struct ObservedItemInfo {
             /// <summary>
             /// Defines the id of the item that is to be reloaded.
             /// </summary>
@@ -79,15 +44,12 @@ namespace Microsoft.VisualStudio.Project
             /// <summary>
             /// Defines the nested project item that is to be reloaded.
             /// </summary>
-            public uint ItemID
-            {
-                get
-                {
+            internal uint ItemID {
+                get {
                     return this.itemID;
                 }
 
-                set
-                {
+                set {
                     this.itemID = value;
                 }
             }
@@ -95,15 +57,12 @@ namespace Microsoft.VisualStudio.Project
             /// <summary>
             /// Defines the file change cookie that is returned when listenning on file changes on the nested project item.
             /// </summary>
-            public uint FileChangeCookie
-            {
-                get
-                {
+            internal uint FileChangeCookie {
+                get {
                     return this.fileChangeCookie;
                 }
 
-                set
-                {
+                set {
                     this.fileChangeCookie = value;
                 }
             }
@@ -114,7 +73,7 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// Event that is raised when one of the observed file names have changed on disk.
         /// </summary>
-        public event EventHandler<FileChangedOnDiskEventArgs> FileChangedOnDisk;
+        internal event EventHandler<FileChangedOnDiskEventArgs> FileChangedOnDisk;
 
         /// <summary>
         /// Reference to the FileChange service.
@@ -138,19 +97,16 @@ namespace Microsoft.VisualStudio.Project
         /// Overloaded ctor.
         /// </summary>
         /// <param name="nodeParam">An instance of a project item.</param>
-        public FileChangeManager(IServiceProvider serviceProvider)
-        {
+        internal FileChangeManager(IServiceProvider serviceProvider) {
             #region input validation
-            if(serviceProvider == null)
-            {
+            if (serviceProvider == null) {
                 throw new ArgumentNullException("serviceProvider");
             }
             #endregion
 
             this.fileChangeService = (IVsFileChangeEx)serviceProvider.GetService(typeof(SVsFileChangeEx));
 
-            if(this.fileChangeService == null)
-            {
+            if (this.fileChangeService == null) {
                 // VS is in bad state, since the SVsFileChangeEx could not be proffered.
                 throw new InvalidOperationException();
             }
@@ -161,19 +117,16 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// Disposes resources.
         /// </summary>
-        public void Dispose()
-        {
+        public void Dispose() {
             // Don't dispose more than once
-            if(this.disposed)
-            {
+            if (this.disposed) {
                 return;
             }
 
             this.disposed = true;
 
             // Unsubscribe from the observed source files.
-            foreach(ObservedItemInfo info in this.observedItems.Values)
-            {
+            foreach (ObservedItemInfo info in this.observedItems.Values) {
                 ErrorHandler.ThrowOnFailure(this.fileChangeService.UnadviseFileChange(info.FileChangeCookie));
             }
 
@@ -190,25 +143,19 @@ namespace Microsoft.VisualStudio.Project
         /// <param name="filesChanged">Array of file names.</param>
         /// <param name="flags">Array of flags indicating the type of changes. See _VSFILECHANGEFLAGS.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
-        int IVsFileChangeEvents.FilesChanged(uint numberOfFilesChanged, string[] filesChanged, uint[] flags)
-        {
-            if (filesChanged == null)
-            {
+        int IVsFileChangeEvents.FilesChanged(uint numberOfFilesChanged, string[] filesChanged, uint[] flags) {
+            if (filesChanged == null) {
                 throw new ArgumentNullException("filesChanged");
             }
 
-            if (flags == null)
-            {
+            if (flags == null) {
                 throw new ArgumentNullException("flags");
             }
-            
-            if(this.FileChangedOnDisk != null)
-            {
-                for(int i = 0; i < numberOfFilesChanged; i++)
-                {
+
+            if (this.FileChangedOnDisk != null) {
+                for (int i = 0; i < numberOfFilesChanged; i++) {
                     string fullFileName = Utilities.CanonicalizeFileName(filesChanged[i]);
-                    if(this.observedItems.ContainsKey(fullFileName))
-                    {
+                    if (this.observedItems.ContainsKey(fullFileName)) {
                         ObservedItemInfo info = this.observedItems[fullFileName];
                         this.FileChangedOnDisk(this, new FileChangedOnDiskEventArgs(fullFileName, info.ItemID, (_VSFILECHANGEFLAGS)flags[i]));
                     }
@@ -223,8 +170,7 @@ namespace Microsoft.VisualStudio.Project
         /// </summary>
         /// <param name="directory">Name of the directory that had a change.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
-        int IVsFileChangeEvents.DirectoryChanged(string directory)
-        {
+        int IVsFileChangeEvents.DirectoryChanged(string directory) {
             return VSConstants.S_OK;
         }
         #endregion
@@ -234,8 +180,7 @@ namespace Microsoft.VisualStudio.Project
         /// Observe when the given file is updated on disk. In this case we do not care about the item id that represents the file in the hierarchy.
         /// </summary>
         /// <param name="fileName">File to observe.</param>
-        public void ObserveItem(string fileName)
-        {
+        internal void ObserveItem(string fileName) {
             this.ObserveItem(fileName, VSConstants.VSITEMID_NIL);
         }
 
@@ -244,18 +189,15 @@ namespace Microsoft.VisualStudio.Project
         /// </summary>
         /// <param name="fileName">File to observe.</param>
         /// <param name="id">The item id of the item to observe.</param>
-        public void ObserveItem(string fileName, uint id)
-        {
+        internal void ObserveItem(string fileName, uint id) {
             #region Input validation
-            if(String.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "fileName");
+            if (String.IsNullOrEmpty(fileName)) {
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "fileName");
             }
             #endregion
 
             string fullFileName = Utilities.CanonicalizeFileName(fileName);
-            if(!this.observedItems.ContainsKey(fullFileName))
-            {
+            if (!this.observedItems.ContainsKey(fullFileName)) {
                 // Observe changes to the file
                 uint fileChangeCookie;
                 ErrorHandler.ThrowOnFailure(this.fileChangeService.AdviseFileChange(fullFileName, (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Del), this, out fileChangeCookie));
@@ -274,18 +216,15 @@ namespace Microsoft.VisualStudio.Project
         /// </summary>
         /// <param name="fileName">File to ignore observing.</param>
         /// <param name="ignore">Flag indicating whether or not to ignore changes (1 to ignore, 0 to stop ignoring).</param>
-        public void IgnoreItemChanges(string fileName, bool ignore)
-        {
+        internal void IgnoreItemChanges(string fileName, bool ignore) {
             #region Input validation
-            if(String.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "fileName");
+            if (String.IsNullOrEmpty(fileName)) {
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "fileName");
             }
             #endregion
 
             string fullFileName = Utilities.CanonicalizeFileName(fileName);
-            if(this.observedItems.ContainsKey(fullFileName))
-            {
+            if (this.observedItems.ContainsKey(fullFileName)) {
                 // Call ignore file with the flags specified.
                 ErrorHandler.ThrowOnFailure(this.fileChangeService.IgnoreFile(0, fileName, ignore ? 1 : 0));
             }
@@ -295,19 +234,16 @@ namespace Microsoft.VisualStudio.Project
         /// Stop observing when the file is updated on disk.
         /// </summary>
         /// <param name="fileName">File to stop observing.</param>
-        public void StopObservingItem(string fileName)
-        {
+        internal void StopObservingItem(string fileName) {
             #region Input validation
-            if(String.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "fileName");
+            if (String.IsNullOrEmpty(fileName)) {
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "fileName");
             }
             #endregion
 
             string fullFileName = Utilities.CanonicalizeFileName(fileName);
 
-            if(this.observedItems.ContainsKey(fullFileName))
-            {
+            if (this.observedItems.ContainsKey(fullFileName)) {
                 // Get the cookie that was used for this.observedItems to this file.
                 ObservedItemInfo itemInfo = this.observedItems[fullFileName];
 

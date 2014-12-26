@@ -1,50 +1,18 @@
-/********************************************************************************************
-
-Copyright (c) Microsoft Corporation 
-All rights reserved. 
-
-Microsoft Public License: 
-
-This license governs use of the accompanying software. If you use the software, you 
-accept this license. If you do not accept the license, do not use the software. 
-
-1. Definitions 
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the 
-same meaning here as under U.S. copyright law. 
-A "contribution" is the original software, or any additions or changes to the software. 
-A "contributor" is any person that distributes its contribution under this license. 
-"Licensed patents" are a contributor's patent claims that read directly on its contribution. 
-
-2. Grant of Rights 
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions 
-and limitations in section 3, each contributor grants you a non-exclusive, worldwide, 
-royalty-free copyright license to reproduce its contribution, prepare derivative works of 
-its contribution, and distribute its contribution or any derivative works that you create. 
-(B) Patent Grant- Subject to the terms of this license, including the license conditions 
-and limitations in section 3, each contributor grants you a non-exclusive, worldwide, 
-royalty-free license under its licensed patents to make, have made, use, sell, offer for 
-sale, import, and/or otherwise dispose of its contribution in the software or derivative 
-works of the contribution in the software. 
-
-3. Conditions and Limitations 
-(A) No Trademark License- This license does not grant you rights to use any contributors' 
-name, logo, or trademarks. 
-(B) If you bring a patent claim against any contributor over patents that you claim are 
-infringed by the software, your patent license from such contributor to the software ends 
-automatically. 
-(C) If you distribute any portion of the software, you must retain all copyright, patent, 
-trademark, and attribution notices that are present in the software. 
-(D) If you distribute any portion of the software in source code form, you may do so only 
-under this license by including a complete copy of this license with your distribution. 
-If you distribute any portion of the software in compiled or object code form, you may only 
-do so under a license that complies with this license. 
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give 
-no express warranties, guarantees or conditions. You may have additional consumer rights 
-under your local laws which this license cannot change. To the extent permitted under your 
-local laws, the contributors exclude the implied warranties of merchantability, fitness for 
-a particular purpose and non-infringement.
-
-********************************************************************************************/
+//*********************************************************//
+//    Copyright (c) Microsoft. All rights reserved.
+//    
+//    Apache 2.0 License
+//    
+//    You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//    
+//    Unless required by applicable law or agreed to in writing, software 
+//    distributed under the License is distributed on an "AS IS" BASIS, 
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
+//    implied. See the License for the specific language governing 
+//    permissions and limitations under the License.
+//
+//*********************************************************//
 
 using System;
 using System.Diagnostics;
@@ -52,23 +20,18 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.VisualStudio.Project.Automation
-{
-    [ComVisible(true), CLSCompliant(false)]
-    public class OAProjectItem<T> : EnvDTE.ProjectItem
-         where T : HierarchyNode
-    {
+namespace Microsoft.VisualStudioTools.Project.Automation {
+    [ComVisible(true)]
+    public class OAProjectItem : EnvDTE.ProjectItem {
 
         #region fields
-        private T node;
+        private HierarchyNode node;
         private OAProject project;
         #endregion
 
         #region properties
-        protected T Node
-        {
-            get
-            {
+        internal HierarchyNode Node {
+            get {
                 return this.node;
             }
         }
@@ -76,18 +39,15 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Returns the automation project
         /// </summary>
-        protected OAProject Project
-        {
-            get
-            {
+        protected OAProject Project {
+            get {
                 return this.project;
             }
         }
         #endregion
 
         #region ctors
-        public OAProjectItem(OAProject project, T node)
-        {
+        internal OAProjectItem(OAProject project, HierarchyNode node) {
             this.node = node;
             this.project = project;
         }
@@ -100,18 +60,15 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// </summary>
         /// <param name="extenderName">The name of the extender.</param>
         /// <returns>The extender object.</returns>
-        public virtual object get_Extender(string extenderName)
-        {
+        public virtual object get_Extender(string extenderName) {
             return null;
         }
 
         /// <summary>
         /// Gets an object that can be accessed by name at run time.
         /// </summary>
-        public virtual object Object
-        {
-            get
-            {
+        public virtual object Object {
+            get {
                 return this.node.Object;
             }
         }
@@ -119,10 +76,8 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets the Document associated with the item, if one exists.
         /// </summary>
-        public virtual EnvDTE.Document Document
-        {
-            get
-            {
+        public virtual EnvDTE.Document Document {
+            get {
                 return null;
             }
         }
@@ -130,10 +85,8 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets the number of files associated with a ProjectItem.
         /// </summary>
-        public virtual short FileCount
-        {
-            get
-            {
+        public virtual short FileCount {
+            get {
                 return (short)1;
             }
         }
@@ -141,18 +94,12 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets a collection of all properties that pertain to the object. 
         /// </summary>
-        public virtual EnvDTE.Properties Properties
-        {
-            get
-            {
-                return UIThread.DoOnUIThread(delegate()
-                {
-                    if (this.node.NodeProperties == null)
-                    {
+        public virtual EnvDTE.Properties Properties {
+            get {
+                if (this.node.NodeProperties == null) {
                     return null;
                 }
                 return new OAProperties(this.node.NodeProperties);
-                });
             }
         }
 
@@ -160,10 +107,8 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets the FileCodeModel object for the project item.
         /// </summary>
-        public virtual EnvDTE.FileCodeModel FileCodeModel
-        {
-            get
-            {
+        public virtual EnvDTE.FileCodeModel FileCodeModel {
+            get {
                 return null;
             }
         }
@@ -171,10 +116,8 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets a ProjectItems for the object.
         /// </summary>
-        public virtual EnvDTE.ProjectItems ProjectItems
-        {
-            get
-            {
+        public virtual EnvDTE.ProjectItems ProjectItems {
+            get {
                 return null;
             }
         }
@@ -182,10 +125,8 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets a GUID string indicating the kind or type of the object.
         /// </summary>
-        public virtual string Kind
-        {
-            get
-            {
+        public virtual string Kind {
+            get {
                 Guid guid;
                 ErrorHandler.ThrowOnFailure(this.node.GetGuidProperty((int)__VSHPROPID.VSHPROPID_TypeGuid, out guid));
                 return guid.ToString("B");
@@ -197,18 +138,15 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// </summary>
         /// <param name="fileName">The name with which to save the project or project item.</param>
         /// <remarks>Implemented by subclasses.</remarks>
-        public virtual void Save(string fileName)
-        {
+        public virtual void Save(string fileName) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// Gets the top-level extensibility object.
         /// </summary>
-        public virtual EnvDTE.DTE DTE
-        {
-            get
-            {
+        public virtual EnvDTE.DTE DTE {
+            get {
                 return (EnvDTE.DTE)this.project.DTE;
             }
         }
@@ -216,46 +154,27 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets the ProjectItems collection containing the ProjectItem object supporting this property.
         /// </summary>
-        public virtual EnvDTE.ProjectItems Collection
-        {
-            get
-            {
-                return UIThread.DoOnUIThread(delegate()
-                {
+        public virtual EnvDTE.ProjectItems Collection {
+            get {
                 // Get the parent node
                 HierarchyNode parentNode = this.node.Parent;
                 Debug.Assert(parentNode != null, "Failed to get the parent node");
 
                 // Get the ProjectItems object for the parent node
-                    if (parentNode is ProjectNode)
-                {
+                if (parentNode is ProjectNode) {
                     // The root node for the project
                     return ((OAProject)parentNode.GetAutomationObject()).ProjectItems;
-                }
-                    else if (parentNode is FileNode && parentNode.FirstChild != null)
-                {
-                    // The item has children
-                    return ((OAProjectItem<FileNode>)parentNode.GetAutomationObject()).ProjectItems;
-                }
-                    else if (parentNode is FolderNode)
-                {
-                    return ((OAProjectItem<FolderNode>)parentNode.GetAutomationObject()).ProjectItems;
-                }
-                else
-                {
+                } else {
                     // Not supported. Override this method in derived classes to return appropriate collection object
-                    throw new NotImplementedException();
+                    throw new InvalidOperationException();
                 }
-                });
             }
         }
         /// <summary>
         /// Gets a list of available Extenders for the object.
         /// </summary>
-        public virtual object ExtenderNames
-        {
-            get
-            {
+        public virtual object ExtenderNames {
+            get {
                 return null;
             }
         }
@@ -264,10 +183,8 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// Gets the ConfigurationManager object for this ProjectItem. 
         /// </summary>
         /// <remarks>We do not support config management based per item.</remarks>
-        public virtual EnvDTE.ConfigurationManager ConfigurationManager
-        {
-            get
-            {
+        public virtual EnvDTE.ConfigurationManager ConfigurationManager {
+            get {
                 return null;
             }
         }
@@ -275,10 +192,8 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets the project hosting the ProjectItem.
         /// </summary>
-        public virtual EnvDTE.Project ContainingProject
-        {
-            get
-            {
+        public virtual EnvDTE.Project ContainingProject {
+            get {
                 return this.project;
             }
         }
@@ -286,15 +201,12 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets or sets a value indicating whether or not the object has been modified since last being saved or opened.
         /// </summary>
-        public virtual bool Saved
-        {
-            get
-            {
+        public virtual bool Saved {
+            get {
                 return !this.IsDirty;
 
             }
-            set
-            {
+            set {
                 throw new NotImplementedException();
             }
         }
@@ -302,10 +214,8 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Gets the Extender category ID (CATID) for the object.
         /// </summary>
-        public virtual string ExtenderCATID
-        {
-            get
-            {
+        public virtual string ExtenderCATID {
+            get {
                 return null;
             }
         }
@@ -313,10 +223,8 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// If the project item is the root of a subproject, then the SubProject property returns the Project object for the subproject.
         /// </summary>
-        public virtual EnvDTE.Project SubProject
-        {
-            get
-            {
+        public virtual EnvDTE.Project SubProject {
+            get {
                 return null;
             }
         }
@@ -324,79 +232,59 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Microsoft Internal Use Only. Checks if the document associated to this item is dirty.
         /// </summary>
-        public virtual bool IsDirty
-        {
-            get
-            {
-                throw new NotImplementedException();
+        public virtual bool IsDirty {
+            get {
+                return false;
             }
-            set
-            {
-                throw new NotImplementedException();
+            set {
             }
         }
 
         /// <summary>
         /// Gets or sets the name of the object.
         /// </summary>
-        public virtual string Name
-        {
-            get
-            {
+        public virtual string Name {
+            get {
                 return this.node.Caption;
             }
-            set
-            {
-                if(this.node == null || this.node.ProjectMgr == null || this.node.ProjectMgr.IsClosed || this.node.ProjectMgr.Site == null)
-                {
-                    throw new InvalidOperationException();
-                }
+            set {
+                CheckProjectIsValid();
 
-                UIThread.DoOnUIThread(delegate()
-                {
-                    using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
-                    {
-                    this.node.SetEditLabel(value);
+                using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site)) {
+                    UIThread.Invoke(() => this.node.SetEditLabel(value));
                 }
-                });
             }
         }
+
+        protected void CheckProjectIsValid() {
+            Utilities.CheckNotNull(this.node);
+            Utilities.CheckNotNull(this.node.ProjectMgr);
+            Utilities.CheckNotNull(this.node.ProjectMgr.Site);
+            if (this.node.ProjectMgr.IsClosed) {
+                throw new InvalidOperationException();
+            }
+        }
+
         /// <summary>
         /// Removes the project item from hierarchy.
         /// </summary>
-        public virtual void Remove()
-        {
-            if(this.node == null || this.node.ProjectMgr == null || this.node.ProjectMgr.IsClosed || this.node.ProjectMgr.Site == null)
-            {
-                throw new InvalidOperationException();
-            }
+        public virtual void Remove() {
+            CheckProjectIsValid();
 
-            UIThread.DoOnUIThread(delegate()
-            {
-                using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
-            {
-                this.node.Remove(false);
+            using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site)) {
+                UIThread.Invoke(() => this.node.Remove(false));
             }
-            });
         }
 
         /// <summary>
         /// Removes the item from its project and its storage. 
         /// </summary>
-        public virtual void Delete()
-        {
-            if(this.node == null || this.node.ProjectMgr == null || this.node.ProjectMgr.IsClosed || this.node.ProjectMgr.Site == null)
-            {
-                throw new InvalidOperationException();
-            }
+        public virtual void Delete() {
+            CheckProjectIsValid();
 
-            UIThread.DoOnUIThread(delegate()
-            {
-                using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
-            {
-                this.node.Remove(true);
+            using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site)) {
+                UIThread.Invoke(() => this.node.Remove(true));
             }
-            });
         }
 
         /// <summary>
@@ -405,8 +293,7 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <param name="newFileName">The file name with which to save the solution, project, or project item. If the file exists, it is overwritten.</param>
         /// <returns>true if save was successful</returns>
         /// <remarks>This method is implemented on subclasses.</remarks>
-        public virtual bool SaveAs(string newFileName)
-        {
+        public virtual bool SaveAs(string newFileName) {
             throw new NotImplementedException();
         }
 
@@ -415,8 +302,7 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// </summary>
         /// <param name="viewKind">A Constants.vsViewKind* indicating the type of view to check./param>
         /// <returns>A Boolean value indicating true if the project is open in the given view type; false if not. </returns>
-        public virtual bool get_IsOpen(string viewKind)
-        {
+        public virtual bool get_IsOpen(string viewKind) {
             throw new NotImplementedException();
         }
 
@@ -426,15 +312,12 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <param name="index"> The index of the item</param>
         /// <returns>The full path of the associated item</returns>
         /// <exception cref="ArgumentOutOfRangeException">Is thrown if index is not one</exception>
-        public virtual string get_FileNames(short index)
-        {
+        public virtual string get_FileNames(short index) {
             // This method should really only be called with 1 as the parameter, but
             // there used to be a bug in VB/C# that would work with 0. To avoid breaking
             // existing automation they are still accepting 0. To be compatible with them
             // we accept it as well.
-            Debug.Assert(index > 0, "Index is 1 based.");
-            if(index < 0)
-            {
+            if (index < 0) {
                 throw new ArgumentOutOfRangeException("index");
             }
             return this.node.Url;
@@ -443,27 +326,12 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// <summary>
         /// Expands the view of Solution Explorer to show project items. 
         /// </summary>
-        public virtual void ExpandView()
-        {
-            if(this.node == null || this.node.ProjectMgr == null || this.node.ProjectMgr.IsClosed || this.node.ProjectMgr.Site == null)
-            {
-                throw new InvalidOperationException();
+        public virtual void ExpandView() {
+            CheckProjectIsValid();
+
+            using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site)) {
+                UIThread.Invoke(() => node.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder));
             }
-
-            UIThread.DoOnUIThread(delegate()
-            {
-                using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
-            {
-                IVsUIHierarchyWindow uiHierarchy = UIHierarchyUtilities.GetUIHierarchyWindow(this.node.ProjectMgr.Site, HierarchyNode.SolutionExplorer);
-                    if (uiHierarchy == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                ErrorHandler.ThrowOnFailure(uiHierarchy.ExpandItem(this.node.ProjectMgr.InteropSafeIVsUIHierarchy, this.node.ID, EXPANDFLAGS.EXPF_ExpandFolder));
-
-            }
-            });
         }
 
         /// <summary>
@@ -471,11 +339,24 @@ namespace Microsoft.VisualStudio.Project.Automation
         /// </summary>
         /// <param name="ViewKind">Specifies the view kind in which to open the item</param>
         /// <returns>Window object</returns>
-        public virtual EnvDTE.Window Open(string ViewKind)
-        {
+        public virtual EnvDTE.Window Open(string ViewKind) {
             throw new NotImplementedException();
         }
 
+        // We're managed and we don't use COM’s IDispatch which would resolve parametrized property FileNames and IsOpen correctly. 
+        // Powershell scripts are using reflection to find (or rather, not find) the methodss. Thus FileNames call ends with exception: method's not defined.
+        // Implementing these as regular methods satisfies the situation.
+        // This is required for Nuget support.
+
+        public string FileNames(short index) {
+            return get_FileNames(index);
+        }
+
+        public bool IsOpen(string viewKind) {
+            return get_IsOpen(viewKind);
+        }
+
         #endregion
+
     }
 }

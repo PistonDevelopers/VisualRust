@@ -1,62 +1,28 @@
-/********************************************************************************************
-
-Copyright (c) Microsoft Corporation 
-All rights reserved. 
-
-Microsoft Public License: 
-
-This license governs use of the accompanying software. If you use the software, you 
-accept this license. If you do not accept the license, do not use the software. 
-
-1. Definitions 
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the 
-same meaning here as under U.S. copyright law. 
-A "contribution" is the original software, or any additions or changes to the software. 
-A "contributor" is any person that distributes its contribution under this license. 
-"Licensed patents" are a contributor's patent claims that read directly on its contribution. 
-
-2. Grant of Rights 
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions 
-and limitations in section 3, each contributor grants you a non-exclusive, worldwide, 
-royalty-free copyright license to reproduce its contribution, prepare derivative works of 
-its contribution, and distribute its contribution or any derivative works that you create. 
-(B) Patent Grant- Subject to the terms of this license, including the license conditions 
-and limitations in section 3, each contributor grants you a non-exclusive, worldwide, 
-royalty-free license under its licensed patents to make, have made, use, sell, offer for 
-sale, import, and/or otherwise dispose of its contribution in the software or derivative 
-works of the contribution in the software. 
-
-3. Conditions and Limitations 
-(A) No Trademark License- This license does not grant you rights to use any contributors' 
-name, logo, or trademarks. 
-(B) If you bring a patent claim against any contributor over patents that you claim are 
-infringed by the software, your patent license from such contributor to the software ends 
-automatically. 
-(C) If you distribute any portion of the software, you must retain all copyright, patent, 
-trademark, and attribution notices that are present in the software. 
-(D) If you distribute any portion of the software in source code form, you may do so only 
-under this license by including a complete copy of this license with your distribution. 
-If you distribute any portion of the software in compiled or object code form, you may only 
-do so under a license that complies with this license. 
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give 
-no express warranties, guarantees or conditions. You may have additional consumer rights 
-under your local laws which this license cannot change. To the extent permitted under your 
-local laws, the contributors exclude the implied warranties of merchantability, fitness for 
-a particular purpose and non-infringement.
-
-********************************************************************************************/
+//*********************************************************//
+//    Copyright (c) Microsoft. All rights reserved.
+//    
+//    Apache 2.0 License
+//    
+//    You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//    
+//    Unless required by applicable law or agreed to in writing, software 
+//    distributed under the License is distributed on an "AS IS" BASIS, 
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
+//    implied. See the License for the specific language governing 
+//    permissions and limitations under the License.
+//
+//*********************************************************//
 
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.VisualStudio.Project
-{
+namespace Microsoft.VisualStudioTools.Project {
     #region structures
     [StructLayoutAttribute(LayoutKind.Sequential)]
-    internal struct _DROPFILES
-    {
+    internal struct _DROPFILES {
         public Int32 pFiles;
         public Int32 X;
         public Int32 Y;
@@ -67,67 +33,12 @@ namespace Microsoft.VisualStudio.Project
 
     #region enums
 
-    /// <summary>
-    /// The type of build performed.
-    /// </summary>
-    public enum BuildKind
-    {
-        Sync,
-        Async
-    }
-
-    /// <summary>
-    /// Defines possible types of output that can produced by a language project
-    /// </summary>
-    [PropertyPageTypeConverterAttribute(typeof(OutputTypeConverter))]
-    public enum OutputType
-    {
-        /// <summary>
-        /// The output type is a class library.
-        /// </summary>
-        Library,
-
-        /// <summary>
-        /// The output type is a windows executable.
-        /// </summary>
-        WinExe,
-
-        /// <summary>
-        /// The output type is an executable.
-        /// </summary>
-        Exe
-    }
-
-    /// <summary>
-    /// Debug values used by DebugModeConverter.
-    /// </summary>
-    [PropertyPageTypeConverterAttribute(typeof(DebugModeConverter))]
-    public enum DebugMode
-    {
-        Project,
-        Program,
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "URL")]
-        URL
-    }
-
-    /// <summary>
-    /// An enumeration that describes the type of action to be taken by the build.
-    /// </summary>
-    [PropertyPageTypeConverterAttribute(typeof(BuildActionConverter))]
-    public enum BuildAction
-    {
-        None,
-        Compile,
-        Content,
-        EmbeddedResource
-    }
 
     /// <summary>
     /// Defines the currect state of a property page.
     /// </summary>
     [Flags]
-    public enum PropPageStatus
-    {
+    public enum PropPageStatus {
 
         Dirty = 0x1,
 
@@ -136,72 +47,46 @@ namespace Microsoft.VisualStudio.Project
         Clean = 0x4
     }
 
-    [Flags]
-    [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue")]
-    public enum ModuleKindFlags
-    {
-
-        ConsoleApplication,
-
-        WindowsApplication,
-
-        DynamicallyLinkedLibrary,
-
-        ManifestResourceFile,
-
-        UnmanagedDynamicallyLinkedLibrary
-    }
-
     /// <summary>
     /// Defines the status of the command being queried
     /// </summary>
     [Flags]
-    [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
-    [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue")]
-    public enum QueryStatusResult
-    {
+    public enum QueryStatusResult {
         /// <summary>
         /// The command is not supported.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "NOTSUPPORTED")]
         NOTSUPPORTED = 0,
 
         /// <summary>
         /// The command is supported
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "SUPPORTED")]
         SUPPORTED = 1,
 
         /// <summary>
         /// The command is enabled
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ENABLED")]
         ENABLED = 2,
 
         /// <summary>
         /// The command is toggled on
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "LATCHED")]
         LATCHED = 4,
 
         /// <summary>
         /// The command is toggled off (the opposite of LATCHED).
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "NINCHED")]
         NINCHED = 8,
 
         /// <summary>
         /// The command is invisible.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "INVISIBLE")]
         INVISIBLE = 16
     }
 
     /// <summary>
     /// Defines the type of item to be added to the hierarchy.
     /// </summary>
-    public enum HierarchyAddType
-    {
+    public enum HierarchyAddType {
         AddNewItem,
         AddExistingItem
     }
@@ -209,9 +94,7 @@ namespace Microsoft.VisualStudio.Project
     /// <summary>
     /// Defines the component from which a command was issued.
     /// </summary>
-    public enum CommandOrigin
-    {
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Ui")]
+    public enum CommandOrigin {
         UiHierarchy,
         OleCommandTarget
     }
@@ -219,8 +102,7 @@ namespace Microsoft.VisualStudio.Project
     /// <summary>
     /// Defines the current status of the build process.
     /// </summary>
-    public enum MSBuildResult
-    {
+    public enum MSBuildResult {
         /// <summary>
         /// The build is currently suspended.
         /// </summary>
@@ -245,8 +127,7 @@ namespace Microsoft.VisualStudio.Project
     /// <summary>
     /// Defines the type of action to be taken in showing the window frame.
     /// </summary>
-    public enum WindowFrameShowAction
-    {
+    public enum WindowFrameShowAction {
         DoNotShow,
         Show,
         ShowNoActivate,
@@ -256,8 +137,7 @@ namespace Microsoft.VisualStudio.Project
     /// <summary>
     /// Defines drop types
     /// </summary>
-    internal enum DropDataType
-    {
+    internal enum DropDataType {
         None,
         Shell,
         VsStg,
@@ -268,9 +148,7 @@ namespace Microsoft.VisualStudio.Project
     /// Used by the hierarchy node to decide which element to redraw.
     /// </summary>
     [Flags]
-    [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
-    public enum UIHierarchyElement
-    {
+    public enum UIHierarchyElement {
         None = 0,
 
         /// <summary>
@@ -281,20 +159,23 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// This will be translated to VSHPROPID_StateIconIndex
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Scc")]
         SccState = 2,
 
         /// <summary>
         /// This will be translated to VSHPROPID_Caption
         /// </summary>
-        Caption = 4
+        Caption = 4,
+
+        /// <summary>
+        /// This will be translated to VSHPROPID_OverlayIconIndex
+        /// </summary>
+        OverlayIcon = 8
     }
 
     /// <summary>
     /// Defines the global propeties used by the msbuild project.
     /// </summary>
-    public enum GlobalProperty
-    {
+    public enum GlobalProperty {
         /// <summary>
         /// Property specifying that we are building inside VS.
         /// </summary>
@@ -303,7 +184,6 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// The VS installation directory. This is the same as the $(DevEnvDir) macro.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Env")]
         DevEnvDir,
 
         /// <summary>
@@ -339,7 +219,6 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// The ResolvedNonMSBuildProjectOutputs msbuild property
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "VSIDE")]
         VSIDEResolvedNonMSBuildProjectOutputs,
 
         /// <summary>
@@ -364,70 +243,78 @@ namespace Microsoft.VisualStudio.Project
     }
     #endregion
 
-    public class AfterProjectFileOpenedEventArgs : EventArgs
-    {
-        #region fields
-        private bool added;
-        #endregion
+    public class AfterProjectFileOpenedEventArgs : EventArgs {
 
-        #region properties
-        /// <summary>
-        /// True if the project is added to the solution after the solution is opened. false if the project is added to the solution while the solution is being opened.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal bool Added
-        {
-            get { return this.added; }
-        }
-        #endregion
-
-        #region ctor
-        internal AfterProjectFileOpenedEventArgs(bool added)
-        {
-            this.added = added;
-        }
-        #endregion
     }
 
-    public class BeforeProjectFileClosedEventArgs : EventArgs
-    {
+    public class BeforeProjectFileClosedEventArgs : EventArgs {
         #region fields
-        private bool removed;
+        private bool _removed;
+        private IVsHierarchy _hierarchy;
         #endregion
 
         #region properties
         /// <summary>
         /// true if the project was removed from the solution before the solution was closed. false if the project was removed from the solution while the solution was being closed.
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal bool Removed
-        {
-            get { return this.removed; }
+        internal bool Removed {
+            get { return _removed; }
         }
+
+        internal IVsHierarchy Hierarchy {
+            get {
+                return _hierarchy;
+            }
+        }
+
         #endregion
 
         #region ctor
-        internal BeforeProjectFileClosedEventArgs(bool removed)
-        {
-            this.removed = removed;
+        internal BeforeProjectFileClosedEventArgs(IVsHierarchy hierarchy, bool removed) {
+            this._removed = removed;
+            _hierarchy = hierarchy;
         }
         #endregion
     }
 
     /// <summary>
+    /// Argument of the event raised when a project property is changed.
+    /// </summary>
+    public class ProjectPropertyChangedArgs : EventArgs {
+        private string propertyName;
+        private string oldValue;
+        private string newValue;
+
+        internal ProjectPropertyChangedArgs(string propertyName, string oldValue, string newValue) {
+            this.propertyName = propertyName;
+            this.oldValue = oldValue;
+            this.newValue = newValue;
+        }
+
+        public string NewValue {
+            get { return newValue; }
+        }
+
+        public string OldValue {
+            get { return oldValue; }
+        }
+
+        public string PropertyName {
+            get { return propertyName; }
+        }
+    }
+
+    /// <summary>
     /// This class is used for the events raised by a HierarchyNode object.
     /// </summary>
-    internal class HierarchyNodeEventArgs : EventArgs
-    {
+    internal class HierarchyNodeEventArgs : EventArgs {
         private HierarchyNode child;
 
-        internal HierarchyNodeEventArgs(HierarchyNode child)
-        {
+        internal HierarchyNodeEventArgs(HierarchyNode child) {
             this.child = child;
         }
 
-        public HierarchyNode Child
-        {
+        public HierarchyNode Child {
             get { return this.child; }
         }
     }
@@ -435,8 +322,7 @@ namespace Microsoft.VisualStudio.Project
     /// <summary>
     /// Event args class for triggering file change event arguments.
     /// </summary>
-    public class FileChangedOnDiskEventArgs : EventArgs
-    {
+    public class FileChangedOnDiskEventArgs : EventArgs {
         #region Private fields
         /// <summary>
         /// File name that was changed on disk.
@@ -459,8 +345,7 @@ namespace Microsoft.VisualStudio.Project
         /// </summary>
         /// <param name="fileName">File name that was changed on disk.</param>
         /// <param name="id">The item id of the file that was changed on disk.</param>
-        public FileChangedOnDiskEventArgs(string fileName, uint id, _VSFILECHANGEFLAGS flag)
-        {
+        internal FileChangedOnDiskEventArgs(string fileName, uint id, _VSFILECHANGEFLAGS flag) {
             this.fileName = fileName;
             this.itemID = id;
             this.fileChangeFlag = flag;
@@ -470,10 +355,8 @@ namespace Microsoft.VisualStudio.Project
         /// Gets the file name that was changed on disk.
         /// </summary>
         /// <value>The file that was changed on disk.</value>
-        public string FileName
-        {
-            get
-            {
+        public string FileName {
+            get {
                 return this.fileName;
             }
         }
@@ -482,10 +365,8 @@ namespace Microsoft.VisualStudio.Project
         /// Gets item id of the file that has changed
         /// </summary>
         /// <value>The file that was changed on disk.</value>
-        public uint ItemID
-        {
-            get
-            {
+        internal uint ItemID {
+            get {
                 return this.itemID;
             }
         }
@@ -494,78 +375,10 @@ namespace Microsoft.VisualStudio.Project
         /// The reason while the file has chnaged on disk.
         /// </summary>
         /// <value>The reason while the file has chnaged on disk.</value>
-        public _VSFILECHANGEFLAGS FileChangeFlag
-        {
-            get
-            {
+        public _VSFILECHANGEFLAGS FileChangeFlag {
+            get {
                 return this.fileChangeFlag;
             }
-        }
-    }
-
-    /// <summary>
-    /// Defines the event args for the active configuration chnage event.
-    /// </summary>
-    public class ActiveConfigurationChangedEventArgs : EventArgs
-    {
-        #region Private fields
-        /// <summary>
-        /// The hierarchy whose configuration has changed 
-        /// </summary>
-        private IVsHierarchy hierarchy;
-        #endregion
-
-        /// <summary>
-        /// Constructs a new event args.
-        /// </summary>
-        /// <param name="fileName">The hierarchy that has changed its configuration.</param>
-        internal ActiveConfigurationChangedEventArgs(IVsHierarchy hierarchy)
-        {
-            this.hierarchy = hierarchy;
-        }
-
-        /// <summary>
-        /// The hierarchy whose configuration has changed 
-        /// </summary>
-        internal IVsHierarchy Hierarchy
-        {
-            get
-            {
-                return this.hierarchy;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Argument of the event raised when a project property is changed.
-    /// </summary>
-    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-    public class ProjectPropertyChangedArgs : EventArgs
-    {
-        private string propertyName;
-        private string oldValue;
-        private string newValue;
-
-        internal ProjectPropertyChangedArgs(string propertyName, string oldValue, string newValue)
-        {
-            this.propertyName = propertyName;
-            this.oldValue = oldValue;
-            this.newValue = newValue;
-        }
-
-        public string NewValue
-        {
-            get { return newValue; }
-        }
-
-        public string OldValue
-        {
-            get { return oldValue; }
-        }
-
-        public string PropertyName
-        {
-            get { return propertyName; }
         }
     }
 }

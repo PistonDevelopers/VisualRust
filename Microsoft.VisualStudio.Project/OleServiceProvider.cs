@@ -1,82 +1,46 @@
-/********************************************************************************************
-
-Copyright (c) Microsoft Corporation 
-All rights reserved. 
-
-Microsoft Public License: 
-
-This license governs use of the accompanying software. If you use the software, you 
-accept this license. If you do not accept the license, do not use the software. 
-
-1. Definitions 
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the 
-same meaning here as under U.S. copyright law. 
-A "contribution" is the original software, or any additions or changes to the software. 
-A "contributor" is any person that distributes its contribution under this license. 
-"Licensed patents" are a contributor's patent claims that read directly on its contribution. 
-
-2. Grant of Rights 
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions 
-and limitations in section 3, each contributor grants you a non-exclusive, worldwide, 
-royalty-free copyright license to reproduce its contribution, prepare derivative works of 
-its contribution, and distribute its contribution or any derivative works that you create. 
-(B) Patent Grant- Subject to the terms of this license, including the license conditions 
-and limitations in section 3, each contributor grants you a non-exclusive, worldwide, 
-royalty-free license under its licensed patents to make, have made, use, sell, offer for 
-sale, import, and/or otherwise dispose of its contribution in the software or derivative 
-works of the contribution in the software. 
-
-3. Conditions and Limitations 
-(A) No Trademark License- This license does not grant you rights to use any contributors' 
-name, logo, or trademarks. 
-(B) If you bring a patent claim against any contributor over patents that you claim are 
-infringed by the software, your patent license from such contributor to the software ends 
-automatically. 
-(C) If you distribute any portion of the software, you must retain all copyright, patent, 
-trademark, and attribution notices that are present in the software. 
-(D) If you distribute any portion of the software in source code form, you may do so only 
-under this license by including a complete copy of this license with your distribution. 
-If you distribute any portion of the software in compiled or object code form, you may only 
-do so under a license that complies with this license. 
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give 
-no express warranties, guarantees or conditions. You may have additional consumer rights 
-under your local laws which this license cannot change. To the extent permitted under your 
-local laws, the contributors exclude the implied warranties of merchantability, fitness for 
-a particular purpose and non-infringement.
-
-********************************************************************************************/
+//*********************************************************//
+//    Copyright (c) Microsoft. All rights reserved.
+//    
+//    Apache 2.0 License
+//    
+//    You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//    
+//    Unless required by applicable law or agreed to in writing, software 
+//    distributed under the License is distributed on an "AS IS" BASIS, 
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
+//    implied. See the License for the specific language governing 
+//    permissions and limitations under the License.
+//
+//*********************************************************//
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace Microsoft.VisualStudio.Project
-{
-    public class OleServiceProvider : IOleServiceProvider, IDisposable
-    {
+namespace Microsoft.VisualStudioTools.Project {
+    // This class is No longer used by project system, retained for backwards for languages
+    // which have already shipped this public type.
+#if SHAREDPROJECT_OLESERVICEPROVIDER    
+    public class OleServiceProvider : IOleServiceProvider, IDisposable {
         #region Public Types
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public delegate object ServiceCreatorCallback(Type serviceType);
         #endregion
 
         #region Private Types
-        private class ServiceData : IDisposable
-        {
+        private class ServiceData : IDisposable {
             private Type serviceType;
             private object instance;
             private ServiceCreatorCallback creator;
             private bool shouldDispose;
-            public ServiceData(Type serviceType, object instance, ServiceCreatorCallback callback, bool shouldDispose)
-            {
-                if(null == serviceType)
-                {
-                    throw new ArgumentNullException("serviceType");
-                }
+            public ServiceData(Type serviceType, object instance, ServiceCreatorCallback callback, bool shouldDispose) {
+                Utilities.ArgumentNotNull("serviceType", serviceType);
 
-                if((null == instance) && (null == callback))
-                {
+                if ((null == instance) && (null == callback)) {
                     throw new ArgumentNullException("instance");
                 }
 
@@ -86,30 +50,24 @@ namespace Microsoft.VisualStudio.Project
                 this.shouldDispose = shouldDispose;
             }
 
-            public object ServiceInstance
-            {
-                get
-                {
-                    if(null == instance)
-                    {
+            public object ServiceInstance {
+                get {
+                    if (null == instance) {
+                        Debug.Assert(serviceType != null);
                         instance = creator(serviceType);
                     }
                     return instance;
                 }
             }
 
-            public Guid Guid
-            {
+            public Guid Guid {
                 get { return serviceType.GUID; }
             }
 
-            public void Dispose()
-            {
-                if((shouldDispose) && (null != instance))
-                {
+            public void Dispose() {
+                if ((shouldDispose) && (null != instance)) {
                     IDisposable disp = instance as IDisposable;
-                    if(null != disp)
-                    {
+                    if (null != disp) {
                         disp.Dispose();
                     }
                     instance = null;
@@ -131,49 +89,42 @@ namespace Microsoft.VisualStudio.Project
         #endregion
 
         #region ctors
-        public OleServiceProvider()
-        {
+        public OleServiceProvider() {
         }
         #endregion
 
         #region IOleServiceProvider Members
 
-        public int QueryService(ref Guid guidService, ref Guid riid, out IntPtr ppvObject)
-        {
+        public int QueryService(ref Guid guidService, ref Guid riid, out IntPtr ppvObject) {
             ppvObject = (IntPtr)0;
             int hr = VSConstants.S_OK;
 
             ServiceData serviceInstance = null;
 
-            if(services != null && services.ContainsKey(guidService))
-            {
+            if (services != null && services.ContainsKey(guidService)) {
                 serviceInstance = services[guidService];
             }
 
-            if(serviceInstance == null)
-            {
+            if (serviceInstance == null) {
                 return VSConstants.E_NOINTERFACE;
             }
 
             // Now check to see if the user asked for an IID other than
             // IUnknown.  If so, we must do another QI.
             //
-            if(riid.Equals(NativeMethods.IID_IUnknown))
-            {
+            if (riid.Equals(NativeMethods.IID_IUnknown)) {
+                object inst = serviceInstance.ServiceInstance;
+                if (inst == null) {
+                    return VSConstants.E_NOINTERFACE;
+                }
                 ppvObject = Marshal.GetIUnknownForObject(serviceInstance.ServiceInstance);
-            }
-            else
-            {
+            } else {
                 IntPtr pUnk = IntPtr.Zero;
-                try
-                {
+                try {
                     pUnk = Marshal.GetIUnknownForObject(serviceInstance.ServiceInstance);
                     hr = Marshal.QueryInterface(pUnk, ref riid, out ppvObject);
-                }
-                finally
-                {
-                    if(pUnk != IntPtr.Zero)
-                    {
+                } finally {
+                    if (pUnk != IntPtr.Zero) {
                         Marshal.Release(pUnk);
                     }
                 }
@@ -189,8 +140,7 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// The IDispose interface Dispose method for disposing the object determinastically.
         /// </summary>
-        public void Dispose()
-        {
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -205,8 +155,7 @@ namespace Microsoft.VisualStudio.Project
         /// <param name="shouldDisposeServiceInstance">true if the Dipose of the service provider is allowed to dispose the sevice instance.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
             Justification = "The services created here will be disposed in the Dispose method of this type.")]
-        public void AddService(Type serviceType, object serviceInstance, bool shouldDisposeServiceInstance)
-        {
+        public void AddService(Type serviceType, object serviceInstance, bool shouldDisposeServiceInstance) {
             // Create the description of this service. Note that we don't do any validation
             // of the parameter here because the constructor of ServiceData will do it for us.
             ServiceData service = new ServiceData(serviceType, serviceInstance, null, shouldDisposeServiceInstance);
@@ -216,9 +165,8 @@ namespace Microsoft.VisualStudio.Project
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification="The services created here will be disposed in the Dispose method of this type.")]
-        public void AddService(Type serviceType, ServiceCreatorCallback callback, bool shouldDisposeServiceInstance)
-        {
+            Justification = "The services created here will be disposed in the Dispose method of this type.")]
+        public void AddService(Type serviceType, ServiceCreatorCallback callback, bool shouldDisposeServiceInstance) {
             // Create the description of this service. Note that we don't do any validation
             // of the parameter here because the constructor of ServiceData will do it for us.
             ServiceData service = new ServiceData(serviceType, null, callback, shouldDisposeServiceInstance);
@@ -227,17 +175,14 @@ namespace Microsoft.VisualStudio.Project
             AddService(service);
         }
 
-        private void AddService(ServiceData data)
-        {
+        private void AddService(ServiceData data) {
             // Make sure that the collection of services is created.
-            if(null == services)
-            {
+            if (null == services) {
                 services = new Dictionary<Guid, ServiceData>();
             }
 
             // Disallow the addition of duplicate services.
-            if(services.ContainsKey(data.Guid))
-            {
+            if (services.ContainsKey(data.Guid)) {
                 throw new InvalidOperationException();
             }
 
@@ -247,15 +192,10 @@ namespace Microsoft.VisualStudio.Project
         /// <devdoc>
         /// Removes the given service type from the service container.
         /// </devdoc>
-        public void RemoveService(Type serviceType)
-        {
-            if(serviceType == null)
-            {
-                throw new ArgumentNullException("serviceType");
-            }
+        public void RemoveService(Type serviceType) {
+            Utilities.ArgumentNotNull("serviceType", serviceType);
 
-            if(services.ContainsKey(serviceType.GUID))
-            {
+            if (services.ContainsKey(serviceType.GUID)) {
                 services.Remove(serviceType.GUID);
             }
         }
@@ -265,21 +205,15 @@ namespace Microsoft.VisualStudio.Project
         /// The method that does the cleanup.
         /// </summary>
         /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
+        protected virtual void Dispose(bool disposing) {
             // Everybody can go here.
-            if(!this.isDisposed)
-            {
+            if (!this.isDisposed) {
                 // Synchronize calls to the Dispose simulteniously.
-                lock(Mutex)
-                {
-                    if(disposing)
-                    {
+                lock (Mutex) {
+                    if (disposing) {
                         // Remove all our services
-                        if(services != null)
-                        {
-                            foreach(ServiceData data in services.Values)
-                            {
+                        if (services != null) {
+                            foreach (ServiceData data in services.Values) {
                                 data.Dispose();
                             }
                             services.Clear();
@@ -294,4 +228,5 @@ namespace Microsoft.VisualStudio.Project
         #endregion
 
     }
+#endif
 }

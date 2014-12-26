@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Project;
+using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
@@ -43,7 +43,7 @@ namespace VisualRust.Project
                 throw new ArgumentNullException("root");
             if (node == null)
                 throw new ArgumentNullException("node");
-            root.ModuleTracker.DeleteModule(node.AbsoluteFilePath);
+            root.ModuleTracker.DeleteModule(node.Url);
             node.Remove(deleteFromStorage);
             return true;
         }
@@ -99,11 +99,7 @@ namespace VisualRust.Project
                 newNode = ReplaceAndSelectCore(root, old, newN, parent);
             }
             // Adjust UI
-            IVsUIHierarchyWindow uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(root.ProjectMgr.Site, HierarchyNode.SolutionExplorer);
-            if (uiWindow != null)
-            {
-                ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(root.ProjectMgr.InteropSafeIVsUIHierarchy, newNode.ID, EXPANDFLAGS.EXPF_SelectItem));
-            }
+            newNode.ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
         }
     }
 }

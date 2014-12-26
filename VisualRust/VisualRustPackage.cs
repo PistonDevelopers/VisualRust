@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 using VisualRust.Project;
-using Microsoft.VisualStudio.Project;
+using Microsoft.VisualStudioTools.Project;
 
 namespace VisualRust
 {
@@ -57,7 +57,7 @@ namespace VisualRust
         LanguageVsTemplate="Rust")]
     [ProvideLanguageExtension(typeof(RustLanguage), ".rs")]
     [Guid(GuidList.guidVisualRustPkgString)]
-    public class VisualRustPackage : ProjectPackage
+    public class VisualRustPackage : CommonProjectPackage
     {
         /// <summary>
         /// Default constructor of the package.
@@ -69,6 +69,7 @@ namespace VisualRust
         public VisualRustPackage()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
+            Microsoft.VisualStudioTools.UIThread.InitializeAndAlwaysInvokeToCurrentThread();
         }
 
         /////////////////////////////////////////////////////////////////////////////
@@ -79,6 +80,8 @@ namespace VisualRust
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
+        ///
+        /*
         protected override void Initialize()
         {
             Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
@@ -87,8 +90,42 @@ namespace VisualRust
 
             Racer.AutoCompleter.Init();
         }
+        */
         #endregion
 
-        public override string ProductUserContext { get { return ""; } }
+        public override ProjectFactory CreateProjectFactory()
+        {
+            return new RustProjectFactory(this);
+        }
+
+        public override CommonEditorFactory CreateEditorFactory()
+        {
+            return null;
+        }
+
+        public override uint GetIconIdForAboutBox()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override uint GetIconIdForSplashScreen()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string GetProductName()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string GetProductDescription()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string GetProductVersion()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

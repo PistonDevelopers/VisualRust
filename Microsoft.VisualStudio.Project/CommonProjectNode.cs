@@ -1189,12 +1189,18 @@ namespace Microsoft.VisualStudioTools.Project {
             return new CommonProjectNodeProperties(this);
         }
 
+        private bool listenForStartupFile = true;
+        public bool ListenForStartupFileUpdates { get { return listenForStartupFile; } set { listenForStartupFile = value; } }
+
         public override int SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider site) {
             base.SetSite(site);
 
             //Initialize a new object to track project document changes so that we can update the StartupFile Property accordingly
-            _projectDocListenerForStartupFileUpdates = new ProjectDocumentsListenerForStartupFileUpdates((ServiceProvider)Site, this);
-            _projectDocListenerForStartupFileUpdates.Init();
+            if (ListenForStartupFileUpdates)
+            {
+                _projectDocListenerForStartupFileUpdates = new ProjectDocumentsListenerForStartupFileUpdates((ServiceProvider)Site, this);
+                _projectDocListenerForStartupFileUpdates.Init();
+            }
 
 #if DEV11_OR_LATER
             UpdateHierarchyManager(alwaysCreate: false);

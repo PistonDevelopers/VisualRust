@@ -31,9 +31,12 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="project">Project that owns this item</param>
         /// <param name="existingItem">an MSBuild.ProjectItem; can be null if virtualFolder is true</param>
         /// <param name="virtualFolder">Is this item virtual (such as reference folder)</param>
-        internal VirtualProjectElement(ProjectNode project)
-            : base(project) {
+        internal VirtualProjectElement(ProjectNode project, string path = null)
+            : base(project)
+        {
             _virtualProperties = new Dictionary<string, string>();
+            if(path != null)
+                Rename(path);
         }
 
         protected override string ItemType {

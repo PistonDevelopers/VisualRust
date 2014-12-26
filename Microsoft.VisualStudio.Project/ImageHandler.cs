@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public ImageHandler(Stream resourceStream) {
             Utilities.ArgumentNotNull("resourceStream", resourceStream);
-            imageList = Utilities.GetImageList(resourceStream);
+            imageList = Utilities.GetImageList(new Bitmap(resourceStream));
         }
 
         /// <summary>
@@ -57,6 +57,15 @@ namespace Microsoft.VisualStudioTools.Project {
             Utilities.ArgumentNotNull("list", list);
 
             imageList = list;
+        }
+
+        public ImageHandler(Bitmap bitmap)
+        {
+            if (null == bitmap)
+            {
+                throw new ArgumentNullException("bitmap");
+            }
+            imageList = Utilities.GetImageList(bitmap);
         }
 
         /// <summary>

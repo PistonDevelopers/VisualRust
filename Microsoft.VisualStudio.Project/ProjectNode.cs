@@ -606,8 +606,8 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        protected abstract Stream ProjectIconsImageStripStream {
-            get;
+        protected virtual Stream ProjectIconsImageStripStream {
+            get { return typeof(ProjectNode).Assembly.GetManifestResourceStream("Microsoft.VisualStudio.Project.Resources.imagelis.bmp"); }
         }
 
         /// <summary>
@@ -2062,7 +2062,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (items.Count != 0) {
                     item = new MsBuildProjectElement(this, items.First());
                 } else {
-                    item = AddFolderToMsBuild(fullPath);
+                    item = AddFolderToMsBuild(fullPath, createOnDisk);
                 }
                 if (createOnDisk) {
                     Directory.CreateDirectory(fullPath);
@@ -2635,7 +2635,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <param name="folder">The folder to be added.</param>
         /// <returns>A ProjectElement describing the newly added folder.</returns>
-        protected virtual ProjectElement AddFolderToMsBuild(string folder) {
+        protected virtual ProjectElement AddFolderToMsBuild(string folder, bool createOnDisk = true) {
             ProjectElement newItem;
 
             if (Path.IsPathRooted(folder)) {
@@ -2846,7 +2846,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 // We do not need any special logic for assuring that a folder is only added once to the ui hierarchy.
                 // The below method will only add once the folder to the ui hierarchy
-                this.CreateFolderNodes(strPath, false);
+                this.CreateFolderNodes(strPath, true);
             }
         }
 
@@ -4748,7 +4748,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// Returns the reference container node.
         /// </summary>
         /// <returns></returns>
-        public IReferenceContainer GetReferenceContainer() {
+        public virtual IReferenceContainer GetReferenceContainer() {
             return FindImmediateChild(node => node is IReferenceContainer) as IReferenceContainer;
         }
 
@@ -4981,7 +4981,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// </summary>
         /// <param name="item">Item to add</param>
         /// <returns>Added node</returns>
-        private HierarchyNode AddIndependentFileNode(MSBuild.ProjectItem item, HierarchyNode parent) {
+        protected virtual HierarchyNode AddIndependentFileNode(MSBuild.ProjectItem item, HierarchyNode parent) {
             return AddFileNodeToNode(item, parent);
         }
 

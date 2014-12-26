@@ -256,16 +256,15 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="imageStream">A Stream representing a Bitmap</param>
         /// <returns>An ImageList object representing the images from the given stream</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static ImageList GetImageList(Stream imageStream) {
+        public static ImageList GetImageList(Bitmap bitmap) {
             ImageList ilist = new ImageList();
 
-            if (imageStream == null) {
+            if (bitmap == null) {
                 Debug.Fail("ImageStream was null.");
                 return ilist;
             }
             ilist.ColorDepth = ColorDepth.Depth24Bit;
             ilist.ImageSize = new Size(16, 16);
-            Bitmap bitmap = new Bitmap(imageStream);
             ilist.Images.AddStrip(bitmap);
             ilist.TransparentColor = Color.Magenta;
             return ilist;

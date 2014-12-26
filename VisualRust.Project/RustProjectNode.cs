@@ -192,9 +192,10 @@ namespace VisualRust.Project
             return node;
         }
 
-        // This gets called  by AddIndependentFileNode so it will always create tracked node
         public override FileNode CreateFileNode(ProjectElement item)
         {
+            if (String.IsNullOrEmpty(item.ItemTypeName))
+                return base.CreateFileNode(item);
             return CreateTrackedNode(item);
         }
 
@@ -317,14 +318,6 @@ namespace VisualRust.Project
             }
             return base.SaveItem(saveFlag, silentSaveAsName, itemid, docData, out cancelled);
         }
-
-        /*
-        protected override bool IsItemTypeFileType(string type)
-        {
-            return String.Equals("file", type, StringComparison.OrdinalIgnoreCase);
-        }
-         * 
-         */
 
         protected override ProjectElement AddFolderToMsBuild(string folder, bool createOnDisk = true)
         {

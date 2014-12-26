@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Project;
+﻿using Microsoft.VisualStudioTools.Project;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -12,31 +12,28 @@ using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
 namespace VisualRust.Project
 {
-    abstract class BaseFileNode : FileNode
+    abstract class BaseFileNode : CommonFileNode
     {
         private bool isDeleted = false;
         protected abstract bool CanUserMove { get; }
-        public string AbsoluteFilePath { get; private set; }
         public new RustProjectNode ProjectMgr { get; private set; }
 
         public BaseFileNode(RustProjectNode node, ProjectElement elm, string path)
             : base(node, elm)
         {
-            Contract.Assert(System.IO.Path.IsPathRooted(path));
-            AbsoluteFilePath = path;
             ProjectMgr = node;
         }
 
-        public override string FilePath { get { return this.AbsoluteFilePath; } }
+        //public override string FilePath { get { return this.AbsoluteFilePath; } }
 
         public bool IsRustFile
         {
-            get { return String.Equals(".rs", Path.GetExtension(this.AbsoluteFilePath), StringComparison.OrdinalIgnoreCase); }
+            get { return String.Equals(".rs", Path.GetExtension(this.Url), StringComparison.OrdinalIgnoreCase); }
         }
 
         protected virtual void OnFileDeleted()
         {
-            TreeOperations.DeleteSubnode(ProjectMgr, this.AbsoluteFilePath);
+            TreeOperations.DeleteSubnode(ProjectMgr, this.Url);
         }
 
         // This forces VS to stop using image list and index directly and go through GetIconHandle(...) instead
@@ -66,7 +63,7 @@ namespace VisualRust.Project
 
 
         // Disable deletion
-        protected override bool CanDeleteItem(Microsoft.VisualStudio.Shell.Interop.__VSDELETEITEMOPERATION deleteOperation)
+        internal override bool CanDeleteItem(Microsoft.VisualStudio.Shell.Interop.__VSDELETEITEMOPERATION deleteOperation)
         {
             if (!CanUserMove)
                 return false;
@@ -75,18 +72,18 @@ namespace VisualRust.Project
         }
 
 
-        protected override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
         {
             if (!CanUserMove)
             {
-                if (cmdGroup == Microsoft.VisualStudio.Project.VsMenus.guidStandardCommandSet97
+                if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet97
                     &&(VsCommands)cmd == VsCommands.Rename 
                     || (VsCommands)cmd == VsCommands.Cut)
                 {
                     result |= QueryStatusResult.NOTSUPPORTED;
                     return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
                 }
-                if (cmdGroup == Microsoft.VisualStudio.Project.VsMenus.guidStandardCommandSet2K
+                if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K
                     && (VsCommands2K)cmd == VsCommands2K.EXCLUDEFROMPROJECT)
                 {
                     result |= QueryStatusResult.NOTSUPPORTED;

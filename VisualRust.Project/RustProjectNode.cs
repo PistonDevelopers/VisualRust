@@ -240,7 +240,7 @@ namespace VisualRust.Project
         {
             string path = node.Url;
             ModuleTracker.UpgradeModule(path);
-            TreeOperations.ReplaceAndSelect(this, node, () => CreateFileNode(path));
+            TreeOperations.Replace(this, node, () => CreateFileNode(path));
         }
 
         internal void ExcludeFileNode(BaseFileNode srcNode)
@@ -250,7 +250,7 @@ namespace VisualRust.Project
             ModuleRemovalResult downgradeResult = ModuleTracker.DowngradeModule(fullPath);
             if (downgradeResult.IsReferenced)
             {
-                TreeOperations.ReplaceAndSelect(this, srcNode, () => CreateUntrackedNode(fullPath));
+                TreeOperations.Replace(this, srcNode, () => CreateUntrackedNode(fullPath));
             }
             else
             {

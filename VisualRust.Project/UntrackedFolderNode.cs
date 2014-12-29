@@ -57,7 +57,9 @@ namespace VisualRust.Project
         public override void AddChild(HierarchyNode node)
         {
             base.AddChild(node);
-            if (!suspendTracking && (node is UntrackedFileNode || node is UntrackedFolderNode))
+            if (suspendTracking)
+                return;
+            if (node is UntrackedFileNode || node is UntrackedFolderNode)
                 untrackedChildren++;
             else
                 ReplaceWithTracked();
@@ -65,7 +67,7 @@ namespace VisualRust.Project
 
         private void ReplaceWithTracked()
         {
-            throw new NotImplementedException();
+            TreeOperations.Replace(this.ProjectMgr, this, () => this.ProjectMgr.CreateFolderNode(this.Url));
         }
 
         private void DecrementTrackedCount()
@@ -91,16 +93,10 @@ namespace VisualRust.Project
 
         internal void OnChildReplaced(HierarchyNode old, HierarchyNode @new)
         {
-            if((old is UntrackedFileNode || old is UntrackedFolderNode)
-                && (@new is TrackedFileNode || @new is FolderNode))
-            {
-                DecrementTrackedCount();
-            }
-            else if((old is TrackedFileNode || old is FolderNode)
-                && (@new is UntrackedFileNode || @new is UntrackedFolderNode))
-            {
+            if (old.Parent != @new.Parent)
+                return;
+            if(@new is TrackedFileNode || @new is FolderNode)
                 ReplaceWithTracked();
-            }
         }
     }
 }

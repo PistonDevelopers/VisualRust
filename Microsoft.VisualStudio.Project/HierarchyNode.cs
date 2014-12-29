@@ -1610,9 +1610,9 @@ namespace Microsoft.VisualStudioTools.Project {
             ErrorHandler.ThrowOnFailure(windows.ExpandItem(ProjectMgr.GetOuterInterface<IVsUIHierarchy>(), ID, flags));
         }
 
-        public bool GetIsExpanded() {
+        public __VSHIERARCHYITEMSTATE GetItemState(__VSHIERARCHYITEMSTATE mask) {
             if (ProjectMgr == null || ProjectMgr.Site == null || ProjectMgr.ParentHierarchy == null) {
-                return false;
+                return 0;
             }
             
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
@@ -1620,17 +1620,21 @@ namespace Microsoft.VisualStudioTools.Project {
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
 
             if (windows == null) {
-                return false;
+                return 0;
             }
 
             uint state;
             if (ErrorHandler.Succeeded(windows.GetItemState(ProjectMgr.GetOuterInterface<IVsUIHierarchy>(),
                 ID,
-                (uint)__VSHIERARCHYITEMSTATE.HIS_Expanded,
+                (uint)mask,
                 out state))) {
-                return state != 0;
+                return (__VSHIERARCHYITEMSTATE)state;
             }
-            return false;
+            return 0;
+        }
+
+        public bool GetIsExpanded() {
+            return (uint)GetItemState(__VSHIERARCHYITEMSTATE.HIS_Expanded) != 0;
         }
 
         /// <summary>

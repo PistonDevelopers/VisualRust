@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
 
 namespace VisualRust.Project
 {
@@ -29,7 +30,7 @@ namespace VisualRust.Project
             var forRemoval = root.ModuleTracker.DeleteModule(srcpath);
             foreach (string path in forRemoval.Orphans)
             {
-                TreeOperations.RemoveSubnode(root, path, (!forRemoval.IsReferenced) && path.Equals(srcpath, StringComparison.InvariantCultureIgnoreCase));
+                TreeOperations.RemoveSubnodeFromHierarchy(root, path, (!forRemoval.IsReferenced) && path.Equals(srcpath, StringComparison.InvariantCultureIgnoreCase));
             }
             if (forRemoval.IsReferenced)
             {
@@ -37,18 +38,13 @@ namespace VisualRust.Project
             }
         }
 
-        public static bool RemoveSubnode(RustProjectNode root, BaseFileNode node, bool deleteFromStorage)
+        private static bool RemoveSubnodeFromHierarchy(RustProjectNode root, HierarchyNode node, bool deleteFromStorage)
         {
-            if (root == null)
-                throw new ArgumentNullException("root");
-            if (node == null)
-                throw new ArgumentNullException("node");
-            root.ModuleTracker.DeleteModule(node.Url);
             node.Remove(deleteFromStorage);
             return true;
         }
 
-        public static bool RemoveSubnode(RustProjectNode root, string path, bool deleteFromStorage)
+        public static bool RemoveSubnodeFromHierarchy(RustProjectNode root, string path, bool deleteFromStorage)
         {
             if (root == null)
                 throw new ArgumentNullException("root");
@@ -61,22 +57,30 @@ namespace VisualRust.Project
                 HierarchyNode node = root.NodeFromItemId(item);
                 if (node != null)
                 {
-                    TreeOperations.RemoveSubnode(root, (BaseFileNode)node, deleteFromStorage);
+                    TreeOperations.RemoveSubnodeFromHierarchy(root, node, deleteFromStorage);
                     return true;
                 }
             }
             return false;
         }
 
-        private static HierarchyNode ReplaceAndSelectCore(RustProjectNode root, BaseFileNode old, Func<HierarchyNode> newN, HierarchyNode parent)
+        private static HierarchyNode ReplaceCore(RustProjectNode root, HierarchyNode old, Func<HierarchyNode> newN, HierarchyNode parent)
         {
-            TreeOperations.RemoveSubnode(root, old, false);
             HierarchyNode newNode = newN();
+            while (old.FirstChild != null)
+            {
+                HierarchyNode current = old.FirstChild;
+                root.ProjectMgr.OnItemDeleted(current);
+                old.RemoveChild(current);
+                current.ID = root.ProjectMgr.ItemIdMap.Add(current);
+                newNode.AddChild(current);
+            }
+            TreeOperations.RemoveSubnodeFromHierarchy(root, old, false);
             parent.AddChild(newNode);
             return newNode;
         }
 
-        public static void ReplaceAndSelect(RustProjectNode root, BaseFileNode old, Func<HierarchyNode> newN)
+        public static void Replace(RustProjectNode root, HierarchyNode old, Func<HierarchyNode> newN)
         {
             if (root == null)
                 throw new ArgumentNullException("root");
@@ -84,22 +88,25 @@ namespace VisualRust.Project
                 throw new ArgumentNullException("old");
             if (newN == null)
                 throw new ArgumentNullException("newN");
+            __VSHIERARCHYITEMSTATE visualState = old.GetItemState(__VSHIERARCHYITEMSTATE.HIS_Selected | __VSHIERARCHYITEMSTATE.HIS_Expanded);
             HierarchyNode parent = old.Parent;
             HierarchyNode newNode;
             if(parent is UntrackedFolderNode)
             {
                 using(((UntrackedFolderNode)parent).SuspendChildrenTracking())
                 { 
-                    newNode = ReplaceAndSelectCore(root, old, newN, parent);
+                    newNode = ReplaceCore(root, old, newN, parent);
                     ((UntrackedFolderNode)parent).OnChildReplaced(old, newNode);
                 }
             }
             else
             {
-                newNode = ReplaceAndSelectCore(root, old, newN, parent);
+                newNode = ReplaceCore(root, old, newN, parent);
             }
-            // Adjust UI
-            newNode.ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
+            if ((visualState & __VSHIERARCHYITEMSTATE.HIS_Expanded) != 0)
+                newNode.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
+            if ((visualState & __VSHIERARCHYITEMSTATE.HIS_Selected) != 0)
+                newNode.ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
         }
     }
 }

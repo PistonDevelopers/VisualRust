@@ -32,8 +32,8 @@
     <ProjectGuid>{59D94B96-1AF7-46F2-8790-AAB6DFAE8D9A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VisualRust.Project</RootNamespace>
-    <AssemblyName>VisualRust.Project</AssemblyName>
+    <RootNamespace>VisualRust.Templates</RootNamespace>
+    <AssemblyName>VisualRust.Templates</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
@@ -44,8 +44,15 @@
     <DeployExtension>false</DeployExtension>
     <DeployVSTemplates>false</DeployVSTemplates>
     <CopyVsixManifestToOutput>false</CopyVsixManifestToOutput>
-    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
     <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+  </PropertyGroup>
+  <!--
+    Technically, we can do without the following check, but I want to have
+    a way to force generation of an (empty) .dll.
+    All because NCrunch doesn't like when projects don't emit assemblies.
+  -->
+  <PropertyGroup Condition="'$(CopyBuildOutputToOutputDirectory)' == '' ">
+    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

@@ -256,7 +256,7 @@ namespace VisualRust.Project
             {
                 foreach (string path in downgradeResult.Orphans)
                 {
-                    TreeOperations.RemoveSubnode(this, path, false);
+                    TreeOperations.RemoveSubnodeFromHierarchy(this, path, false);
                 }
             }
         }
@@ -266,7 +266,7 @@ namespace VisualRust.Project
             var orphans = ModuleTracker.DisableTracking(node.Url);
             foreach (string mod in orphans)
             {
-                TreeOperations.RemoveSubnode(this, mod, false);
+                TreeOperations.RemoveSubnodeFromHierarchy(this, mod, false);
             }
         }
 
@@ -285,7 +285,7 @@ namespace VisualRust.Project
             var diff = ModuleTracker.Reparse(n.Url);
             foreach(string mod in diff.Removed)
             {
-                TreeOperations.RemoveSubnode(this, mod, false);
+                TreeOperations.RemoveSubnodeFromHierarchy(this, mod, false);
             }
             foreach (string mod in diff.Added)
             {

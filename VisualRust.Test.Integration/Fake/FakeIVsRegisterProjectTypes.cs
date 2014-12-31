@@ -19,7 +19,7 @@ namespace VisualRust.Test.Integration.Fake
 
         public int UnregisterProjectType(uint dwCookie)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
     }
 }

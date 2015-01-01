@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VsSDK.UnitTestLibrary;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +12,10 @@ using VisualRust.Test.Integration.Fake;
 
 namespace VisualRust.Test.Integration
 {
+    [TestClass]
     public class SanityCheck
     {
-        [Test]
+        [TestMethod]
         public void SetSite()
         {
             IVsPackage package = new VisualRustPackage() as IVsPackage;

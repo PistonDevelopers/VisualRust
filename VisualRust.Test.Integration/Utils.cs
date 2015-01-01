@@ -1,7 +1,10 @@
 ﻿using EnvDTE;
 using EnvDTE80;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudioTools.Project;
+using Microsoft.VisualStudioTools.Project.Automation;
 using Microsoft.VSSDK.Tools.VsIdeTesting;
 using System;
 using System.Collections.Generic;
@@ -124,6 +127,15 @@ namespace VisualRust.Test.Integration
             object projectCount;
             solutionService.GetProperty((int)__VSPROPID.VSPROPID_ProjectCount, out projectCount);
             return (int)projectCount;
+        }
+
+        public static ProjectNode GetProject(string name)
+        {
+            DTE dte = (DTE)VsIdeTestHostContext.ServiceProvider.GetService(typeof(DTE));
+            EnvDTE.Project envProj = dte.Solution.Projects.Cast<EnvDTE.Project>().FirstOrDefault(p => p.Name == name);
+            Assert.IsInstanceOfType(envProj, typeof(OAProject));
+            Assert.IsInstanceOfType(((OAProject)envProj).Project, typeof(ProjectNode));
+            return (ProjectNode)((OAProject)envProj).Project;
         }
     }
 }

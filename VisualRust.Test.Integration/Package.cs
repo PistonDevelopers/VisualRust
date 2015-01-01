@@ -10,6 +10,10 @@ using Microsoft.VisualStudio;
 
 namespace VisualRust.Test.Integration
 {
+    using EnvDTE;
+    using Microsoft.VisualStudioTools.Project;
+    using Microsoft.VisualStudioTools.Project.Automation;
+
     [TestClass]
     public class Package
     {
@@ -39,10 +43,15 @@ namespace VisualRust.Test.Integration
         {
             UIThreadInvoker.Invoke((Action)delegate()
             {
-                Utils.CreateEmptySolution(TestContext.TestDir, Utils.GetCallingFunction());
-                Assert.AreEqual<int>(0, Utils.ProjectCount());
-                Utils.CreateProjectFromTemplate(Utils.GetCallingFunction(), "Rust Library", "Rust", false);
-                Assert.AreEqual<int>(1, Utils.ProjectCount());
+                string projName = Utils.GetCallingFunction();
+                Utils.CreateEmptySolution(TestContext.TestDir, projName);
+                Utils.CreateProjectFromTemplate(projName, "Rust Library", "Rust", false);
+                ProjectNode root = Utils.GetProject(projName);
+                Assert.IsNotNull(root);
+                new HierarchyCheck(root)
+                    .Child<FolderNode>("src")
+                        .Child<FileNode>("lib.rs")
+                .Run();
             });
         }
 
@@ -53,10 +62,15 @@ namespace VisualRust.Test.Integration
         {
             UIThreadInvoker.Invoke((Action)delegate()
             {
-                Utils.CreateEmptySolution(TestContext.TestDir, Utils.GetCallingFunction());
-                Assert.AreEqual<int>(0, Utils.ProjectCount());
-                Utils.CreateProjectFromTemplate(Utils.GetCallingFunction(), "Rust Application", "Rust", false);
-                Assert.AreEqual<int>(1, Utils.ProjectCount());
+                string projName = Utils.GetCallingFunction();
+                Utils.CreateEmptySolution(TestContext.TestDir, projName);
+                Utils.CreateProjectFromTemplate(projName, "Rust Application", "Rust", false);
+                ProjectNode root = Utils.GetProject(projName);
+                Assert.IsNotNull(root);
+                new HierarchyCheck(root)
+                    .Child<FolderNode>("src")
+                        .Child<FileNode>("main.rs")
+                .Run();
             });
         }
     }

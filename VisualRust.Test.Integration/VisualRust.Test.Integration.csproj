@@ -30,6 +30,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\VisualRust\Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -61,6 +67,7 @@
     <Compile Include="Fake\FakeIVsRegisterProjectTypes.cs" />
     <Compile Include="Fake\FakeIVsSolution.cs" />
     <Compile Include="Fake\FakeIVsActivityLog.cs" />
+    <Compile Include="HierarchyCheck.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="SanityCheck.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,6 +77,10 @@
     <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">
       <Project>{cacb60a9-1e76-4f92-8831-b134a658c695}</Project>
       <Name>Microsoft.VisualStudio.Project</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Project\VisualRust.Project.csproj">
+      <Project>{475c4df2-4d4b-4f2c-9f27-414148dd6f11}</Project>
+      <Name>VisualRust.Project</Name>
     </ProjectReference>
     <ProjectReference Include="..\VisualRust\VisualRust.csproj">
       <Project>{8b7b30f7-17c1-4ce8-baf4-88b086af7b25}</Project>

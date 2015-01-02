@@ -72,7 +72,7 @@ namespace VisualRust.Test.Integration
         /// Closes the currently open solution (if any), and creates a new solution with the given name.
         /// </summary>
         /// <param name="solutionName">Name of new solution.</param>
-        public static void CreateEmptySolution(string directory, string solutionName)
+        public static string CreateEmptySolution(string directory, string solutionName)
         {
             CloseCurrentSolution(__VSSLNSAVEOPTIONS.SLNSAVEOPT_NoSave);
 
@@ -84,6 +84,7 @@ namespace VisualRust.Test.Integration
             solutionService.SaveSolutionElement((uint)__VSSLNSAVEOPTIONS.SLNSAVEOPT_ForceSave, null, 0);
             DTE dte = VsIdeTestHostContext.Dte;
             Assert.AreEqual(solutionName + ".sln", Path.GetFileName(dte.Solution.FileName), "Newly created solution has wrong Filename");
+            return solutionDirectory;
         }
 
         public static void CloseCurrentSolution(__VSSLNSAVEOPTIONS saveoptions)
@@ -102,7 +103,7 @@ namespace VisualRust.Test.Integration
         /// <param name="templateName">Name of project template to use</param>
         /// <param name="language">language</param>
         /// <returns>New project.</returns>
-        public static void CreateProjectFromTemplate(string projectName, string templateName, string language, bool exclusive)
+        public static string CreateProjectFromTemplate(string projectName, string templateName, string language, bool exclusive)
         {
             DTE dte = (DTE)VsIdeTestHostContext.ServiceProvider.GetService(typeof(DTE));
 
@@ -114,6 +115,7 @@ namespace VisualRust.Test.Integration
             string projectDirectory = GetNewDirectoryName(solutionDirectory, projectName);
 
             dte.Solution.AddFromTemplate(projectTemplate, projectDirectory, projectName, false);
+            return projectDirectory;
         }
 
         /// <summary>
@@ -136,6 +138,30 @@ namespace VisualRust.Test.Integration
             Assert.IsInstanceOfType(envProj, typeof(OAProject));
             Assert.IsInstanceOfType(((OAProject)envProj).Project, typeof(ProjectNode));
             return (ProjectNode)((OAProject)envProj).Project;
+        }
+
+        public static DTE GetDTE()
+        {
+            return (DTE)VsIdeTestHostContext.ServiceProvider.GetService(typeof(DTE));
+        }
+
+        public static Task<IntPtr> GetNewDialogOwnerHwnd()
+        {
+            IVsUIShell shell = (IVsUIShell)VsIdeTestHostContext.ServiceProvider.GetService(typeof(SVsUIShell));
+            IntPtr oldHwnd;
+            Assert.AreEqual(VSConstants.S_OK, shell.GetDialogOwnerHwnd(out oldHwnd));
+            return Task.Factory.StartNew(() =>
+            {
+                IntPtr newHwnd;
+                while(true)
+                {
+                    Assert.AreEqual(VSConstants.S_OK, shell.GetDialogOwnerHwnd(out newHwnd));
+                    if(newHwnd != oldHwnd)
+                        break;
+                    System.Threading.Thread.Sleep(100);
+                }
+                return newHwnd;
+            });
         }
     }
 }

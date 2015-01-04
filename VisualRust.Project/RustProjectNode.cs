@@ -102,16 +102,14 @@ namespace VisualRust.Project
             }
         }
 
-        public override object GetProperty(int propId)
-        {
-            if(propId == (int)__VSHPROPID.VSHPROPID_IconImgList)
-                return RustImageHandler.ImageList.Handle;
-            return base.GetProperty(propId);
-        }
-
         public override int ImageIndex
         {
-            get { return (int)IconIndex.RustProject; }
+            get { return (int)IconIndex.NoIcon; }
+        }
+
+        public override object GetIconHandle(bool open)
+        {
+            return RustImageHandler.GetIconHandle((int)IconIndex.RustProject);
         }
 
         protected internal override int UnloadProject()
@@ -173,8 +171,6 @@ namespace VisualRust.Project
         {
             var node = new TrackedFileNode(this, elm);
             fileWatcher.ObserveItem(node.Url, node.ID);
-            if (!node.GetModuleTracking())
-                ModuleTracker.DisableTracking(node.Url);
             if (!ModuleTracker.IsIncremental)
             {
                 ModuleTracker.AddRootModule(node.Url);
@@ -229,10 +225,6 @@ namespace VisualRust.Project
                     node.IsEntryPoint = true;
                     containsEntryPoint = true;
                 }
-            }
-            else
-            {
-                ModuleTracker.DisableTracking(node.Url);
             }
             return node;
         }
@@ -350,6 +342,24 @@ namespace VisualRust.Project
         public override CommonFileNode CreateCodeFileNode(ProjectElement item)
         {
             return new TrackedFileNode(this, item);
+        }
+
+        protected override bool IncludeNonMemberItemInProject(HierarchyNode node)
+        {
+            return base.IncludeNonMemberItemInProject(node)
+                || (node is UntrackedFileNode)
+                || (node is UntrackedFolderNode);
+        }
+
+        internal void OnNodeIncluded(TrackedFileNode node)
+        {
+            fileWatcher.ObserveItem(node.Url, node.ID);
+            HashSet<string> children = ModuleTracker.AddRootModuleIncremental(node.Url);
+            foreach (string child in children)
+            {
+                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(child), false);
+                parent.AddChild(CreateUntrackedNode(child));
+            }
         }
 
 #region Disable "Add references..."

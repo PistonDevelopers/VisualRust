@@ -49,6 +49,8 @@ namespace VisualRust.Project
             ProjectMgr = root;
         }
 
+        public override int ImageIndex { get { return (int)IconIndex.NoIcon; } }
+
         public override object GetIconHandle(bool open)
         {
             return ProjectMgr.RustImageHandler.GetIconHandle((int)(open ? IconIndex.UntrackedFolderOpen : IconIndex.UntrackedFolder));

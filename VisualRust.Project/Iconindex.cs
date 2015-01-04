@@ -15,5 +15,8 @@ namespace VisualRust.Project
         UntrackedRustFile,
         UntrackedFolder,
         UntrackedFolderOpen,
+        ZombieUntrackedRustFile,
+        ZombieUntrackedFolder,
+        ZombieUntrackedFolderOpen,
     }
 }

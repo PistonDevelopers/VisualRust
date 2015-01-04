@@ -66,6 +66,7 @@
     <Reference Include="UIAutomationTypes" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssertEx.cs" />
     <Compile Include="Fake\FakeIOleComponentManager.cs" />
     <Compile Include="Fake\FakeIVsRegisterProjectTypes.cs" />
     <Compile Include="Fake\FakeIVsSolution.cs" />

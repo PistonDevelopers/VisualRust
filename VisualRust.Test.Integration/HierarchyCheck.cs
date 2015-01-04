@@ -76,6 +76,7 @@ namespace VisualRust.Test.Integration
             {
                 HierarchyNode childNode = projChildren.FirstOrDefault(n => child.type.IsAssignableFrom(n.GetType()) && String.Equals(n.Caption, child.caption));
                 Assert.IsNotNull(childNode, "Node <{0} ({1})> has no subnode <{2} ({3})>. All subnodes: [{4}].", node.Caption, node.GetType(), child.caption, child.type, allNodes);
+                child.validator(childNode);
                 child.Run(childNode);
             }
         }

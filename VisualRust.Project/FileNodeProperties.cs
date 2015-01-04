@@ -80,7 +80,7 @@ namespace VisualRust.Project
 
         public override string GetClassName()
         {
-            return "VisualRust.Project.FileNodeProperties";
+            return "File Properties";
         }
     }
 
@@ -101,7 +101,28 @@ namespace VisualRust.Project
 
         public override string GetClassName()
         {
-            return "VisualRust.Project.ReferencedFileNodeProperties";
+            return "File Properties";
+        }
+    }
+
+    [ComVisible(true)]
+    public class ExcludedFileNodeProperties : FileNodePropertiesBase
+    {
+        [CategoryAttribute("Advanced")]
+        [ResourceDisplayName("TrackModules")]
+        [ResourceDescription("TrackModulesReferencedDescription")]
+        public bool TrackModules
+        {
+            get { return false; }
+        }
+
+        internal ExcludedFileNodeProperties(TrackedFileNode node)
+            : base(node)
+        { }
+
+        public override string GetClassName()
+        {
+            return "File Properties";
         }
     }
 }

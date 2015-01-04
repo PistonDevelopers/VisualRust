@@ -14,7 +14,7 @@ using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 namespace VisualRust.Project
 {
     /*
-     * From the perspective of VisualRust items can be split into four categories:
+     * From the perspective of VisualRust items can be split into five categories:
      * # Tracked files (stored in .rsproj)
      *   ## Module roots with auto-import
      *      Code files that will automatically include all reference file 
@@ -27,7 +27,10 @@ namespace VisualRust.Project
      *   ## Others
      *      Other files that have disabled option for auto-tracking. Bitmaps, sql files, docs, etc.
      * # Untracked files (not stored in .rsproj, calculated ad-hoc)
-     *   Code files that were reached from module roots by automatic tracking
+     *   ## Code files that were reached from module roots by automatic tracking
+     *   ## Excluded files
+     *      Nodes that are shown when you press "Show all files"
+     *   Automatically-tracked nodes have priority over excluded files
      * Also, items can be in a zombie stated (one way or another item is present in the project
      * hierarchy but actual file doesn't exist on disk)
      *
@@ -45,6 +48,8 @@ namespace VisualRust.Project
      *      If the file does not exist, create it
      * # Include
      *   ## Untracked
+     *      Convert to a module root with auto-import
+     *   ## Excluded
      *      Convert to a module root with auto-import
      * # Exclude
      *   ## Module roots with auto-import

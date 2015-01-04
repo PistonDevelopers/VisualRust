@@ -70,6 +70,7 @@ namespace VisualRust.Project
         public RustProjectNode(CommonProjectPackage package)
             : base(package, Utilities.GetImageList(new System.Drawing.Bitmap(typeof(RustProjectNode).Assembly.GetManifestResourceStream("VisualRust.Project.Resources.IconList.bmp"))))
         {
+            this.CanFileNodesHaveChilds = false;
             this.CanProjectDeleteItems = true;
             this.ListenForStartupFileUpdates = false;
         }
@@ -334,6 +335,16 @@ namespace VisualRust.Project
                 return new CommonFolderNode(this, element);
             else
                 return new UntrackedFolderNode(this, element);
+        }
+
+        public override CommonFileNode CreateNonCodeFileNode(ProjectElement item)
+        {
+            return new TrackedFileNode(this, item);
+        }
+
+        public override CommonFileNode CreateCodeFileNode(ProjectElement item)
+        {
+            return new TrackedFileNode(this, item);
         }
 
 #region Disable "Add references..."

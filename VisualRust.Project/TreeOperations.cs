@@ -32,10 +32,6 @@ namespace VisualRust.Project
             {
                 TreeOperations.RemoveSubnodeFromHierarchy(root, path, (!forRemoval.IsReferenced) && path.Equals(srcpath, StringComparison.InvariantCultureIgnoreCase));
             }
-            if (forRemoval.IsReferenced)
-            {
-                // TODO: Mark node of deleted file as a zombie
-            }
         }
 
         private static bool RemoveSubnodeFromHierarchy(RustProjectNode root, HierarchyNode node, bool deleteFromStorage)

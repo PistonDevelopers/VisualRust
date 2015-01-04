@@ -37,9 +37,10 @@ namespace VisualRust.Test.Integration
             return check;
         }
 
-        public HierarchyCheck Child<U>(string caption, Action<U> ac) where U : HierarchyNode
+        public HierarchyCheck Child<U>(string caption, params Action<U>[] ac) where U : HierarchyNode
         {
-            var check = new HierarchyCheck(caption, typeof(U), n => ac((U)n));
+            Action<U> combined = (Action<U>)Action<U>.Combine(ac);
+            var check = new HierarchyCheck(caption, typeof(U), n => combined((U)n));
             check.parent = this;
             children.Add(check);
             return check;
@@ -47,12 +48,12 @@ namespace VisualRust.Test.Integration
 
         public HierarchyCheck Sibling<U>(string caption) where U : HierarchyNode
         {
-            return Child<U>(caption).parent;
+            return parent.Child<U>(caption).parent;
         }
 
-        public HierarchyCheck Sibling<U>(string caption, Action<U> ac) where U : HierarchyNode
+        public HierarchyCheck Sibling<U>(string caption, params Action<U>[] ac) where U : HierarchyNode
         {
-            return Child<U>(caption, ac).parent;
+            return parent.Child<U>(caption, ac).parent;
         }
 
         public HierarchyCheck Parent()
@@ -73,9 +74,9 @@ namespace VisualRust.Test.Integration
             string allNodes = String.Join(", ", projChildren.Select(n => String.Format("<{0} ({1})>", n.Caption, n.GetType())));
             foreach(var child in children)
             {
-                System.Diagnostics.Debug.WriteLine("child type : {0}", child.type);
                 HierarchyNode childNode = projChildren.FirstOrDefault(n => child.type.IsAssignableFrom(n.GetType()) && String.Equals(n.Caption, child.caption));
                 Assert.IsNotNull(childNode, "Node <{0} ({1})> has no subnode <{2} ({3})>. All subnodes: [{4}].", node.Caption, node.GetType(), child.caption, child.type, allNodes);
+                child.validator(childNode);
                 child.Run(childNode);
             }
         }

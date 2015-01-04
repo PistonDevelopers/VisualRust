@@ -34,7 +34,10 @@ namespace VisualRust.Project
 
         protected override NodeProperties CreatePropertiesObject()
         {
-            return new FileNodeProperties(this);
+            if (this.ItemNode.IsExcluded)
+                return new ExcludedFileNodeProperties(this);
+            else
+                return new FileNodeProperties(this);
         }
 
         private static bool ParseBool(string name)
@@ -47,6 +50,8 @@ namespace VisualRust.Project
 
         public bool GetModuleTracking()
         {
+            if (ItemNode.IsExcluded)
+                return false;
             string value = this.ItemNode.GetMetadata(ModuleTrackingKey);
             if (String.IsNullOrWhiteSpace(value))
                 return true;
@@ -58,6 +63,8 @@ namespace VisualRust.Project
 
         public void SetModuleTracking(bool value)
         {
+            if (ItemNode.IsExcluded)
+                throw new InvalidOperationException();
             this.ItemNode.SetMetadata(ModuleTrackingKey, value.ToString());
             if (value)
                 this.ProjectMgr.EnableAutoImport(this);

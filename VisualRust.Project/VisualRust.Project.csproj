@@ -77,6 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseFileNode.cs" />
+    <Compile Include="DefaultRustLauncher.cs" />
     <Compile Include="IconIndex.cs" />
     <Compile Include="CollectionDifference.cs" />
     <Compile Include="TrackedFileNode.cs" />

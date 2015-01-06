@@ -24,7 +24,7 @@ namespace VisualRust.Project
             ProjectMgr = node;
         }
 
-        //public override string FilePath { get { return this.AbsoluteFilePath; } }
+        public abstract bool GetModuleTracking();
 
         public bool IsRustFile
         {
@@ -35,9 +35,6 @@ namespace VisualRust.Project
         {
             TreeOperations.DeleteSubnode(ProjectMgr, this.Url);
         }
-
-        // This forces VS to stop using image list and index directly and go through GetIconHandle(...) instead
-        public override int ImageIndex { get { return (int)IconIndex.NoIcon; } }
 
         protected virtual void OnFileCreated()
         {

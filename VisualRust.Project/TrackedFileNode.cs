@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
+using System.Diagnostics.Contracts;
 
 namespace VisualRust.Project
 {
@@ -23,12 +24,24 @@ namespace VisualRust.Project
         {
         }
 
+        public override int ImageIndex
+        {
+            get
+            {
+                int baseIdx = base.ImageIndex;
+                if (baseIdx == (int)ProjectNode.ImageName.MissingFile || baseIdx == (int)ProjectNode.ImageName.ExcludedFile)
+                    return baseIdx;
+                else if (IsRustFile || GetModuleTracking())
+                    return (int)IconIndex.NoIcon;
+                else
+                    return baseIdx;
+            }
+        }
+
         public override object GetIconHandle(bool open)
         {
             if (IsRustFile || GetModuleTracking())
-            {
                 return ProjectMgr.RustImageHandler.GetIconHandle((int)IconIndex.RustFile);
-            }
             return base.GetIconHandle(open);
         }
 
@@ -48,7 +61,7 @@ namespace VisualRust.Project
             return retValue;
         }
 
-        public bool GetModuleTracking()
+        public override bool GetModuleTracking()
         {
             if (ItemNode.IsExcluded)
                 return false;
@@ -82,6 +95,14 @@ namespace VisualRust.Project
         protected override bool CanUserMove
         {
             get { return !IsEntryPoint; }
+        }
+
+        internal override int IncludeInProject(bool includeChildren)
+        {
+            Contract.Assert(this.ItemNode.IsExcluded);
+            int result = base.IncludeInProject(includeChildren);
+            ProjectMgr.OnNodeIncluded(this);
+            return result;
         }
     }
 }

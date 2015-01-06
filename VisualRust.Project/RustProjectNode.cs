@@ -71,7 +71,6 @@ namespace VisualRust.Project
         private ImageHandler handler;
         private bool containsEntryPoint;
         internal ModuleTracker ModuleTracker { get; private set; }
-        private FileChangeManager fileWatcher;
 
         public RustProjectNode(CommonProjectPackage package)
             : base(package, Utilities.GetImageList(new System.Drawing.Bitmap(typeof(RustProjectNode).Assembly.GetManifestResourceStream("VisualRust.Project.Resources.IconList.bmp"))))
@@ -103,28 +102,18 @@ namespace VisualRust.Project
             }
         }
 
-        public override object GetProperty(int propId)
-        {
-            if(propId == (int)__VSHPROPID.VSHPROPID_IconImgList)
-                return RustImageHandler.ImageList.Handle;
-            return base.GetProperty(propId);
-        }
-
         public override int ImageIndex
         {
-            get { return (int)IconIndex.RustProject; }
+            get { return (int)IconIndex.NoIcon; }
         }
 
-        protected internal override int UnloadProject()
+        public override object GetIconHandle(bool open)
         {
-            if (fileWatcher != null)
-                fileWatcher.Dispose();
-            return base.UnloadProject();
+            return RustImageHandler.GetIconHandle((int)IconIndex.RustProject);
         }
 
         protected override void Reload()
         {
-            fileWatcher = new FileChangeManager(this.Site);
             string outputType = GetProjectProperty(ProjectFileConstants.OutputType, false);
             string entryPoint = Path.Combine(Path.GetDirectoryName(this.FileName), outputType == "library" ? @"src\lib.rs" : @"src\main.rs");
             containsEntryPoint = false;
@@ -143,39 +132,19 @@ namespace VisualRust.Project
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file), false);
                 parent.AddChild(CreateUntrackedNode(file));
             }
-            fileWatcher.FileChangedOnDisk += OnFileChangedOnDisk;
             this.BuildProject.Save();
         }
 
-        void OnFileChangedOnDisk(object sender, FileChangedOnDiskEventArgs e)
+        internal void OnNodeDirty(uint id)
         {
-            switch(e.FileChangeFlag)
-            {
-                case _VSFILECHANGEFLAGS.VSFILECHG_Time:
-                case _VSFILECHANGEFLAGS.VSFILECHG_Size:
-                case _VSFILECHANGEFLAGS.VSFILECHG_Add:
-                    if (e.ItemID != (uint)VSConstants.VSITEMID.Nil)
-                        OnFileDirty(e.ItemID);
-                    break;
-                case _VSFILECHANGEFLAGS.VSFILECHG_Del:
-                    // For some reason VSFILECHG_Del sometimes gets raised on file change
-                    if (e.ItemID != (uint)VSConstants.VSITEMID.Nil && !File.Exists(e.FileName))
-                        TreeOperations.DeleteSubnode(this, e.FileName);
-                    break;
-            }
-        }
-
-        internal void OnFileDirty(uint id)
-        {
-            ReparseFileNode((BaseFileNode)this.NodeFromItemId(id));
+            BaseFileNode dirtyNode = this.NodeFromItemId(id) as BaseFileNode;
+            if (dirtyNode != null && dirtyNode.GetModuleTracking())
+                ReparseFileNode(dirtyNode);
         }
 
         private TrackedFileNode CreateTrackedNode(ProjectElement elm)
         {
             var node = new TrackedFileNode(this, elm);
-            fileWatcher.ObserveItem(node.Url, node.ID);
-            if (!node.GetModuleTracking())
-                ModuleTracker.DisableTracking(node.Url);
             if (!ModuleTracker.IsIncremental)
             {
                 ModuleTracker.AddRootModule(node.Url);
@@ -195,7 +164,6 @@ namespace VisualRust.Project
         private UntrackedFileNode CreateUntrackedNode(string path)
         {
             var node = new UntrackedFileNode(this, path);
-            fileWatcher.ObserveItem(node.Url, node.ID);
             return node;
         }
 
@@ -230,10 +198,6 @@ namespace VisualRust.Project
                     node.IsEntryPoint = true;
                     containsEntryPoint = true;
                 }
-            }
-            else
-            {
-                ModuleTracker.DisableTracking(node.Url);
             }
             return node;
         }
@@ -306,22 +270,10 @@ namespace VisualRust.Project
             BaseFileNode node = this.NodeFromItemId(itemid) as BaseFileNode;
             if(node != null)
             {
-                try
-                {
-                    fileWatcher.IgnoreItemChanges(node.Url, true);
-                    int result = base.SaveItem(saveFlag, silentSaveAsName, itemid, docData, out cancelled);
-                    if(result == VSConstants.S_OK)
-                        ReparseFileNode(node);
-                    return result;
-                }
-                catch
-                {
-                    throw;
-                }
-                finally
-                {
-                    fileWatcher.IgnoreItemChanges(node.Url, false);
-                }
+                int result = base.SaveItem(saveFlag, silentSaveAsName, itemid, docData, out cancelled);
+                if (result == VSConstants.S_OK)
+                    ReparseFileNode(node);
+                return result;
             }
             return base.SaveItem(saveFlag, silentSaveAsName, itemid, docData, out cancelled);
         }
@@ -351,6 +303,23 @@ namespace VisualRust.Project
         public override CommonFileNode CreateCodeFileNode(ProjectElement item)
         {
             return new TrackedFileNode(this, item);
+        }
+
+        protected override bool IncludeNonMemberItemInProject(HierarchyNode node)
+        {
+            return base.IncludeNonMemberItemInProject(node)
+                || (node is UntrackedFileNode)
+                || (node is UntrackedFolderNode);
+        }
+
+        internal void OnNodeIncluded(TrackedFileNode node)
+        {
+            HashSet<string> children = ModuleTracker.AddRootModuleIncremental(node.Url);
+            foreach (string child in children)
+            {
+                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(child), false);
+                parent.AddChild(CreateUntrackedNode(child));
+            }
         }
 
 #region Disable "Add references..."

@@ -29,11 +29,14 @@ namespace VisualRust.Project
             return new ReferencedFileNodeProperties(this);
         }
 
+        public override int ImageIndex { get { return (int)IconIndex.NoIcon; } }
+
         public override object GetIconHandle(bool open)
         {
-            if (IsRustFile)
+            if(!System.IO.File.Exists(this.Url))
+                return this.ProjectMgr.RustImageHandler.GetIconHandle((int)IconIndex.ZombieUntrackedRustFile);
+            else
                 return this.ProjectMgr.RustImageHandler.GetIconHandle((int)IconIndex.UntrackedRustFile);
-            return base.GetIconHandle(open);
         }
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
@@ -55,6 +58,11 @@ namespace VisualRust.Project
                 return (int)VSConstants.S_OK;
             }
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
+
+        public override bool GetModuleTracking()
+        {
+            return true;
         }
     }
 }

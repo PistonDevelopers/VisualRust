@@ -24,6 +24,7 @@ namespace VisualRust.Test.Integration
             serviceProvider.AddService(typeof(SVsSolution), new FakeIVsSolution(), true);
             serviceProvider.AddService(typeof(SVsRegisterProjectTypes), new FakeIVsRegisterProjectTypes(), true);
             serviceProvider.AddService(typeof(SOleComponentManager), new FakeIOleComponentManager(), true);
+            serviceProvider.AddService(typeof(SVsRunningDocumentTable), new FakeIVsRunningDocumentTable(), true);
             Assert.AreEqual(0, package.SetSite(serviceProvider));
             Assert.AreEqual(0, package.SetSite(null));
         }

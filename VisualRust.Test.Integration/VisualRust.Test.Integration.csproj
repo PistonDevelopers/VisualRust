@@ -69,6 +69,7 @@
     <Compile Include="AssertEx.cs" />
     <Compile Include="Fake\FakeIOleComponentManager.cs" />
     <Compile Include="Fake\FakeIVsRegisterProjectTypes.cs" />
+    <Compile Include="Fake\FakeIVsRunningDocumentTable.cs" />
     <Compile Include="Fake\FakeIVsSolution.cs" />
     <Compile Include="Fake\FakeIVsActivityLog.cs" />
     <Compile Include="HierarchyCheck.cs" />

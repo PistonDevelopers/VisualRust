@@ -24,7 +24,7 @@ namespace VisualRust.Project
             ProjectMgr = node;
         }
 
-        //public override string FilePath { get { return this.AbsoluteFilePath; } }
+        public abstract bool GetModuleTracking();
 
         public bool IsRustFile
         {

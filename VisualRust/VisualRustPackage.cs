@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 using VisualRust.Project;
 using Microsoft.VisualStudioTools.Project;
+using Microsoft.VisualStudioTools.Project.Automation;
 
 namespace VisualRust
 {
@@ -59,6 +60,8 @@ namespace VisualRust
     [Guid(GuidList.guidVisualRustPkgString)]
     public class VisualRustPackage : CommonProjectPackage
     {
+        private RunningDocTableEventsListener docEventsListener;
+
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -75,22 +78,24 @@ namespace VisualRust
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
         #region Package Members
-
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
         ///
-        /*
         protected override void Initialize()
         {
-            Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
-            this.RegisterProjectFactory(new RustProjectFactory(this));
-
+            docEventsListener = new RunningDocTableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
             Racer.AutoCompleter.Init();
         }
-        */
+
+        protected override void Dispose(bool disposing)
+        {
+            docEventsListener.Dispose();
+            base.Dispose(disposing);
+        }
+
         #endregion
 
         public override ProjectFactory CreateProjectFactory()

@@ -61,7 +61,7 @@ namespace VisualRust.Project
             return retValue;
         }
 
-        public bool GetModuleTracking()
+        public override bool GetModuleTracking()
         {
             if (ItemNode.IsExcluded)
                 return false;

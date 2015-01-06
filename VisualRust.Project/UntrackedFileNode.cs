@@ -59,5 +59,10 @@ namespace VisualRust.Project
             }
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
         }
+
+        public override bool GetModuleTracking()
+        {
+            return true;
+        }
     }
 }

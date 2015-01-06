@@ -62,7 +62,6 @@ namespace VisualRust.Project
             var startInfo = new ProcessStartInfo(startupFile, commandLineArgs);
 
             startInfo.UseShellExecute = false;
-            startInfo.WorkingDirectory = _project.GetWorkingDirectory();
 
             return startInfo;
         }

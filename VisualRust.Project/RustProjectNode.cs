@@ -7,7 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
+ using Microsoft.VisualStudioTools;
+ using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
@@ -417,7 +418,8 @@ namespace VisualRust.Project
 
         public override IProjectLauncher GetLauncher()
         {
-            throw new NotImplementedException();
+            var defaultLauncher = new DefaultRustLauncher(this);
+            return defaultLauncher;
         }
 
         internal override string IssueTrackerUrl

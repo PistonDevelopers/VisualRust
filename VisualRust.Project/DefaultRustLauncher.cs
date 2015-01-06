@@ -44,14 +44,7 @@ namespace VisualRust.Project
 
         public int LaunchFile(string file, bool debug)
         {
-            if (debug)
-            {
-                StartWithDebugger(file);
-            }
-            else
-            {
-                StartWithoutDebugger(file);
-            }
+            StartWithoutDebugger(file);
 
             return VSConstants.S_OK;
         }
@@ -72,11 +65,6 @@ namespace VisualRust.Project
             startInfo.WorkingDirectory = _project.GetWorkingDirectory();
 
             return startInfo;
-        }
-
-        private void StartWithDebugger(string filePath)
-        {
-            throw new NotImplementedException();
         }
     }
 }

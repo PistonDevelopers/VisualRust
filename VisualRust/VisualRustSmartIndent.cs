@@ -53,25 +53,27 @@ namespace VisualRust
             var indentStep = _textView.Options.GetIndentSize();
 
             var tokens = Utils.LexString(textSnapshot.GetText()).ToArray();
-            var currentTokenIndex = GetTokensArrayIndexForPosition(tokens, currentLineStartPosition);
-            if (currentTokenIndex < 0)
+            var tokenOnCaretPositionIndex = GetTokensArrayIndexForPosition(tokens, currentLineStartPosition);
+            if (tokenOnCaretPositionIndex < 0)
             {
                 return null;
             }
 
-            var tokenForCaretPosition = tokens[currentTokenIndex];
+            var tokenOnCaretPosition = tokens[tokenOnCaretPositionIndex];
             
-            if (tokenForCaretPosition.Type == RustLexer.RustLexer.COMMENT || tokenForCaretPosition.Type == RustLexer.RustLexer.DOC_COMMENT)
+            if (tokenOnCaretPosition.Type == RustLexer.RustLexer.COMMENT || tokenOnCaretPosition.Type == RustLexer.RustLexer.DOC_COMMENT)
             {
                 // for comment return comment start position
-                var startPositionInLine = GetStartTokenPositionInLine(tokenForCaretPosition, textSnapshot);
+                var startPositionInLine = GetStartTokenPositionInLine(tokenOnCaretPosition, textSnapshot);
 
                 return startPositionInLine;
             }
 
             var bracketChecker = new Stack<IToken>();
+            IToken lastBracket = null;
+            var lastBracketIndex = -1;
 
-            for (int tokenIndex = currentTokenIndex; tokenIndex >= 0; tokenIndex--)
+            for (int tokenIndex = tokenOnCaretPositionIndex; tokenIndex >= 0; tokenIndex--)
             {
                 var token = tokens[tokenIndex];
                 var firstTokenLetter = GetFirstTokenLetter(token);
@@ -80,15 +82,25 @@ namespace VisualRust
                     case '{':
                         if (bracketChecker.Any())
                         {
-                            var lastBracket = bracketChecker.Pop();
-                            if (lastBracket.Text[0] != '}')
+                            var lastClosingBracket = bracketChecker.Pop();
+                            if (GetFirstTokenLetter(lastClosingBracket) != '}')
                             {
                                 return null;
+                            }
+                            else
+                            {
+                                lastBracket = token;
+                                lastBracketIndex = tokenIndex;
                             }
                         }
                         else
                         {
-                            var result = GetStartTokenPositionInLine(token, textSnapshot) + indentStep;
+                            var result = GetStartTokenPositionForCurlyBracket(tokenIndex, textSnapshot, tokens) + indentStep;
+                            if (!result.HasValue)
+                            {
+                                break;
+                            }
+
                             return result;
                         }
 
@@ -96,23 +108,51 @@ namespace VisualRust
                     case '(':
                         if (bracketChecker.Any())
                         {
-                            var lastBracket = bracketChecker.Pop();
-                            if (lastBracket.Text[0] != ')')
+                            var lastClosingBracket = bracketChecker.Pop();
+                            if (GetFirstTokenLetter(lastClosingBracket) != ')')
                             {
                                 return null;
+                            }
+                            else
+                            {
+                                lastBracket = token;
+                                lastBracketIndex = tokenIndex;
                             }
                         }
                         else
                         {
-                            var result = GetStartTokenPositionInLine(token, textSnapshot) + indentStep;
-                            return result;
+                            return GetStartTokenPositionInLine(token, textSnapshot) + indentStep;
                         }
 
                         break;
                     case '}':
                     case ')':
                         bracketChecker.Push(token);
-                        break;
+                        continue;
+                }
+
+                if (HasLineEnding(token) && !bracketChecker.Any())
+                {
+                    // if we on line where only spaces
+                    if (currentLineStartPosition == tokenIndex)
+                    {
+                        var line = textSnapshot.GetLineFromPosition(currentLineStartPosition);
+                        var result = currentLineStartPosition - line.Start.Position;
+                        return result;
+                    }
+
+                    if (lastBracket != null && GetFirstTokenLetter(lastBracket) == '{')
+                    {
+                        var result = GetStartTokenPositionForCurlyBracket(lastBracketIndex, textSnapshot, tokens);
+                        if (!result.HasValue)
+                        {
+                            break;
+                        }
+
+                        return result;   
+                    }
+
+                    return GetStartTokenPositionInLine(tokens[tokenIndex + 1], textSnapshot);
                 }
             }
 
@@ -122,6 +162,80 @@ namespace VisualRust
             }
 
             return 0;
+        }
+
+        /// <summary>
+        /// Empirical method identifing begining of some statement
+        /// </summary>
+        /// <returns></returns>
+        private static int? GetStartTokenPositionForCurlyBracket(int bracketTokenIndex, ITextSnapshot textSnapshot, IToken[] tokens)
+        {
+            if (bracketTokenIndex == 0)
+            {
+                return 0;
+            }
+
+            // if curly bracket is begining token in line
+            var bracketToken = tokens[bracketTokenIndex - 1];
+            if (HasLineEnding(bracketToken))
+            {
+                return GetStartTokenPositionInLine(bracketToken, textSnapshot);
+            }
+
+            // looking for begining of syntax block which can contain complex body defining with brackets
+            var keyWords = new HashSet<string>
+            {
+                "mod",
+                "struct",
+                "fn",
+                "impl",
+                "if",
+                "else",
+                "for",
+                "while",
+                "loop",
+                "proc",
+                "|",
+                "while",
+                "enum",
+                "match",
+                "unsafe",
+                "macro_rules!"
+            };
+
+            for (int tokenIndex = bracketTokenIndex - 1; tokenIndex >= 0; tokenIndex--)
+            {
+                var token = tokens[tokenIndex];
+
+                var firstTokenLetter = GetFirstTokenLetter(token);
+                if (firstTokenLetter == '{' || firstTokenLetter == '}')
+                {
+                    return GetStartTokenPositionInLine(bracketToken, textSnapshot);
+                }
+
+                if (keyWords.Contains(token.Text))
+                {
+                    return GetStartTokenPositionInLine(token, textSnapshot);
+                }
+            }
+
+            return null;
+        }
+
+        private static bool HasLineEnding(IToken token)
+        {
+            if (token.Type == RustLexer.RustLexer.WHITESPACE)
+            {
+                foreach (var symbol in token.Text)
+                {
+                    if (symbol == '\n')
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static char GetFirstTokenLetter(IToken token)
@@ -176,7 +290,7 @@ namespace VisualRust
                 var token = tokens[index];
                 if (token.StartIndex <= searchingPosition && searchingPosition <= token.StopIndex)
                 {
-                    if (token.Type == RustLexer.RustLexer.WHITESPACE)
+                    if (HasLineEnding(token))
                     {
                         return index - 1;
                     }

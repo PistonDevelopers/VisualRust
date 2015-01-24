@@ -93,11 +93,11 @@ fragment CHAR_ESCAPE
   ;
 
 LIT_CHAR
-  : '\'' ( '\\' CHAR_ESCAPE | ~[\\'\n\t\r] ) '\''
+  : '\'' ( '\\' CHAR_ESCAPE | ~[\\'\n\t\r] ) ('\'' | '\r\n' | EOF)
   ;
 
 LIT_BYTE
-  : 'b\'' ( '\\' ( [xX] HEXIT HEXIT | [nrt\\'"0] ) | ~[\\'\n\t\r] ) '\''
+  : 'b\'' ( '\\' ( [xX] HEXIT HEXIT | [nrt\\'"0] ) | ~[\\'\n\t\r] ) ('\'' | '\r\n' | EOF)
   ;
 
 fragment INT_SUFFIX
@@ -130,7 +130,7 @@ LIT_FLOAT
   ;
 
 LIT_STR
-  : '"' ('\\\n' | '\\\r\n' | '\\' CHAR_ESCAPE | .)*? '"'
+  : '"' ('\\\n' | '\\\r\n' | '\\' CHAR_ESCAPE | .)*? ('"' | EOF)
   ;
 
 LIT_BINARY : 'b' LIT_STR ;
@@ -163,7 +163,6 @@ OUTER_DOC_COMMENT : '//!' ~[\r\n]* -> type(DOC_COMMENT) ;
 LINE_COMMENT      : '//' ~[\r\n]* -> type(COMMENT) ;
 
 DOC_BLOCK_COMMENT
-  : ('/**' ~[*] | '/*!') (DOC_BLOCK_COMMENT | .)*? '*/' -> type(DOC_COMMENT)
-  ;
+  : ('/**' ~[*] | '/*!') (DOC_BLOCK_COMMENT | .)*? '*/' ;
 
-BLOCK_COMMENT : '/*' (BLOCK_COMMENT | .)*? '*/' -> type(COMMENT) ;
+BLOCK_COMMENT : '/*' (BLOCK_COMMENT | .)*? ('*/' | EOF) ;

@@ -167,9 +167,9 @@
     <Compile Include="RunningDocTableEventsListener.cs" />
     <Compile Include="RustBraceMatcher.cs" />
     <Compile Include="RustClassifier.cs" />
+    <Compile Include="RustClassifierProvider.cs" />
     <Compile Include="RustCompletionCommandHandler.cs" />
     <Compile Include="RustCompletionSource.cs" />
-    <Compile Include="RustTokenTag.cs" />
     <Compile Include="RustTokenTypes.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="RustLanguage.cs" />

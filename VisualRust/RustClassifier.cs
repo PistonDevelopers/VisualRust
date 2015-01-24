@@ -1,82 +1,72 @@
-﻿namespace VisualRust
+﻿using Microsoft.VisualStudio.Language.StandardClassification;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Text.Tagging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace VisualRust
 {
-    using System;
-    using System.Diagnostics;
-    using System.Collections.Generic;
-    using System.ComponentModel.Composition;
-    using Microsoft.VisualStudio.Text;
-    using Microsoft.VisualStudio.Text.Classification;
-    using Microsoft.VisualStudio.Text.Editor;
-    using Microsoft.VisualStudio.Text.Tagging;
-    using Microsoft.VisualStudio.Utilities;
-    using Microsoft.VisualStudio.Language.StandardClassification;
-
-    [Export(typeof(ITaggerProvider))]
-    [ContentType("rust")]
-    [TagType(typeof(ClassificationTag))]
-    internal sealed class VisualRustClassifierProvider : ITaggerProvider
-    {
-        [Export]
-        [Name("rust")]
-        [BaseDefinition("code")]
-        internal static ContentTypeDefinition RustContentType = null;
-
-        [Export]
-        [FileExtension(".rs")]
-        [ContentType("rust")]
-        internal static FileExtensionToContentTypeDefinition RustFileType = null;
-
-        [Import]
-        internal IClassificationTypeRegistryService ClassificationTypeRegistry = null;
-
-        [Import]
-        internal IBufferTagAggregatorFactoryService aggregatorFactory = null;
-
-        public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
-        {
-            ITagAggregator<RustTokenTag> rustTagAgg = aggregatorFactory.CreateTagAggregator<RustTokenTag>(buffer);
-            return new VisualRustClassifier(buffer, rustTagAgg, ClassificationTypeRegistry) as ITagger<T>;
-        }
-    }
-
-    internal sealed class VisualRustClassifier : ITagger<ClassificationTag>
+    using RustLexer;
+    sealed class RustClassifier : ITagger<ClassificationTag>
     {
         ITextBuffer _buffer;
-        ITagAggregator<RustTokenTag> _agg;
-        IDictionary<RustTokenTypes, IClassificationType> _rustTypes;
+        static Dictionary<RustTokenTypes, IClassificationType> _rustTypes;
 
-        internal VisualRustClassifier(ITextBuffer buffer, ITagAggregator<RustTokenTag> rustTagAgg, IClassificationTypeRegistryService typeService)
+        void InitializeClassifierDictionary(IStandardClassificationService typeService)
         {
-            _buffer = buffer;
-            _agg = rustTagAgg;
+            if(_rustTypes != null)
+                return;
             _rustTypes = new Dictionary<RustTokenTypes, IClassificationType>();
-            _rustTypes[RustTokenTypes.COMMENT] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Comment);
-            _rustTypes[RustTokenTypes.DOC_COMMENT] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Comment);
-            _rustTypes[RustTokenTypes.CHAR] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Character);
-            _rustTypes[RustTokenTypes.IDENT] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Identifier);
-            _rustTypes[RustTokenTypes.LIFETIME] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Identifier);
-            _rustTypes[RustTokenTypes.NUMBER] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Number);
-            _rustTypes[RustTokenTypes.OP] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Operator);
-            _rustTypes[RustTokenTypes.STRING] = typeService.GetClassificationType(PredefinedClassificationTypeNames.String);
-            _rustTypes[RustTokenTypes.STRUCTURAL] = typeService.GetClassificationType(PredefinedClassificationTypeNames.FormalLanguage);
-            _rustTypes[RustTokenTypes.WHITESPACE] = typeService.GetClassificationType(PredefinedClassificationTypeNames.WhiteSpace);
-            _rustTypes[RustTokenTypes.KEYWORD] = typeService.GetClassificationType(PredefinedClassificationTypeNames.Keyword);
+            _rustTypes[RustTokenTypes.COMMENT] = typeService.Comment;
+            _rustTypes[RustTokenTypes.DOC_COMMENT] = typeService.Comment;
+            _rustTypes[RustTokenTypes.CHAR] = typeService.CharacterLiteral;
+            _rustTypes[RustTokenTypes.IDENT] = typeService.Identifier;
+            _rustTypes[RustTokenTypes.LIFETIME] = typeService.Identifier;
+            _rustTypes[RustTokenTypes.NUMBER] = typeService.NumberLiteral;
+            _rustTypes[RustTokenTypes.OP] = typeService.Operator;
+            _rustTypes[RustTokenTypes.STRING] = typeService.StringLiteral;
+            _rustTypes[RustTokenTypes.STRUCTURAL] = typeService.FormalLanguage;
+            _rustTypes[RustTokenTypes.WHITESPACE] = typeService.WhiteSpace;
+            _rustTypes[RustTokenTypes.KEYWORD] = typeService.Keyword;
         }
 
-        public event EventHandler<SnapshotSpanEventArgs> TagsChanged
+        public RustClassifier(ITextBuffer buffer, IStandardClassificationService standardClassificationService)
         {
-            add { }
-            remove { }
+            InitializeClassifierDictionary(standardClassificationService);
+            _buffer = buffer;
+        }
+
+        public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
+
+        private void OnTagsChanged(SnapshotSpan sp)
+        {
+            var temp = TagsChanged;
+            if(temp != null)
+                temp(this, new SnapshotSpanEventArgs(sp));
         }
 
         public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
-            foreach (var tagSpan in this._agg.GetTags(spans))
+            foreach (SnapshotSpan curSpan in spans)
             {
-                var tagSpans = tagSpan.Span.GetSpans(spans[0].Snapshot);
-                yield return
-                    new TagSpan<ClassificationTag>(tagSpans[0],
-                                                   new ClassificationTag(_rustTypes[tagSpan.Tag.type]));
+                var containingLine = curSpan.Start.GetContainingLine();
+                var lexer = new RustLexer(curSpan.Start.GetContainingLine().GetText());
+                int curLoc = containingLine.Start.Position;
+
+                while (true)
+                {
+                    var tok = lexer.NextToken();
+                    if (tok.Type == RustLexer.Eof)
+                    {
+                        yield break;
+                    }
+                    var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc + tok.StartIndex, tok.Text.Length));
+                    yield return new TagSpan<ClassificationTag>(tokenSpan, new ClassificationTag(_rustTypes[Utils.LexerTokenToRustToken(tok.Text, tok.Type)]));
+                }
             }
         }
     }

@@ -163,7 +163,6 @@ OUTER_DOC_COMMENT : '//!' ~[\r\n]* -> type(DOC_COMMENT) ;
 LINE_COMMENT      : '//' ~[\r\n]* -> type(COMMENT) ;
 
 DOC_BLOCK_COMMENT
-  : ('/**' ~[*] | '/*!') (DOC_BLOCK_COMMENT | .)*? ('*/' | EOF) -> type(DOC_COMMENT)
-  ;
+  : ('/**' ~[*] | '/*!') (DOC_BLOCK_COMMENT | .)*? '*/' ;
 
-BLOCK_COMMENT : '/*' (BLOCK_COMMENT | .)*? ('*/' | EOF) -> type(COMMENT) ;
+BLOCK_COMMENT : '/*' (BLOCK_COMMENT | .)*? ('*/' | EOF) ;

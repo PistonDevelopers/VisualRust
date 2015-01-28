@@ -53,15 +53,15 @@
     <CreateVsixContainer>false</CreateVsixContainer>
   </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Debug-CI'">
-    <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\1033\ApplicationProject.zip">
+    <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\ApplicationProject.zip">
       <Link>ProjectTemplates\ApplicationProject.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\1033\LibraryProject.zip">
+    <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\LibraryProject.zip">
       <Link>ProjectTemplates\LibraryProject.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ItemTemplates\Rust\1033\Module.zip">
+    <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ItemTemplates\Rust\127\Module.zip">
       <Link>ItemTemplates\Module.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

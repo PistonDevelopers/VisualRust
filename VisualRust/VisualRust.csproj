@@ -21,6 +21,16 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <CopyVsixManifestToOutput>true</CopyVsixManifestToOutput>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-CI|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug-CI\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <DeployExtension>false</DeployExtension>
+    <CreateVsixContainer>true</CreateVsixContainer>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -29,7 +39,7 @@
     <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <!-- Don't explicitly set DeployExtension to true, or you will break CI -->
+    <DeployExtension>true</DeployExtension>
     <CreateVsixContainer>true</CreateVsixContainer>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -42,16 +52,16 @@
     <DeployExtension>false</DeployExtension>
     <CreateVsixContainer>false</CreateVsixContainer>
   </PropertyGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <Content Include="..\VisualRust.Templates\bin\Debug\ProjectTemplates\Rust\1033\ApplicationProject.zip">
+  <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Debug-CI'">
+    <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\ApplicationProject.zip">
       <Link>ProjectTemplates\ApplicationProject.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\VisualRust.Templates\bin\Debug\ProjectTemplates\Rust\1033\LibraryProject.zip">
+    <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\LibraryProject.zip">
       <Link>ProjectTemplates\LibraryProject.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\VisualRust.Templates\bin\Debug\ItemTemplates\Rust\1033\Module.zip">
+    <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ItemTemplates\Rust\127\Module.zip">
       <Link>ItemTemplates\Module.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -167,9 +177,9 @@
     <Compile Include="RunningDocTableEventsListener.cs" />
     <Compile Include="RustBraceMatcher.cs" />
     <Compile Include="RustClassifier.cs" />
+    <Compile Include="RustClassifierProvider.cs" />
     <Compile Include="RustCompletionCommandHandler.cs" />
     <Compile Include="RustCompletionSource.cs" />
-    <Compile Include="RustTokenTag.cs" />
     <Compile Include="RustTokenTypes.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="RustLanguage.cs" />
@@ -273,7 +283,11 @@
     <Delete Files="$(TargetDir)source.extension.vsixmanifest" />
   </Target>
   <Target Name="BeforeBuild">
-    <Copy SourceFiles="source.extension.$(Configuration).vsixmanifest" DestinationFiles="$(TargetDir)source.extension.vsixmanifest" />
+    <PropertyGroup>
+      <_VsixmanifestConfiguration Condition=" '$(Configuration)' == 'Debug-CI' ">Debug</_VsixmanifestConfiguration>
+      <_VsixmanifestConfiguration Condition=" '$(_VsixmanifestConfiguration)' == '' ">$(Configuration)</_VsixmanifestConfiguration>
+    </PropertyGroup>
+    <Copy SourceFiles="source.extension.$(_VsixmanifestConfiguration).vsixmanifest" DestinationFiles="$(TargetDir)source.extension.vsixmanifest" />
     <ItemGroup>
       <None Include="$(TargetDir)source.extension.vsixmanifest" />
     </ItemGroup>

@@ -18,6 +18,72 @@ namespace VisualRust
 
     static class Utils
     {
+        private static Dictionary<int, RustTokenTypes> _tt = new Dictionary<int, RustTokenTypes>()
+        {
+            { RustLexer.EQ, RustTokenTypes.OP },
+            { RustLexer.LT, RustTokenTypes.OP },
+            { RustLexer.LE, RustTokenTypes.OP },
+            { RustLexer.EQEQ, RustTokenTypes.OP },
+            { RustLexer.NE, RustTokenTypes.OP },
+            { RustLexer.GE, RustTokenTypes.OP },
+            { RustLexer.GT, RustTokenTypes.OP },
+            { RustLexer.ANDAND, RustTokenTypes.OP },
+            { RustLexer.OROR, RustTokenTypes.OP },
+            { RustLexer.NOT, RustTokenTypes.OP },
+            { RustLexer.TILDE, RustTokenTypes.OP },
+            { RustLexer.PLUS, RustTokenTypes.OP },
+
+            { RustLexer.MINUS, RustTokenTypes.OP },
+            { RustLexer.STAR, RustTokenTypes.OP },
+            { RustLexer.SLASH, RustTokenTypes.OP },
+            { RustLexer.PERCENT, RustTokenTypes.OP },
+            { RustLexer.CARET, RustTokenTypes.OP },
+            { RustLexer.AND, RustTokenTypes.OP },
+            { RustLexer.OR, RustTokenTypes.OP },
+            { RustLexer.SHL, RustTokenTypes.OP },
+            { RustLexer.SHR, RustTokenTypes.OP },
+            { RustLexer.BINOP, RustTokenTypes.OP },
+
+            { RustLexer.BINOPEQ, RustTokenTypes.OP },
+            { RustLexer.AT, RustTokenTypes.STRUCTURAL },
+            { RustLexer.DOT, RustTokenTypes.STRUCTURAL },
+            { RustLexer.DOTDOT, RustTokenTypes.STRUCTURAL },
+            { RustLexer.DOTDOTDOT, RustTokenTypes.STRUCTURAL },
+            { RustLexer.COMMA, RustTokenTypes.STRUCTURAL },
+            { RustLexer.SEMI, RustTokenTypes.STRUCTURAL },
+            { RustLexer.COLON, RustTokenTypes.STRUCTURAL },
+
+            { RustLexer.MOD_SEP, RustTokenTypes.STRUCTURAL },
+            { RustLexer.RARROW, RustTokenTypes.STRUCTURAL },
+            { RustLexer.FAT_ARROW, RustTokenTypes.STRUCTURAL },
+            { RustLexer.LPAREN, RustTokenTypes.STRUCTURAL },
+            { RustLexer.RPAREN, RustTokenTypes.STRUCTURAL },
+            { RustLexer.LBRACKET, RustTokenTypes.STRUCTURAL },
+            { RustLexer.RBRACKET, RustTokenTypes.STRUCTURAL },
+
+            { RustLexer.LBRACE, RustTokenTypes.STRUCTURAL },
+            { RustLexer.RBRACE, RustTokenTypes.STRUCTURAL },
+            { RustLexer.POUND, RustTokenTypes.STRUCTURAL },
+            { RustLexer.DOLLAR, RustTokenTypes.STRUCTURAL },
+            { RustLexer.UNDERSCORE, RustTokenTypes.STRUCTURAL },
+            { RustLexer.LIT_CHAR, RustTokenTypes.CHAR },
+
+            { RustLexer.LIT_INTEGER, RustTokenTypes.NUMBER },
+            { RustLexer.LIT_FLOAT, RustTokenTypes.NUMBER },
+            { RustLexer.LIT_STR, RustTokenTypes.STRING },
+            { RustLexer.LIT_STR_RAW, RustTokenTypes.STRING },
+            { RustLexer.LIT_BINARY, RustTokenTypes.STRING },
+
+            { RustLexer.LIT_BINARY_RAW, RustTokenTypes.STRING },
+            { RustLexer.IDENT, RustTokenTypes.IDENT },
+            { RustLexer.LIFETIME, RustTokenTypes.LIFETIME },
+            { RustLexer.WHITESPACE, RustTokenTypes.WHITESPACE },
+            { RustLexer.DOC_COMMENT, RustTokenTypes.DOC_COMMENT },
+            { RustLexer.COMMENT, RustTokenTypes.COMMENT },
+            { RustLexer.BLOCK_COMMENT, RustTokenTypes.COMMENT },
+            { RustLexer.DOC_BLOCK_COMMENT, RustTokenTypes.DOC_COMMENT },
+        };
+
         // These keywords are from rustc /src/libsyntax/parse/token.rs, module keywords
         private static readonly HashSet<string> _kws = new HashSet<string> {
                 "as",
@@ -59,81 +125,9 @@ namespace VisualRust
                 "while"
             };
 
-        private static readonly Dictionary<int, RustTokenTypes> _rustTokenTypesDictionary;
-
-        static Utils()
-        {
-            _rustTokenTypesDictionary = new Dictionary<int, RustTokenTypes>();
-            _rustTokenTypesDictionary[RustLexer.EQ] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.LT] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.LE] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.EQEQ] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.NE] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.GE] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.GT] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.ANDAND] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.OROR] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.NOT] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.TILDE] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.PLUS] = RustTokenTypes.OP;
-
-            _rustTokenTypesDictionary[RustLexer.MINUS] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.STAR] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.SLASH] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.PERCENT] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.CARET] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.AND] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.OR] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.SHL] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.SHR] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.BINOP] = RustTokenTypes.OP;
-
-            _rustTokenTypesDictionary[RustLexer.BINOPEQ] = RustTokenTypes.OP;
-            _rustTokenTypesDictionary[RustLexer.AT] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.DOT] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.DOTDOT] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.DOTDOTDOT] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.COMMA] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.SEMI] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.COLON] = RustTokenTypes.STRUCTURAL;
-
-            _rustTokenTypesDictionary[RustLexer.MOD_SEP] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.RARROW] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.FAT_ARROW] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.LPAREN] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.RPAREN] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.LBRACKET] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.RBRACKET] = RustTokenTypes.STRUCTURAL;
-
-            _rustTokenTypesDictionary[RustLexer.LBRACE] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.RBRACE] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.POUND] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.DOLLAR] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.UNDERSCORE] = RustTokenTypes.STRUCTURAL;
-            _rustTokenTypesDictionary[RustLexer.LIT_CHAR] = RustTokenTypes.CHAR;
-
-            _rustTokenTypesDictionary[RustLexer.LIT_INTEGER] = RustTokenTypes.NUMBER;
-            _rustTokenTypesDictionary[RustLexer.LIT_FLOAT] = RustTokenTypes.NUMBER;
-            _rustTokenTypesDictionary[RustLexer.LIT_STR] = RustTokenTypes.STRING;
-            _rustTokenTypesDictionary[RustLexer.LIT_STR_RAW] = RustTokenTypes.STRING;
-            _rustTokenTypesDictionary[RustLexer.LIT_BINARY] = RustTokenTypes.STRING;
-
-            _rustTokenTypesDictionary[RustLexer.LIT_BINARY_RAW] = RustTokenTypes.STRING;
-            _rustTokenTypesDictionary[RustLexer.IDENT] = RustTokenTypes.IDENT;
-            _rustTokenTypesDictionary[RustLexer.LIFETIME] = RustTokenTypes.LIFETIME;
-            _rustTokenTypesDictionary[RustLexer.WHITESPACE] = RustTokenTypes.WHITESPACE;
-            _rustTokenTypesDictionary[RustLexer.DOC_COMMENT] = RustTokenTypes.DOC_COMMENT;
-            _rustTokenTypesDictionary[RustLexer.COMMENT] = RustTokenTypes.COMMENT;            
-        }
-
-        public static RustTokenTypes GetRustTokenType(this Antlr4.Runtime.IToken token)
-        {
-            return LexerTokenToRustToken(token.Text, token.Type);
-        }
-
         public static RustTokenTypes LexerTokenToRustToken(string text, int tok)
         {
-            RustTokenTypes ty = _rustTokenTypesDictionary[tok];
+            RustTokenTypes ty = _tt[tok];
             if (ty == RustTokenTypes.IDENT)
             {
                 if (_kws.Contains(text))
@@ -145,8 +139,6 @@ namespace VisualRust
                     ty = RustTokenTypes.IDENT;
                 }
             }
-
-
             return ty;
         }
 

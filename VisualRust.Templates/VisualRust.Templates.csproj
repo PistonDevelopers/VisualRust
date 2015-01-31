@@ -71,6 +71,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-CI|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug-CI\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="Items\Module\module.rs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -87,7 +95,11 @@
     <None Include="Projects\Library\lib.rs" />
   </ItemGroup>
   <ItemGroup>
-    <VSTemplate Include="Projects\Application\ApplicationProject.vstemplate" />
+    <VSTemplate Include="Projects\Application\ApplicationProject.vstemplate">
+      <SubType>Designer</SubType>
+      <Language>Rust</Language>
+      <Culture>127</Culture>
+    </VSTemplate>
   </ItemGroup>
   <ItemGroup>
     <None Include="Projects\Library\LibraryProject.ico" />
@@ -95,12 +107,16 @@
   <ItemGroup>
     <VSTemplate Include="Projects\Library\LibraryProject.vstemplate">
       <SubType>Designer</SubType>
+      <Language>Rust</Language>
+      <Culture>127</Culture>
     </VSTemplate>
   </ItemGroup>
   <ItemGroup>
     <None Include="Items\Module\Module.ico" />
     <VSTemplate Include="Items\Module\Module.vstemplate">
       <SubType>Designer</SubType>
+      <Language>Rust</Language>
+      <Culture>127</Culture>
     </VSTemplate>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,16 +1,19 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.ComponentModel.Composition;
+using System.Linq.Expressions;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Antlr4.Runtime;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
+using Microsoft.VisualStudio.Text.Formatting;
 
 namespace VisualRust
 {
@@ -40,43 +43,48 @@ namespace VisualRust
             ed = operations;
         }
 
-        // Check if the last non-whitespace token is left brace
-        private static bool EndsWidthLBrace(List<IToken> tokens)
+        int? ISmartIndent.GetDesiredIndentation(ITextSnapshotLine currentSnapshotLine)
         {
-            for(int i = tokens.Count - 1; i >= 0; i--)
-            {
-                if (tokens[i].Type == RustLexer.RustLexer.WHITESPACE)
-                    continue;
-                else if (tokens[i].Type == RustLexer.RustLexer.LBRACE)
-                    return true;
-                else
-                    return false;
-            }
-            throw new InvalidOperationException();
-        }
+            var textView = _textView;
+            var textSnapshot = textView.TextSnapshot;
+            var caret = textView.Caret;
+            var caretPosition = caret.Position.BufferPosition.Position;
 
-        int? ISmartIndent.GetDesiredIndentation(ITextSnapshotLine line)
-        {
-            ITextSnapshot snap = _textView.TextSnapshot;
-            int indentSize = _textView.Options.GetIndentSize();
-            // get all of the previous lines
-            IEnumerable<ITextSnapshotLine> lines = snap.Lines.Reverse().Skip(snap.LineCount - line.LineNumber);
-            foreach (ITextSnapshotLine prevLine in lines)
+            var indentStep = _textView.Options.GetIndentSize();
+
+            var textToCaret = textSnapshot.GetText(0, caretPosition);
+            var tokens = Utils.LexString(textToCaret);
+
+            var indentStepsCount = 0;
+            foreach (var token in tokens)
             {
-                var text = prevLine.GetText();
-                if (String.IsNullOrWhiteSpace(text))
+                // "{"
+                if (token.Type == RustLexer.RustLexer.LBRACE)
                 {
-                    continue;
+                    indentStepsCount++;
                 }
-                List<IToken> toks = Utils.LexString(text).ToList();
-                // The line before ends with {, we add tab
-                if (EndsWidthLBrace(toks))
+
+                // "}"
+                if (token.Type == RustLexer.RustLexer.RBRACE && indentStepsCount > 0)
                 {
-                    return prevLine.GetText().TakeWhile(c2 => c2 == ' ').Count() + indentSize;
+                    indentStepsCount--;
+                }
+
+                // "("
+                if (token.Type == RustLexer.RustLexer.LPAREN)
+                {
+                    indentStepsCount++;
+                }
+
+                // ")"
+                if (token.Type == RustLexer.RustLexer.RPAREN && indentStepsCount > 0)
+                {
+                    indentStepsCount--;
                 }
             }
-            // otherwise, there are no lines ending in braces before us.
-            return null;
+
+            var indention = indentStepsCount * indentStep;
+            return indention;
         }
 
         public void Dispose() { }

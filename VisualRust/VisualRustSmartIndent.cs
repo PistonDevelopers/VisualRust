@@ -48,61 +48,43 @@ namespace VisualRust
             var textView = _textView;
             var textSnapshot = textView.TextSnapshot;
             var caret = textView.Caret;
-            var caretPosition = caret.Position.BufferPosition.Position;            
-            var caretLine = textSnapshot.GetLineFromPosition(caretPosition);
+            var caretPosition = caret.Position.BufferPosition.Position;
 
-            var caretLineNumber = caretLine.LineNumber;
             var indentStep = _textView.Options.GetIndentSize();
 
+            var textToCaret = textSnapshot.GetText(0, caretPosition);
+            var tokens = Utils.LexString(textToCaret);
+
             var indentStepsCount = 0;
-
-            var currentLineNumber = 0;
-            foreach (var line in textSnapshot.Lines)
+            foreach (var token in tokens)
             {
-                if (IsLineWithCaret(caretLineNumber, currentLineNumber))
+                // "{"
+                if (token.Type == RustLexer.RustLexer.LBRACE)
                 {
-                    var indention = indentStepsCount * indentStep;
-                    return indention;
+                    indentStepsCount++;
                 }
 
-                var tokens = Utils.LexString(line.GetText()).ToArray();
-                foreach (var token in tokens)
+                // "}"
+                if (token.Type == RustLexer.RustLexer.RBRACE && indentStepsCount > 0)
                 {
-                    // "{"
-                    if (token.Type == RustLexer.RustLexer.LBRACE)
-                    {
-                        indentStepsCount++;
-                    }
-
-                    // "}"
-                    if (token.Type == RustLexer.RustLexer.RBRACE && indentStepsCount > 0)
-                    {
-                        indentStepsCount--;
-                    }
-
-                    // "("
-                    if (token.Type == RustLexer.RustLexer.LPAREN)
-                    {
-                        indentStepsCount++;
-                    }
-
-                    // ")"
-                    if (token.Type == RustLexer.RustLexer.RPAREN && indentStepsCount > 0)
-                    {
-                        indentStepsCount--;
-                    }
+                    indentStepsCount--;
                 }
 
-                currentLineNumber++;
+                // "("
+                if (token.Type == RustLexer.RustLexer.LPAREN)
+                {
+                    indentStepsCount++;
+                }
+
+                // ")"
+                if (token.Type == RustLexer.RustLexer.RPAREN && indentStepsCount > 0)
+                {
+                    indentStepsCount--;
+                }
             }
 
-            return 0;
-        }
-
-        private static bool IsLineWithCaret(int caretLineNumber, int currentLineNumber)
-        {
-            var result = currentLineNumber == caretLineNumber;
-            return result;
+            var indention = indentStepsCount * indentStep;
+            return indention;
         }
 
         public void Dispose() { }

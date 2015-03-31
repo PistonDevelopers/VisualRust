@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.Build.Framework;
+using System.IO;
 
 namespace VisualRust.Build
 {
@@ -178,6 +179,12 @@ namespace VisualRust.Build
 
         private bool ExecuteInner()
         {
+            string rustBinPath = VisualRust.Shared.Environment.FindInstallPath(VisualRust.Shared.Environment.DefaultTarget);
+            if(rustBinPath == null)
+            {
+                Log.LogError("No Rust compiler installed.");
+                return false;
+            }
             StringBuilder sb = new StringBuilder();
             if (ConfigFlags.Length > 0)
                 sb.AppendFormat(" --cfg {0}", String.Join(",", ConfigFlags));
@@ -218,12 +225,13 @@ namespace VisualRust.Build
             var psi = new ProcessStartInfo()
             {
                 CreateNoWindow = true,
-                FileName = "rustc.exe",
+                FileName =  Path.Combine(rustBinPath, "rustc.exe"),
                 UseShellExecute = false,
                 WorkingDirectory = WorkingDirectory,
                 Arguments = sb.ToString(),
                 RedirectStandardError = true
             };
+            Log.LogCommandLine(String.Join(" ", psi.FileName, psi.Arguments));
             try
             {
                 Process process = new Process();

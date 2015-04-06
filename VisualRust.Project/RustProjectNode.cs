@@ -400,5 +400,11 @@ namespace VisualRust.Project
         {
             get { throw new NotImplementedException(); }
         }
+
+        protected override Guid[] GetConfigurationIndependentPropertyPages() {
+            return new[] { 
+                new Guid(Constants.BuildPropertyPage)
+            };
+        }
     }
 }

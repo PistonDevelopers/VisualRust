@@ -58,6 +58,7 @@ namespace VisualRust
         LanguageVsTemplate="Rust")]
     [ProvideLanguageExtension(typeof(RustLanguage), ".rs")]
     [Guid(GuidList.guidVisualRustPkgString)]
+    [ProvideObject(typeof(Project.Forms.BuildPropertyPage))]
     public class VisualRustPackage : CommonProjectPackage
     {
         private RunningDocTableEventsListener docEventsListener;

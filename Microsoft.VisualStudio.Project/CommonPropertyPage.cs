@@ -26,6 +26,7 @@ namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
     /// Base class for property pages based on a WinForm control.
     /// </summary>
+    [ComVisible(true)]
     public abstract class CommonPropertyPage : IPropertyPage {
         private IPropertyPageSite _site;
         private bool _dirty, _loading;

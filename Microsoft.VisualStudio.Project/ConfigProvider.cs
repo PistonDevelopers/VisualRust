@@ -489,7 +489,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Return the supported platform names.
         /// </summary>
         /// <returns>An array of supported platform names.</returns>
-        private string[] GetSupportedPlatformsFromProject() {
+        protected string[] GetSupportedPlatformsFromProject() {
             string platforms = this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.AvailablePlatforms);
 
             if (platforms == null) {
@@ -525,7 +525,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="platforms">An array of available platform names</param>
         /// <returns>A count of the actual number of platform names returned.</returns>
         /// <devremark>The platforms array is never null. It is assured by the callers.</devremark>
-        private static int GetPlatforms(uint celt, string[] names, uint[] actual, string[] platforms) {
+        protected static int GetPlatforms(uint celt, string[] names, uint[] actual, string[] platforms) {
             Utilities.ArgumentNotNull("platforms", platforms);
             if (names == null) {
                 if (actual == null || actual.Length == 0) {
@@ -566,7 +566,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Get all the configurations in the project.
         /// </summary>
-        private string[] GetPropertiesConditionedOn(string constant) {
+        protected string[] GetPropertiesConditionedOn(string constant) {
             List<string> configurations = null;
             this.project.BuildProject.ReevaluateIfNecessary();
             this.project.BuildProject.ConditionedProperties.TryGetValue(constant, out configurations);

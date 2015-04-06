@@ -322,6 +322,11 @@ namespace VisualRust.Project
             }
         }
 
+        protected override ConfigProvider CreateConfigProvider()
+        {
+            return new RustConfigProvider(this);
+        }
+
 #region Disable "Add references..."
         protected override ReferenceContainerNode CreateReferenceContainerNode()
         {

@@ -89,6 +89,7 @@
     <Compile Include="DefaultRustLauncher.cs" />
     <Compile Include="IconIndex.cs" />
     <Compile Include="CollectionDifference.cs" />
+    <Compile Include="RustConfigProvider.cs" />
     <Compile Include="TrackedFileNode.cs" />
     <Compile Include="FileNodeProperties.cs" />
     <Compile Include="ModuleRemovalResult.cs" />
@@ -120,6 +121,10 @@
     <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">
       <Project>{cacb60a9-1e76-4f92-8831-b134a658c695}</Project>
       <Name>Microsoft.VisualStudio.Project</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Shared\VisualRust.Shared.csproj">
+      <Project>{b99cc9eb-90f2-4040-9e66-418cc7042153}</Project>
+      <Name>VisualRust.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

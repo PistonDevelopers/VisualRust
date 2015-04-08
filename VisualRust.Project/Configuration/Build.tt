@@ -1,0 +1,10 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ include file="ControllerTemplate.ttinclude" #>
+<#+
+    Field[] Fields = new Field[]
+    {
+        new Field { Name = "UseDefaultTarget", Type = typeof(bool) },
+        new Field { Name = "PlatformTarget", Type = typeof(string), Key= "PlatformTarget"  },
+    };
+#>

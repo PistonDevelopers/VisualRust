@@ -87,11 +87,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseFileNode.cs" />
+    <Compile Include="Configuration\Build.Custom.cs" />
+    <Compile Include="Configuration\Utils.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Configuration\Build.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Build.tt</DependentUpon>
+    </Compile>
     <Compile Include="DefaultRustLauncher.cs" />
     <Compile Include="Forms\BuildPropertyControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Forms\Utils.cs" />
     <Compile Include="IconIndex.cs" />
     <Compile Include="CollectionDifference.cs" />
     <Compile Include="RustConfigProvider.cs" />
@@ -147,6 +155,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\IconList.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Configuration\ControllerTemplate.ttinclude" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Configuration\Build.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Build.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -1,0 +1,100 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.VisualStudioTools.Project;
+
+namespace VisualRust.Project.Configuration
+{
+    partial class <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>
+    {
+<#
+        foreach(var f in Fields)
+        {
+#>
+        private <#= f.Type.FullName #> <#= f.NameLower #>;
+        public <#= f.Type.FullName #> <#= f.NameUpper #> { get { return <#= f.NameLower #>; }  set { <#= f.NameLower #> = value; } }
+<#
+        }
+#>
+
+        public bool IsEqual(<#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> obj)
+        {
+            return true
+<#
+            foreach(var f in Fields)
+            {
+#>
+                && EqualityComparer<<#= f.Type.FullName #>>.Default.Equals(<#= f.NameUpper #>, obj.<#= f.NameUpper #>)
+<#
+            }
+#>
+            ;
+        }
+
+        public <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> Clone()
+        {
+            return new <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>
+            {
+<#
+                foreach(var f in Fields)
+                {
+#>
+                <#= f.NameUpper #> = this.<#= f.NameUpper #>,
+<#
+                }
+#>
+            };
+        }
+
+        public static <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> LoadFrom(CommonProjectNode proj)
+        {
+            var x = new <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>();
+<#
+            foreach(var f in Fields)
+            {
+                if(f.Key != null)
+                {
+#>
+            Utils.FromString(proj.GetUnevaluatedProperty("<#= f.Key #>"), out x.<#= f.NameLower #>);
+<#
+                }
+                else
+                {
+#>
+            x.<#= f.NameUpper #> = Load<#= f.NameUpper #>(proj);
+<#              }
+            }
+#>
+            return x;
+        }
+
+        public void SaveTo(CommonProjectNode proj)
+        {
+<#
+            foreach(var f in Fields)
+            {
+                if(f.Key != null)
+                {
+#>
+            proj.SetProjectProperty("<#= f.Key #>", <#= f.NameUpper #>.ToString());
+<#
+                }
+                else
+                {
+#>
+            Save<#= f.NameUpper #>();
+<#              }
+            }
+#>
+        }
+    }
+}
+<#+
+    class Field
+    {
+        public string Name { get; set; }
+        public Type Type { get; set; }
+        public string Key {  get; set; }
+        public string NameUpper { get { return char.ToUpper(Name[0]) + Name.Substring(1); } }
+        public string NameLower { get { return char.ToLower(Name[0]) + Name.Substring(1); } }
+    }
+#>

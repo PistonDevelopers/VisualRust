@@ -33,7 +33,7 @@ namespace VisualRust.Project.Forms
         {
             Loading = true;
             try {
-                //control.LoadSettings();
+                control.LoadSettings(this.Project);
             } finally {
                 Loading = false;
             }

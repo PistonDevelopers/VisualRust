@@ -167,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Forms\BuildPropertyPage.cs" />
+    <Compile Include="Forms\GeneralPropertyPage.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Racer\AutoCompleter.cs" />
     <Compile Include="Resources.Designer.cs">

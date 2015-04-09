@@ -49,6 +49,41 @@ namespace VisualRust.Project.Forms
             };
         }
 
+        public static Label CreateLabel(string text, Padding margin)
+        {
+            return new Label
+            {
+                Anchor = AnchorStyles.Left,
+                AutoSize = true,
+                Margin = margin,
+                Text = text
+            };
+        }
+
+        public static CheckBox CreateCheckBox(string text, Padding margin)
+        {
+            return new CheckBox
+            {
+                Anchor = AnchorStyles.Left,
+                AutoSize = true,
+                Margin = margin,
+                Text = text
+            };
+        }
+
+        public static ComboBox CreateComboBox(string[] text, Padding margin)
+        {
+            var box = new ComboBox
+            {
+                Anchor = AnchorStyles.Left,
+                AutoSize = true,
+                Margin = margin,
+                DropDownStyle =  ComboBoxStyle.DropDownList
+            };
+            box.Items.AddRange(text);
+            return box;
+        }
+
         public static TextBox CreateTextBox(string text, Padding margin)
         {
             return new TextBox

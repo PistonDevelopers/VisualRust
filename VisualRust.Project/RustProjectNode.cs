@@ -402,7 +402,8 @@ namespace VisualRust.Project
         }
 
         protected override Guid[] GetConfigurationIndependentPropertyPages() {
-            return new[] { 
+            return new[] {
+                new Guid(Constants.ApplicationPropertyPage),
                 new Guid(Constants.BuildPropertyPage)
             };
         }

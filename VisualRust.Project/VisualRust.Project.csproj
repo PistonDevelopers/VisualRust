@@ -87,6 +87,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseFileNode.cs" />
+    <Compile Include="Configuration\Application.cs">
+      <DependentUpon>Application.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Configuration\Build.Custom.cs" />
     <Compile Include="Configuration\Utils.cs" />
     <Compile Include="Constants.cs" />
@@ -97,6 +102,9 @@
     </Compile>
     <Compile Include="DefaultRustLauncher.cs" />
     <Compile Include="Forms\BuildPropertyControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\ApplicationPropertyControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Forms\Utils.cs" />
@@ -163,6 +171,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Configuration\Application.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Application.cs</LastGenOutput>
+    </Content>
     <Content Include="Configuration\Build.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Build.cs</LastGenOutput>

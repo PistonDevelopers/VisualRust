@@ -11,7 +11,6 @@ namespace VisualRust.Project.Forms
     class BuildPropertyControl : UserControl
     {
         private Configuration.Build buildConfig;
-
         private TableLayoutPanel mainPanel;
 
         public BuildPropertyControl()
@@ -26,20 +25,42 @@ namespace VisualRust.Project.Forms
                 Height = 0,
                 ColumnCount = 2,
             };
-            TableLayoutPanel generalHeader = Utils.CreateHeaderLabel("General");
-            mainPanel.Controls.Add(generalHeader);
-            mainPanel.SetColumnSpan(generalHeader, 2);
+            int generalSectionRows =  AddPlatformTargetSection(mainPanel, 0);
+            AddOutputSection(mainPanel, generalSectionRows);
+            this.Controls.Add(mainPanel);
+        }
+
+        private static int AddPlatformTargetSection(TableLayoutPanel mainPanel, int startingRow)
+        {
+            TableLayoutPanel platformHeader = Utils.CreateHeaderLabel("Platform target");
+            mainPanel.Controls.Add(platformHeader);
+            mainPanel.SetColumnSpan(platformHeader, 2);
             RadioButton defaultPlatform = Utils.CreateRadioButton("Use default platform target", Utils.Paddding().Left().Top());
             mainPanel.Controls.Add(defaultPlatform);
             RadioButton customPlatform = Utils.CreateRadioButton("Use custom target:", Utils.Paddding().Left().Bottom());
             mainPanel.Controls.Add(customPlatform);
-            mainPanel.SetRow(customPlatform, 2);
+            mainPanel.SetRow(customPlatform, startingRow + 2);
             mainPanel.SetColumn(customPlatform, 0);
             TextBox customTargetTextBox = Utils.CreateTextBox("", Utils.Paddding().Bottom());
             mainPanel.Controls.Add(customTargetTextBox);
-            mainPanel.SetRow(customTargetTextBox, 2);
+            mainPanel.SetRow(customTargetTextBox, startingRow + 2);
             mainPanel.SetColumn(customTargetTextBox, 1);
-            this.Controls.Add(mainPanel);
+            return startingRow + 3;
+        }
+
+        private static int AddOutputSection(TableLayoutPanel mainPanel, int startingRow)
+        {
+            TableLayoutPanel outputHeader = Utils.CreateHeaderLabel("Compilation");
+            mainPanel.Controls.Add(outputHeader);
+            mainPanel.SetColumnSpan(outputHeader, 2);
+            mainPanel.Controls.Add(Utils.CreateLabel("Optimization level:", Utils.Paddding().Left().Top()));
+            mainPanel.Controls.Add(Utils.CreateComboBox(new string[] { "none (O0)", "minimal (O1)", "optimized (O2)", "aggresive (O3)" }, Utils.Paddding().Top()));
+            CheckBox lto = Utils.CreateCheckBox("Apply link-time optimization", Utils.Paddding().Left());
+            mainPanel.Controls.Add(lto);
+            mainPanel.SetColumnSpan(lto, 2);
+            mainPanel.Controls.Add(Utils.CreateLabel("Debug information:", Utils.Paddding().Left().Bottom()));
+            mainPanel.Controls.Add(Utils.CreateComboBox(new string[] { "none", "line numbers", "full" }, Utils.Paddding().Bottom()));
+            return startingRow + 4;
         }
 
         public void LoadSettings(CommonProjectNode node)

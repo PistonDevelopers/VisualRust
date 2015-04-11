@@ -10,8 +10,8 @@ namespace VisualRust.Project.Configuration
         foreach(var f in Fields)
         {
 #>
-        private <#= f.Type.FullName #> <#= f.NameLower #>;
-        public <#= f.Type.FullName #> <#= f.NameUpper #> { get { return <#= f.NameLower #>; }  set { <#= f.NameLower #> = value; } }
+        private <#= f.Type #> <#= f.NameLower #>;
+        public <#= f.Type #> <#= f.NameUpper #> { get { return <#= f.NameLower #>; }  set { <#= f.NameLower #> = value; } }
 <#
         }
 #>
@@ -23,7 +23,7 @@ namespace VisualRust.Project.Configuration
             foreach(var f in Fields)
             {
 #>
-                && EqualityComparer<<#= f.Type.FullName #>>.Default.Equals(<#= f.NameUpper #>, obj.<#= f.NameUpper #>)
+                && EqualityComparer<<#= f.Type #>>.Default.Equals(<#= f.NameUpper #>, obj.<#= f.NameUpper #>)
 <#
             }
 #>
@@ -53,9 +53,18 @@ namespace VisualRust.Project.Configuration
             {
                 if(f.Key != null)
                 {
+                    if(f.Normalize)
+                    {
+#>
+            x.<#= f.NameUpper #> = <#= f.NameUpper #>FromString(proj.GetUnevaluatedProperty("<#= f.Key #>"));
+<#
+                    }
+                    else
+                    {
 #>
             Utils.FromString(proj.GetUnevaluatedProperty("<#= f.Key #>"), out x.<#= f.NameLower #>);
 <#
+                    }
                 }
                 else
                 {
@@ -74,9 +83,18 @@ namespace VisualRust.Project.Configuration
             {
                 if(f.Key != null)
                 {
+                    if(f.Normalize)
+                    {
+#>
+            proj.SetProjectProperty("<#= f.Key #>", <#= f.NameUpper #>ToString(<#= f.NameUpper #>));
+<#
+                    }
+                    else
+                    {
 #>
             proj.SetProjectProperty("<#= f.Key #>", <#= f.NameUpper #>.ToString());
 <#
+                    }
                 }
                 else
                 {
@@ -92,8 +110,9 @@ namespace VisualRust.Project.Configuration
     class Field
     {
         public string Name { get; set; }
-        public Type Type { get; set; }
+        public object Type { get; set; }
         public string Key {  get; set; }
+        public bool Normalize { get; set; }
         public string NameUpper { get { return char.ToUpper(Name[0]) + Name.Substring(1); } }
         public string NameLower { get { return char.ToLower(Name[0]) + Name.Substring(1); } }
     }

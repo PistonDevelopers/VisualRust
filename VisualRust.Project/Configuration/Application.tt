@@ -4,5 +4,7 @@
 <#+
     Field[] Fields = new Field[]
     {
+        new Field { Name = "CrateName", Type = typeof(string), Key = "CrateName" },
+        new Field { Name = "OutputType", Type = "VisualRust.Shared.BuildOutputType", Key = "PlatformTarget", Normalize = true },
     };
 #>

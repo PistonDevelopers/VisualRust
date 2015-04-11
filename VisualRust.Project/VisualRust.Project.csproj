@@ -92,6 +92,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="Configuration\Application.Custom.cs" />
     <Compile Include="Configuration\Build.Custom.cs" />
     <Compile Include="Configuration\Utils.cs" />
     <Compile Include="Constants.cs" />

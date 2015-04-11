@@ -16,7 +16,7 @@ namespace VisualRust.Project.Forms
 
         public ApplicationPropertyPage()
         {
-            control = new ApplicationPropertyControl();
+            control = new ApplicationPropertyControl(isDirty => IsDirty = isDirty);
         }
 
         public override System.Windows.Forms.Control Control
@@ -26,6 +26,7 @@ namespace VisualRust.Project.Forms
 
         public override void Apply()
         {
+            control.ApplyConfig(this.Project);
             IsDirty = false;
         }
 

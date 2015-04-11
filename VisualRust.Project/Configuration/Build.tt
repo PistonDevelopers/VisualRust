@@ -4,9 +4,9 @@
 <#+
     Field[] Fields = new Field[]
     {
-        new Field { Name = "PlatformTarget", Type = typeof(string), Key= "PlatformTarget", Normalize = true },
-        new Field { Name = "OptimizationLevel", Type = "VisualRust.Shared.OptimizationLevel", Key= "OptimizationLevel", Normalize = true },
         new Field { Name = "LTO", Type = typeof(bool), Key= "LinkTimeOptimization" },
         new Field { Name = "EmitDebug", Type = typeof(bool), Key= "DebugSymbols" },
+        new Field { Name = "OptimizationLevel", Type = "VisualRust.Shared.OptimizationLevel", Key= "OptimizationLevel", Normalize = true },
+        new Field { Name = "PlatformTarget", Type = typeof(string), Key= "PlatformTarget", Normalize = true },
     };
 #>

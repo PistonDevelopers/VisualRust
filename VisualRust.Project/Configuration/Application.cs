@@ -6,16 +6,37 @@ namespace VisualRust.Project.Configuration
 {
     partial class Application
     {
-        private System.String crateName;
-        public System.String CrateName { get { return crateName; }  set { crateName = value; } }
+        public event EventHandler Changed;
         private VisualRust.Shared.BuildOutputType outputType;
-        public VisualRust.Shared.BuildOutputType OutputType { get { return outputType; }  set { outputType = value; } }
-
-        public bool IsEqual(Application obj)
+        public VisualRust.Shared.BuildOutputType OutputType
         {
-            return true
-                && EqualityComparer<System.String>.Default.Equals(CrateName, obj.CrateName)
-                && EqualityComparer<VisualRust.Shared.BuildOutputType>.Default.Equals(OutputType, obj.OutputType)
+            get { return outputType; }
+            set
+            {
+                outputType = value;
+                var temp = Changed;
+                if(temp != null)
+                    temp(this, new EventArgs());
+            }
+        }
+        private System.String crateName;
+        public System.String CrateName
+        {
+            get { return crateName; }
+            set
+            {
+                crateName = value;
+                var temp = Changed;
+                if(temp != null)
+                    temp(this, new EventArgs());
+            }
+        }
+
+        public bool HasChangedFrom(Application obj)
+        {
+            return false
+            || (!EqualityComparer<VisualRust.Shared.BuildOutputType>.Default.Equals(OutputType, obj.OutputType))
+            || (!EqualityComparer<System.String>.Default.Equals(CrateName, obj.CrateName))
             ;
         }
 
@@ -23,23 +44,23 @@ namespace VisualRust.Project.Configuration
         {
             return new Application
             {
-                CrateName = this.CrateName,
                 OutputType = this.OutputType,
+                CrateName = this.CrateName,
             };
         }
 
         public static Application LoadFrom(CommonProjectNode proj)
         {
             var x = new Application();
-            Utils.FromString(proj.GetUnevaluatedProperty("CrateName"), out x.crateName);
             x.OutputType = OutputTypeFromString(proj.GetUnevaluatedProperty("PlatformTarget"));
+            Utils.FromString(proj.GetUnevaluatedProperty("CrateName"), out x.crateName);
             return x;
         }
 
         public void SaveTo(CommonProjectNode proj)
         {
-            proj.SetProjectProperty("CrateName", CrateName.ToString());
             proj.SetProjectProperty("PlatformTarget", OutputTypeToString(OutputType));
+            proj.SetProjectProperty("CrateName", CrateName.ToString());
         }
     }
 }

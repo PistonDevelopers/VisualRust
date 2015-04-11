@@ -11,16 +11,19 @@ namespace VisualRust.Project.Forms
 {
     class BuildPropertyControl : UserControl
     {
-        private string[] knownTargets;
+        private Action<bool> isDirty;
+        private Configuration.Build originalConfig;
         private Configuration.Build config;
+        private string[] knownTargets;
         private TableLayoutPanel mainPanel;
         private ComboBox customTargetBox;
         private ComboBox optimizationBox;
         private CheckBox lto;
         private CheckBox emitDebug;
 
-        public BuildPropertyControl()
+        public BuildPropertyControl(Action<bool> isDirtyAction)
         {
+            isDirty = isDirtyAction;
             knownTargets = new string[] { Shared.Environment.DefaultTarget }.Union(Shared.Environment.FindInstalledTargets()).ToArray();
             // This looks nonsensical but is required to avoid getting "Microsoft Sans Serif, 8.25pt"
             // http://stackoverflow.com/questions/297701/default-font-for-windows-forms-application
@@ -77,7 +80,8 @@ namespace VisualRust.Project.Forms
 
         public void LoadSettings(CommonProjectNode node)
         {
-            config = Configuration.Build.LoadFrom(node);
+            originalConfig = Configuration.Build.LoadFrom(node);
+            config = originalConfig.Clone();
             customTargetBox.Text = config.PlatformTarget;
             customTargetBox.TextChanged += (src,arg) => config.PlatformTarget = customTargetBox.Text;
             optimizationBox.SelectedIndex = (int)config.OptimizationLevel;
@@ -86,6 +90,13 @@ namespace VisualRust.Project.Forms
             lto.CheckedChanged += (src,arg) => config.LTO = lto.Checked;
             emitDebug.Checked = config.EmitDebug;
             emitDebug.CheckedChanged += (src,arg) => config.EmitDebug = emitDebug.Checked;
+            config.Changed += (src, arg) => isDirty(config.HasChangedFrom(originalConfig));
+        }
+
+        public void ApplyConfig(CommonProjectNode node)
+        {
+            config.SaveTo(node);
+            originalConfig = config.Clone();
         }
     }
 }

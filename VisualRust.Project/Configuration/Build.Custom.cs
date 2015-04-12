@@ -11,14 +11,16 @@ namespace VisualRust.Project.Configuration
 {
     partial class Build
     {
-        private static OptimizationLevel OptimizationLevelFromString(string p)
+        private static OptimizationLevel? OptimizationLevelFromString(string p)
         {
             return OptimizationLevelExtension.Parse(p);
         }
 
-        private string OptimizationLevelToString(OptimizationLevel OptimizationLevel)
+        private string OptimizationLevelToString(OptimizationLevel? OptimizationLevel)
         {
-            return optimizationLevel.ToBuildString();
+            if(!optimizationLevel.HasValue)
+                return null;
+            return optimizationLevel.Value.ToBuildString();
         }
 
         private static string PlatformTargetFromString(string p)

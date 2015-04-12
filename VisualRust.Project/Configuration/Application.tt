@@ -1,7 +1,8 @@
 ﻿<#@ template debug="false" hostspecific="true" language="C#" #>
 <#@ output extension=".cs" #>
-<#@ include file="ControllerTemplate.ttinclude" #>
+<#@ include file="ConfigurationTemplate.ttinclude" #>
 <#+
+    bool ConfigurationDependent = false;
     Field[] Fields = new Field[]
     {
         new Field { Name = "OutputType", Type = "VisualRust.Shared.BuildOutputType", Key = "PlatformTarget", Normalize = true },

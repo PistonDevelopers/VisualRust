@@ -78,24 +78,34 @@ namespace VisualRust.Project.Forms
             return startingRow + 4;
         }
 
-        public void LoadSettings(CommonProjectNode node)
+        public void LoadSettings(ProjectConfig[] configs)
         {
-            originalConfig = Configuration.Build.LoadFrom(node);
+            originalConfig = Configuration.Build.LoadFrom(configs);
             config = originalConfig.Clone();
             customTargetBox.Text = config.PlatformTarget;
             customTargetBox.TextChanged += (src,arg) => config.PlatformTarget = customTargetBox.Text;
-            optimizationBox.SelectedIndex = (int)config.OptimizationLevel;
+            if(config.OptimizationLevel.HasValue)
+                optimizationBox.SelectedIndex = (int)config.OptimizationLevel.Value;
+            else
+                optimizationBox.SelectedItem = null;
             optimizationBox.SelectedIndexChanged += (src,arg) => config.OptimizationLevel = (OptimizationLevel)optimizationBox.SelectedIndex;
-            lto.Checked = config.LTO;
+            lto.CheckState = ToCheckState(config.LTO);
             lto.CheckedChanged += (src,arg) => config.LTO = lto.Checked;
-            emitDebug.Checked = config.EmitDebug;
+            emitDebug.CheckState = ToCheckState(config.EmitDebug);
             emitDebug.CheckedChanged += (src,arg) => config.EmitDebug = emitDebug.Checked;
             config.Changed += (src, arg) => isDirty(config.HasChangedFrom(originalConfig));
         }
 
-        public void ApplyConfig(CommonProjectNode node)
+        private static CheckState ToCheckState(bool? v)
         {
-            config.SaveTo(node);
+            if(!v.HasValue)
+                return CheckState.Indeterminate;
+            return v.Value ? CheckState.Checked : CheckState.Unchecked;
+        }
+
+        public void ApplyConfig(ProjectConfig[] configs)
+        {
+            config.SaveTo(configs);
             originalConfig = config.Clone();
         }
     }

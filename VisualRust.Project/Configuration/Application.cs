@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.VisualStudioTools.Project;
 
@@ -18,7 +19,7 @@ namespace VisualRust.Project.Configuration
                 if(temp != null)
                     temp(this, new EventArgs());
             }
-        }
+        } 
         private System.String crateName;
         public System.String CrateName
         {
@@ -30,7 +31,7 @@ namespace VisualRust.Project.Configuration
                 if(temp != null)
                     temp(this, new EventArgs());
             }
-        }
+        } 
 
         public bool HasChangedFrom(Application obj)
         {
@@ -48,6 +49,7 @@ namespace VisualRust.Project.Configuration
                 CrateName = this.CrateName,
             };
         }
+
 
         public static Application LoadFrom(CommonProjectNode proj)
         {

@@ -10,7 +10,7 @@ namespace VisualRust.Project.Forms
 {
     [ComVisible(true)]
     [System.Runtime.InteropServices.Guid(Constants.BuildPropertyPage)]
-    public class BuildPropertyPage : CommonPropertyPage
+    public class BuildPropertyPage : BasePropertyPage
     {
         private readonly BuildPropertyControl control;
 
@@ -26,7 +26,7 @@ namespace VisualRust.Project.Forms
 
         public override void Apply()
         {
-            control.ApplyConfig(this.Project);
+            control.ApplyConfig(Configs);
             IsDirty = false;
         }
 
@@ -34,7 +34,7 @@ namespace VisualRust.Project.Forms
         {
             Loading = true;
             try {
-                control.LoadSettings(this.Project);
+                control.LoadSettings(Configs);
             } finally {
                 Loading = false;
             }

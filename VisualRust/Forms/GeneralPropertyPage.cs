@@ -10,7 +10,7 @@ namespace VisualRust.Project.Forms
 {
     [ComVisible(true)]
     [System.Runtime.InteropServices.Guid(Constants.ApplicationPropertyPage)]
-    public class ApplicationPropertyPage : CommonPropertyPage
+    public class ApplicationPropertyPage : BasePropertyPage
     {
         private readonly ApplicationPropertyControl control;
 

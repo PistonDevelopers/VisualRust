@@ -166,6 +166,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\BasePropertyPage.cs" />
     <Compile Include="Forms\BuildPropertyPage.cs" />
     <Compile Include="Forms\GeneralPropertyPage.cs" />
     <Compile Include="Guids.cs" />

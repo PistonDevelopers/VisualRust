@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.VisualStudioTools.Project;
 
@@ -7,10 +8,7 @@ namespace VisualRust.Project.Configuration
     partial class <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>
     {
         public event EventHandler Changed;
-<#
-        foreach(var f in Fields)
-        {
-#>
+<# foreach(var f in Fields) { #>
         private <#= f.Type #> <#= f.NameLower #>;
         public <#= f.Type #> <#= f.NameUpper #>
         {
@@ -22,22 +20,15 @@ namespace VisualRust.Project.Configuration
                 if(temp != null)
                     temp(this, new EventArgs());
             }
-        }
-<#
-        }
-#>
+        } 
+<# } #>
 
         public bool HasChangedFrom(<#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> obj)
         {
             return false
-<#
-            foreach(var f in Fields)
-            {
-#>
+<# foreach(var f in Fields) { #>
             || (!EqualityComparer<<#= f.Type #>>.Default.Equals(<#= f.NameUpper #>, obj.<#= f.NameUpper #>))
-<#
-            }
-#>
+<# } #>
             ;
         }
 
@@ -45,76 +36,81 @@ namespace VisualRust.Project.Configuration
         {
             return new <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>
             {
-<#
-                foreach(var f in Fields)
-                {
-#>
+<# foreach(var f in Fields) { #>
                 <#= f.NameUpper #> = this.<#= f.NameUpper #>,
-<#
-                }
-#>
+<# } #>
             };
         }
 
+<# if(ConfigurationDependent) { /* Aggregate load */ #>
+        public static <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> LoadFrom(ProjectConfig[] configs)
+        {
+            return configs.Select(LoadFromForConfig).Aggregate((prev, cur) =>
+            {
+<# foreach(var f in Fields) { #>
+                if(prev.<#= f.NameUpper #> != null && !EqualityComparer<<#= f.Type #>>.Default.Equals(prev.<#= f.NameUpper #>, cur.<#= f.NameUpper #>))
+                    prev.<#= f.NameUpper #> = null;
+<# } #>
+                return prev;
+            });
+        }
+<# } #>
+
+<# if(ConfigurationDependent) { #>
+        private static <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> LoadFromForConfig(ProjectConfig cfg)
+        {
+            var x = new <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>();
+<# foreach(var f in Fields) { 
+    if(f.Normalize) { #>
+            x.<#= f.NameUpper #> = <#= f.NameUpper #>FromString(cfg.GetConfigurationProperty("<#= f.Key #>", false));
+<#  } else { #>
+            Utils.FromString(cfg.GetConfigurationProperty("<#= f.Key #>", false), out x.<#= f.NameLower #>);
+<#  }
+} #>
+            return x;
+        }
+<# } else { #>
         public static <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> LoadFrom(CommonProjectNode proj)
         {
             var x = new <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>();
-<#
-            foreach(var f in Fields)
-            {
-                if(f.Key != null)
-                {
-                    if(f.Normalize)
-                    {
-#>
+<# foreach(var f in Fields) { 
+    if(f.Normalize) { #>
             x.<#= f.NameUpper #> = <#= f.NameUpper #>FromString(proj.GetUnevaluatedProperty("<#= f.Key #>"));
-<#
-                    }
-                    else
-                    {
-#>
+<#  } else { #>
             Utils.FromString(proj.GetUnevaluatedProperty("<#= f.Key #>"), out x.<#= f.NameLower #>);
-<#
-                    }
-                }
-                else
-                {
-#>
-            x.<#= f.NameUpper #> = Load<#= f.NameUpper #>(proj);
-<#              }
-            }
-#>
+<#  }
+} #>
             return x;
         }
+<# } #>
 
+<# if(ConfigurationDependent) { #>
+        public void SaveTo(ProjectConfig[] configs)
+        {
+            foreach(ProjectConfig cfg in configs)
+            {
+<# foreach(Field f in Fields) { #>
+                if(<#= f.NameUpper #> != null)
+<#  if(f.Normalize) { #>
+                    cfg.SetConfigurationProperty("<#= f.Key #>", <#= f.NameUpper #>ToString(<#= f.NameUpper #>));
+<#  } else { #>
+                    cfg.SetConfigurationProperty("<#= f.Key #>", <#= f.NameUpper #>.ToString());
+<#  }
+} #>
+            }
+        }
+<# } else { #>
         public void SaveTo(CommonProjectNode proj)
         {
-<#
-            foreach(var f in Fields)
-            {
-                if(f.Key != null)
-                {
-                    if(f.Normalize)
-                    {
-#>
+<# foreach(Field f in Fields) {
+    if(f.Normalize) { #>
             proj.SetProjectProperty("<#= f.Key #>", <#= f.NameUpper #>ToString(<#= f.NameUpper #>));
-<#
-                    }
-                    else
-                    {
-#>
+<#  } else { #>
             proj.SetProjectProperty("<#= f.Key #>", <#= f.NameUpper #>.ToString());
-<#
-                    }
-                }
-                else
-                {
-#>
-            Save<#= f.NameUpper #>();
-<#              }
-            }
-#>
+<#  }
+} #>
         }
+<# } #>
     }
 }
 <#+

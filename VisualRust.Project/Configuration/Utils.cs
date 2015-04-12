@@ -17,5 +17,12 @@ namespace VisualRust.Project.Configuration
         {
             val = bool.TryParse(text, out val) && val;
         }
+
+        public static void FromString(string text, out bool? val)
+        {
+            bool temp;
+            FromString(text, out temp);
+            val = temp;
+        }
     }
 }

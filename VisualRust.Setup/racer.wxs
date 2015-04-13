@@ -8,20 +8,11 @@
       <Component Id="Cmp_racer_exe" Guid="{0AA50111-A890-4F7F-8C1C-493D99A33592}">
         <File Id="File_racer_exe" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\racer.exe" />
       </Component>
-      <Component Id="Cmp_libgcc_dw2_1_dll" Guid="{AAF5CE45-52C8-44FF-BFB4-F3BA91555984}">
-        <File Id="File_libgcc_dw2_1_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\libgcc_s_dw2-1.dll" />
-      </Component>
       <Component Id="Cmp_fmt_macros_4e7c5e5c_dll" Guid="{BD132407-FAFF-4232-8985-443B41C6D692}">
         <File Id="File_fmt_macros_4e7c5e5c_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\fmt_macros-4e7c5e5c.dll" />
       </Component>
       <Component Id="Cmp_log_4e7c5e5c_dll" Guid="{370392DC-2D45-461A-9A59-D1585A1262D4}">
         <File Id="File_log_4e7c5e5c_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\log-4e7c5e5c.dll" />
-      </Component>
-      <Component Id="Cmp_regex_4e7c5e5c_dll" Guid="{81E726E4-F258-4202-8152-E900E3FC0B7E}">
-        <File Id="File_regex_4e7c5e5c_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\regex-4e7c5e5c.dll" />
-      </Component>
-      <Component Id="Cmp_rustrt_4e7c5e5c_dll" Guid="{25F856B0-2C44-41D6-B940-2363E5EBBAD7}">
-        <File Id="File_rustrt_4e7c5e5c_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\rustrt-4e7c5e5c.dll" />
       </Component>
       <Component Id="Cmp_std_4e7c5e5c_dll" Guid="{89746199-9FC3-4B85-A80C-43C5E3F3940D}">
         <File Id="File_std_4e7c5e5c_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\std-4e7c5e5c.dll" />

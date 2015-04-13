@@ -92,11 +92,6 @@ namespace VisualRust.Build
         /// </summary>
         public string OutputDirectory { get; set; }
 
-        /// <summary>
-        /// Sets --sysroot option.
-        /// </summary>
-        public string SystemRoot { get; set; }
-
         private bool? test;
         /// <summary>
         /// Sets --test option. Default value is false.
@@ -197,15 +192,13 @@ namespace VisualRust.Build
             if(!String.IsNullOrWhiteSpace(CrateName))
                 sb.AppendFormat(" --crate-name {0}", CrateName);
             if(debugInfo.HasValue)
-                sb.AppendFormat(" --debuginfo {0}", DebugInfo);
+                sb.AppendFormat(" -g {0}", DebugInfo);
             if(OutputFile != null)
                 sb.AppendFormat(" -o {0}", OutputFile);
             if (optimizationLevel.HasValue)
-                sb.AppendFormat(" --opt-level {0}", OptimizationLevel);
+                sb.AppendFormat(" -O {0}", OptimizationLevel);
             if (OutputDirectory != null)
                 sb.AppendFormat(" --out-dir {0}", OutputDirectory);
-            if (SystemRoot != null)
-                sb.AppendFormat(" --sysroot {0}", SystemRoot);
             if (test.HasValue && test.Value)
                 sb.Append(" --test");
             if (TargetTriple != null)
@@ -221,11 +214,21 @@ namespace VisualRust.Build
             if (CodegenOptions != null)
                 sb.AppendFormat(" -C {0}", CodegenOptions);
             sb.AppendFormat(" {0}", Input);
+            string target = TargetTriple ?? Shared.Environment.DefaultTarget;
+            string installPath = Shared.Environment.FindInstallPath(target);
+            if(installPath == null)
+            {
+                if(String.Equals(target, Shared.Environment.DefaultTarget, StringComparison.OrdinalIgnoreCase))
+                    Log.LogError("Could not find a Rust installation.");
+                else
+                    Log.LogError("Could not find a Rust instalation that can compile target {0}.", target);
+                return false;
+            }
             // Currently we hope that rustc is in the path
             var psi = new ProcessStartInfo()
             {
                 CreateNoWindow = true,
-                FileName =  Path.Combine(rustBinPath, "rustc.exe"),
+                FileName =  Path.Combine(installPath, "bin", "rustc.exe"),
                 UseShellExecute = false,
                 WorkingDirectory = WorkingDirectory,
                 Arguments = sb.ToString(),

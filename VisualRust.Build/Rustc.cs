@@ -153,6 +153,16 @@ namespace VisualRust.Build
         /// </summary>
         public string CodegenOptions { get; set; }
 
+        private bool? lto;
+        /// <summary>
+        /// Sets -C lto option. Default value is false.
+        /// </summary>
+        public bool LTO
+        {
+            get { return lto.HasValue ? lto.Value : false; }
+            set { lto = value; }
+        }
+
         [Required]
         public string WorkingDirectory { get; set; }
 
@@ -211,6 +221,8 @@ namespace VisualRust.Build
                 sb.AppendFormat(" -D {0}", String.Join(",", LintsAsDenied));
             if(LintsAsForbidden.Length > 0)
                 sb.AppendFormat(" -F {0}", String.Join(",", LintsAsForbidden));
+            if (lto.HasValue && lto.Value)
+                sb.AppendFormat(" -C lto");
             if (CodegenOptions != null)
                 sb.AppendFormat(" -C {0}", CodegenOptions);
             sb.AppendFormat(" {0}", Input);
@@ -224,7 +236,6 @@ namespace VisualRust.Build
                     Log.LogError("Could not find a Rust instalation that can compile target {0}.", target);
                 return false;
             }
-            // Currently we hope that rustc is in the path
             var psi = new ProcessStartInfo()
             {
                 CreateNoWindow = true,

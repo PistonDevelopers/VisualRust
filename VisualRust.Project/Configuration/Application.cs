@@ -54,14 +54,14 @@ namespace VisualRust.Project.Configuration
         public static Application LoadFrom(CommonProjectNode proj)
         {
             var x = new Application();
-            x.OutputType = OutputTypeFromString(proj.GetUnevaluatedProperty("PlatformTarget"));
+            x.OutputType = OutputTypeFromString(proj.GetUnevaluatedProperty("CrateType"));
             Utils.FromString(proj.GetUnevaluatedProperty("CrateName"), out x.crateName);
             return x;
         }
 
         public void SaveTo(CommonProjectNode proj)
         {
-            proj.SetProjectProperty("PlatformTarget", OutputTypeToString(OutputType));
+            proj.SetProjectProperty("CrateType", OutputTypeToString(OutputType));
             proj.SetProjectProperty("CrateName", CrateName.ToString());
         }
     }

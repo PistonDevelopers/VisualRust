@@ -1,25 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
-  <PropertyGroup>
-    <VisualRustTasksPath>$(MSBuildExtensionsPath)\VisualRust</VisualRustTasksPath>
-  </PropertyGroup>
 
   <UsingTask AssemblyFile="$(VisualRustTasksPath)\VisualRust.Build.dll"
              TaskFactory="RustcFactory"
              TaskName="Rustc"/>
 
+  <PropertyGroup>
+    <VisualRustTasksPath>$(MSBuildExtensionsPath)\VisualRust</VisualRustTasksPath>
+    <CrateType Condition="'$(CrateType)' != 'library'">exe</CrateType>
+    <_EntryPoint Condition="'$(CrateType)'=='exe'">src\main.rs</_EntryPoint>
+    <_EntryPoint Condition="'$(CrateType)'=='library'">src\lib.rs</_EntryPoint>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <PlatformTarget Condition="'$(PlatformTarget)' == ''" >default</PlatformTarget>
+    <OutDir Condition="'$(PlatformTarget)' == 'default'" >target\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(PlatformTarget)' != 'default'" >target\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <LinkTimeOptimization Condition="'$(LinkTimeOptimization)' == ''">false</LinkTimeOptimization>
+    <_DebugLevel Condition="'$(DebugSymbols)' == 'true'">2</_DebugLevel>
+    <_DebugLevel Condition="'$(DebugSymbols)' != 'true'">0</_DebugLevel>
+  </PropertyGroup>
+
   <Target Name="CoreCompile">
-    <PropertyGroup>
-      <EntryPoint Condition="'$(EntryPoint)'=='' and '$(OutputType)'=='library'">src\lib.rs</EntryPoint>
-      <EntryPoint Condition="'$(EntryPoint)'=='' and ('$(OutputType)'=='exe' or '$(OutputType)'=='winexe')">src\main.rs</EntryPoint>
-      <CompilerOutput Condition="'$(OutputType)'=='library'">$(CompilerOutput);lib</CompilerOutput>
-      <CompilerOutput Condition="'$(OutputType)'=='exe' or '$(OutputType)'=='winexe'">$(CompilerOutput);bin</CompilerOutput>
-    </PropertyGroup>
-    <Rustc Input="$(EntryPoint)"
-           OutputFile="$(IntermediateOutputPath)$(TargetFileName)"
+    <Rustc Input="$(_EntryPoint)"
+           OutputDirectory="$(OutDir)"
            WorkingDirectory="$(ProjectDir)"
-           CrateType="$(CompilerOutput)"/>
+           CrateName="$(CrateName)"
+           CrateType="$(CrateType)"
+           LTO="$(LinkTimeOptimization)"
+           DebugInfo="$(_DebugLevel)"
+           OptimizationLevel="$(OptimizationLevel)"
+           TargetTriple="$(PlatformTarget)"/>
   </Target>
   <Target Name="CreateManifestResourceNames"/>
 </Project>

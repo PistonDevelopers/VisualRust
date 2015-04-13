@@ -32,15 +32,18 @@ namespace VisualRust.Shared
 
         private static IEnumerable<string> GetAllInstallPaths()
         {
-            IEnumerable<string> installPaths = GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32)
-                .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32));
+            IEnumerable<string> installPaths;
             if(System.Environment.Is64BitOperatingSystem)
             {
-                installPaths = installPaths
-                    .Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64))
+                installPaths = GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64)
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry64));
             }
-            return installPaths;
+            else
+            {
+                installPaths = new string[0];
+            }
+            return installPaths.Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32))
+                .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32));
         }
 
         private static IEnumerable<string> GetInstallRoots(RegistryHive hive, RegistryView view)

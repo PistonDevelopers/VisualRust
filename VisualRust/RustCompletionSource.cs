@@ -194,7 +194,7 @@ namespace VisualRust
                     continue;
                 }
 
-                string insertionText = tokenType == RustTokenTypes.STRUCTURAL ? tokenText + text : text;
+                var insertionText = text;
                 var icon = GetCompletionIcon(elType);
 
                 yield return new Completion(text, insertionText, description, icon, null);

@@ -298,7 +298,7 @@ namespace VisualRust
 
         public override void Filter()
         {
-            Filter(CompletionMatchType.MatchInsertionText, false);
+            Filter(CompletionMatchType.MatchInsertionText, true);
         }
     }
 

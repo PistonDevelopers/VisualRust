@@ -179,13 +179,16 @@ namespace VisualRust
         private IEnumerable<Completion> GetCompletions(RustTokenTypes tokenType, string tokenText, string racerResponse)
         {
             // Completions from racer.
-            var lines = racerResponse.Split(new[] { '\n' }, StringSplitOptions.None).Where(l => l.StartsWith("MATCH"));
-            foreach (var line in lines)
+            var lines = racerResponse.Split(new[] { '\n' }, StringSplitOptions.None);
+
+            var matches = lines.Where(l => l.StartsWith("MATCH"));
+            foreach (var matchLine in matches)
             {
-                var tokens = line.Substring(6).Split(',');
-                string text = tokens[0];
-                string langElemText = tokens[4];
-                string description = tokens[5];
+                var tokens = matchLine.Substring(6).Split(',');
+                var text = tokens[0];
+                var langElemText = tokens[4];
+                var descriptionStartIndex = tokens[0].Length + tokens[1].Length + tokens[2].Length + tokens[3].Length + tokens[4].Length + 11;
+                var description = matchLine.Substring(descriptionStartIndex); 
                 CompletableLanguageElement elType;
 
                 if (!Enum.TryParse(langElemText, out elType))

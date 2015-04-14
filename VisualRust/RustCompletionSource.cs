@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Media;
+using Antlr4.Runtime;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Operations;
@@ -131,9 +132,7 @@ namespace VisualRust
 
             // Get token under cursor.
             var tokens = Utils.LexString(line.GetText());
-            var activeToken = col == line.Length
-                ? tokens.Last()
-                : tokens.FirstOrDefault(t => col >= t.StartIndex && col <= t.StopIndex);
+            var activeToken = GetActiveToken(col, line);
             if (activeToken == null)
                 return;
 
@@ -153,6 +152,47 @@ namespace VisualRust
             completions.AddRange(keywordCompletions);
 
             completionSets.Add(new RustCompletionSet("All", "All", span, completions, null));
+        }
+
+        private static IToken GetActiveToken(int columnIndex, ITextSnapshotLine line)
+        {
+            var tokens = Utils.LexString(line.GetText());
+            if (columnIndex == line.Length)
+            {
+                return tokens.Last();
+            }
+
+            IToken token = null;
+            IToken previousToken = null;
+            foreach (var currentToken in tokens)
+            {
+                if (currentToken.StartIndex <= columnIndex && columnIndex <= currentToken.StopIndex)
+                {
+                    token = currentToken;
+                    break;
+                }
+
+                previousToken = currentToken;
+            }
+
+            if (token == null)
+            {
+                return null;
+            }
+
+            if (token.Type == RustLexer.RustLexer.IDENT)
+            {
+                return token;
+            }
+
+            // if current token isn't identifier and caret at end of ident token
+            if (token.StartIndex == columnIndex && previousToken != null && previousToken.Type == RustLexer.RustLexer.IDENT)
+            {
+                return previousToken;
+            }
+
+            // fake token for position between 2 non-ident tokens
+            return new CommonToken(new Tuple<ITokenSource, ICharStream>(token.TokenSource, token.TokenSource.InputStream), 1, 0, token.StartIndex, token.StartIndex - 1);
         }
 
         private static int GetColumn(SnapshotPoint point)

@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.Build.Framework;
 using System.IO;
+using VisualRust.Shared;
 
 namespace VisualRust.Build
 {
@@ -37,15 +38,10 @@ namespace VisualRust.Build
             set { libPaths = value; }
         }
 
-        private string[] crateType = new string[0];
         /// <summary>
         /// Sets --crate-type option.
         /// </summary>
-        public string[] CrateType
-        {
-            get { return crateType; }
-            set { crateType = value; }
-        }
+        public string CrateType { get; set; }
 
         private string[] emit = new string[0];
         /// <summary>
@@ -62,13 +58,13 @@ namespace VisualRust.Build
         /// </summary>
         public string CrateName { get; set; }
 
-        private int? debugInfo;
+        private bool? debugInfo;
         /// <summary>
-        /// Sets --debuginfo option. Default value is 0.
+        /// Sets -g option.
         /// </summary>
-        public int DebugInfo 
+        public bool DebugInfo 
         {
-            get { return debugInfo.HasValue ? debugInfo.Value : 0; }
+            get { return debugInfo.HasValue && debugInfo.Value; }
             set { debugInfo = value; }
         }
 
@@ -196,22 +192,22 @@ namespace VisualRust.Build
             if (AdditionalLibPaths.Length > 0)
                 sb.AppendFormat(" -L {0}", String.Join(",", AdditionalLibPaths));
             if(CrateType.Length > 0)
-                sb.AppendFormat(" --crate-type {0}", String.Join(",", CrateType));
+                sb.AppendFormat(" --crate-type {0}", BuildOutputTypeExtension.Parse(CrateType).ToRustcString());
             if(Emit.Length > 0)
                 sb.AppendFormat(" --emit {0}", String.Join(",", Emit));
             if(!String.IsNullOrWhiteSpace(CrateName))
                 sb.AppendFormat(" --crate-name {0}", CrateName);
-            if(debugInfo.HasValue)
-                sb.AppendFormat(" -g {0}", DebugInfo);
+            if(DebugInfo)
+                sb.AppendFormat(" -g");
             if(OutputFile != null)
                 sb.AppendFormat(" -o {0}", OutputFile);
             if (optimizationLevel.HasValue)
-                sb.AppendFormat(" -O {0}", OptimizationLevel);
+                sb.AppendFormat(" -C opt-level={0}", Shared.OptimizationLevelExtension.Parse(OptimizationLevel.ToString()).ToBuildString());
             if (OutputDirectory != null)
                 sb.AppendFormat(" --out-dir {0}", OutputDirectory);
             if (test.HasValue && test.Value)
                 sb.Append(" --test");
-            if (TargetTriple != null)
+            if (TargetTriple != null && !String.Equals(TargetTriple, Shared.Environment.DefaultTarget, StringComparison.OrdinalIgnoreCase))
                 sb.AppendFormat(" --target {0}", TargetTriple);
             if(LintsAsWarnings.Length > 0)
                 sb.AppendFormat(" -W {0}", String.Join(",", LintsAsWarnings));
@@ -239,7 +235,7 @@ namespace VisualRust.Build
             var psi = new ProcessStartInfo()
             {
                 CreateNoWindow = true,
-                FileName =  Path.Combine(installPath, "bin", "rustc.exe"),
+                FileName =  Path.Combine(installPath, "rustc.exe"),
                 UseShellExecute = false,
                 WorkingDirectory = WorkingDirectory,
                 Arguments = sb.ToString(),

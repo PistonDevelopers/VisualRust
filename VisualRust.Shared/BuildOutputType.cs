@@ -50,5 +50,18 @@ namespace VisualRust.Shared
                     throw new ArgumentException("val");
             }
         }
+
+        public static string ToRustcString(this BuildOutputType val)
+        {
+            switch(val)
+            {
+                case BuildOutputType.Application:
+                    return "bin";
+                case BuildOutputType.Library:
+                    return "lib";
+                default:
+                    throw new ArgumentException("val");
+            }
+        }
     }
 }

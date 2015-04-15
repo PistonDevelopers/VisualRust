@@ -1,23 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
-
   <UsingTask AssemblyFile="$(VisualRustTasksPath)\VisualRust.Build.dll"
              TaskFactory="RustcFactory"
              TaskName="Rustc"/>
 
   <PropertyGroup>
     <VisualRustTasksPath>$(MSBuildExtensionsPath)\VisualRust</VisualRustTasksPath>
-    <CrateType Condition="'$(CrateType)' != 'library'">exe</CrateType>
-    <_EntryPoint Condition="'$(CrateType)'=='exe'">src\main.rs</_EntryPoint>
-    <_EntryPoint Condition="'$(CrateType)'=='library'">src\lib.rs</_EntryPoint>
+    <OutputType Condition="'$(OutputType)' != 'library'">exe</OutputType>
+    <_EntryPoint Condition="'$(OutputType)'=='exe'">src\main.rs</_EntryPoint>
+    <_EntryPoint Condition="'$(OutputType)'=='library'">src\lib.rs</_EntryPoint>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <PlatformTarget Condition="'$(PlatformTarget)' == ''" >default</PlatformTarget>
-    <OutDir Condition="'$(PlatformTarget)' == 'default'" >target\$(Configuration)\</OutDir>
-    <OutDir Condition="'$(PlatformTarget)' != 'default'" >target\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <OutputPath>obj\$(PlatformTarget)\$(Configuration)\</OutputPath>
     <LinkTimeOptimization Condition="'$(LinkTimeOptimization)' == ''">false</LinkTimeOptimization>
-    <_DebugLevel Condition="'$(DebugSymbols)' == 'true'">2</_DebugLevel>
-    <_DebugLevel Condition="'$(DebugSymbols)' != 'true'">0</_DebugLevel>
+    <AssemblyName>$(CrateName)</AssemblyName>
   </PropertyGroup>
 
   <Target Name="CoreCompile">
@@ -25,11 +21,12 @@
            OutputDirectory="$(OutDir)"
            WorkingDirectory="$(ProjectDir)"
            CrateName="$(CrateName)"
-           CrateType="$(CrateType)"
+           CrateType="$(OutputType)"
            LTO="$(LinkTimeOptimization)"
-           DebugInfo="$(_DebugLevel)"
+           DebugInfo="$(DebugSymbols)"
            OptimizationLevel="$(OptimizationLevel)"
            TargetTriple="$(PlatformTarget)"/>
   </Target>
   <Target Name="CreateManifestResourceNames"/>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>

@@ -30,20 +30,33 @@ namespace VisualRust.Shared
             return GetAllInstallPaths().SelectMany(SniffTargets);
         }
 
-        private static IEnumerable<string> GetAllInstallPaths()
+        public static IEnumerable<string> FindCurrentUserInstallPaths()
         {
-            IEnumerable<string> installPaths;
             if(System.Environment.Is64BitOperatingSystem)
             {
-                installPaths = GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64)
-                    .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry64));
+                return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64)
+                    .Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32));
             }
             else
             {
-                installPaths = new string[0];
+                return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32);
             }
-            return installPaths.Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32))
-                .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32));
+        }
+
+        private static IEnumerable<string> GetAllInstallPaths()
+        {
+            if(System.Environment.Is64BitOperatingSystem)
+            {
+                return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64)
+                    .Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32))
+                    .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry64))
+                    .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32));
+            }
+            else
+            {
+                return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32)
+                    .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32));
+            }
         }
 
         private static IEnumerable<string> GetInstallRoots(RegistryHive hive, RegistryView view)

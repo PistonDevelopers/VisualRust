@@ -1,21 +1,43 @@
 ﻿using System;
+using System.Text;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Deployment.WindowsInstaller;
 using System.IO;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Logging;
 
 namespace VisualRust.Test.Integration
 {
     [TestClass]
     public class Project
     {
+        private class StringLogger : ConsoleLogger
+        {
+            private StringBuilder sb = new StringBuilder();
+            public StringLogger()
+            {
+                this.WriteHandler = new WriteHandler(Write);
+            }
+
+            private void Write(string message)
+            {
+                sb.Append(message);
+            }
+
+            public override string ToString()
+            {
+                return sb.ToString();
+            }
+        }
+
         [ClassInitialize]
         public static void InstallRustLocally(TestContext testContext)
         {
             AssertNoRustInstalled();
             Installer.SetInternalUI(InstallUIOptions.Silent);
             Installer.InstallProduct(
-                @"Build\rust-1.0.0-beta-i686-pc-windows-gnu.msi",
+                @"MSBuild\rust-1.0.0-beta.2-i686-pc-windows-gnu.msi",
                 String.Format("INSTALLDIR_USER=\"{0}\"", Path.Combine(Path.GetTempPath(), Path.GetRandomFileName())));
         }
 
@@ -29,8 +51,15 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         public void BuildTrivialProject()
         {
-            var proj = new Microsoft.Build.Evaluation.Project(@"Build\Trivial\trivial.rsproj");
-            proj.Build("Build");
+            var proj = new Microsoft.Build.Evaluation.Project(@"MSBuild\Trivial\trivial.rsproj");
+            AssertBuildsProject(proj, "Build");
+        }
+
+        private static void AssertBuildsProject(Microsoft.Build.Evaluation.Project proj, string target)
+        {
+            var logger = new StringLogger();
+            if(!proj.Build(target, new StringLogger[] { logger }))
+                Assert.Fail(logger.ToString());
         }
 
         private static void AssertNoRustInstalled()

@@ -110,13 +110,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Build\Trivial\trivial.rsproj">
+    <None Include="MSBuild\rust-1.0.0-beta.2-i686-pc-windows-gnu.msi" />
+    <None Include="MSBuild\Trivial\trivial.rsproj">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Build\Trivial\src\main.rs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Build\rust-1.0.0-beta-i686-pc-windows-gnu.msi">
+    <None Include="MSBuild\Trivial\src\main.rs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -3,5 +3,5 @@
     <Folder Include="src\" />
     <Code Include="src\main.rs" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\VisualRust\VisualRust.Rust.targets"/>
+  <Import Project="..\..\VisualRust.Rust.targets"/>
 </Project>

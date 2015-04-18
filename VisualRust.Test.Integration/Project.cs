@@ -44,7 +44,7 @@ namespace VisualRust.Test.Integration
         [ClassCleanup]
         public static void UninstallRustLocally()
         {
-            Installer.ConfigureProduct("{17A31558-A8C0-4C44-A679-09F1B8732999}", 0, InstallState.Absent, "");
+            Installer.ConfigureProduct("{35295818-DAA6-43A9-997B-11EB194EFB2F}", 0, InstallState.Absent, "");
         }
 
         [TestCategory("Explicit")]
@@ -53,6 +53,9 @@ namespace VisualRust.Test.Integration
         {
             var proj = new Microsoft.Build.Evaluation.Project(@"MSBuild\Trivial\trivial.rsproj");
             AssertBuildsProject(proj, "Build");
+            Assert.IsTrue(File.Exists(@"MSBuild\Trivial\target\Debug\trivial.exe"));
+            Directory.Delete(@"MSBuild\Trivial\obj", true);
+            Directory.Delete(@"MSBuild\Trivial\target", true);
         }
 
         private static void AssertBuildsProject(Microsoft.Build.Evaluation.Project proj, string target)

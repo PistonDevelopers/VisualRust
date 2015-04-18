@@ -11,14 +11,16 @@
     <_EntryPoint Condition="'$(OutputType)'=='library'">src\lib.rs</_EntryPoint>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <PlatformTarget Condition="'$(PlatformTarget)' == ''" >default</PlatformTarget>
-    <OutputPath>obj\$(PlatformTarget)\$(Configuration)\</OutputPath>
+    <OutputPath Condition="'$(PlatformTarget)' == 'default'" >target\$(Configuration)\</OutputPath>
+    <OutputPath Condition="'$(PlatformTarget)' != 'default'" >target\$(PlatformTarget)\$(Configuration)\</OutputPath>
     <LinkTimeOptimization Condition="'$(LinkTimeOptimization)' == ''">false</LinkTimeOptimization>
+    <CrateName Condition="'$(CrateName)' ==''">$(MSBuildProjectName)</CrateName>
     <AssemblyName>$(CrateName)</AssemblyName>
   </PropertyGroup>
 
   <Target Name="CoreCompile">
     <Rustc Input="$(_EntryPoint)"
-           OutputDirectory="$(OutDir)"
+           OutputDirectory="$(IntermediateOutputPath)"
            WorkingDirectory="$(ProjectDir)"
            CrateName="$(CrateName)"
            CrateType="$(OutputType)"
@@ -27,6 +29,7 @@
            OptimizationLevel="$(OptimizationLevel)"
            TargetTriple="$(PlatformTarget)"/>
   </Target>
-  <Target Name="CreateManifestResourceNames"/>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <Target Name="GetFrameworkPaths"/>
+  <Target Name="CreateManifestResourceNames"/>
 </Project>

@@ -1,0 +1,13 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ include file="ConfigurationTemplate.ttinclude" #>
+<#+
+    bool ConfigurationDependent = true;
+    Field[] Fields = new Field[]
+    {
+        new Field { Name = "LTO", Type = "bool?", Key= "LinkTimeOptimization" },
+        new Field { Name = "EmitDebug", Type = "bool?", Key= "DebugSymbols" },
+        new Field { Name = "OptimizationLevel", Type = "VisualRust.Shared.OptimizationLevel?", Key= "OptimizationLevel", Normalize = true },
+        new Field { Name = "PlatformTarget", Type = typeof(string), Key= "PlatformTarget", Normalize = true },
+    };
+#>

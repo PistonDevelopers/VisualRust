@@ -166,6 +166,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\BasePropertyPage.cs" />
+    <Compile Include="Forms\BuildPropertyPage.cs" />
+    <Compile Include="Forms\GeneralPropertyPage.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Racer\AutoCompleter.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -246,6 +249,10 @@
     <ProjectReference Include="..\RustLexer\RustLexer.csproj">
       <Project>{e983e989-f83a-4643-896a-ad496bf647d0}</Project>
       <Name>RustLexer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Shared\VisualRust.Shared.csproj">
+      <Project>{b99cc9eb-90f2-4040-9e66-418cc7042153}</Project>
+      <Name>VisualRust.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\VisualRust.Templates\VisualRust.Templates.csproj">
       <Project>{59D94B96-1AF7-46F2-8790-AAB6DFAE8D9A}</Project>

@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
             }
 
-            string condition = String.Format(CultureInfo.InvariantCulture, ConfigProvider.configString, this.ConfigName);
+            string condition = String.Format(CultureInfo.InvariantCulture, ConfigProvider.configString, this.ConfigName, this.PlatformName);
 
             SetPropertyUnderCondition(propertyName, propertyValue, condition);
 
@@ -244,6 +244,17 @@ namespace Microsoft.VisualStudioTools.Project {
         public virtual int get_DisplayName(out string name) {
             name = DisplayName;
             return VSConstants.S_OK;
+        }
+
+        private string PlatformName {
+            get {
+                string[] platform = new string[1];
+                uint[] actual = new uint[1];
+                IVsCfgProvider provider;
+                ErrorHandler.ThrowOnFailure(project.GetCfgProvider(out provider));
+                ErrorHandler.ThrowOnFailure(((IVsCfgProvider2)provider).GetPlatformNames(1, platform, actual));
+                return platform[0];
+            }
         }
 
         private string DisplayName {

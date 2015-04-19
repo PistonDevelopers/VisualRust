@@ -322,6 +322,11 @@ namespace VisualRust.Project
             }
         }
 
+        protected override ConfigProvider CreateConfigProvider()
+        {
+            return new RustConfigProvider(this);
+        }
+
 #region Disable "Add references..."
         protected override ReferenceContainerNode CreateReferenceContainerNode()
         {
@@ -394,6 +399,20 @@ namespace VisualRust.Project
         internal override string IssueTrackerUrl
         {
             get { throw new NotImplementedException(); }
+        }
+
+        protected override Guid[] GetConfigurationDependentPropertyPages()
+        {
+            return new[] {
+                new Guid(Constants.BuildPropertyPage)
+            };
+        }
+
+        protected override Guid[] GetConfigurationIndependentPropertyPages()
+        {
+            return new[] {
+                new Guid(Constants.ApplicationPropertyPage),
+            };
         }
     }
 }

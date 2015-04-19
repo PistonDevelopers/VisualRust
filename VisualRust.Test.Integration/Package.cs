@@ -27,6 +27,7 @@ namespace VisualRust.Test.Integration
 
         [TestMethod]
         [HostType("VS IDE")]
+        [TestCategory("Explicit")]
         [TestProperty("VsHiveName", "12.0Exp")]
         public void PackageLoad()
         {
@@ -44,6 +45,7 @@ namespace VisualRust.Test.Integration
 
         [TestMethod]
         [HostType("VS IDE")]
+        [TestCategory("Explicit")]
         [TestProperty("VsHiveName", "12.0Exp")]
         public void CreateRustLibraryProject()
         {
@@ -77,6 +79,7 @@ namespace VisualRust.Test.Integration
 
         [TestMethod]
         [HostType("VS IDE")]
+        [TestCategory("Explicit")]
         [TestProperty("VsHiveName", "12.0Exp")]
         public void ExcludedNodesAreNotTracked()
         {
@@ -112,6 +115,7 @@ namespace VisualRust.Test.Integration
 
         [TestMethod]
         [HostType("VS IDE")]
+        [TestCategory("Explicit")]
         [TestProperty("VsHiveName", "12.0Exp")]
         public void AddExistingFileFromFolder()
         {
@@ -150,6 +154,7 @@ namespace VisualRust.Test.Integration
 
         [TestMethod]
         [HostType("VS IDE")]
+        [TestCategory("Explicit")]
         [TestProperty("VsHiveName", "12.0Exp")]
         public void CreateRustApplicationProject()
         {

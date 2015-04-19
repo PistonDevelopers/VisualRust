@@ -26,6 +26,7 @@ namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
     /// Base class for property pages based on a WinForm control.
     /// </summary>
+    [ComVisible(true)]
     public abstract class CommonPropertyPage : IPropertyPage {
         private IPropertyPageSite _site;
         private bool _dirty, _loading;
@@ -133,7 +134,7 @@ namespace Microsoft.VisualStudioTools.Project {
             Control.Size = new Size(r.right - r.left, r.bottom - r.top);
         }
 
-        void IPropertyPage.SetObjects(uint count, object[] punk) {
+        public virtual void SetObjects(uint count, object[] punk) {
             if (punk == null) {
                 return;
             }

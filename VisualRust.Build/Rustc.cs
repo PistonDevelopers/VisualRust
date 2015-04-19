@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.Build.Framework;
+using System.IO;
+using VisualRust.Shared;
 
 namespace VisualRust.Build
 {
@@ -36,15 +38,10 @@ namespace VisualRust.Build
             set { libPaths = value; }
         }
 
-        private string[] crateType = new string[0];
         /// <summary>
         /// Sets --crate-type option.
         /// </summary>
-        public string[] CrateType
-        {
-            get { return crateType; }
-            set { crateType = value; }
-        }
+        public string CrateType { get; set; }
 
         private string[] emit = new string[0];
         /// <summary>
@@ -61,13 +58,13 @@ namespace VisualRust.Build
         /// </summary>
         public string CrateName { get; set; }
 
-        private int? debugInfo;
+        private bool? debugInfo;
         /// <summary>
-        /// Sets --debuginfo option. Default value is 0.
+        /// Sets -g option.
         /// </summary>
-        public int DebugInfo 
+        public bool DebugInfo 
         {
-            get { return debugInfo.HasValue ? debugInfo.Value : 0; }
+            get { return debugInfo.HasValue && debugInfo.Value; }
             set { debugInfo = value; }
         }
 
@@ -90,11 +87,6 @@ namespace VisualRust.Build
         /// Sets --out-dir option.
         /// </summary>
         public string OutputDirectory { get; set; }
-
-        /// <summary>
-        /// Sets --sysroot option.
-        /// </summary>
-        public string SystemRoot { get; set; }
 
         private bool? test;
         /// <summary>
@@ -157,6 +149,16 @@ namespace VisualRust.Build
         /// </summary>
         public string CodegenOptions { get; set; }
 
+        private bool? lto;
+        /// <summary>
+        /// Sets -C lto option. Default value is false.
+        /// </summary>
+        public bool LTO
+        {
+            get { return lto.HasValue ? lto.Value : false; }
+            set { lto = value; }
+        }
+
         [Required]
         public string WorkingDirectory { get; set; }
 
@@ -178,30 +180,34 @@ namespace VisualRust.Build
 
         private bool ExecuteInner()
         {
+            string rustBinPath = VisualRust.Shared.Environment.FindInstallPath(VisualRust.Shared.Environment.DefaultTarget);
+            if(rustBinPath == null)
+            {
+                Log.LogError("No Rust compiler installed.");
+                return false;
+            }
             StringBuilder sb = new StringBuilder();
             if (ConfigFlags.Length > 0)
                 sb.AppendFormat(" --cfg {0}", String.Join(",", ConfigFlags));
             if (AdditionalLibPaths.Length > 0)
                 sb.AppendFormat(" -L {0}", String.Join(",", AdditionalLibPaths));
             if(CrateType.Length > 0)
-                sb.AppendFormat(" --crate-type {0}", String.Join(",", CrateType));
+                sb.AppendFormat(" --crate-type {0}", BuildOutputTypeExtension.Parse(CrateType).ToRustcString());
             if(Emit.Length > 0)
                 sb.AppendFormat(" --emit {0}", String.Join(",", Emit));
             if(!String.IsNullOrWhiteSpace(CrateName))
                 sb.AppendFormat(" --crate-name {0}", CrateName);
-            if(debugInfo.HasValue)
-                sb.AppendFormat(" --debuginfo {0}", DebugInfo);
+            if(DebugInfo)
+                sb.AppendFormat(" -g");
             if(OutputFile != null)
                 sb.AppendFormat(" -o {0}", OutputFile);
             if (optimizationLevel.HasValue)
-                sb.AppendFormat(" --opt-level {0}", OptimizationLevel);
+                sb.AppendFormat(" -C opt-level={0}", Shared.OptimizationLevelExtension.Parse(OptimizationLevel.ToString()).ToBuildString());
             if (OutputDirectory != null)
                 sb.AppendFormat(" --out-dir {0}", OutputDirectory);
-            if (SystemRoot != null)
-                sb.AppendFormat(" --sysroot {0}", SystemRoot);
             if (test.HasValue && test.Value)
                 sb.Append(" --test");
-            if (TargetTriple != null)
+            if (TargetTriple != null && !String.Equals(TargetTriple, Shared.Environment.DefaultTarget, StringComparison.OrdinalIgnoreCase))
                 sb.AppendFormat(" --target {0}", TargetTriple);
             if(LintsAsWarnings.Length > 0)
                 sb.AppendFormat(" -W {0}", String.Join(",", LintsAsWarnings));
@@ -211,19 +217,31 @@ namespace VisualRust.Build
                 sb.AppendFormat(" -D {0}", String.Join(",", LintsAsDenied));
             if(LintsAsForbidden.Length > 0)
                 sb.AppendFormat(" -F {0}", String.Join(",", LintsAsForbidden));
+            if (lto.HasValue && lto.Value)
+                sb.AppendFormat(" -C lto");
             if (CodegenOptions != null)
                 sb.AppendFormat(" -C {0}", CodegenOptions);
             sb.AppendFormat(" {0}", Input);
-            // Currently we hope that rustc is in the path
+            string target = TargetTriple ?? Shared.Environment.DefaultTarget;
+            string installPath = Shared.Environment.FindInstallPath(target);
+            if(installPath == null)
+            {
+                if(String.Equals(target, Shared.Environment.DefaultTarget, StringComparison.OrdinalIgnoreCase))
+                    Log.LogError("Could not find a Rust installation.");
+                else
+                    Log.LogError("Could not find a Rust instalation that can compile target {0}.", target);
+                return false;
+            }
             var psi = new ProcessStartInfo()
             {
                 CreateNoWindow = true,
-                FileName = "rustc.exe",
+                FileName =  Path.Combine(installPath, "rustc.exe"),
                 UseShellExecute = false,
                 WorkingDirectory = WorkingDirectory,
                 Arguments = sb.ToString(),
                 RedirectStandardError = true
             };
+            Log.LogCommandLine(String.Join(" ", psi.FileName, psi.Arguments));
             try
             {
                 Process process = new Process();

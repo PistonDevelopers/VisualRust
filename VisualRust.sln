@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.Test", "VisualRu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.Test.Integration", "VisualRust.Test.Integration\VisualRust.Test.Integration.csproj", "{5276348D-B99D-408B-A16E-4B2C527E7EA0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.Shared", "VisualRust.Shared\VisualRust.Shared.csproj", "{B99CC9EB-90F2-4040-9E66-418CC7042153}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,21 @@ Global
 		{5276348D-B99D-408B-A16E-4B2C527E7EA0}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{5276348D-B99D-408B-A16E-4B2C527E7EA0}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{5276348D-B99D-408B-A16E-4B2C527E7EA0}.Release|x86.ActiveCfg = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug-CI|Any CPU.ActiveCfg = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug-CI|Any CPU.Build.0 = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug-CI|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug-CI|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Debug-CI|x86.ActiveCfg = Debug|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B99CC9EB-90F2-4040-9E66-418CC7042153}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

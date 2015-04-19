@@ -51,6 +51,10 @@
     <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.Engine" />
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Deployment.WindowsInstaller, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ce35f76fcda82bad, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -75,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertEx.cs" />
+    <Compile Include="Project.cs" />
     <Compile Include="Fake\FakeIOleComponentManager.cs" />
     <Compile Include="Fake\FakeIVsRegisterProjectTypes.cs" />
     <Compile Include="Fake\FakeIVsRunningDocumentTable.cs" />
@@ -91,14 +96,33 @@
       <Project>{cacb60a9-1e76-4f92-8831-b134a658c695}</Project>
       <Name>Microsoft.VisualStudio.Project</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Build\VisualRust.Build.csproj">
+      <Project>{9cf556ab-76fe-4c3d-ad0a-b64b3b9989b4}</Project>
+      <Name>VisualRust.Build</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VisualRust.Project\VisualRust.Project.csproj">
       <Project>{475c4df2-4d4b-4f2c-9f27-414148dd6f11}</Project>
       <Name>VisualRust.Project</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Shared\VisualRust.Shared.csproj">
+      <Project>{b99cc9eb-90f2-4040-9e66-418cc7042153}</Project>
+      <Name>VisualRust.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\VisualRust\VisualRust.csproj">
       <Project>{8b7b30f7-17c1-4ce8-baf4-88b086af7b25}</Project>
       <Name>VisualRust</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MSBuild\rust-1.0.0-beta.2-i686-pc-windows-gnu.msi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="MSBuild\Trivial\trivial.rsproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="MSBuild\Trivial\src\main.rs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -373,7 +373,7 @@ namespace Microsoft.VisualStudioTools.Project {
             return found;
         }
 
-        public virtual CommonProjectConfig MakeConfiguration(string activeConfigName) {
+        public virtual ProjectConfig MakeConfiguration(string activeConfigName) {
             return new CommonProjectConfig(this, activeConfigName);
         }
 

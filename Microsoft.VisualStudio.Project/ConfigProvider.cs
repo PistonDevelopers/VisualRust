@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
     [ComVisible(true)]
     internal abstract class ConfigProvider : IVsCfgProvider2 {
-        internal const string configString = " '$(Configuration)' == '{0}' ";
+        internal const string configString = " '$(Configuration)|$(Platform)' == '{0}|{1}' ";
         internal const string AnyCPUPlatform = "Any CPU";
         internal const string x86Platform = "x86";
 
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudioTools.Project {
             newConfig.AddProperty("OutputPath", CommonUtils.NormalizeDirectoryPath(Path.Combine(outputBasePath, name)));
 
             // Set the condition that will define the new configuration
-            string newCondition = String.Format(CultureInfo.InvariantCulture, configString, name);
+            string newCondition = String.Format(CultureInfo.InvariantCulture, configString, name, "default");
             newConfig.Condition = newCondition;
 
             NotifyOnCfgNameAdded(name);
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudioTools.Project {
             foreach (string config in configs) {
                 if (String.Compare(config, name, StringComparison.OrdinalIgnoreCase) == 0) {
                     // Create condition of config to remove
-                    string condition = String.Format(CultureInfo.InvariantCulture, configString, config);
+                    string condition = String.Format(CultureInfo.InvariantCulture, configString, config, "default");
 
                     foreach (ProjectPropertyGroupElement element in this.project.BuildProject.Xml.PropertyGroups) {
                         if (String.Equals(element.Condition, condition, StringComparison.OrdinalIgnoreCase)) {
@@ -364,7 +364,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public virtual int RenameCfgsOfCfgName(string old, string newname) {
             // First create the condition that represent the configuration we want to rename
-            string condition = String.Format(CultureInfo.InvariantCulture, configString, old).Trim();
+            string condition = String.Format(CultureInfo.InvariantCulture, configString, old, "default").Trim();
 
             foreach (ProjectPropertyGroupElement config in this.project.BuildProject.Xml.PropertyGroups) {
                 // Only care about conditional property groups
@@ -376,7 +376,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     continue;
 
                 // Change the name 
-                config.Condition = String.Format(CultureInfo.InvariantCulture, configString, newname);
+                config.Condition = String.Format(CultureInfo.InvariantCulture, configString, newname, "default");
                 // Update the name in our config list
                 if (configurationsList.ContainsKey(old)) {
                     ProjectConfig configuration = configurationsList[old];
@@ -489,7 +489,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Return the supported platform names.
         /// </summary>
         /// <returns>An array of supported platform names.</returns>
-        private string[] GetSupportedPlatformsFromProject() {
+        protected string[] GetSupportedPlatformsFromProject() {
             string platforms = this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.AvailablePlatforms);
 
             if (platforms == null) {
@@ -525,7 +525,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="platforms">An array of available platform names</param>
         /// <returns>A count of the actual number of platform names returned.</returns>
         /// <devremark>The platforms array is never null. It is assured by the callers.</devremark>
-        private static int GetPlatforms(uint celt, string[] names, uint[] actual, string[] platforms) {
+        protected static int GetPlatforms(uint celt, string[] names, uint[] actual, string[] platforms) {
             Utilities.ArgumentNotNull("platforms", platforms);
             if (names == null) {
                 if (actual == null || actual.Length == 0) {
@@ -566,7 +566,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Get all the configurations in the project.
         /// </summary>
-        private string[] GetPropertiesConditionedOn(string constant) {
+        protected string[] GetPropertiesConditionedOn(string constant) {
             List<string> configurations = null;
             this.project.BuildProject.ReevaluateIfNecessary();
             this.project.BuildProject.ConditionedProperties.TryGetValue(constant, out configurations);

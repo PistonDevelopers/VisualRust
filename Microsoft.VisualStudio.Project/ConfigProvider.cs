@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
     [ComVisible(true)]
     internal abstract class ConfigProvider : IVsCfgProvider2 {
-        internal const string configString = " '$(Configuration)' == '{0}' ";
+        internal const string configString = " '$(Configuration)|$(Platform)' == '{0}|{1}' ";
         internal const string AnyCPUPlatform = "Any CPU";
         internal const string x86Platform = "x86";
 
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudioTools.Project {
             newConfig.AddProperty("OutputPath", CommonUtils.NormalizeDirectoryPath(Path.Combine(outputBasePath, name)));
 
             // Set the condition that will define the new configuration
-            string newCondition = String.Format(CultureInfo.InvariantCulture, configString, name);
+            string newCondition = String.Format(CultureInfo.InvariantCulture, configString, name, "default");
             newConfig.Condition = newCondition;
 
             NotifyOnCfgNameAdded(name);
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudioTools.Project {
             foreach (string config in configs) {
                 if (String.Compare(config, name, StringComparison.OrdinalIgnoreCase) == 0) {
                     // Create condition of config to remove
-                    string condition = String.Format(CultureInfo.InvariantCulture, configString, config);
+                    string condition = String.Format(CultureInfo.InvariantCulture, configString, config, "default");
 
                     foreach (ProjectPropertyGroupElement element in this.project.BuildProject.Xml.PropertyGroups) {
                         if (String.Equals(element.Condition, condition, StringComparison.OrdinalIgnoreCase)) {
@@ -364,7 +364,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public virtual int RenameCfgsOfCfgName(string old, string newname) {
             // First create the condition that represent the configuration we want to rename
-            string condition = String.Format(CultureInfo.InvariantCulture, configString, old).Trim();
+            string condition = String.Format(CultureInfo.InvariantCulture, configString, old, "default").Trim();
 
             foreach (ProjectPropertyGroupElement config in this.project.BuildProject.Xml.PropertyGroups) {
                 // Only care about conditional property groups
@@ -376,7 +376,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     continue;
 
                 // Change the name 
-                config.Condition = String.Format(CultureInfo.InvariantCulture, configString, newname);
+                config.Condition = String.Format(CultureInfo.InvariantCulture, configString, newname, "default");
                 // Update the name in our config list
                 if (configurationsList.ContainsKey(old)) {
                     ProjectConfig configuration = configurationsList[old];

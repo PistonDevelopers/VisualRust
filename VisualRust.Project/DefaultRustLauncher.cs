@@ -7,10 +7,6 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace VisualRust.Project
 {
-    /// <summary>
-    /// Simple realization of project launcher for executable file
-    /// TODO need realize for library
-    /// </summary>
     sealed class DefaultRustLauncher : IProjectLauncher
     {
         private readonly RustProjectNode _project;
@@ -18,12 +14,13 @@ namespace VisualRust.Project
         public DefaultRustLauncher(RustProjectNode project)
         {
             Utilities.ArgumentNotNull("project", project);
-
             _project = project;
         }
 
         public int LaunchProject(bool debug)
         {
+            if(_project.GetProjectProperty("OutputType") != "exe")
+                throw new InvalidOperationException("A project with an Output Type of Library cannot be started directly.");
             var startupFilePath = GetProjectStartupFile();
             return LaunchFile(startupFilePath, debug);
         }
@@ -31,12 +28,10 @@ namespace VisualRust.Project
         private string GetProjectStartupFile()
         {
             var startupFilePath = Path.Combine(_project.GetProjectProperty("TargetDir"), _project.GetProjectProperty("TargetFileName"));
-
-            //var startupFilePath = _project.GetStartupFile();
             
             if (string.IsNullOrEmpty(startupFilePath))
             {
-                throw new ApplicationException("Startup file is not defined in project");
+                throw new ApplicationException("Visual Rust could not resolve path for your executable. Your installation of Visual Rust or .rsproj file might be corrupted.");
             }
 
             return startupFilePath;
@@ -45,24 +40,22 @@ namespace VisualRust.Project
         public int LaunchFile(string file, bool debug)
         {
             StartWithoutDebugger(file);
-
             return VSConstants.S_OK;
         }
 
         private void StartWithoutDebugger(string startupFile)
         {
+            if(!File.Exists(startupFile))
+                _project.Build("Build");
             var processStartInfo = CreateProcessStartInfoNoDebug(startupFile);
             Process.Start(processStartInfo);
         }
 
         private ProcessStartInfo CreateProcessStartInfoNoDebug(string startupFile)
         {
-            // TODO add command line arguments
             var commandLineArgs = string.Empty;
             var startInfo = new ProcessStartInfo(startupFile, commandLineArgs);
-
             startInfo.UseShellExecute = false;
-
             return startInfo;
         }
     }

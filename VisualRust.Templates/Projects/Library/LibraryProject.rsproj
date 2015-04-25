@@ -4,7 +4,7 @@
     <Platform Condition=" '$(Platform)' == '' ">default</Platform>
     <ProjectGuid>$guid1$</ProjectGuid>
     <OutputType>library</OutputType>
-    <CrateName>$crate_name$</CrateName>
+    <CrateName>$safeprojectname$</CrateName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|default' ">
     <LinkTimeOptimization>false</LinkTimeOptimization>

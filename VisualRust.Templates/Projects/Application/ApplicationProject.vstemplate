@@ -6,7 +6,7 @@
      <Icon>ApplicationProject.ico</Icon>
      <ProjectType>Rust</ProjectType>
      <CreateNewFolder>true</CreateNewFolder>
-     <DefaultName>RustApplication</DefaultName>
+     <DefaultName>rust_application</DefaultName>
      <ProvideDefaultName>true</ProvideDefaultName>
   </TemplateData>
   <TemplateContent>

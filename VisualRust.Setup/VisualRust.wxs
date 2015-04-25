@@ -65,6 +65,9 @@
               Source="$(var.VisualRust.Build.TargetDir)VisualRust.Build.dll"
               KeyPath="yes" />
       </Component>
+      <Component Id="Cmp_VisualRust_Shared_dll_MSBuild" Guid="{B13DFA16-392F-4374-A21C-EEA1FDC3696E}">
+        <File Id="File_VisualRust_Shared_dll_MSBuild" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Shared.dll" />
+      </Component>
     </ComponentGroup>
   </Product>
 </Wix>

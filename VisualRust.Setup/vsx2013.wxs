@@ -29,6 +29,9 @@
       <Component Id="Cmp_VisualRust_Project_dll" Guid="{28F566C7-23AD-439B-8AF9-E924C45EE715}">
         <File Id="File_VisualRust_Project_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Project.dll" />
       </Component>
+      <Component Id="Cmp_VisualRust_Shared_dll" Guid="{ACA9C549-92DB-4AF4-96B3-169E9E1AB056}">
+        <File Id="File_VisualRust_Shared_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Shared.dll" />
+      </Component>
       <ComponentGroupRef Id="CmpGroup_Racer"/>
     </ComponentGroup>
     <PropertyRef Id="VS2013DEVENV" />

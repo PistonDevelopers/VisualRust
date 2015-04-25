@@ -6,7 +6,7 @@
      <Icon>LibraryProject.ico</Icon>
      <ProjectType>Rust</ProjectType>
      <CreateNewFolder>true</CreateNewFolder>
-     <DefaultName>RustLibrary</DefaultName>
+     <DefaultName>rust_library</DefaultName>
      <ProvideDefaultName>true</ProvideDefaultName>
   </TemplateData>
   <TemplateContent>

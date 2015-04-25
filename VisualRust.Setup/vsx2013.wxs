@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <Fragment>
     <PropertyRef Id="VS2013_EXTENSIONS_DIR" />
     <DirectoryRef Id="TARGETDIR">
@@ -25,6 +26,7 @@
       </Component>
       <Component Id="Cmp_VisualRust_pkgdef" Guid="{EC760202-90E8-4365-B848-D056CD4931D8}">
         <File Id="File_VisualRust_pkgdef" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.pkgdef" />
+        <util:RestartResource Path="[VS2013DEVENV]"/>
       </Component>
       <Component Id="Cmp_VisualRust_Project_dll" Guid="{28F566C7-23AD-439B-8AF9-E924C45EE715}">
         <File Id="File_VisualRust_Project_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Project.dll" />

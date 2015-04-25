@@ -8,6 +8,11 @@
         <Directory Id="Dir_vsx2013" Name="Visual Rust"/>
       </Directory>
     </DirectoryRef>
+    <Property Id="VSLAUNCHER" >
+      <DirectorySearch Path="[ProgramFilesFolder]\Common Files\Microsoft Shared\MSEnv" Depth="4" Id="FindVSLauncher">
+        <FileSearch Name="VSLauncher.exe" />
+      </DirectorySearch>
+    </Property>
     <ComponentGroup Id="CmpGroup_vsx2013" Directory="Dir_vsx2013">
       <Component Id="Cmp_Antlr4_Runtime_net45_dll" Guid="{762AC9CD-9E49-4498-AD43-6FA96DDA5252}">
         <File Id="File_Antlr4_Runtime_net45_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Antlr4.Runtime.net45.dll" />
@@ -34,7 +39,22 @@
       <Component Id="Cmp_VisualRust_Shared_dll" Guid="{ACA9C549-92DB-4AF4-96B3-169E9E1AB056}">
         <File Id="File_VisualRust_Shared_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Shared.dll" />
       </Component>
+      <!-- Racer files -->
       <ComponentGroupRef Id="CmpGroup_Racer"/>
+      <!-- Open .rsproj with vs launcher -->
+      <Component Id="Cmp_RsprojRegistration" Guid="{15CB1600-9413-4770-9BDC-39C8593B8FC4}">
+        <CreateFolder/>
+        <ProgId Id="VisualRust.Launcher" Description="Rust Project">
+          <Extension Id="rsproj" ContentType="text/plain">
+            <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
+          </Extension>
+        </ProgId>
+      </Component>
+      <!-- Open .rs with context menu  -->
+      <Component Id="Cmp_RsRegistration" Guid="{76DF7BF5-FE0C-4634-AA8E-19B65DB87630}">
+        <CreateFolder/>
+        <RegistryValue Root="HKCR" Key=".rs\OpenWithProgids" Name="VisualRust.Launcher" Type="string" Value="" />
+      </Component>
     </ComponentGroup>
     <PropertyRef Id="VS2013DEVENV" />
     <!--

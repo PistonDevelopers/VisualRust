@@ -114,19 +114,14 @@ namespace VisualRust.Project.Forms
         private void MakeSureAtLeastOneLibraryTypeIsSelected()
         {
             if (config.OutputType == BuildOutputType.Library && !config.BuildDylib && !config.BuildRlib && !config.BuildStaticlib)
-                config.BuildRlib = true;
+                buildRlib.Checked = true;
         }
 
-        public bool ApplyConfig(CommonProjectNode node)
+        public void ApplyConfig(CommonProjectNode node)
         {
-            if (config.OutputType == BuildOutputType.Library && !config.BuildDylib && !config.BuildRlib && !config.BuildStaticlib)
-            {
-                MessageBox.Show("Can't build a library project with no library type.", "Visual Rust");
-                return false;
-            }
+            MakeSureAtLeastOneLibraryTypeIsSelected();
             config.SaveTo(node);
             originalConfig = config.Clone();
-            return true;
         }
     }
 }

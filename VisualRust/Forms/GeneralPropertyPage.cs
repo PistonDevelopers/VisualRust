@@ -24,12 +24,10 @@ namespace VisualRust.Project.Forms
             get { return control; }
         }
 
-        public override bool Apply()
+        public override void Apply()
         {
-            if(!control.ApplyConfig(this.Project))
-                return false;
+            control.ApplyConfig(this.Project);
             IsDirty = false;
-            return true;
         }
 
         public override void LoadSettings()

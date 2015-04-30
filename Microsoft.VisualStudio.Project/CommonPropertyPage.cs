@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudioTools.Project {
             get;
         }
 
-        public abstract bool Apply();
+        public abstract void Apply();
         public abstract void LoadSettings();
 
         public abstract string Name {
@@ -91,10 +91,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
         int IPropertyPage.Apply() {
             try {
-                if(Apply())
-                    return VSConstants.S_OK;
-                else
-                    return VSConstants.S_FALSE;
+                Apply();
+                return VSConstants.S_OK;
             } catch (Exception e) {
                 return Marshal.GetHRForException(e);
             }

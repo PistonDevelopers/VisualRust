@@ -144,6 +144,10 @@
       <Project>{cacb60a9-1e76-4f92-8831-b134a658c695}</Project>
       <Name>Microsoft.VisualStudio.Project</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Build\VisualRust.Build.csproj">
+      <Project>{9cf556ab-76fe-4c3d-ad0a-b64b3b9989b4}</Project>
+      <Name>VisualRust.Build</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VisualRust.Shared\VisualRust.Shared.csproj">
       <Project>{b99cc9eb-90f2-4040-9e66-418cc7042153}</Project>
       <Name>VisualRust.Shared</Name>

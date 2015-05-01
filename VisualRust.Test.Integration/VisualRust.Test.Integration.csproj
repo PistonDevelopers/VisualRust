@@ -117,11 +117,17 @@
     <None Include="MSBuild\rust-1.0.0-beta.2-i686-pc-windows-gnu.msi">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="MSBuild\Trivial\trivial.rsproj">
+    <None Include="MSBuild\multi_lib\src\lib.rs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="MSBuild\Trivial\src\main.rs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="MSBuild\multi_lib\multi_lib.rsproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="MSBuild\trivial\trivial.rsproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="MSBuild\trivial\src\main.rs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

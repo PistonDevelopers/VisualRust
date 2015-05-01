@@ -38,10 +38,15 @@ namespace VisualRust.Build
             set { libPaths = value; }
         }
 
+        private string[] crateType = new string[0];
         /// <summary>
         /// Sets --crate-type option.
         /// </summary>
-        public string CrateType { get; set; }
+        public string[] CrateType 
+        { 
+            get { return crateType; }
+            set { crateType = value; }
+        }
 
         private string[] emit = new string[0];
         /// <summary>
@@ -192,7 +197,7 @@ namespace VisualRust.Build
             if (AdditionalLibPaths.Length > 0)
                 sb.AppendFormat(" -L {0}", String.Join(",", AdditionalLibPaths));
             if(CrateType.Length > 0)
-                sb.AppendFormat(" --crate-type {0}", BuildOutputTypeExtension.Parse(CrateType).ToRustcString());
+                sb.AppendFormat(" --crate-type {0}", String.Join(",",CrateType));
             if(Emit.Length > 0)
                 sb.AppendFormat(" --emit {0}", String.Join(",", Emit));
             if(!String.IsNullOrWhiteSpace(CrateName))

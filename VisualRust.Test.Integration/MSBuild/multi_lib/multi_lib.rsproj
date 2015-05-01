@@ -1,0 +1,13 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutputType>library</OutputType>
+    <BuildDylib>True</BuildDylib>
+    <BuildRlib>True</BuildRlib>
+    <BuildStaticlib>True</BuildStaticlib>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="src\" />
+    <Code Include="src\lib.rs" />
+  </ItemGroup>
+  <Import Project="..\..\VisualRust.Rust.targets"/>
+</Project>

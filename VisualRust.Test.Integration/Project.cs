@@ -61,6 +61,19 @@ namespace VisualRust.Test.Integration
 
         [TestCategory("Explicit")]
         [TestMethod]
+        public void BuildAndCleanLibraryWithMultipleOutputs()
+        {
+            var proj = new ProjectCollection().LoadProject(@"MSBuild\multi_lib\multi_lib.rsproj");
+            AssertBuildsProject(proj, "Build");
+            Assert.IsTrue(File.Exists(@"MSBuild\multi_lib\target\Debug\multi_lib.dll"));
+            Assert.IsTrue(File.Exists(@"MSBuild\multi_lib\target\Debug\libmulti_lib.a"));
+            Assert.IsTrue(File.Exists(@"MSBuild\multi_lib\target\Debug\libmulti_lib.rlib"));
+            AssertBuildsProject(proj, "Clean");
+            AssertBuildEnviromentIsClean(@"MSBuild\multi_lib");
+        }
+
+        [TestCategory("Explicit")]
+        [TestMethod]
         public void CleanWithoutBuild()
         {
             AssertBuildEnviromentIsClean(@"MSBuild\Trivial");

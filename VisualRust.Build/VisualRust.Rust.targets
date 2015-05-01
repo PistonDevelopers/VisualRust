@@ -9,6 +9,8 @@
     <OutputType Condition="'$(OutputType)' != 'library'">exe</OutputType>
     <_EntryPoint Condition="'$(OutputType)'=='exe'">src\main.rs</_EntryPoint>
     <_EntryPoint Condition="'$(OutputType)'=='library'">src\lib.rs</_EntryPoint>
+    <CrateType Condition="'$(OutputType)' == 'exe'">bin</CrateType>
+    <CrateType Condition="'$(OutputType)' == 'library'">lib</CrateType>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <PlatformTarget Condition="'$(PlatformTarget)' == ''" >default</PlatformTarget>
     <OutputPath Condition="'$(PlatformTarget)' == 'default'" >target\$(Configuration)\</OutputPath>
@@ -18,18 +20,64 @@
     <AssemblyName>$(CrateName)</AssemblyName>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(OutputType)'!='library'">
+    <BuildStaticlib>false</BuildStaticlib>
+    <BuildDylib>false</BuildDylib>
+    <BuildRlib>false</BuildRlib>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BuildStaticlib)'=='true'">
+    <TargetFileName>lib$(CrateName).a</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BuildDylib)'=='true'">
+    <TargetFileName>$(CrateName).dll</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BuildRlib)'=='true'">
+    <TargetFileName>lib$(CrateName).rlib</TargetFileName>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(BuildRlib)' == 'true'">
+    <FileWrites Include="$(IntermediateOutputPath)lib$(CrateName).rlib"/>
+    <AddModules Include="$(IntermediateOutputPath)lib$(CrateName).rlib"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(BuildDylib)' == 'true'">
+    <FileWrites Include="$(IntermediateOutputPath)$(CrateName).dll"/>
+    <AddModules Include="$(IntermediateOutputPath)$(CrateName).dll"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(BuildStaticlib)' == 'true'">
+    <FileWrites Include="$(IntermediateOutputPath)lib$(CrateName).a"/>
+    <AddModules Include="$(IntermediateOutputPath)lib$(CrateName).a"/>
+  </ItemGroup>
+
   <Target Name="CoreCompile">
     <Rustc Input="$(_EntryPoint)"
            OutputDirectory="$(IntermediateOutputPath)"
            WorkingDirectory="$(ProjectDir)"
            CrateName="$(CrateName)"
-           CrateType="$(OutputType)"
+           CrateType="$(CrateType)"
            LTO="$(LinkTimeOptimization)"
            DebugInfo="$(DebugSymbols)"
            OptimizationLevel="$(OptimizationLevel)"
            TargetTriple="$(PlatformTarget)"/>
   </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <PropertyGroup Condition="'$(BuildStaticlib)'=='true'">
+    <TargetExt>.a</TargetExt>
+    <CrateType>$(CrateType);staticlib</CrateType>
+    <TargetName>lib$(CrateName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BuildDylib)'=='true'">
+    <TargetExt>.dll</TargetExt>
+    <CrateType>$(CrateType);dylib</CrateType>
+    <TargetName>$(CrateName)</TargetName>
+    <TargetFileName>$(TargetName)$(TargetExt)</TargetFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BuildRlib)'=='true'">
+    <TargetExt>.rlib</TargetExt>
+    <CrateType>$(CrateType);rlib</CrateType>
+    <TargetName>lib$(CrateName)</TargetName>
+    <TargetFileName>$(TargetName)$(TargetExt)</TargetFileName>
+  </PropertyGroup>
   <Target Name="GetFrameworkPaths"/>
   <Target Name="CreateManifestResourceNames"/>
 </Project>

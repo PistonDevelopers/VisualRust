@@ -16,6 +16,10 @@ namespace VisualRust.Project.Forms
         private TableLayoutPanel mainPanel;
         TextBox crateBox;
         ComboBox typeComboBox;
+        GroupBox libraryGroup;
+        CheckBox buildRlib;
+        CheckBox buildStaticlib;
+        CheckBox buildDylib;
 
         public ApplicationPropertyControl(Action<bool> isDirtyAction)
         {
@@ -42,7 +46,46 @@ namespace VisualRust.Project.Forms
                 Utils.Paddding());
             typeComboBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             mainPanel.Controls.Add(typeComboBox);
+            AddLibraryTypeBox();
             this.Controls.Add(mainPanel);
+        }
+
+        private void AddLibraryTypeBox()
+        {
+            libraryGroup = new GroupBox()
+            {
+                Anchor = AnchorStyles.Left | AnchorStyles.Right,
+                AutoSize = true,
+                Margin = Utils.Paddding(),
+                Text = "Library Type"
+            };
+            TableLayoutPanel panel = new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+                Margin = new Padding(),
+                RowCount = 3,
+                ColumnCount = 1,
+            };
+            panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            Padding topMargin = Utils.Paddding();
+            topMargin.Top +=7;
+            topMargin.Left +=7;
+            buildDylib = Utils.CreateCheckBox("Build dynamic library", topMargin);
+            panel.Controls.Add(buildDylib);
+            Padding midMargin = Utils.Paddding();
+            midMargin.Left +=7;
+            buildStaticlib = Utils.CreateCheckBox("Build static library", midMargin);
+            panel.Controls.Add(buildStaticlib);
+            Padding botMargin = Utils.Paddding();
+            botMargin.Left +=7;
+            botMargin.Bottom +=7;
+            buildRlib = Utils.CreateCheckBox("Build Rust library", botMargin);
+            panel.Controls.Add(buildRlib);
+            libraryGroup.Controls.Add(panel);
+            mainPanel.Controls.Add(libraryGroup);
         }
 
         public void LoadSettings(CommonProjectNode node)
@@ -52,12 +95,31 @@ namespace VisualRust.Project.Forms
             crateBox.Text = config.CrateName;
             crateBox.TextChanged += (src, arg) => config.CrateName = crateBox.Text;
             typeComboBox.SelectedIndex = (int)config.OutputType;
-            typeComboBox.SelectedIndexChanged += (src, arg) => config.OutputType = (BuildOutputType)typeComboBox.SelectedIndex;
+            libraryGroup.Enabled = config.OutputType == BuildOutputType.Library;
+            typeComboBox.SelectedIndexChanged += (src, arg) =>
+            {
+                config.OutputType = (BuildOutputType)typeComboBox.SelectedIndex;
+                libraryGroup.Enabled = config.OutputType == BuildOutputType.Library;
+            };
+            buildDylib.Checked = config.BuildDylib;
+            buildDylib.CheckedChanged += (src, arg) => config.BuildDylib = buildDylib.Checked;
+            buildStaticlib.Checked = config.BuildStaticlib;
+            buildStaticlib.CheckedChanged += (src, arg) => config.BuildStaticlib = buildStaticlib.Checked;
+            buildRlib.Checked = config.BuildRlib;
+            buildRlib.CheckedChanged += (src, arg) => config.BuildRlib = buildRlib.Checked;
+            MakeSureAtLeastOneLibraryTypeIsSelected();
             config.Changed += (src, arg) => isDirty(config.HasChangedFrom(originalConfig));
+        }
+
+        private void MakeSureAtLeastOneLibraryTypeIsSelected()
+        {
+            if (config.OutputType == BuildOutputType.Library && !config.BuildDylib && !config.BuildRlib && !config.BuildStaticlib)
+                buildRlib.Checked = true;
         }
 
         public void ApplyConfig(CommonProjectNode node)
         {
+            MakeSureAtLeastOneLibraryTypeIsSelected();
             config.SaveTo(node);
             originalConfig = config.Clone();
         }

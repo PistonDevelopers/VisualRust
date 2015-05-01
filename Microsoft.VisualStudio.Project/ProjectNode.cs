@@ -2201,7 +2201,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 disableQueryEdit = true;
 
                 isClosed = false;
-                eventTriggeringFlag = ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents | ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
 
                 SetBuildProject(Utilities.ReinitializeMsBuildProject(buildEngine, filename, buildProject));
 
@@ -2221,7 +2220,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 RegisterSccProject();
             } finally {
                 isDirty = false;
-                eventTriggeringFlag = ProjectNode.EventTriggering.TriggerAll;
                 disableQueryEdit = false;
             }
         }

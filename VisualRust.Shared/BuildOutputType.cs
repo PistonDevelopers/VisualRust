@@ -34,7 +34,7 @@ namespace VisualRust.Shared
                 case BuildOutputType.Library:
                     return "library";
                 default:
-                    throw new ArgumentException("val");
+                    throw new ArgumentException(null, "val");
             }
         }
 
@@ -47,7 +47,7 @@ namespace VisualRust.Shared
                 case BuildOutputType.Library:
                     return "Library";
                 default:
-                    throw new ArgumentException("val");
+                    throw new ArgumentException(null, "val");
             }
         }
 
@@ -60,7 +60,20 @@ namespace VisualRust.Shared
                 case BuildOutputType.Library:
                     return "lib";
                 default:
-                    throw new ArgumentException("val");
+                    throw new ArgumentException(null, "val");
+            }
+        }
+
+        public static string ToCrateFile(this BuildOutputType val)
+        {
+            switch(val)
+            {
+                case BuildOutputType.Application:
+                    return "main.rs";
+                case BuildOutputType.Library:
+                    return "lib.rs";
+                default:
+                    throw new ArgumentException(null, "val");
             }
         }
     }

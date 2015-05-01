@@ -11,6 +11,7 @@ using System.Threading.Tasks;
  using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
+using VisualRust.Shared;
 
 namespace VisualRust.Project
 {
@@ -78,6 +79,16 @@ namespace VisualRust.Project
             this.CanFileNodesHaveChilds = false;
             this.CanProjectDeleteItems = true;
             this.ListenForStartupFileUpdates = false;
+            this.OnProjectPropertyChanged += ReloadOnOutputChange;
+        }
+
+        void ReloadOnOutputChange(object sender, ProjectPropertyChangedArgs e)
+        {
+            if(String.Equals(e.PropertyName, "OutputType", StringComparison.OrdinalIgnoreCase)
+                && !String.Equals(e.OldValue, e.NewValue, StringComparison.OrdinalIgnoreCase))
+            {
+                this.ReloadCore();
+            }
         }
 
         public override System.Guid ProjectGuid
@@ -114,9 +125,24 @@ namespace VisualRust.Project
 
         protected override void Reload()
         {
-            string outputType = GetProjectProperty(ProjectFileConstants.OutputType, false);
-            string entryPoint = Path.Combine(Path.GetDirectoryName(this.FileName), outputType == "library" ? @"src\lib.rs" : @"src\main.rs");
-            containsEntryPoint = false;
+            EventTriggeringFlag = ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents | ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
+            try
+            {
+                ReloadCore();
+            }
+            finally
+            {
+                EventTriggeringFlag = ProjectNode.EventTriggering.TriggerAll;
+            }
+            this.SaveMSBuildProjectFile(this.FileName);
+            EventTriggeringFlag = ProjectNode.EventTriggering.TriggerAll;
+        }
+
+        protected void ReloadCore()
+        {
+            BuildOutputType outputType = BuildOutputTypeExtension.Parse(GetProjectProperty(ProjectFileConstants.OutputType, true));
+            string entryPoint = Path.Combine(Path.GetDirectoryName(this.FileName), "src", outputType.ToCrateFile());
+            containsEntryPoint = FindNodeByFullPath(entryPoint) != null;
             ModuleTracker = new ModuleTracker(entryPoint);
             base.Reload();
             // This project for some reason doesn't include entrypoint node, add it
@@ -132,7 +158,6 @@ namespace VisualRust.Project
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file), false);
                 parent.AddChild(CreateUntrackedNode(file));
             }
-            this.BuildProject.Save();
         }
 
         internal void OnNodeDirty(uint id)

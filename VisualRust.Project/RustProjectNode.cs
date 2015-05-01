@@ -87,7 +87,11 @@ namespace VisualRust.Project
             if(String.Equals(e.PropertyName, "OutputType", StringComparison.OrdinalIgnoreCase)
                 && !String.Equals(e.OldValue, e.NewValue, StringComparison.OrdinalIgnoreCase))
             {
+                TrackedFileNode crateNode =  this.GetCrateFileNode(e.OldValue);
+                if(crateNode != null)
+                    crateNode.IsEntryPoint = false;
                 this.ReloadCore();
+                this.GetCrateFileNode(e.NewValue).IsEntryPoint = true;
             }
         }
 
@@ -138,11 +142,22 @@ namespace VisualRust.Project
             EventTriggeringFlag = ProjectNode.EventTriggering.TriggerAll;
         }
 
+        public string GetCrateFileNodePath(string outputType)
+        {
+            BuildOutputType output = BuildOutputTypeExtension.Parse(outputType);
+            return Path.Combine(Path.GetDirectoryName(this.FileName), "src", output.ToCrateFile());
+        }
+
+        public TrackedFileNode GetCrateFileNode(string outputType)
+        {
+            return FindNodeByFullPath(GetCrateFileNodePath(outputType)) as TrackedFileNode;
+        }
+
         protected void ReloadCore()
         {
-            BuildOutputType outputType = BuildOutputTypeExtension.Parse(GetProjectProperty(ProjectFileConstants.OutputType, true));
-            string entryPoint = Path.Combine(Path.GetDirectoryName(this.FileName), "src", outputType.ToCrateFile());
-            containsEntryPoint = FindNodeByFullPath(entryPoint) != null;
+            string outputType = GetProjectProperty(ProjectFileConstants.OutputType, true);
+            string entryPoint = GetCrateFileNodePath(outputType);
+            containsEntryPoint = GetCrateFileNode(outputType) != null;
             ModuleTracker = new ModuleTracker(entryPoint);
             base.Reload();
             // This project for some reason doesn't include entrypoint node, add it

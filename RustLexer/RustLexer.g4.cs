@@ -7,5 +7,9 @@
         {
             
         }
+        
+        private bool isAt(int pos) {
+            return _input.Index == pos;
+        }
     }
 }

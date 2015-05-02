@@ -70,6 +70,8 @@
       <Listener>True</Listener>
     </Antlr4>
     <None Include="packages.config" />
+    <None Include="xidcontinue.g4" />
+    <None Include="xidstart.g4" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

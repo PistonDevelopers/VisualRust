@@ -168,10 +168,23 @@ namespace VisualRust.Project
                 node.IsEntryPoint = true;
                 parent.AddChild(node);
             }
+            MarkEntryPointFolders(outputType);
             foreach (string file in ModuleTracker.ExtractReachableAndMakeIncremental())
             {
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file), false);
                 parent.AddChild(CreateUntrackedNode(file));
+            }
+        }
+
+        private void MarkEntryPointFolders(string outputType)
+        {
+            HierarchyNode node = GetCrateFileNode(outputType);
+            while(true)
+            {
+                node = node.Parent;
+                if(!(node is RustFolderNode))
+                    break;
+                ((RustFolderNode)node).IsEntryPoint = true;
             }
         }
 
@@ -330,7 +343,7 @@ namespace VisualRust.Project
             if (element == null)
                 throw new ArgumentException("element");
             if (element is AllFilesProjectElement || !String.IsNullOrEmpty(element.ItemTypeName))
-                return new CommonFolderNode(this, element);
+                return new RustFolderNode(this, element);
             else
                 return new UntrackedFolderNode(this, element);
         }

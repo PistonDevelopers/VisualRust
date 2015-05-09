@@ -107,7 +107,7 @@ LIT_CHAR
          | ~[\\'\n\t\r]
          | '\ud800' .. '\udbff' '\udc00' .. '\udfff'
          )
-    '\'' SUFFIX?
+    ('\'' SUFFIX? | '\n'| '\r\n' | EOF)
   ;
 
 LIT_BYTE
@@ -115,7 +115,7 @@ LIT_BYTE
                  | [nrt\\'"0] )
           | ~[\\'\n\t\r] '\udc00'..'\udfff'?
           )
-    '\'' SUFFIX?
+    ('\'' SUFFIX? | '\n'| '\r\n' | EOF)
   ;
 
 LIT_INTEGER
@@ -138,7 +138,7 @@ LIT_FLOAT
   ;
 
 LIT_STR
-  : '"' ('\\\n' | '\\\r\n' | '\\' CHAR_ESCAPE | .)*? '"' SUFFIX?
+  : '"' ('\\\n' | '\\\r\n' | '\\' CHAR_ESCAPE | .)*? ('"' SUFFIX? | '\n'| '\r\n' | EOF)
   ;
 
 LIT_BINARY : 'b' LIT_STR ;
@@ -176,10 +176,10 @@ OUTER_DOC_COMMENT : '//!' ~[\r\n]* -> type(DOC_COMMENT) ;
 LINE_COMMENT      : '//' ( ~[/\n] ~[\n]* )? -> type(COMMENT) ;
 
 DOC_BLOCK_COMMENT
-  : ('/**' ~[*] | '/*!') (DOC_BLOCK_COMMENT | .)*? '*/' -> type(DOC_BLOCK_COMMENT)
+  : ('/**' ~[*] | '/*!') (DOC_BLOCK_COMMENT | .)*? ('*/' | '\n'| '\r\n'  | EOF)  -> type(DOC_BLOCK_COMMENT)
   ;
 
-BLOCK_COMMENT : '/*' (BLOCK_COMMENT | .)*? '*/' -> type(BLOCK_COMMENT) ;
+BLOCK_COMMENT : '/*' (BLOCK_COMMENT | .)*? ('*/' | '\n'| '\r\n' | EOF)  -> type(BLOCK_COMMENT) ;
 
 /* these appear at the beginning of a file */
 

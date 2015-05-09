@@ -104,5 +104,17 @@ namespace VisualRust.Project
             ProjectMgr.OnNodeIncluded(this);
             return result;
         }
+
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
+        {
+            if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K
+                && (VsCommands2K)cmd == VsCommands2K.INCLUDEINPROJECT
+                && ItemNode.ItemTypeName == null)
+            {
+                result |= QueryStatusResult.NOTSUPPORTED;
+                return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
+            }
+            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
     }
 }

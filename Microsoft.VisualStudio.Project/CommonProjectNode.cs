@@ -1719,7 +1719,7 @@ namespace Microsoft.VisualStudioTools.Project {
             return VSConstants.S_OK;
         }
 
-        public int GetSpecificEditorType(string mkDocument, out Guid guidEditorType) {
+        public virtual int GetSpecificEditorType(string mkDocument, out Guid guidEditorType) {
             // Ideally we should at this point initalize a File extension to EditorFactory guid Map e.g.
             // in the registry hive so that more editors can be added without changing this part of the
             // code. Dynamic languages only make usage of one Editor Factory and therefore we will return 

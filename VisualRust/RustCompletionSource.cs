@@ -272,6 +272,8 @@ namespace VisualRust
         private string GetPrefix(string line)
         {
             var tokens = line.Split(',');
+            if(tokens.Length != 3)
+                return null;
             var prefix = tokens[2];
             return prefix;
         }

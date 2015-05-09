@@ -223,8 +223,8 @@ namespace VisualRust
 
         public void Dispose()
         {
-            if (!File.Exists(Path))                      
-                File.Delete(Path);            
+            if (File.Exists(Path))
+                File.Delete(Path);
         }
     }
 

@@ -14,7 +14,8 @@ namespace VisualRust.Racer
     /// </remarks>
     public class AutoCompleter
     {
-        private const string RacerExecutable = "racer.exe";
+        private const string SystemRacerExecutable = "racer.exe";
+        private const string BundledRacerExecutable = "racer-bf2373e.exe";
         private const int TimeoutMillis = 3000;
         private readonly string racerPath;
 
@@ -40,7 +41,7 @@ namespace VisualRust.Racer
         public static void Init()
         {
             if (instance == null)
-                instance = new AutoCompleter();            
+                instance = new AutoCompleter();
         }       
 
         private AutoCompleter()
@@ -55,12 +56,12 @@ namespace VisualRust.Racer
             // If a racer.exe is found on the path, it is used instead of the bundled racer from $extdir\Racer.
             if (RacerExistsOnPath())
             {
-                racerPath = RacerExecutable;
+                racerPath = SystemRacerExecutable;
                 Utils.PrintToOutput("Using racer.exe found in PATH");
             }
             else
             {
-                racerPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Racer", RacerExecutable);
+                racerPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Racer", BundledRacerExecutable);
             }
         }
 
@@ -77,7 +78,7 @@ namespace VisualRust.Racer
                 using (var ps = new Process())
                 {
                     // Note: no attempt is made here to see if it is actually the racer.exe we want.
-                    ps.StartInfo.FileName = RacerExecutable;
+                    ps.StartInfo.FileName = SystemRacerExecutable;
                     ps.StartInfo.UseShellExecute = false;
                     ps.StartInfo.CreateNoWindow = true;
                     ps.Start();

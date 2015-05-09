@@ -51,7 +51,7 @@ namespace VisualRust.Project
             if (IsEntryPoint)
             {
                 if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet97
-                    &&(VsCommands)cmd == VsCommands.Rename 
+                    && (VsCommands)cmd == VsCommands.Rename
                     || (VsCommands)cmd == VsCommands.Cut)
                 {
                     result |= QueryStatusResult.NOTSUPPORTED;
@@ -63,6 +63,13 @@ namespace VisualRust.Project
                     result |= QueryStatusResult.NOTSUPPORTED;
                     return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
                 }
+            }
+            if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K
+                && (VsCommands2K)cmd == VsCommands2K.INCLUDEINPROJECT
+                && ItemNode.ItemTypeName == null)
+            {
+                result |= QueryStatusResult.NOTSUPPORTED;
+                return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
             }
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
         }

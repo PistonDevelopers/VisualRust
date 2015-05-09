@@ -59,7 +59,7 @@ namespace VisualRust.Project
         public override void AddChild(HierarchyNode node)
         {
             base.AddChild(node);
-            if (suspendTracking)
+            if (suspendTracking || node.ItemNode.ItemTypeName == null)
                 return;
             if (node is UntrackedFileNode || node is UntrackedFolderNode)
                 untrackedChildren++;

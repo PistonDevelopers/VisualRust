@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using VisualRust.Project;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
+using VisualRust.Options;
 
 namespace VisualRust
 {
@@ -60,6 +61,7 @@ namespace VisualRust
     [Guid(GuidList.guidVisualRustPkgString)]
     [ProvideObject(typeof(Project.Forms.ApplicationPropertyPage))]
     [ProvideObject(typeof(Project.Forms.BuildPropertyPage))]
+    [ProvideOptionPage(typeof(RustOptionsPage), "Rust", "General", 0, 0, true)]
     public class VisualRustPackage : CommonProjectPackage
     {
         private RunningDocTableEventsListener docEventsListener;
@@ -89,6 +91,7 @@ namespace VisualRust
         {
             base.Initialize();
             docEventsListener = new RunningDocTableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
+
             Racer.AutoCompleter.Init();
         }
 

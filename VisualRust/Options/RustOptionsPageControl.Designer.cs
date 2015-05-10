@@ -82,9 +82,9 @@
             this.RustSrcFolderPathLabel.AutoSize = true;
             this.RustSrcFolderPathLabel.Location = new System.Drawing.Point(3, 52);
             this.RustSrcFolderPathLabel.Name = "RustSrcFolderPathLabel";
-            this.RustSrcFolderPathLabel.Size = new System.Drawing.Size(93, 13);
+            this.RustSrcFolderPathLabel.Size = new System.Drawing.Size(125, 13);
             this.RustSrcFolderPathLabel.TabIndex = 4;
-            this.RustSrcFolderPathLabel.Text = "Path to Racer.exe";
+            this.RustSrcFolderPathLabel.Text = "Path to rust source folder";
             // 
             // RustSrcFolderPathTextBox
             // 

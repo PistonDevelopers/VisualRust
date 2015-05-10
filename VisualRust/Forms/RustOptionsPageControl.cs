@@ -5,25 +5,29 @@ namespace VisualRust.Options
 {
     public partial class RustOptionsPageControl : UserControl
     {
-        public RustOptionsPageControl()
-        {
-            InitializeComponent();
-        }
-
         private RustOptionsPage optionsPage;
 
-        internal void Initialize(RustOptionsPage optionsPage)
+        public RustOptionsPageControl(RustOptionsPage optionsPage)
         {
             this.optionsPage = optionsPage;
-
-            //RacerPathTextBox.Text = optionsPage.RacerPath;
-            //RustSrcFolderPathTextBox.Text = optionsPage.RustSourcePath;
+            InitializeComponent();
+            bundledRacer.Checked = !optionsPage.UseCustomRacer;
+            customRacer.Checked = optionsPage.UseCustomRacer;
+            envSource.Checked = !optionsPage.UseCustomSources;
+            customSource.Checked = optionsPage.UseCustomSources;
+            customRacerPath.Text = optionsPage.CustomRacerPath;
+            customSourcePath.Text = optionsPage.CustomSourcesPath;
+            customRacer_CheckedChanged(null, null);
+            customSource_CheckedChanged(null, null);
+            string envSrcPath = Environment.GetEnvironmentVariable("RUST_SRC_PATH");
+            if(!String.IsNullOrEmpty(envSrcPath))
+                envSource.Text = String.Format("Read rust sources from enviroment variable RUST_SRC_PATH\n(current value: {0})", envSrcPath);
         }
 
-        private void SetRacerPathButton_Click(object sender, EventArgs e)
+        private void OnCustomRacerPath_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog();
-            dialog.Title = "Selection Racer file";
+            dialog.Title = "Select Racer location";
             dialog.Filter = "Executable files (*.exe)|*.exe|All files (*.*)|*.*";
             dialog.DefaultExt = ".exe";
             dialog.CheckFileExists = true;
@@ -33,34 +37,52 @@ namespace VisualRust.Options
                 return;
             }
 
-            var filePath = dialog.FileName;
-            //RacerPathTextBox.Text = filePath;
-            optionsPage.RacerPath = filePath;
+            customRacerPath.Text = dialog.FileName;
         }
 
-        private void SetRustSrcFolderPathButton_Click(object sender, EventArgs e)
+        private void OnCustomRacerPath_TextChanged(object sender, EventArgs e)
+        {
+            optionsPage.CustomRacerPath = customRacerPath.Text;
+        }
+
+        private void OnCustomSourcePath_Click(object sender, EventArgs e)
         {
             var dialog = new FolderBrowserDialog();
-            dialog.Description = "Specify rust source folder";
+            dialog.Description = "Specify Rust source folder";
 
             if (dialog.ShowDialog() != DialogResult.OK)
             {
                 return;
             }
 
-            var folderPath = dialog.SelectedPath;
-            //RustSrcFolderPathTextBox.Text = folderPath;
-            optionsPage.RustSourcePath = folderPath;
+            customSourcePath.Text = dialog.SelectedPath;
         }
 
-        private void RustSrcFolderPathTextBox_TextChanged(object sender, EventArgs e)
+        private void OnCustomSourcePath_TextChanged(object sender, EventArgs e)
         {
-            //optionsPage.RustSourcePath = RustSrcFolderPathTextBox.Text;
+            optionsPage.CustomSourcesPath = customSourcePath.Text;
         }
 
-        private void RacerPathTextBox_TextChanged(object sender, EventArgs e)
+        private void bundledRacer_CheckedChanged(object sender, EventArgs e)
         {
-            //optionsPage.RacerPath = RacerPathTextBox.Text;
+            optionsPage.UseCustomRacer = !bundledRacer.Checked;
+        }
+
+        private void customRacer_CheckedChanged(object sender, EventArgs e)
+        {
+            customRacerPath.Enabled = customRacer.Checked;
+            customRacerButton.Enabled = customRacer.Checked;
+        }
+
+        private void envSource_CheckedChanged(object sender, EventArgs e)
+        {
+            optionsPage.UseCustomSources = !envSource.Checked;
+        }
+
+        private void customSource_CheckedChanged(object sender, EventArgs e)
+        {
+            customSourcePath.Enabled = customSource.Checked;
+            customSourceButton.Enabled = customSource.Checked;
         }
     }
 }

@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             this.racerBox = new System.Windows.Forms.GroupBox();
+            this.racerBoxPanel = new System.Windows.Forms.TableLayoutPanel();
             this.bundledRacer = new System.Windows.Forms.RadioButton();
             this.customRacer = new System.Windows.Forms.RadioButton();
             this.customRacerPath = new System.Windows.Forms.TextBox();
-            this.racerBoxPanel = new System.Windows.Forms.TableLayoutPanel();
             this.customRacerButton = new System.Windows.Forms.Button();
             this.sourceBox = new System.Windows.Forms.GroupBox();
             this.sourceBoxPanel = new System.Windows.Forms.TableLayoutPanel();
@@ -54,46 +54,10 @@
             this.racerBox.Controls.Add(this.racerBoxPanel);
             this.racerBox.Location = new System.Drawing.Point(0, 0);
             this.racerBox.Name = "racerBox";
-            this.racerBox.Size = new System.Drawing.Size(379, 103);
+            this.racerBox.Size = new System.Drawing.Size(379, 104);
             this.racerBox.TabIndex = 7;
             this.racerBox.TabStop = false;
             this.racerBox.Text = "Racer location";
-            // 
-            // bundledRacer
-            // 
-            this.bundledRacer.AutoSize = true;
-            this.racerBoxPanel.SetColumnSpan(this.bundledRacer, 2);
-            this.bundledRacer.Location = new System.Drawing.Point(8, 4);
-            this.bundledRacer.Margin = new System.Windows.Forms.Padding(8, 4, 3, 3);
-            this.bundledRacer.Name = "bundledRacer";
-            this.bundledRacer.Size = new System.Drawing.Size(132, 17);
-            this.bundledRacer.TabIndex = 3;
-            this.bundledRacer.TabStop = true;
-            this.bundledRacer.Text = "Use bundled racer.exe";
-            this.bundledRacer.UseVisualStyleBackColor = true;
-            // 
-            // customRacer
-            // 
-            this.customRacer.AutoSize = true;
-            this.racerBoxPanel.SetColumnSpan(this.customRacer, 2);
-            this.customRacer.Location = new System.Drawing.Point(8, 29);
-            this.customRacer.Margin = new System.Windows.Forms.Padding(8, 3, 3, 3);
-            this.customRacer.Name = "customRacer";
-            this.customRacer.Size = new System.Drawing.Size(174, 17);
-            this.customRacer.TabIndex = 4;
-            this.customRacer.TabStop = true;
-            this.customRacer.Text = "Use racer from custom location:";
-            this.customRacer.UseVisualStyleBackColor = true;
-            // 
-            // customRacerPath
-            // 
-            this.customRacerPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.customRacerPath.Location = new System.Drawing.Point(27, 54);
-            this.customRacerPath.Margin = new System.Windows.Forms.Padding(27, 3, 3, 4);
-            this.customRacerPath.Name = "customRacerPath";
-            this.customRacerPath.Size = new System.Drawing.Size(306, 20);
-            this.customRacerPath.TabIndex = 1;
             // 
             // racerBoxPanel
             // 
@@ -112,18 +76,58 @@
             this.racerBoxPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.racerBoxPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.racerBoxPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.racerBoxPanel.Size = new System.Drawing.Size(373, 84);
+            this.racerBoxPanel.Size = new System.Drawing.Size(373, 85);
             this.racerBoxPanel.TabIndex = 5;
+            // 
+            // bundledRacer
+            // 
+            this.bundledRacer.AutoSize = true;
+            this.racerBoxPanel.SetColumnSpan(this.bundledRacer, 2);
+            this.bundledRacer.Location = new System.Drawing.Point(8, 4);
+            this.bundledRacer.Margin = new System.Windows.Forms.Padding(8, 4, 3, 3);
+            this.bundledRacer.Name = "bundledRacer";
+            this.bundledRacer.Size = new System.Drawing.Size(132, 17);
+            this.bundledRacer.TabIndex = 3;
+            this.bundledRacer.TabStop = true;
+            this.bundledRacer.Text = "Use bundled racer.exe";
+            this.bundledRacer.UseVisualStyleBackColor = true;
+            this.bundledRacer.CheckedChanged += new System.EventHandler(this.bundledRacer_CheckedChanged);
+            // 
+            // customRacer
+            // 
+            this.customRacer.AutoSize = true;
+            this.racerBoxPanel.SetColumnSpan(this.customRacer, 2);
+            this.customRacer.Location = new System.Drawing.Point(8, 27);
+            this.customRacer.Margin = new System.Windows.Forms.Padding(8, 3, 3, 3);
+            this.customRacer.Name = "customRacer";
+            this.customRacer.Size = new System.Drawing.Size(174, 17);
+            this.customRacer.TabIndex = 4;
+            this.customRacer.TabStop = true;
+            this.customRacer.Text = "Use racer from custom location:";
+            this.customRacer.UseVisualStyleBackColor = true;
+            this.customRacer.CheckedChanged += new System.EventHandler(this.customRacer_CheckedChanged);
+            // 
+            // customRacerPath
+            // 
+            this.customRacerPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.customRacerPath.Location = new System.Drawing.Point(27, 50);
+            this.customRacerPath.Margin = new System.Windows.Forms.Padding(27, 3, 3, 4);
+            this.customRacerPath.Name = "customRacerPath";
+            this.customRacerPath.Size = new System.Drawing.Size(311, 20);
+            this.customRacerPath.TabIndex = 1;
+            this.customRacerPath.TextChanged += new System.EventHandler(this.OnCustomRacerPath_TextChanged);
             // 
             // customRacerButton
             // 
-            this.customRacerButton.Location = new System.Drawing.Point(344, 53);
+            this.customRacerButton.Location = new System.Drawing.Point(344, 49);
             this.customRacerButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 4);
             this.customRacerButton.Name = "customRacerButton";
             this.customRacerButton.Size = new System.Drawing.Size(26, 22);
             this.customRacerButton.TabIndex = 8;
             this.customRacerButton.Text = "...";
             this.customRacerButton.UseVisualStyleBackColor = true;
+            this.customRacerButton.Click += new System.EventHandler(this.OnCustomRacerPath_Click);
             // 
             // sourceBox
             // 
@@ -131,7 +135,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.sourceBox.AutoSize = true;
             this.sourceBox.Controls.Add(this.sourceBoxPanel);
-            this.sourceBox.Location = new System.Drawing.Point(0, 111);
+            this.sourceBox.Location = new System.Drawing.Point(0, 110);
             this.sourceBox.Name = "sourceBox";
             this.sourceBox.Size = new System.Drawing.Size(379, 113);
             this.sourceBox.TabIndex = 8;
@@ -171,6 +175,7 @@
             this.envSource.Text = "Read rust sources from enviroment variable RUST_SRC_PATH\r\n(current value: <empty>" +
     ")";
             this.envSource.UseVisualStyleBackColor = true;
+            this.envSource.CheckedChanged += new System.EventHandler(this.envSource_CheckedChanged);
             // 
             // customSource
             // 
@@ -184,6 +189,7 @@
             this.customSource.TabStop = true;
             this.customSource.Text = "Read rust sources from custom location";
             this.customSource.UseVisualStyleBackColor = true;
+            this.customSource.CheckedChanged += new System.EventHandler(this.customSource_CheckedChanged);
             // 
             // customSourcePath
             // 
@@ -194,6 +200,7 @@
             this.customSourcePath.Name = "customSourcePath";
             this.customSourcePath.Size = new System.Drawing.Size(311, 20);
             this.customSourcePath.TabIndex = 1;
+            this.customSourcePath.TextChanged += new System.EventHandler(this.OnCustomSourcePath_TextChanged);
             // 
             // customSourceButton
             // 
@@ -204,6 +211,8 @@
             this.customSourceButton.TabIndex = 8;
             this.customSourceButton.Text = "...";
             this.customSourceButton.UseVisualStyleBackColor = true;
+            this.customSourceButton.TextChanged += new System.EventHandler(this.OnCustomSourcePath_Click);
+            this.customSourceButton.Click += new System.EventHandler(this.OnCustomSourcePath_Click);
             // 
             // RustOptionsPageControl
             // 

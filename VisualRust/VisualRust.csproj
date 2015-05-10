@@ -170,6 +170,15 @@
     <Compile Include="Forms\BuildPropertyPage.cs" />
     <Compile Include="Forms\GeneralPropertyPage.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="Options\RustOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\RustOptionsPageControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\RustOptionsPageControl.Designer.cs">
+      <DependentUpon>RustOptionsPageControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Racer\AutoCompleter.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -191,6 +200,9 @@
     <Compile Include="VisualRustSmartIndent.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Options\RustOptionsPageControl.resx">
+      <DependentUpon>RustOptionsPageControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

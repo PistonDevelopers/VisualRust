@@ -61,7 +61,7 @@ namespace VisualRust
     [Guid(GuidList.guidVisualRustPkgString)]
     [ProvideObject(typeof(Project.Forms.ApplicationPropertyPage))]
     [ProvideObject(typeof(Project.Forms.BuildPropertyPage))]
-    [ProvideOptionPage(typeof(RustOptionsPage), "Rust", "General", 0, 0, true)]
+    [ProvideOptionPage(typeof(RustOptionsPage), "Visual Rust", "General", 0, 0, true)]
     public class VisualRustPackage : CommonProjectPackage
     {
         private RunningDocTableEventsListener docEventsListener;

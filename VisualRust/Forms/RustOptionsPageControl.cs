@@ -16,8 +16,8 @@ namespace VisualRust.Options
         {
             this.optionsPage = optionsPage;
 
-            RacerPathTextBox.Text = optionsPage.RacerPath;
-            RustSrcFolderPathTextBox.Text = optionsPage.RustSourcePath;
+            //RacerPathTextBox.Text = optionsPage.RacerPath;
+            //RustSrcFolderPathTextBox.Text = optionsPage.RustSourcePath;
         }
 
         private void SetRacerPathButton_Click(object sender, EventArgs e)
@@ -34,7 +34,7 @@ namespace VisualRust.Options
             }
 
             var filePath = dialog.FileName;
-            RacerPathTextBox.Text = filePath;
+            //RacerPathTextBox.Text = filePath;
             optionsPage.RacerPath = filePath;
         }
 
@@ -49,18 +49,18 @@ namespace VisualRust.Options
             }
 
             var folderPath = dialog.SelectedPath;
-            RustSrcFolderPathTextBox.Text = folderPath;
+            //RustSrcFolderPathTextBox.Text = folderPath;
             optionsPage.RustSourcePath = folderPath;
         }
 
         private void RustSrcFolderPathTextBox_TextChanged(object sender, EventArgs e)
         {
-            optionsPage.RustSourcePath = RustSrcFolderPathTextBox.Text;
+            //optionsPage.RustSourcePath = RustSrcFolderPathTextBox.Text;
         }
 
         private void RacerPathTextBox_TextChanged(object sender, EventArgs e)
         {
-            optionsPage.RacerPath = RacerPathTextBox.Text;
+            //optionsPage.RacerPath = RacerPathTextBox.Text;
         }
     }
 }

@@ -2,11 +2,12 @@
 <VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
   <TemplateData>
     <Name>Module</Name>
+    <DefaultName>module.rs</DefaultName>
     <Description>An empty module</Description>
     <Icon>Module.ico</Icon>
     <ProjectType>Rust</ProjectType>
   </TemplateData>
   <TemplateContent>
-    <ProjectItem SubType="File">module.rs</ProjectItem>
+    <ProjectItem SubType="File" TargetFileName="$fileinputname$.rs">module.rs</ProjectItem>
   </TemplateContent>
 </VSTemplate>

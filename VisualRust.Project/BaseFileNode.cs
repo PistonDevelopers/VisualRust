@@ -6,14 +6,19 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Shell.Interop;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
+using Microsoft.VisualStudio.Shell;
 
 namespace VisualRust.Project
 {
     abstract class BaseFileNode : CommonFileNode
     {
+        private const string CreateFileMessage = 
+            "The item '{0}' does not exist in the project directory. It may have been moved, renamed or deleted.\n\n"
+            + "Do you want to create it now?";
         private bool isDeleted = false;
         protected abstract bool CanUserMove { get; }
         public new RustProjectNode ProjectMgr { get; private set; }
@@ -88,6 +93,39 @@ namespace VisualRust.Project
                 }
             }
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
+
+        protected internal override bool IsFileOnDisk(bool showMessage)
+        {
+            bool fileExist = IsFileOnDisk(this.Url);
+
+            if (!fileExist && showMessage && !Utilities.IsInAutomationFunction(this.ProjectMgr.Site)) {
+                string message = String.Format(CreateFileMessage, this.Caption);
+                string title = string.Empty;
+                OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
+                OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNO;
+                OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
+                if(6 == VsShellUtilities.ShowMessageBox(this.ProjectMgr.Site, title, message, icon, buttons, defaultButton))
+                {
+                    try
+                    {
+                        File.Create(this.Url);
+                        return true;
+                    }
+                    catch(IOException)
+                    {
+                        VsShellUtilities.ShowMessageBox(
+                            this.ProjectMgr.Site,
+                            title, 
+                            String.Format("Could not create file '{0}'.", this.Url),
+                            OLEMSGICON.OLEMSGICON_CRITICAL,
+                            OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                            OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                    }
+                }
+            }
+
+            return fileExist;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace VisualRust
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "0.1", IconResourceID = 400)]
     [ProvideLanguageService(typeof(RustLanguage), "Rust", 100, 
         CodeSense = true, 
         DefaultToInsertSpaces = true,
@@ -126,17 +126,17 @@ namespace VisualRust
 
         public override string GetProductName()
         {
-            throw new NotImplementedException();
+            return "Visual Rust";
         }
 
         public override string GetProductDescription()
         {
-            throw new NotImplementedException();
+            return "Visual Studio integration for the Rust programming language (http://www.rust-lang.org/)";
         }
 
         public override string GetProductVersion()
         {
-            throw new NotImplementedException();
+            return "0.1";
         }
     }
 }

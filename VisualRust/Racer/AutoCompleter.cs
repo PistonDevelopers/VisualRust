@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EnvDTE;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -16,19 +17,11 @@ namespace VisualRust.Racer
     {
         private const string SystemRacerExecutable = "racer.exe";
         private const string BundledRacerExecutable = "racer-bf2373e.exe";
+        private const string RacerSourceEnviromentVariable = "RUST_SRC_PATH";
         private const int TimeoutMillis = 3000;
 
-        /// <summary>
-        /// System environment variable with path to racer.exe
-        /// </summary>
-        public const string EnvVarRacerPath = "RUST_RACER_PATH";
-
-        /// <summary>
-        /// System environment variable with path to rust sources folder
-        /// </summary>
-        private const string EnvVarRustSrcPath = "RUST_SRC_PATH";
-
         private string racerPathForExecution;
+        private string racerSourcesLocation;
 
         private static AutoCompleter instance;
 
@@ -57,83 +50,26 @@ namespace VisualRust.Racer
 
         private AutoCompleter()
         {
-            // Check for the source dir env var required by racer.
-            CheckRustSrcPath(RustSrcPath);
-            
-            ReinitializeRacerPath();
         }
 
-        private static bool CheckRustSrcPath(string rustSrcPath)
+        private T GetVisualRustProperty<T>(DTE env, string key)
         {
-            if (string.IsNullOrEmpty(rustSrcPath) || !Directory.Exists(rustSrcPath))
-            {
-                Utils.PrintToOutput(@"Environment variable RUST_SRC_PATH must exist and point to a rust source dir for autocompletion to work, e.g. 'C:\Rust\src'");
-                return false;
-            }
-
-            return true;
+            return (T)env.get_Properties("Visual Rust", "General").Item(key).Value;
         }
 
-        /// <summary>
-        /// Path to rust source folder
-        /// </summary>
-        public string RustSrcPath
+        private void ReinitializeRacerPaths()
         {
-            get
-            {
-                var result = Environment.GetEnvironmentVariable(EnvVarRustSrcPath, EnvironmentVariableTarget.User) ??
-                             Environment.GetEnvironmentVariable(EnvVarRustSrcPath, EnvironmentVariableTarget.Machine);
-                return result;
-            }
-            set
-            {
-                if (CheckRustSrcPath(value))
-                {
-                    Environment.SetEnvironmentVariable(EnvVarRustSrcPath, value, EnvironmentVariableTarget.User);
-                }                            
-            }
-        }
-
-        public string RacerPath
-        {
-            get
-            {
-                var result = Environment.GetEnvironmentVariable(EnvVarRacerPath, EnvironmentVariableTarget.User) ??
-                             Environment.GetEnvironmentVariable(EnvVarRacerPath, EnvironmentVariableTarget.Machine);
-                return result;                
-            }
-            set
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    Environment.SetEnvironmentVariable(EnvVarRacerPath, value, EnvironmentVariableTarget.User);
-                }
-
-                ReinitializeRacerPath();                
-            }
-        }
-
-        private void ReinitializeRacerPath()
-        {
-            // If path to racer.exe specifed in options and this file is exists
-            var racerPathFromOptions = RacerPath;
-            if (!string.IsNullOrWhiteSpace(racerPathFromOptions) && File.Exists(racerPathFromOptions))
-            {
-                racerPathForExecution = racerPathFromOptions;
-            }
+            DTE env = (DTE)VisualRustPackage.GetGlobalService(typeof(DTE));
+            // If path to racer.exe is specifed, use it
+            if(GetVisualRustProperty<bool>(env, "UseCustomRacer"))
+                racerPathForExecution = GetVisualRustProperty<string>(env, "CustomRacerPath");
             else
-            {
-                // If a racer.exe is found on the path, it is used instead of the bundled racer from $extdir\Racer.            
-                if (RacerExistsOnPath())
-                {
-                    racerPathForExecution = SystemRacerExecutable;
-                    Utils.PrintToOutput("Using racer.exe found in PATH");
-                }
-                else
-                {
-                    racerPathForExecution = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Racer", BundledRacerExecutable);
-                }
-            }
+                racerPathForExecution = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Racer", BundledRacerExecutable);
+            // Same for custom RUST_SRC_PATH
+            if(GetVisualRustProperty<bool>(env, "UseCustomSources"))
+                racerSourcesLocation = GetVisualRustProperty<string>(env, "CustomSourcesPath");
+            else
+                racerSourcesLocation = null;
         }
 
         public static string Run(string args)
@@ -165,6 +101,7 @@ namespace VisualRust.Racer
 
         private string Exec(string args)
         {
+            ReinitializeRacerPaths();
             try
             {
                 using (new WindowsErrorMode(3))
@@ -176,7 +113,8 @@ namespace VisualRust.Racer
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.RedirectStandardOutput = true;
                     process.StartInfo.CreateNoWindow = true;
-                    process.StartInfo.EnvironmentVariables[EnvVarRustSrcPath] = RustSrcPath;
+                    if(this.racerSourcesLocation != null)
+                        process.StartInfo.EnvironmentVariables[RacerSourceEnviromentVariable] = racerSourcesLocation;
 
                     process.Start();
 

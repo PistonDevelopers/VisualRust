@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace VisualRust.Project.Forms
 {
-    static class Utils
+    public static class Utils
     {
         public static TableLayoutPanel CreateHeaderLabel(string text)
         {

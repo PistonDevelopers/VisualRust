@@ -41,14 +41,10 @@ namespace VisualRust.Project
             return project.MakeConfiguration(configName);
         }
 
-        public override int GetCfgProviderProperty(int propid, out object var) {
-            switch ((__VSCFGPROPID)propid) {
-                case __VSCFGPROPID.VSCFGPROPID_SupportsPlatformAdd:
-                case __VSCFGPROPID.VSCFGPROPID_SupportsPlatformDelete:
-                    var = true;
-                    return VSConstants.S_OK;
-            }
-            return base.GetCfgProviderProperty(propid, out var);
+        public override int GetCfgProviderProperty(int propid, out object var)
+        {
+          var = false;
+          return VSConstants.S_OK;
         }
     }
 }

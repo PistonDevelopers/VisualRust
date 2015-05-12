@@ -55,8 +55,31 @@ namespace VisualRust.Project
         {
             var commandLineArgs = string.Empty;
             var startInfo = new ProcessStartInfo(startupFile, commandLineArgs);
+            InjectRustBinPath(startInfo);
             startInfo.UseShellExecute = false;
             return startInfo;
+        }
+
+        private void InjectRustBinPath(ProcessStartInfo startInfo)
+        {
+            EnvDTE.Project proj = _project.GetAutomationObject() as EnvDTE.Project;
+            if(proj == null)
+                return;
+            string currentConfigName = Utilities.GetActiveConfigurationName(proj);
+            if(currentConfigName == null)
+                return;
+            ProjectConfig  currentConfig = _project.ConfigProvider.GetProjectConfiguration(currentConfigName);
+            if(currentConfig == null)
+                return;
+            string currentTarget = currentConfig.GetConfigurationProperty("PlatformTarget", true);
+            if(currentTarget == null)
+                currentTarget =  Shared.Environment.DefaultTarget;
+            string installPath = Shared.Environment.FindInstallPath(currentTarget);
+            if(installPath == null)
+                return;
+            string envPath = Environment.GetEnvironmentVariable("PATH");
+            string newEnvPath = String.Format("{0};{1}", envPath, installPath);
+            startInfo.EnvironmentVariables["PATH"] = newEnvPath;
         }
     }
 }

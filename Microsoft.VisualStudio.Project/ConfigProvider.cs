@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <param name="configName">The name of the configuration</param>
         /// <returns>An instance of a ProjectConfig object.</returns>
-        protected ProjectConfig GetProjectConfiguration(string configName) {
+        internal ProjectConfig GetProjectConfiguration(string configName) {
             // if we already created it, return the cached one
             if (configurationsList.ContainsKey(configName)) {
                 return configurationsList[configName];

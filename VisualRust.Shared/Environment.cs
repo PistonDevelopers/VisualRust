@@ -10,6 +10,7 @@ namespace VisualRust.Shared
 {
     public class Environment
     {
+        private const string InnoPath = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\Rust_is1";
         private const string MozillaPath = @"Software\Mozilla Foundation";
         private const string install = "InstallLocation";
 
@@ -50,13 +51,26 @@ namespace VisualRust.Shared
                 return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64)
                     .Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32))
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry64))
-                    .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32));
+                    .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32))
+                    .Union(GetInnoInstallRoot());
             }
             else
             {
                 return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32)
-                    .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32));
+                    .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32))
+                    .Union(GetInnoInstallRoot());
             }
+        }
+
+        private static string[] GetInnoInstallRoot()
+        {
+            RegistryKey innoKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default).OpenSubKey(InnoPath);
+            if(innoKey == null)
+                return new string[0];
+            string installPath = innoKey.GetValue("InstallLocation") as string;
+            if(installPath == null)
+                return new string[0];
+            return new [] { installPath };
         }
 
         private static IEnumerable<string> GetInstallRoots(RegistryHive hive, RegistryView view)

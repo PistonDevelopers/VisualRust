@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,23 +13,20 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
+using VSCommand = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
 namespace VisualRust
 {
-    internal sealed class RustCompletionCommandHandler : IOleCommandTarget
+    internal sealed class RustCompletionCommandHandler : VSCommandTarget<VSCommand>
     {
-        private readonly IOleCommandTarget next;
         private ICompletionSession currentSession;
 
-        public RustCompletionCommandHandler(IVsTextView viewAdapter, ITextView textView, ICompletionBroker broker)
+        public RustCompletionCommandHandler(IVsTextView viewAdapter, IWpfTextView textView, ICompletionBroker broker)
+            : base(viewAdapter, textView)
         {
             currentSession = null;
-            TextView = textView;
             Broker = broker;
-            viewAdapter.AddCommandFilter(this, out next);
         }
-
-        public ITextView TextView { get; private set; }
 
         public ICompletionBroker Broker { get; private set; }
 
@@ -42,82 +40,77 @@ namespace VisualRust
             get { return currentSession != null && currentSession.IsStarted && !currentSession.IsDismissed; }
         }
 
-        public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        protected override bool Execute(VSCommand command, uint options, IntPtr pvaIn, IntPtr pvaOut)
         {
             bool handled = false;
-            int hresult = VSConstants.S_OK;
 
-            if (pguidCmdGroup == VSConstants.VSStd2K)
+            switch (command)
             {
-                switch ((VSConstants.VSStd2KCmdID)nCmdID)
-                {
-                    case VSConstants.VSStd2KCmdID.AUTOCOMPLETE:
-                    case VSConstants.VSStd2KCmdID.COMPLETEWORD:
-                    case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
-                        handled = StartSession();
-                        break;
-                    case VSConstants.VSStd2KCmdID.RETURN:
-                        handled = Complete(false);
-                        break;
-                    case VSConstants.VSStd2KCmdID.TAB:
-                        handled = Complete(true);
-                        break;
-                    case VSConstants.VSStd2KCmdID.CANCEL:
-                        handled = Cancel();
-                        break;
-                }
+                case VSConstants.VSStd2KCmdID.AUTOCOMPLETE:
+                case VSConstants.VSStd2KCmdID.COMPLETEWORD:
+                case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
+                    handled = StartSession();
+                    break;
+                case VSConstants.VSStd2KCmdID.RETURN:
+                    handled = Complete(false);
+                    break;
+                case VSConstants.VSStd2KCmdID.TAB:
+                    handled = Complete(true);
+                    break;
+                case VSConstants.VSStd2KCmdID.CANCEL:
+                    handled = Cancel();
+                    break;
             }
 
+            bool hresult = true;
+
             if (!handled)
-                hresult = next.Exec(pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                hresult = ExecuteNext(command, options, pvaIn, pvaOut);
 
-            if (ErrorHandler.Succeeded(hresult))
+            if (hresult)
             {
-                if (pguidCmdGroup == VSConstants.VSStd2K)
+                switch (command)
                 {
-                    switch ((VSConstants.VSStd2KCmdID)nCmdID)
-                    {
-                        case VSConstants.VSStd2KCmdID.TYPECHAR:
-                            char ch = GetTypeChar(pvaIn);
-                            var tokensAtCursor = GetTokensAtCursor();
+                    case VSConstants.VSStd2KCmdID.TYPECHAR:
+                        char ch = GetTypeChar(pvaIn);
+                        var tokensAtCursor = GetTokensAtCursor();
 
-                            var leftTokenType = tokensAtCursor.Item1;
-                            var currentTokenType = tokensAtCursor.Item2;
+                        var leftTokenType = tokensAtCursor.Item1;
+                        var currentTokenType = tokensAtCursor.Item2;
 
-                            RustTokenTypes[] cancelTokens = { RustTokenTypes.COMMENT, RustTokenTypes.STRING, RustTokenTypes.DOC_COMMENT, RustTokenTypes.WHITESPACE };
+                        RustTokenTypes[] cancelTokens = { RustTokenTypes.COMMENT, RustTokenTypes.STRING, RustTokenTypes.DOC_COMMENT, RustTokenTypes.WHITESPACE };
 
-                            if (char.IsControl(ch)
-                                || ch == ';'
-                                || (leftTokenType.HasValue && cancelTokens.Contains(leftTokenType.Value))
-                                || (currentTokenType.HasValue && cancelTokens.Contains(currentTokenType.Value)))
-                            {
-                                Cancel();
-                            }
-                            else if (leftTokenType == RustTokenTypes.STRUCTURAL)
-                            {
-                                Cancel();
-                                StartSession();
-                            }
-                            else if (leftTokenType == RustTokenTypes.IDENT && currentTokenType == null)
-                            {
-                                StartSession();
-                            }
-                            else if (IsSessionStarted)
-                            {
-                                string applicableTo = currentSession.SelectedCompletionSet.ApplicableTo.GetText(currentSession.TextView.TextSnapshot);
-                                if (string.IsNullOrEmpty(applicableTo))
-                                    RestartSession();
-                                else
-                                    Filter();
-                            }
-                            break;
-                        case VSConstants.VSStd2KCmdID.BACKSPACE:
-                        case VSConstants.VSStd2KCmdID.DELETE:
-                        case VSConstants.VSStd2KCmdID.DELETEWORDLEFT:
-                        case VSConstants.VSStd2KCmdID.DELETEWORDRIGHT:
-                            Filter();
-                            break;
-                    }
+                        if (char.IsControl(ch)
+                            || ch == ';'
+                            || (leftTokenType.HasValue && cancelTokens.Contains(leftTokenType.Value))
+                            || (currentTokenType.HasValue && cancelTokens.Contains(currentTokenType.Value)))
+                        {
+                            Cancel();
+                        }
+                        else if (leftTokenType == RustTokenTypes.STRUCTURAL)
+                        {
+                            Cancel();
+                            StartSession();
+                        }
+                        else if (leftTokenType == RustTokenTypes.IDENT && currentTokenType == null)
+                        {
+                            StartSession();
+                        }
+                        else if (IsSessionStarted)
+                        {
+                            string applicableTo = currentSession.SelectedCompletionSet.ApplicableTo.GetText(currentSession.TextView.TextSnapshot);
+                            if (string.IsNullOrEmpty(applicableTo))
+                                RestartSession();
+                            else
+                                Filter();
+                        }
+                        break;
+                    case VSConstants.VSStd2KCmdID.BACKSPACE:
+                    case VSConstants.VSStd2KCmdID.DELETE:
+                    case VSConstants.VSStd2KCmdID.DELETEWORDLEFT:
+                    case VSConstants.VSStd2KCmdID.DELETEWORDRIGHT:
+                        Filter();
+                        break;
                 }
             }
 
@@ -231,21 +224,40 @@ namespace VisualRust
             return true;
         }
 
-        public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
+        protected override IEnumerable<VSCommand> SupportedCommands
         {
-            if (pguidCmdGroup == VSConstants.VSStd2K)
+            get
             {
-                switch ((VSConstants.VSStd2KCmdID)prgCmds[0].cmdID)
-                {
-                    case VSConstants.VSStd2KCmdID.AUTOCOMPLETE:
-                    case VSConstants.VSStd2KCmdID.COMPLETEWORD:
-                        prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_ENABLED | (uint)OLECMDF.OLECMDF_SUPPORTED;
-                        return VSConstants.S_OK;
-                }
+                yield return VSCommand.CANCEL;
+
+                // start / filter / complete commands
+                yield return VSCommand.TYPECHAR;
+                yield return VSCommand.BACKSPACE;
+                yield return VSCommand.DELETE;
+                yield return VSCommand.DELETEWORDLEFT;
+                yield return VSCommand.DELETEWORDRIGHT;
+
+                // completion commands
+                yield return VSCommand.RETURN;
+                yield return VSCommand.TAB;
+
+                // ctrl + space commands
+                yield return VSCommand.COMPLETEWORD;
+                yield return VSCommand.AUTOCOMPLETE;
+
+                // ctrl + j commands
+                yield return VSCommand.SHOWMEMBERLIST;
             }
-            return next.QueryStatus(pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
 
+        protected override VSCommand ConvertFromCommandId(uint id)
+        {
+            return (VSCommand)id;
+        }
 
+        protected override uint ConvertFromCommand(VSCommand command)
+        {
+            return (uint)command;
+        }
     }
 }

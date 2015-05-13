@@ -15,32 +15,6 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace VisualRust
 {
-    [Export(typeof(IVsTextViewCreationListener))]
-    [ContentType("rust")]
-    [TextViewRole(PredefinedTextViewRoles.Interactive)]
-    internal sealed class RustCompletionHandlerProvider : IVsTextViewCreationListener
-    {
-        [Import]
-        IVsEditorAdaptersFactoryService AdapterService { get; set; }
-
-        [Import]
-        internal SVsServiceProvider ServiceProvider { get; set; }
-
-        [Import]
-        internal ICompletionBroker CompletionBroker { get; set; }
-
-        public void VsTextViewCreated(IVsTextView textViewAdapter)
-        {
-            IWpfTextView textView = AdapterService.GetWpfTextView(textViewAdapter);
-            if (textView == null)
-                return;
-
-            Func<RustCompletionCommandHandler> createCommandHandler =
-               () => new RustCompletionCommandHandler(textViewAdapter, textView, CompletionBroker);
-            textView.Properties.GetOrCreateSingletonProperty(createCommandHandler);
-        }
-    }
-
     internal sealed class RustCompletionCommandHandler : IOleCommandTarget
     {
         private readonly IOleCommandTarget next;

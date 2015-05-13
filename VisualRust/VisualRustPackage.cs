@@ -15,6 +15,7 @@ using VisualRust.Project;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using VisualRust.Options;
+using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace VisualRust
 {
@@ -66,6 +67,7 @@ namespace VisualRust
     public class VisualRustPackage : CommonProjectPackage
     {
         private RunningDocTableEventsListener docEventsListener;
+        internal static VisualRustPackage Instance { get; private set; }
 
         /// <summary>
         /// Default constructor of the package.
@@ -91,6 +93,8 @@ namespace VisualRust
         protected override void Initialize()
         {
             base.Initialize();
+            Instance = this;
+
             docEventsListener = new RunningDocTableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
 
             Racer.AutoCompleter.Init();

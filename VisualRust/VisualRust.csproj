@@ -190,14 +190,17 @@
     <Compile Include="RustBraceMatcher.cs" />
     <Compile Include="RustClassifier.cs" />
     <Compile Include="RustClassifierProvider.cs" />
+    <Compile Include="RustCommentSelectionCommandHandler.cs" />
     <Compile Include="RustCompletionCommandHandler.cs" />
     <Compile Include="RustCompletionSource.cs" />
+    <Compile Include="RustDocumentListener.cs" />
     <Compile Include="RustTokenTypes.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="RustLanguage.cs" />
     <Compile Include="VisualRustPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VisualRustSmartIndent.cs" />
+    <Compile Include="VSCommandTarget.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\RustOptionsPageControl.resx">

@@ -187,7 +187,7 @@ namespace VisualRust.Build
             string rustBinPath = VisualRust.Shared.Environment.FindInstallPath(VisualRust.Shared.Environment.DefaultTarget);
             if(rustBinPath == null)
             {
-                Log.LogError("No Rust compiler installed.");
+              Log.LogError("No Rust installation detected. You can download official Rust installer from rust-lang.org/install.");
                 return false;
             }
             StringBuilder sb = new StringBuilder();

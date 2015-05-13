@@ -18,9 +18,6 @@ namespace VisualRust
 
         protected override bool Execute(VSConstants.VSStd2KCmdID command, uint options, IntPtr pvaIn, IntPtr pvaOut)
         {
-            if (TextView.Selection.IsEmpty) return false;
-
-
             var snapshot = Buffer.CurrentSnapshot;
             int start = TextView.Selection.Start.Position.Position;
             int end = TextView.Selection.End.Position.Position;
@@ -30,7 +27,7 @@ namespace VisualRust
 
             using (var edit = Buffer.CreateEdit())
             {
-                while (start < end)
+                while (start <= end)
                 {
                     var line = snapshot.GetLineFromPosition(start);
                     var text = line.GetText();
@@ -79,7 +76,7 @@ namespace VisualRust
         private int GetOffset(ITextSnapshot snapshot, int start, int end)
         {
             int offset = int.MaxValue;
-            while (start < end)
+            while (start <= end)
             {
                 var line = snapshot.GetLineFromPosition(start);
                 var text = line.GetText();

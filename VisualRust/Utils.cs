@@ -15,6 +15,8 @@ using Microsoft.VisualStudio.Text.Operations;
 namespace VisualRust
 {
     using RustLexer;
+    using Microsoft.VisualStudio.Text;
+    using Antlr4.Runtime;
 
     static class Utils
     {
@@ -194,6 +196,34 @@ namespace VisualRust
             outWindow.GetPane(ref paneGuid, out pane);
             pane.OutputString(string.Format("[VisualRust]: " + s, args) + "\n");
             pane.Activate();
+        }
+
+        internal static Tuple<IToken, IToken> GetTokensAtPosition(SnapshotPoint snapshotPoint)
+        {
+            var line = snapshotPoint.GetContainingLine();
+            var tokens = Utils.LexString(line.GetText()).ToList();
+
+            if (tokens.Count == 0)
+                return Tuple.Create<IToken, IToken>(null, null);
+
+            int col = snapshotPoint.Position - line.Start.Position;
+
+            IToken leftToken;
+            IToken currentToken = tokens.FirstOrDefault(t => col > t.StartIndex && col <= t.StopIndex);
+
+            if (currentToken != null)
+            {
+                if (currentToken == tokens.First())
+                    leftToken = null;
+                else
+                    leftToken = tokens[tokens.IndexOf(currentToken) - 1];
+            }
+            else
+            {
+                leftToken = tokens.Last();
+            }
+
+            return Tuple.Create(leftToken, currentToken);
         }
     }
 

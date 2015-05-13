@@ -73,10 +73,10 @@ namespace VisualRust
                 {
                     case VSConstants.VSStd2KCmdID.TYPECHAR:
                         char ch = GetTypeChar(pvaIn);
-                        var tokensAtCursor = GetTokensAtCursor();
+                        var tokensAtCursor = Utils.GetTokensAtPosition(TextView.Caret.Position.BufferPosition);
 
-                        var leftTokenType = tokensAtCursor.Item1;
-                        var currentTokenType = tokensAtCursor.Item2;
+                        RustTokenTypes? leftTokenType = tokensAtCursor.Item1 != null ? (RustTokenTypes?)Utils.LexerTokenToRustToken(tokensAtCursor.Item1.Text, tokensAtCursor.Item1.Type) : null;
+                        RustTokenTypes? currentTokenType = tokensAtCursor.Item2 != null ? (RustTokenTypes?)Utils.LexerTokenToRustToken(tokensAtCursor.Item2.Text, tokensAtCursor.Item2.Type) : null;
 
                         RustTokenTypes[] cancelTokens = { RustTokenTypes.COMMENT, RustTokenTypes.STRING, RustTokenTypes.DOC_COMMENT, RustTokenTypes.WHITESPACE };
 
@@ -115,38 +115,6 @@ namespace VisualRust
             }
 
             return hresult;
-        }
-
-        private Tuple<RustTokenTypes?, RustTokenTypes?> GetTokensAtCursor()
-        {
-            SnapshotPoint caret = TextView.Caret.Position.BufferPosition;
-            var line = caret.GetContainingLine();
-            var tokens = Utils.LexString(line.GetText()).ToList();
-
-            if (tokens.Count == 0)
-                return Tuple.Create<RustTokenTypes?, RustTokenTypes?>(null, null);
-
-            int col = caret.Position - line.Start.Position;
-
-            IToken leftToken;
-            IToken currentToken = tokens.FirstOrDefault(t => col > t.StartIndex && col <= t.StopIndex);
-
-            if (currentToken != null)
-            {
-                if (currentToken == tokens.First())
-                    leftToken = null;
-                else
-                    leftToken = tokens[tokens.IndexOf(currentToken) - 1];
-            }
-            else
-            {
-                leftToken = tokens.Last();
-            }
-
-            RustTokenTypes? leftTokenType = leftToken != null ? (RustTokenTypes?)Utils.LexerTokenToRustToken(leftToken.Text, leftToken.Type) : null;
-            RustTokenTypes? currentTokenType = currentToken != null ? (RustTokenTypes?)Utils.LexerTokenToRustToken(currentToken.Text, currentToken.Type) : null;
-
-            return Tuple.Create(leftTokenType, currentTokenType);
         }
 
         private void RestartSession()

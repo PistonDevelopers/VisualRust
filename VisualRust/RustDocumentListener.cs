@@ -32,6 +32,7 @@ namespace VisualRust
 
             textView.Properties.GetOrCreateSingletonProperty(() => new RustCompletionCommandHandler(textViewAdapter, textView, CompletionBroker));
             textView.Properties.GetOrCreateSingletonProperty(() => new RustCommentSelectionCommandHandler(textViewAdapter, textView));
+            textView.Properties.GetOrCreateSingletonProperty(() => new RustF1HelpCommandHandler(textViewAdapter, textView));
             // TODO: also handle FormatDocument and GoToDefiniton here in a similar way
         }
     }

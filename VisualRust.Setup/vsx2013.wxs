@@ -68,5 +68,9 @@
       <Custom Action="CA_Remove_Ancient_Version" Before="CA_VS2013Setup"><![CDATA[VS2013DEVENV AND &Ftr_VisualRust=3]]></Custom>
       <Custom Action="CA_VS2013Setup" Before="InstallFinalize"><![CDATA[(VS2013DEVENV AND &Ftr_VisualRust=3) OR ((NOT UPGRADINGPRODUCTCODE) AND (&Ftr_VisualRust=2) AND (!Ftr_VisualRust=3))]]></Custom>
     </InstallExecuteSequence>
+    <UI>
+      <ProgressText Action="CA_Remove_Ancient_Version">Removing ancient version of Visual Rust</ProgressText>
+      <ProgressText Action="CA_VS2013Setup">Configuring Visual Studio 2013 (this might take a few minutes)</ProgressText>
+    </UI>
   </Fragment>
 </Wix>

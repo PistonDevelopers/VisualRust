@@ -4,10 +4,10 @@ Visual Studio extension for Rust
 [![Build status](https://ci.appveyor.com/api/projects/status/5nw5no10jj0y4p3f?svg=true)]
 (https://ci.appveyor.com/project/vosen/visualrust)
 
-![Screenshot](http://i.imgur.com/T06C5wH.png)
+![Screenshot](http://i.imgur.com/63IYU6b.png)
 
 Currently in development, and not feature complete. Stable versions are
-available [on the Visual Studio extension gallery](http://visualstudiogallery.msdn.microsoft.com/dcd9075c-46da-4164-be4a-4d09589efcad).
+available [on the Visual Studio extension gallery](https://visualstudiogallery.msdn.microsoft.com/c6075d2f-8864-47c0-8333-92f183d3e640).
 
 Unstable, but more recent builds are downloadable from [AppVeyor]
 (https://ci.appveyor.com/project/vosen/visualrust) (choose "Configuration:

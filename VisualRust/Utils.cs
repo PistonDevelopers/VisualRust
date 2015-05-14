@@ -84,6 +84,8 @@ namespace VisualRust
             { RustLexer.COMMENT, RustTokenTypes.COMMENT },
             { RustLexer.BLOCK_COMMENT, RustTokenTypes.COMMENT },
             { RustLexer.DOC_BLOCK_COMMENT, RustTokenTypes.DOC_COMMENT },
+            { RustLexer.QUESTION, RustTokenTypes.OP },
+            { RustLexer.UTF8_BOM, RustTokenTypes.WHITESPACE }
         };
 
         // These keywords are from rustc /src/libsyntax/parse/token.rs, module keywords

@@ -27,7 +27,9 @@ namespace VisualRust
 
             using (var edit = Buffer.CreateEdit())
             {
-                while (start <= end)
+                // NOTE: At this point always start <= end, so we can safely run the loop at least once
+                //       in order to get the desired effect even when start == end, i.e. there is just a cursor
+                do
                 {
                     var line = snapshot.GetLineFromPosition(start);
                     var text = line.GetText();
@@ -37,7 +39,7 @@ namespace VisualRust
                         case VSConstants.VSStd2KCmdID.COMMENT_BLOCK:
                             {
                                 if (insertStartOffset == null) insertStartOffset = GetOffset(snapshot, start, end);
-                                if (!string.IsNullOrEmpty(text))
+                                if (!string.IsNullOrWhiteSpace(text))
                                     edit.Insert(line.Start.Position + insertStartOffset.GetValueOrDefault(), "//");
 
                                 break;
@@ -47,7 +49,7 @@ namespace VisualRust
                             {
                                 // NOTE: it is important to use the lexer here, because we want to keep doc comments
                                 //       (purely textual check would result in '///' being changed to '/')
-                                foreach (var token in Utils.LexString(line.GetText()))
+                                foreach (var token in Utils.LexString(text))
                                 {
                                     // TODO: how to deal with block comments and other multiline tokens?
                                     if (token.Type == RustLexer.RustLexer.COMMENT)
@@ -65,7 +67,7 @@ namespace VisualRust
                     }
 
                     start = line.EndIncludingLineBreak.Position;
-                }
+                } while (start < end);
 
                 edit.Apply();
             }
@@ -76,7 +78,7 @@ namespace VisualRust
         private int GetOffset(ITextSnapshot snapshot, int start, int end)
         {
             int offset = int.MaxValue;
-            while (start <= end)
+            do
             {
                 var line = snapshot.GetLineFromPosition(start);
                 var text = line.GetText();
@@ -88,7 +90,7 @@ namespace VisualRust
                 }
 
                 start = line.EndIncludingLineBreak.Position;
-            }
+            } while (start < end);
 
             return offset == int.MaxValue ? 0 : offset;
         }

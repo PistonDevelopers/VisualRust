@@ -13,7 +13,7 @@ namespace VisualRust.Racer
     /// <remarks>
     /// racer.exe compiled (x86) as rustc -O -o racer.exe src\main.rs    
     /// </remarks>
-    public class AutoCompleter
+    public class RacerSingleton
     {
         private const string SystemRacerExecutable = "racer.exe";
         private const string BundledRacerExecutable = "racer-bf2373e.exe";
@@ -23,12 +23,12 @@ namespace VisualRust.Racer
         private string racerPathForExecution;
         private string racerSourcesLocation;
 
-        private static AutoCompleter instance;
+        private static RacerSingleton instance;
 
         /// <summary>
         /// Gets the singleton instance.
         /// </summary>
-        public static AutoCompleter Instance
+        public static RacerSingleton Instance
         {
             get
             {
@@ -45,10 +45,10 @@ namespace VisualRust.Racer
         public static void Init()
         {
             if (instance == null)
-                instance = new AutoCompleter();
+                instance = new RacerSingleton();
         }
 
-        private AutoCompleter()
+        private RacerSingleton()
         {
         }
 

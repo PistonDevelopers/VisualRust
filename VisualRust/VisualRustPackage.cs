@@ -97,7 +97,7 @@ namespace VisualRust
 
             docEventsListener = new RunningDocTableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
 
-            Racer.AutoCompleter.Init();
+            Racer.RacerSingleton.Init();
         }
 
         protected override void Dispose(bool disposing)

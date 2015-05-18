@@ -68,7 +68,7 @@ namespace VisualRust
         {
             var keywords = Utils.Keywords;
             var resultKeywords = string.IsNullOrEmpty(prefix) ? keywords : keywords.Where(x => x.StartsWith(prefix));
-            var completions = resultKeywords.Select(k => new Completion(k, k + " ", "", null, null));
+            var completions = resultKeywords.Select(k => new Completion(k, k + " ", "", null, ""));
 
             return completions;
         }
@@ -147,8 +147,7 @@ namespace VisualRust
                 return;
             }
 
-            // Get token under cursor.
-            var tokens = Utils.LexString(line.GetText());
+            // Get token under cursor.            
             var activeToken = GetActiveToken(col, line);
             if (activeToken == null)
                 return;
@@ -177,7 +176,13 @@ namespace VisualRust
             var tokens = Utils.LexString(line.GetText());
             if (columnIndex == line.Length)
             {
-                return tokens.Last();
+                var lastToken = tokens.Last();
+                if (lastToken.Type == RustLexer.RustLexer.IDENT)
+                    return lastToken;
+                
+                // fake token for an ident not yet started at the end of the line. 
+                return new CommonToken(new Tuple<ITokenSource, ICharStream>(lastToken.TokenSource, lastToken.TokenSource.InputStream),
+                    RustLexer.RustLexer.IDENT, 0, columnIndex, columnIndex);
             }
 
             IToken token = null;
@@ -232,8 +237,7 @@ namespace VisualRust
             }
         }
 
-
-        // Parses racer output into completions.
+        
         // Parses racer output into completions.
         private IEnumerable<Completion> GetCompletions(string racerResponse, out string prefix)
         {
@@ -245,8 +249,9 @@ namespace VisualRust
         }
 
         private IEnumerable<Completion> GetCompletions(string[] lines)
-        {
-            var matches = lines.Where(l => l.StartsWith("MATCH"));
+        {            
+            var matches = lines.Where(l => l.StartsWith("MATCH")).Distinct(StringComparer.Ordinal);
+
             foreach (var matchLine in matches)
             {
                 var tokens = matchLine.Substring(6).Split(',');
@@ -265,7 +270,7 @@ namespace VisualRust
                 var insertionText = text;
                 var icon = GetCompletionIcon(elType);
 
-                yield return new Completion(text, insertionText, description, icon, null);
+                yield return new Completion(text, insertionText, description, icon, "");
             }
         }
 

@@ -15,6 +15,10 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
+    <SuppressSpecificWarnings>
+    </SuppressSpecificWarnings>
+    <SuppressIces>ICE30</SuppressIces>
+    <SuppressValidation>False</SuppressValidation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -34,7 +38,10 @@
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="racer.wxs" />
+    <Compile Include="racer2015.wxs" />
+    <Compile Include="templates2015.wxs" />
+    <Compile Include="vsx2015.wxs" />
+    <Compile Include="racer2013.wxs" />
     <Compile Include="templates2013.wxs" />
     <Compile Include="VisualRust.wxs" />
     <Compile Include="vsx2013.wxs" />

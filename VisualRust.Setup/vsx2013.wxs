@@ -1,48 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  <?define VsVersion  = "2013"?>
   <Fragment>
-    <PropertyRef Id="VS2013_EXTENSIONS_DIR" />
-    <DirectoryRef Id="TARGETDIR">
-      <Directory Id="VS2013_EXTENSIONS_DIR">
-        <Directory Id="Dir_vsx2013" Name="Visual Rust"/>
-      </Directory>
-    </DirectoryRef>
-    <Property Id="VSLAUNCHER" >
-      <DirectorySearch Path="[ProgramFilesFolder]\Common Files\Microsoft Shared\MSEnv" Depth="4" Id="FindVSLauncher">
-        <FileSearch Name="VSLauncher.exe" />
-      </DirectorySearch>
-    </Property>
-    <ComponentGroup Id="CmpGroup_vsx2013" Directory="Dir_vsx2013">
-      <Component Id="Cmp_Antlr4_Runtime_net45_dll" Guid="{762AC9CD-9E49-4498-AD43-6FA96DDA5252}">
-        <File Id="File_Antlr4_Runtime_net45_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Antlr4.Runtime.net45.dll" />
+    <ComponentGroup Id="CmpGroup_vsx_$(var.VsVersion)" Directory="Dir_vsx_$(var.VsVersion)">
+      <Component Id="Cmp_Antlr4_Runtime_net45_dll_$(var.VsVersion)" Guid="{762AC9CD-9E49-4498-AD43-6FA96DDA5252}">
+        <File Id="File_Antlr4_Runtime_net45_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Antlr4.Runtime.net45.dll" />
       </Component>
-      <Component Id="Cmp_extension_vsixmanifest" Guid="{0530F158-140D-4049-9A5E-872E177B0876}">
-        <File Id="File_extension_vsixmanifest" KeyPath="yes" Source="$(var.VisualRust.TargetDir)extension.vsixmanifest" />
+      <Component Id="Cmp_extension_vsixmanifest_$(var.VsVersion)" Guid="{0530F158-140D-4049-9A5E-872E177B0876}">
+        <File Id="File_extension_vsixmanifest_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)extension.vsixmanifest" />
       </Component>
-      <Component Id="Cmp_Microsoft_VisualStudio_Project_dll" Guid="{10A9BDCC-3D04-4CE8-B412-3642C0B5F1E7}">
-        <File Id="File_Microsoft_VisualStudio_Project_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Microsoft.VisualStudio.Project.dll" />
+      <Component Id="Cmp_Microsoft_VisualStudio_Project_dll_$(var.VsVersion)" Guid="{10A9BDCC-3D04-4CE8-B412-3642C0B5F1E7}">
+        <File Id="File_Microsoft_VisualStudio_Project_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Microsoft.VisualStudio.Project.dll" />
       </Component>
-      <Component Id="Cmp_RustLexer_dll" Guid="{82BDDBEC-9937-4478-B8BE-BD3ADE93BB55}">
-        <File Id="File_RustLexer_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)RustLexer.dll" />
+      <Component Id="Cmp_RustLexer_dll_$(var.VsVersion)" Guid="{82BDDBEC-9937-4478-B8BE-BD3ADE93BB55}">
+        <File Id="File_RustLexer_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)RustLexer.dll" />
       </Component>
-      <Component Id="Cmp_VisualRust_dll" Guid="{586D8DB5-1342-46B0-9730-6A32AE3BDD9E}">
-        <File Id="File_VisualRust_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.dll" />
+      <Component Id="Cmp_VisualRust_dll_$(var.VsVersion)" Guid="{586D8DB5-1342-46B0-9730-6A32AE3BDD9E}">
+        <File Id="File_VisualRust_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.dll" />
       </Component>
-      <Component Id="Cmp_VisualRust_pkgdef" Guid="{EC760202-90E8-4365-B848-D056CD4931D8}">
-        <File Id="File_VisualRust_pkgdef" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.pkgdef" />
+      <Component Id="Cmp_VisualRust_pkgdef_$(var.VsVersion)" Guid="{EC760202-90E8-4365-B848-D056CD4931D8}">
+        <File Id="File_VisualRust_pkgdef_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.pkgdef" />
         <util:RestartResource Path="[VS2013DEVENV]"/>
       </Component>
-      <Component Id="Cmp_VisualRust_Project_dll" Guid="{28F566C7-23AD-439B-8AF9-E924C45EE715}">
-        <File Id="File_VisualRust_Project_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Project.dll" />
+      <Component Id="Cmp_VisualRust_Project_dll_$(var.VsVersion)" Guid="{28F566C7-23AD-439B-8AF9-E924C45EE715}">
+        <File Id="File_VisualRust_Project_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Project.dll" />
       </Component>
-      <Component Id="Cmp_VisualRust_Shared_dll" Guid="{ACA9C549-92DB-4AF4-96B3-169E9E1AB056}">
-        <File Id="File_VisualRust_Shared_dll" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Shared.dll" />
+      <Component Id="Cmp_VisualRust_Shared_dll_$(var.VsVersion)" Guid="{ACA9C549-92DB-4AF4-96B3-169E9E1AB056}">
+        <File Id="File_VisualRust_Shared_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Shared.dll" />
       </Component>
       <!-- Racer files -->
-      <ComponentGroupRef Id="CmpGroup_Racer"/>
+      <ComponentGroupRef Id="CmpGroup_Racer_2013"/>
       <!-- Open .rsproj with vs launcher -->
-      <Component Id="Cmp_RsprojRegistration" Guid="{15CB1600-9413-4770-9BDC-39C8593B8FC4}">
+      <Component Id="Cmp_RsprojRegistration_$(var.VsVersion)" Guid="{15CB1600-9413-4770-9BDC-39C8593B8FC4}">
         <CreateFolder/>
         <ProgId Id="VisualRust.Launcher" Description="Rust Project">
           <Extension Id="rsproj" ContentType="text/plain">
@@ -51,22 +41,22 @@
         </ProgId>
       </Component>
       <!-- Open .rs with context menu  -->
-      <Component Id="Cmp_RsRegistration" Guid="{76DF7BF5-FE0C-4634-AA8E-19B65DB87630}">
+      <Component Id="Cmp_RsRegistration_$(var.VsVersion)" Guid="{76DF7BF5-FE0C-4634-AA8E-19B65DB87630}">
         <CreateFolder/>
         <RegistryValue Root="HKCR" Key=".rs\OpenWithProgids" Name="VisualRust.Launcher" Type="string" Value="" />
       </Component>
     </ComponentGroup>
     <PropertyRef Id="VS2013DEVENV" />
     <!--
-      This custom actions is taken pretty much verbatim from the WiX source. One differences is that we check if the vsx23013 feature was selected (or is being uninstalled).
+      This custom actions is taken pretty much verbatim from the WiX source. One differences is that we check if the vsx2013 feature was selected (or is being uninstalled).
     -->
     <CustomAction Id="CA_VS2013Setup" Property="VS2013DEVENV" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
     <CustomAction Id="CA_Set_VSIXINSTALLER2013" Property="VSIXINSTALLER2013" Value="[VS2013DEVENV]\..\VsixInstaller.exe"/>
     <CustomAction Id="CA_Remove_Ancient_Version" Property="VSIXINSTALLER2013" ExeCommand="/q /u:40c1d2b5-528b-4966-a7b1-1974e3568abe" Execute="deferred" Return="ignore" Impersonate="yes"/>
     <InstallExecuteSequence>
       <Custom Action="CA_Set_VSIXINSTALLER2013" Before="CA_Remove_Ancient_Version"></Custom>
-      <Custom Action="CA_Remove_Ancient_Version" Before="CA_VS2013Setup"><![CDATA[VS2013DEVENV AND &Ftr_VisualRust=3]]></Custom>
-      <Custom Action="CA_VS2013Setup" Before="InstallFinalize"><![CDATA[(VS2013DEVENV AND &Ftr_VisualRust=3) OR ((NOT UPGRADINGPRODUCTCODE) AND (&Ftr_VisualRust=2) AND (!Ftr_VisualRust=3))]]></Custom>
+      <Custom Action="CA_Remove_Ancient_Version" Before="CA_VS2013Setup"><![CDATA[VS2013DEVENV AND &Ftr_VisualRust_2013=3]]></Custom>
+      <Custom Action="CA_VS2013Setup" Before="InstallFinalize"><![CDATA[(VS2013DEVENV AND &Ftr_VisualRust_2013=3) OR ((NOT UPGRADINGPRODUCTCODE) AND (&Ftr_VisualRust_2013=2) AND (!Ftr_VisualRust_2013=3))]]></Custom>
     </InstallExecuteSequence>
     <UI>
       <ProgressText Action="CA_Remove_Ancient_Version">Removing ancient version of Visual Rust</ProgressText>

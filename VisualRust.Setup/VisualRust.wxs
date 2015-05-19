@@ -17,6 +17,24 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of Visual Rust is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
+
+    <Property Id="VSLAUNCHER" >
+      <DirectorySearch Path="[ProgramFilesFolder]\Common Files\Microsoft Shared\MSEnv" Depth="4" Id="FindVSLauncher">
+        <FileSearch Name="VSLauncher.exe" />
+      </DirectorySearch>
+    </Property>
+
+    <PropertyRef Id="VS2013_EXTENSIONS_DIR" />
+    <PropertyRef Id="VS14_EXTENSIONS_DIR" />
+    <DirectoryRef Id="TARGETDIR">
+      <Directory Id="VS2013_EXTENSIONS_DIR">
+        <Directory Id="Dir_vsx_2013" Name="Visual Rust"/>
+      </Directory>
+      <Directory Id="VS14_EXTENSIONS_DIR">
+        <Directory Id="Dir_vsx_2015" Name="Visual Rust"/>
+      </Directory>
+    </DirectoryRef>
+
     <Feature Id="Ftr_MSBuild_Integration"
              Title="MSBuild integration"
              Description="MSBuild tasks and targets. This feature is required for building Visual Rust projects from command line and Visual Studio."
@@ -25,9 +43,8 @@
       <ComponentGroupRef Id="CmpGroup_MSBuild_Integration" />
     </Feature>
 
-
     <PropertyRef Id="VS2013DEVENV" />
-    <Feature Id="Ftr_VisualRust"
+    <Feature Id="Ftr_VisualRust_2013"
          Title="Visual Studio 2013 extension"
          Description="Extension for Visual Studio 2013. Provides support for Rust projects."
          Level="1000">
@@ -35,9 +52,23 @@
         <!-- This is not fully satisfying because the user can still enable it, but I hope most of our users are smarter than that  -->
         <![CDATA[Installed OR VS2013DEVENV]]>
       </Condition>
-      <ComponentGroupRef Id="CmpGroup_vsx2013"/>
-      <ComponentGroupRef Id="CmpGroup_item_templates2013"/>
-      <ComponentGroupRef Id="CmpGroup_proj_templates2013"/>
+      <ComponentGroupRef Id="CmpGroup_vsx_2013"/>
+      <ComponentGroupRef Id="CmpGroup_item_templates_2013"/>
+      <ComponentGroupRef Id="CmpGroup_proj_templates_2013"/>
+    </Feature>
+
+    <PropertyRef Id="VS14DEVENV" />
+    <Feature Id="Ftr_VisualRust_2015"
+         Title="Visual Studio 2015 extension"
+         Description="Extension for Visual Studio 2015. Provides support for Rust projects."
+         Level="1000">
+      <Condition Level="1">
+        <!-- This is not fully satisfying because the user can still enable it, but I hope most of our users are smarter than that  -->
+        <![CDATA[Installed OR VS14DEVENV]]>
+      </Condition>
+      <ComponentGroupRef Id="CmpGroup_vsx_2015"/>
+      <ComponentGroupRef Id="CmpGroup_item_templates_2015"/>
+      <ComponentGroupRef Id="CmpGroup_proj_templates_2015"/>
     </Feature>
 
     <Directory Id="TARGETDIR"

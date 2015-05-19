@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define VsVersion  = "2013"?>
+  <Fragment>
+    <DirectoryRef Id="Dir_vsx_$(var.VsVersion)">
+      <Directory Id="Dir_Racer_$(var.VsVersion)" Name="Racer"/>
+    </DirectoryRef>
+    <ComponentGroup Id="CmpGroup_Racer_$(var.VsVersion)" Directory="Dir_Racer_$(var.VsVersion)">
+      <Component Id="Cmp_racer_bf2373e_exe_$(var.VsVersion)" Guid="{BC0C9FDF-6495-457E-9F8D-38FAC0202544}">
+        <File Id="File_racer_bf2373e_exe_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\racer-bf2373e.exe" />
+      </Component>
+      <Component Id="Cmp_libgcc_s_dw2_1_dll_$(var.VsVersion)" Guid="{E64B2509-45B7-485E-822A-4274127D23E4}">
+        <File Id="File_libgcc_s_dw2_1_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\libgcc_s_dw2-1.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

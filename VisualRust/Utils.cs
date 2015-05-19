@@ -144,6 +144,58 @@ namespace VisualRust
             "yield"
         };
 
+        private static readonly HashSet<string> wellKnownTypes = new HashSet<string> {
+            // primitives
+            "bool",
+            "char",
+            "u8",
+            "i8",
+            "u16",
+            "i16",
+            "u32",
+            "i32",
+            "u64",
+            "i64",
+            "f32",
+            "f64",
+            "isize",
+            "usize",
+            "str",
+            //prelude
+            "Copy",
+            "Send",
+            "Sized",
+            "Sync",
+            "Drop",
+            "Fn",
+            "FnMut",
+            "FnOnce",
+            "Box",
+            "ToOwned",
+            "Clone",
+            "PartialEq",
+            "PartialOrd",
+            "Eq",
+            "Ord",
+            "AsRef",
+            "Into",
+            "From",
+            "Default",
+            "Iterator",
+            "Extend",
+            "IntoIterator",
+            "DoubleEndedIterator",
+            "ExactSizeIterator",
+            "Some",
+            "None",
+            "Ok",
+            "Err",
+            "SliceConcatExt",
+            "String",
+            "ToString",
+            "Vec",
+        };
+
         public static RustTokenTypes LexerTokenToRustToken(string text, int tok)
         {
             RustTokenTypes ty = _tt[tok];
@@ -152,6 +204,10 @@ namespace VisualRust
                 if (_kws.Contains(text))
                 {
                     ty = RustTokenTypes.KEYWORD;
+                }
+                else if(wellKnownTypes.Contains(text))
+                {
+                    ty = RustTokenTypes.TYPE;
                 }
                 else
                 {

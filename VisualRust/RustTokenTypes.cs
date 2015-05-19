@@ -13,5 +13,6 @@
         STRUCTURAL,
         WHITESPACE,
         KEYWORD,
+        TYPE,
     }
 }

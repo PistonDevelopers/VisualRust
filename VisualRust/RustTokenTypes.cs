@@ -13,6 +13,7 @@
         STRUCTURAL,
         WHITESPACE,
         KEYWORD,
+        PRIMITIVE_TYPE,
         TYPE,
     }
 }

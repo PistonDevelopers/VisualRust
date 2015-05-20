@@ -144,7 +144,7 @@ namespace VisualRust
             "yield"
         };
 
-        private static readonly HashSet<string> wellKnownTypes = new HashSet<string> {
+        private static readonly HashSet<string> primitiveTypes = new HashSet<string> {
             // primitives
             "bool",
             "char",
@@ -160,8 +160,10 @@ namespace VisualRust
             "f64",
             "isize",
             "usize",
-            "str",
-            //prelude
+            "str"
+        };
+
+        private static readonly HashSet<string> wellKnownTypes = new HashSet<string> {
             "Copy",
             "Send",
             "Sized",
@@ -186,7 +188,9 @@ namespace VisualRust
             "IntoIterator",
             "DoubleEndedIterator",
             "ExactSizeIterator",
+            "Option",
             "Some",
+            "Result",
             "None",
             "Ok",
             "Err",
@@ -204,6 +208,10 @@ namespace VisualRust
                 if (_kws.Contains(text))
                 {
                     ty = RustTokenTypes.KEYWORD;
+                }
+                else if(primitiveTypes.Contains(text))
+                {
+                    ty = RustTokenTypes.PRIMITIVE_TYPE;
                 }
                 else if(wellKnownTypes.Contains(text))
                 {

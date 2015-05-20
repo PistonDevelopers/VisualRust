@@ -32,6 +32,7 @@ namespace VisualRust
             _rustTypes[RustTokenTypes.STRUCTURAL] = typeService.FormalLanguage;
             _rustTypes[RustTokenTypes.WHITESPACE] = typeService.WhiteSpace;
             _rustTypes[RustTokenTypes.KEYWORD] = typeService.Keyword;
+            _rustTypes[RustTokenTypes.PRIMITIVE_TYPE] = typeService.Keyword;
             _rustTypes[RustTokenTypes.TYPE] = typeService.SymbolDefinition;
         }
 

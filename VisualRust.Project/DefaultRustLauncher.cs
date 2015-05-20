@@ -39,24 +39,24 @@ namespace VisualRust.Project
 
         public int LaunchFile(string file, bool debug)
         {
-            StartWithoutDebugger(file);
+            if(!File.Exists(file))
+                _project.Build("Build");
+            var processStartInfo = CreateProcessStartInfo(file, debug);
+            Process.Start(processStartInfo);
             return VSConstants.S_OK;
         }
 
-        private void StartWithoutDebugger(string startupFile)
-        {
-            if(!File.Exists(startupFile))
-                _project.Build("Build");
-            var processStartInfo = CreateProcessStartInfoNoDebug(startupFile);
-            Process.Start(processStartInfo);
-        }
-
-        private ProcessStartInfo CreateProcessStartInfoNoDebug(string startupFile)
+        private ProcessStartInfo CreateProcessStartInfo(string startupFile, bool debug)
         {
             var commandLineArgs = string.Empty;
+            if(!debug)
+            {
+                commandLineArgs = String.Format(@"/c """"{0}"" {1} & pause""", startupFile, commandLineArgs);
+                startupFile = Path.Combine(System.Environment.SystemDirectory, "cmd.exe");
+            }
             var startInfo = new ProcessStartInfo(startupFile, commandLineArgs);
-            InjectRustBinPath(startInfo);
             startInfo.UseShellExecute = false;
+            InjectRustBinPath(startInfo);
             return startInfo;
         }
 

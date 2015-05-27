@@ -179,7 +179,7 @@
     <Compile Include="Forms\RustOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Racer\AutoCompleter.cs" />
+    <Compile Include="Racer\RacerSingleton.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -195,6 +195,7 @@
     <Compile Include="RustCompletionSource.cs" />
     <Compile Include="RustDocumentListener.cs" />
     <Compile Include="RustF1HelpCommandHandler.cs" />
+    <Compile Include="RustGoToDefinitionCommandHandler.cs" />
     <Compile Include="RustTokenTypes.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="RustLanguage.cs" />

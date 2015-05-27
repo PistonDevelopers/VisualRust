@@ -233,7 +233,7 @@ namespace VisualRust
                 int lineNumber = point.GetContainingLine().LineNumber;
                 int charNumber = GetColumn(point);
                 string args = string.Format("complete {0} {1} {2}", lineNumber + 1, charNumber, tmpFile.Path);
-                return Racer.AutoCompleter.Run(args);
+                return Racer.RacerSingleton.Run(args);
             }
         }
 

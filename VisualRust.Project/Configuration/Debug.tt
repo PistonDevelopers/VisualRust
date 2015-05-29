@@ -1,0 +1,13 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ include file="ConfigurationTemplate.ttinclude" #>
+<#+
+    bool ConfigurationDependent = true;
+    Field[] Fields = new Field[]
+    {
+        new Field { Name = "StartActionQ", Type = "StartAction?", Key = "DebugStartAction", Normalize = true },
+        new Field { Name = "ExternalProgram", Type = typeof(string), Key= "DebugExternalProgram" },
+        new Field { Name = "CommandLineArgs", Type = typeof(string), Key= "DebugCommandLineArgs" },
+        new Field { Name = "WorkingDir", Type = typeof(string), Key = "DebugWorkingDirectory" },
+    };
+#>

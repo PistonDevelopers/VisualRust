@@ -166,9 +166,19 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Forms\BasePropertyPage.cs" />
-    <Compile Include="Forms\BuildPropertyPage.cs" />
-    <Compile Include="Forms\GeneralPropertyPage.cs" />
+    <Compile Include="ProjectForms\BasePropertyPage.cs" />
+    <Compile Include="ProjectForms\BuildPropertyPage.cs" />
+    <Compile Include="ProjectForms\DebugPropertyPage.cs" />
+    <Compile Include="Forms\DebuggingOptionsPage.cs">
+      <SubType>component</SubType>
+    </Compile>
+    <Compile Include="Forms\DebuggingOptionsPageControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\DebuggingOptionsPageControl.Designer.cs">
+      <DependentUpon>DebuggingOptionsPageControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectForms\GeneralPropertyPage.cs" />
     <Compile Include="Forms\RustOptionsPageControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -205,6 +215,9 @@
     <Compile Include="VSCommandTarget.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\DebuggingOptionsPageControl.resx">
+      <DependentUpon>DebuggingOptionsPageControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\RustOptionsPageControl.resx">
       <DependentUpon>RustOptionsPageControl.cs</DependentUpon>
     </EmbeddedResource>

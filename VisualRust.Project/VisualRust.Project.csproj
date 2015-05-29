@@ -94,6 +94,12 @@
     </Compile>
     <Compile Include="Configuration\Application.Custom.cs" />
     <Compile Include="Configuration\Build.Custom.cs" />
+    <Compile Include="Configuration\Debug.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Debug.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Configuration\Debug.Custom.cs" />
     <Compile Include="Configuration\Utils.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Configuration\Build.cs">
@@ -109,10 +115,17 @@
     <Compile Include="Forms\ApplicationPropertyControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Forms\DebugPropertyControl.cs">
+      <SubType>usercontrol</SubType>
+    </Compile>
+    <Compile Include="Forms\DebugPropertyControl.Designer.cs">
+      <DependentUpon>DebugPropertyControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Utils.cs" />
     <Compile Include="IconIndex.cs" />
     <Compile Include="CollectionDifference.cs" />
     <Compile Include="RustConfigProvider.cs" />
+    <Compile Include="RustProjectConfig.cs" />
     <Compile Include="TrackedFileNode.cs" />
     <Compile Include="FileNodeProperties.cs" />
     <Compile Include="ModuleRemovalResult.cs" />
@@ -162,6 +175,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\DebugPropertyControl.resx">
+      <DependentUpon>DebugPropertyControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -184,6 +200,10 @@
     <Content Include="Configuration\Build.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Build.cs</LastGenOutput>
+    </Content>
+    <Content Include="Configuration\Debug.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Debug.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

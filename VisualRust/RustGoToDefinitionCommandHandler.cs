@@ -9,20 +9,21 @@ using Microsoft.VisualStudio.Text;
 using VisualRust.Racer;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
 namespace VisualRust
 {
     class RustGoToDefinitionCommandHandler : VSCommandTarget<VSConstants.VSStd97CmdID>
     {
-        readonly ITextBuffer Buffer;
-        readonly IServiceProvider ServiceProvider;
+        readonly ITextBuffer _buffer;
+        readonly IServiceProvider _serviceProvider;
 
         public RustGoToDefinitionCommandHandler(IServiceProvider serviceProvider, IVsTextView vsTextView, IWpfTextView textView)
             : base(vsTextView, textView)
         {
-            Buffer = textView.TextBuffer;
-            ServiceProvider = serviceProvider;
+            _buffer = textView.TextBuffer;
+            _serviceProvider = serviceProvider;
         }
 
         protected override IEnumerable<VSConstants.VSStd97CmdID> SupportedCommands
@@ -45,7 +46,6 @@ namespace VisualRust
 
         protected override bool Execute(VSConstants.VSStd97CmdID command, uint options, IntPtr pvaIn, IntPtr pvaOut)
         {
-            var snapshot = Buffer.CurrentSnapshot;
             var snapshotPoint = TextView.Caret.Position.BufferPosition;
             var tokens = Utils.GetTokensAtPosition(snapshotPoint);
 
@@ -58,36 +58,32 @@ namespace VisualRust
                 return false;
             }
 
-            // TODO: Taken from AugmentCompletionSession
-            using (var tmpFile = new TemporaryFile(snapshot.GetText()))
+            var path = _buffer.GetFilePath();
+            var line = snapshotPoint.GetContainingLine();
+            // line.LineNumber uses 0 based indexing
+            var row = line.LineNumber + 1;
+            var column = snapshotPoint.Position - line.Start.Position;
+            var args = $"find-definition {row} {column} {path}";
+            var findOutput = RacerSingleton.Run(args);
+            if (Regex.IsMatch(findOutput, "^MATCH"))
             {
-                var line = snapshotPoint.GetContainingLine();
-                // line.LineNumber uses 0 based indexing
-                int row = line.LineNumber + 1;
-                int column = snapshotPoint.Position - line.Start.Position;
-                var args = String.Format("find-definition {0} {1} {2}", row, column, tmpFile.Path);
-                var findOutput = Racer.RacerSingleton.Run(args);
-                if (Regex.IsMatch(findOutput, "^MATCH"))
+                var results = findOutput.Substring(6).Split(',');
+                // 1 based indexing
+                var targetLine = Convert.ToInt32(results[1]) - 1;
+                var targetColumn = Convert.ToInt32(results[2]);
+                var fname = results[3];
+                if (fname == path)
                 {
-                    var results = findOutput.Substring(6).Split(',');
-                    // 1 based indexing
-                    var targetLine = Convert.ToInt32(results[1]) - 1;
-                    var targetColumn = Convert.ToInt32(results[2]);
-                    var fname = results[3];
-                    if (fname == tmpFile.Path)
-                    {
-                        // Current File
-                        var newLine = Buffer.CurrentSnapshot.Lines.ElementAt(targetLine);
-                        TextView.Caret.MoveTo(newLine.Start.Add(targetColumn));
-                        TextView.ViewScroller.EnsureSpanVisible(TextView.GetTextElementSpan(newLine.Start));
-                    }
-                    else
-                    {
-                        VsUtilities.NavigateTo(ServiceProvider, fname, Guid.Empty, targetLine, targetColumn);
-                    }
-                    return true;
+                    // Current File
+                    var newLine = _buffer.CurrentSnapshot.Lines.ElementAt(targetLine);
+                    TextView.Caret.MoveTo(newLine.Start.Add(targetColumn));
+                    TextView.ViewScroller.EnsureSpanVisible(TextView.GetTextElementSpan(newLine.Start));
                 }
-
+                else
+                {
+                    VsUtilities.NavigateTo(_serviceProvider, fname, Guid.Empty, targetLine, targetColumn);
+                }
+                return true;
             }
             return false;
         }

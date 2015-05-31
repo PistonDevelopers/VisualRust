@@ -33,7 +33,6 @@ namespace VisualRust
             { RustLexer.OROR, RustTokenTypes.OP },
             { RustLexer.NOT, RustTokenTypes.OP },
             { RustLexer.TILDE, RustTokenTypes.OP },
-            { RustLexer.PLUS, RustTokenTypes.OP },
 
             { RustLexer.MINUS, RustTokenTypes.OP },
             { RustLexer.STAR, RustTokenTypes.OP },
@@ -82,8 +81,11 @@ namespace VisualRust
             { RustLexer.WHITESPACE, RustTokenTypes.WHITESPACE },
             { RustLexer.DOC_COMMENT, RustTokenTypes.DOC_COMMENT },
             { RustLexer.COMMENT, RustTokenTypes.COMMENT },
-            { RustLexer.BLOCK_COMMENT, RustTokenTypes.COMMENT },
+            { RustLexer.SHEBANG, RustTokenTypes.COMMENT },
             { RustLexer.DOC_BLOCK_COMMENT, RustTokenTypes.DOC_COMMENT },
+            { RustLexer.BLOCK_COMMENT, RustTokenTypes.COMMENT },
+            { RustLexer.PLUS, RustTokenTypes.OP },
+            { RustLexer.LIT_BYTE, RustTokenTypes.STRING },
             { RustLexer.QUESTION, RustTokenTypes.OP },
             { RustLexer.UTF8_BOM, RustTokenTypes.WHITESPACE }
         };

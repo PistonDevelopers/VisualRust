@@ -122,7 +122,7 @@ namespace VisualRust.Project
                 writer.WriteStartElement("PipeLaunchOptions", "http://schemas.microsoft.com/vstudio/MDDDebuggerOptions/2014");
                 writer.WriteAttributeString("PipePath", gdbPath);
                 writer.WriteAttributeString("PipeArguments", gdbArgs);
-                writer.WriteAttributeString("ExePath", file);
+                writer.WriteAttributeString("ExePath", "\"" + file + "\"");
                 if (!string.IsNullOrEmpty(_debugConfig.CommandLineArgs))
                     writer.WriteAttributeString("ExeArguments", _debugConfig.CommandLineArgs);
                 if (!string.IsNullOrEmpty(_debugConfig.WorkingDir))

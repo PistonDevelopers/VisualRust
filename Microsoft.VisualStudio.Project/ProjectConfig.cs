@@ -498,6 +498,7 @@ namespace Microsoft.VisualStudioTools.Project {
             if (resetCache || currentConfig == null) {
                 // Get properties for current configuration from project file and cache it
                 project.SetConfiguration(ConfigName);
+                project.SetPlatformName(PlatformName);
                 project.BuildProject.ReevaluateIfNecessary();
                 // Create a snapshot of the evaluated project in its current state
                 currentConfig = project.BuildProject.CreateProjectInstance();

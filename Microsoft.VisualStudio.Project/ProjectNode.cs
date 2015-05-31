@@ -2812,6 +2812,19 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
+        // Set the platform property in MSBuild.
+        protected internal virtual void SetPlatformName(string platform) {
+            Utilities.ArgumentNotNull("platform", platform);
+
+            if (!IsProjectOpened)
+                return;
+
+            bool propertiesChanged = this.BuildProject.SetGlobalProperty(ProjectFileConstants.Platform, platform);
+            if (this.currentConfig == null || propertiesChanged) {
+                this.currentConfig = this.BuildProject.CreateProjectInstance();
+            }
+        }
+
         /// <summary>
         /// Loads reference items from the project file into the hierarchy.
         /// </summary>

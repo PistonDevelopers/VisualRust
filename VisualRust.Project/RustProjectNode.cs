@@ -1,4 +1,4 @@
-﻿ using Microsoft.VisualStudio;
+﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -7,8 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
- using Microsoft.VisualStudioTools;
- using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
+using Microsoft.VisualStudioTools;
+using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VisualRust.Shared;
@@ -454,6 +454,11 @@ namespace VisualRust.Project
             return defaultLauncher;
         }
 
+        public override ProjectConfig MakeConfiguration(string activeConfigName)
+        {
+            return new RustProjectConfig(this, activeConfigName);
+        }
+
         internal override string IssueTrackerUrl
         {
             get { return "http://github.com/PistonDevelopers/VisualRust/issues"; }
@@ -462,7 +467,8 @@ namespace VisualRust.Project
         protected override Guid[] GetConfigurationDependentPropertyPages()
         {
             return new[] {
-                new Guid(Constants.BuildPropertyPage)
+                new Guid(Constants.BuildPropertyPage),
+                new Guid(Constants.DebugPropertyPage),
             };
         }
 

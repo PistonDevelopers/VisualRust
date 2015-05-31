@@ -5239,7 +5239,7 @@ If the files in the existing folder have the same names as files in the folder y
             // Other misc properties
             this.buildProject.SetGlobalProperty(GlobalProperty.BuildingInsideVisualStudio.ToString(), "true");
             this.buildProject.SetGlobalProperty(GlobalProperty.Configuration.ToString(), ProjectConfig.Debug);
-            this.buildProject.SetGlobalProperty(GlobalProperty.Platform.ToString(), ProjectConfig.AnyCPU);
+            this.buildProject.SetGlobalProperty(GlobalProperty.Platform.ToString(), "default");
 
             // DevEnvDir property
             object installDirAsObject = null;

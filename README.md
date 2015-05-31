@@ -13,6 +13,30 @@ Unstable, but more recent builds are downloadable from [AppVeyor]
 (https://ci.appveyor.com/project/vosen/visualrust) (choose "Configuration:
 Release" and "Artifacts").
 
+### Debugging
+Starting with Visual Studio 2015, the IDE is capable of using GDB as a debugging backend.  
+Visual Rust now supports this feature!
+
+#### Pre-requisites
+- You will need to intall GDB for Windows (available e.g. as a part of the 
+[MinGW-w64](http://mingw-w64.org/doku.php) distribution).
+- When installing Visual Studio 2015, be sure to put check mark next to 
+'Tools for Visual C++ Mobile Development' component.  This will install the GDB front-end package.
+
+#### Configuration
+If GDB installation directory is on your PATH, no further configuration should be required. 
+Otherwise, open `Tools/Options...` dialog in the IDE, navigate to `Visual Rust/Debugging` and 
+enter the full path to gdb.exe there.
+
+#### Usage
+Most of the usual VS debugger features are supported.  
+You can also issue GDB-specific commands in the VS Command Window: `Debug.GDBExec <command>`. 
+For convenience, `Debug.GDBExec` has been aliased to `gdb`.
+
+#### Known issues
+- The 64-bit GDB fails to start 32-bit executables. This appears to be a GDB problem. 
+Meanwhile, you can use the 32-bt version of GDB for 32-bit debugging.
+
 Contributing
 ============
 

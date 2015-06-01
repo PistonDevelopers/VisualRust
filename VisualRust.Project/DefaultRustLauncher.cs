@@ -122,11 +122,13 @@ namespace VisualRust.Project
                 writer.WriteStartElement("PipeLaunchOptions", "http://schemas.microsoft.com/vstudio/MDDDebuggerOptions/2014");
                 writer.WriteAttributeString("PipePath", gdbPath);
                 writer.WriteAttributeString("PipeArguments", gdbArgs);
-                writer.WriteAttributeString("ExePath", "\"" + file + "\"");
+                writer.WriteAttributeString("ExePath", EscapePath(file));
                 if (!string.IsNullOrEmpty(_debugConfig.CommandLineArgs))
                     writer.WriteAttributeString("ExeArguments", _debugConfig.CommandLineArgs);
                 if (!string.IsNullOrEmpty(_debugConfig.WorkingDir))
-                    writer.WriteAttributeString("WorkingDirectory", _debugConfig.WorkingDir);
+                    writer.WriteAttributeString("WorkingDirectory", EscapePath(_debugConfig.WorkingDir));
+                else
+                    writer.WriteAttributeString("WorkingDirectory", EscapePath(Path.GetDirectoryName(file)));
                 // this affects the number of bytes the engine reads when disassembling commands, 
                 // x64 has the largest maximum command size, so it should be safe to use for x86 as well
                 writer.WriteAttributeString("TargetArchitecture", "x64");
@@ -145,6 +147,11 @@ namespace VisualRust.Project
             // Type "gdb <command>" in the VS Command Window
             var commandWnd = (IVsCommandWindow)_project.GetService(typeof(SVsCommandWindow));
             commandWnd.ExecuteCommand("alias gdb Debug.GDBExec");
+        }
+
+        private string EscapePath(string path)
+        {
+            return String.Format("\"{0}\"", path);
         }
 
         private T GetDebuggingProperty<T>(string key)

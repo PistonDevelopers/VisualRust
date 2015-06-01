@@ -18,7 +18,7 @@ Starting with Visual Studio 2015, the IDE is capable of using GDB as a debugging
 Visual Rust now supports this feature!
 
 #### Pre-requisites
-- You will need to intall GDB for Windows from one of the [MinGW-w64](http://mingw-w64.org) distributions **(original [MinGW](http://www.mingw.org/) won't work)**.
+- You will need to install GDB for Windows from one of the [MinGW-w64](http://mingw-w64.org) distributions **(original [MinGW](http://www.mingw.org/) won't work)**.
 - When installing Visual Studio 2015, be sure to put check mark next to 
 'Tools for Visual C++ Mobile Development' component.  This will install the GDB front-end package.
 

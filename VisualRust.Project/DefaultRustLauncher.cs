@@ -108,13 +108,7 @@ namespace VisualRust.Project
             string gdbArgs =
                 "-q " +	// quiet
                 "-interpreter=mi " + // use machine interface
-                "-iex \\\"set new-console on\\\" " + // launch debuggee in a new console window
-                // GDB engine expects to find a shell on the other end of the pipe, so the first thing it sends over is "gdb --interpreter=mi",
-                // (which GDB complains about, since this isn't a valid command).  
-                // Since we are launching GDB directly, here we create a noop alias for "gdb" to make the error message go away.
-                "-iex \\\"alias gdb=echo\\\" " +
-                // add extra options from Visual Rust/Debugging options page
-                GetDebuggingProperty<string>("ExtraArgs");
+                GetDebuggingProperty<string>("ExtraArgs"); // add extra options from Visual Rust/Debugging options page
 
             var options = new StringBuilder();
             using (var writer = XmlWriter.Create(options, new XmlWriterSettings { OmitXmlDeclaration = true }))
@@ -132,9 +126,17 @@ namespace VisualRust.Project
                 // this affects the number of bytes the engine reads when disassembling commands, 
                 // x64 has the largest maximum command size, so it should be safe to use for x86 as well
                 writer.WriteAttributeString("TargetArchitecture", "x64");
-                // these aren't used for now
+
+                // isn't used for now
                 //writer.WriteAttributeString("AdditionalSOLibSearchPath", ...); // set solib-search-path ...
-                //writer.WriteElementString("Command", ...); // debugger startup command(s)
+
+                // GDB engine expects to find a shell on the other end of the pipe, so the first thing it sends over is "gdb --interpreter=mi",
+                // (which GDB complains about, since this isn't a valid command).  
+                // Since we are launching GDB directly, here we create a noop alias for "gdb" to make the error message go away.
+                writer.WriteElementString("Command", "alias -a gdb=echo");
+                // launch debuggee in a new console window
+                writer.WriteElementString("Command", "set new-console on");
+
                 writer.WriteEndElement();
             }
             targets[0].bstrOptions = options.ToString();

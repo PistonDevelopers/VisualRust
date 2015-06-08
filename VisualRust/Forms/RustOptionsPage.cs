@@ -1,8 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell;
-using VisualRust.Racer;
 
 namespace VisualRust.Options
 {
@@ -16,13 +15,29 @@ namespace VisualRust.Options
         public bool UseCustomSources { get; set; }
         public string CustomSourcesPath { get; set; }
 
+        private RustOptionsPageControl _page;
+
         protected override IWin32Window Window
         {
             get
             {
-                var page = new RustOptionsPageControl(this);
-                return page;
+                _page = new RustOptionsPageControl();
+                _page.LoadSettings(this);
+                return _page;
             }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _page.LoadSettings(this);
+            base.OnClosed(e);
+        }
+
+        protected override void OnApply(PageApplyEventArgs e)
+        {
+            if (e.ApplyBehavior == ApplyKind.Apply)
+                _page.ApplySettings(this);
+            base.OnApply(e);
         }
     }
 }

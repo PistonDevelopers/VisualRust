@@ -91,7 +91,6 @@
             this.bundledRacer.TabStop = true;
             this.bundledRacer.Text = "Use bundled racer.exe";
             this.bundledRacer.UseVisualStyleBackColor = true;
-            this.bundledRacer.CheckedChanged += new System.EventHandler(this.bundledRacer_CheckedChanged);
             // 
             // customRacer
             // 
@@ -116,7 +115,6 @@
             this.customRacerPath.Name = "customRacerPath";
             this.customRacerPath.Size = new System.Drawing.Size(311, 20);
             this.customRacerPath.TabIndex = 1;
-            this.customRacerPath.TextChanged += new System.EventHandler(this.OnCustomRacerPath_TextChanged);
             // 
             // customRacerButton
             // 
@@ -172,10 +170,8 @@
             this.envSource.Size = new System.Drawing.Size(325, 30);
             this.envSource.TabIndex = 3;
             this.envSource.TabStop = true;
-            this.envSource.Text = "Read rust sources from enviroment variable RUST_SRC_PATH\r\n(current value: <empty>" +
-    ")";
+            this.envSource.Text = "Read rust sources from enviroment variable RUST_SRC_PATH\r\n(current value: <empty>)";
             this.envSource.UseVisualStyleBackColor = true;
-            this.envSource.CheckedChanged += new System.EventHandler(this.envSource_CheckedChanged);
             // 
             // customSource
             // 
@@ -200,7 +196,6 @@
             this.customSourcePath.Name = "customSourcePath";
             this.customSourcePath.Size = new System.Drawing.Size(311, 20);
             this.customSourcePath.TabIndex = 1;
-            this.customSourcePath.TextChanged += new System.EventHandler(this.OnCustomSourcePath_TextChanged);
             // 
             // customSourceButton
             // 

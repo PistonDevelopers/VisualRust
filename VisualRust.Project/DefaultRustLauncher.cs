@@ -136,6 +136,12 @@ namespace VisualRust.Project
                 writer.WriteElementString("Command", "alias -a gdb=echo");
                 // launch debuggee in a new console window
                 writer.WriteElementString("Command", "set new-console on");
+                if (!string.IsNullOrEmpty(_debugConfig.DebuggerScript))
+                {
+                    foreach (string cmd in _debugConfig.DebuggerScript.Split('\r', '\n'))
+                        if (!string.IsNullOrEmpty(cmd))
+                            writer.WriteElementString("Command", cmd);
+                }
 
                 writer.WriteEndElement();
             }

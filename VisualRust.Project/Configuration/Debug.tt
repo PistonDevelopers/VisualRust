@@ -9,5 +9,6 @@
         new Field { Name = "ExternalProgram", Type = typeof(string), Key= "DebugExternalProgram" },
         new Field { Name = "CommandLineArgs", Type = typeof(string), Key= "DebugCommandLineArgs" },
         new Field { Name = "WorkingDir", Type = typeof(string), Key = "DebugWorkingDirectory" },
+		new Field { Name = "DebuggerScript", Type = typeof(string), Key = "DebugDebuggerScript" },
     };
 #>

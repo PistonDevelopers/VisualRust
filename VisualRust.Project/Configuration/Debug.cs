@@ -56,6 +56,18 @@ namespace VisualRust.Project.Configuration
                     temp(this, new EventArgs());
             }
         } 
+        private System.String debuggerScript;
+        public System.String DebuggerScript
+        {
+            get { return debuggerScript; }
+            set
+            {
+                debuggerScript = value;
+                var temp = Changed;
+                if(temp != null)
+                    temp(this, new EventArgs());
+            }
+        } 
 
         public bool HasChangedFrom(Debug obj)
         {
@@ -64,6 +76,7 @@ namespace VisualRust.Project.Configuration
             || (!EqualityComparer<System.String>.Default.Equals(ExternalProgram, obj.ExternalProgram))
             || (!EqualityComparer<System.String>.Default.Equals(CommandLineArgs, obj.CommandLineArgs))
             || (!EqualityComparer<System.String>.Default.Equals(WorkingDir, obj.WorkingDir))
+            || (!EqualityComparer<System.String>.Default.Equals(DebuggerScript, obj.DebuggerScript))
             ;
         }
 
@@ -75,6 +88,7 @@ namespace VisualRust.Project.Configuration
                 ExternalProgram = this.ExternalProgram,
                 CommandLineArgs = this.CommandLineArgs,
                 WorkingDir = this.WorkingDir,
+                DebuggerScript = this.DebuggerScript,
             };
         }
 
@@ -90,6 +104,8 @@ namespace VisualRust.Project.Configuration
                     prev.CommandLineArgs = null;
                 if(prev.WorkingDir != null && !EqualityComparer<System.String>.Default.Equals(prev.WorkingDir, cur.WorkingDir))
                     prev.WorkingDir = null;
+                if(prev.DebuggerScript != null && !EqualityComparer<System.String>.Default.Equals(prev.DebuggerScript, cur.DebuggerScript))
+                    prev.DebuggerScript = null;
                 return prev;
             });
         }
@@ -101,6 +117,7 @@ namespace VisualRust.Project.Configuration
             Utils.FromString(cfg.GetConfigurationProperty("DebugExternalProgram", false), out x.externalProgram);
             Utils.FromString(cfg.GetConfigurationProperty("DebugCommandLineArgs", false), out x.commandLineArgs);
             Utils.FromString(cfg.GetConfigurationProperty("DebugWorkingDirectory", false), out x.workingDir);
+            Utils.FromString(cfg.GetConfigurationProperty("DebugDebuggerScript", false), out x.debuggerScript);
             return x;
         }
 
@@ -116,6 +133,8 @@ namespace VisualRust.Project.Configuration
                     cfg.SetConfigurationProperty("DebugCommandLineArgs", CommandLineArgs.ToString());
                 if(WorkingDir != null)
                     cfg.SetConfigurationProperty("DebugWorkingDirectory", WorkingDir.ToString());
+                if(DebuggerScript != null)
+                    cfg.SetConfigurationProperty("DebugDebuggerScript", DebuggerScript.ToString());
             }
         }
     }

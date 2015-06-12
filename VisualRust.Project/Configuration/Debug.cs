@@ -113,11 +113,11 @@ namespace VisualRust.Project.Configuration
         private static Debug LoadFromForConfig(ProjectConfig cfg)
         {
             var x = new Debug();
-            x.StartActionQ = StartActionQFromString(cfg.GetConfigurationProperty("DebugStartAction", false));
-            Utils.FromString(cfg.GetConfigurationProperty("DebugExternalProgram", false), out x.externalProgram);
-            Utils.FromString(cfg.GetConfigurationProperty("DebugCommandLineArgs", false), out x.commandLineArgs);
-            Utils.FromString(cfg.GetConfigurationProperty("DebugWorkingDirectory", false), out x.workingDir);
-            Utils.FromString(cfg.GetConfigurationProperty("DebugDebuggerScript", false), out x.debuggerScript);
+            x.StartActionQ = StartActionQFromString(cfg.GetConfigurationProperty("StartAction", false));
+            Utils.FromString(cfg.GetConfigurationProperty("StartProgram", false), out x.externalProgram);
+            Utils.FromString(cfg.GetConfigurationProperty("StartArguments", false), out x.commandLineArgs);
+            Utils.FromString(cfg.GetConfigurationProperty("StartWorkingDirectory", false), out x.workingDir);
+            Utils.FromString(cfg.GetConfigurationProperty("StartDebuggerScript", false), out x.debuggerScript);
             return x;
         }
 
@@ -126,15 +126,15 @@ namespace VisualRust.Project.Configuration
             foreach(ProjectConfig cfg in configs)
             {
                 if(StartActionQ != null)
-                    cfg.SetConfigurationProperty("DebugStartAction", StartActionQToString(StartActionQ));
+                    cfg.SetConfigurationProperty("StartAction", StartActionQToString(StartActionQ));
                 if(ExternalProgram != null)
-                    cfg.SetConfigurationProperty("DebugExternalProgram", ExternalProgram.ToString());
+                    cfg.SetConfigurationProperty("StartProgram", ExternalProgram.ToString());
                 if(CommandLineArgs != null)
-                    cfg.SetConfigurationProperty("DebugCommandLineArgs", CommandLineArgs.ToString());
+                    cfg.SetConfigurationProperty("StartArguments", CommandLineArgs.ToString());
                 if(WorkingDir != null)
-                    cfg.SetConfigurationProperty("DebugWorkingDirectory", WorkingDir.ToString());
+                    cfg.SetConfigurationProperty("StartWorkingDirectory", WorkingDir.ToString());
                 if(DebuggerScript != null)
-                    cfg.SetConfigurationProperty("DebugDebuggerScript", DebuggerScript.ToString());
+                    cfg.SetConfigurationProperty("StartDebuggerScript", DebuggerScript.ToString());
             }
         }
     }

@@ -30,7 +30,7 @@ namespace VisualRust.Project.Forms
                 if (radioButton1.Checked)
                     config.StartAction = Configuration.StartAction.Project;
                 else
-                    config.StartAction = Configuration.StartAction.ExternalProgram;
+                    config.StartAction = Configuration.StartAction.Program;
                 externalProg.Enabled = !radioButton1.Checked;
                 browseProg.Enabled = !radioButton1.Checked;
             };

@@ -9,7 +9,7 @@ namespace VisualRust.Project.Configuration
     public enum StartAction
     {
         Project,
-        ExternalProgram
+        Program
     }
 
     partial class Debug

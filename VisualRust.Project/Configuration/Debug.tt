@@ -5,10 +5,10 @@
     bool ConfigurationDependent = true;
     Field[] Fields = new Field[]
     {
-        new Field { Name = "StartActionQ", Type = "StartAction?", Key = "DebugStartAction", Normalize = true },
-        new Field { Name = "ExternalProgram", Type = typeof(string), Key= "DebugExternalProgram" },
-        new Field { Name = "CommandLineArgs", Type = typeof(string), Key= "DebugCommandLineArgs" },
-        new Field { Name = "WorkingDir", Type = typeof(string), Key = "DebugWorkingDirectory" },
-		new Field { Name = "DebuggerScript", Type = typeof(string), Key = "DebugDebuggerScript" },
+        new Field { Name = "StartActionQ", Type = "StartAction?", Key = "StartAction", Normalize = true },
+        new Field { Name = "ExternalProgram", Type = typeof(string), Key= "StartProgram" },
+        new Field { Name = "CommandLineArgs", Type = typeof(string), Key= "StartArguments" },
+        new Field { Name = "WorkingDir", Type = typeof(string), Key = "StartWorkingDirectory" },
+		new Field { Name = "DebuggerScript", Type = typeof(string), Key = "StartDebuggerScript" },
     };
 #>

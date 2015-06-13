@@ -118,17 +118,22 @@ namespace VisualRust.Project
                 writer.WriteAttributeString("PipeArguments", gdbArgs);
                 writer.WriteAttributeString("ExePath", EscapePath(file));
                 if (!string.IsNullOrEmpty(_debugConfig.CommandLineArgs))
+                {
                     writer.WriteAttributeString("ExeArguments", _debugConfig.CommandLineArgs);
+                }
                 if (!string.IsNullOrEmpty(_debugConfig.WorkingDir))
+                {
                     writer.WriteAttributeString("WorkingDirectory", EscapePath(_debugConfig.WorkingDir));
+                    // GDB won't search working directory by default, but this is expected on Windows.
+                    writer.WriteAttributeString("AdditionalSOLibSearchPath", _debugConfig.WorkingDir);
+                }
                 else
+                {
                     writer.WriteAttributeString("WorkingDirectory", EscapePath(Path.GetDirectoryName(file)));
+                }
                 // this affects the number of bytes the engine reads when disassembling commands, 
                 // x64 has the largest maximum command size, so it should be safe to use for x86 as well
                 writer.WriteAttributeString("TargetArchitecture", "x64");
-
-                // isn't used for now
-                //writer.WriteAttributeString("AdditionalSOLibSearchPath", ...); // set solib-search-path ...
 
                 // GDB engine expects to find a shell on the other end of the pipe, so the first thing it sends over is "gdb --interpreter=mi",
                 // (which GDB complains about, since this isn't a valid command).  
@@ -136,6 +141,12 @@ namespace VisualRust.Project
                 writer.WriteElementString("Command", "alias -a gdb=echo");
                 // launch debuggee in a new console window
                 writer.WriteElementString("Command", "set new-console on");
+                if (!string.IsNullOrEmpty(_debugConfig.DebuggerScript))
+                {
+                    foreach (string cmd in _debugConfig.DebuggerScript.Split('\r', '\n'))
+                        if (!string.IsNullOrEmpty(cmd))
+                            writer.WriteElementString("Command", cmd);
+                }
 
                 writer.WriteEndElement();
             }

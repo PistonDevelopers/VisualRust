@@ -9,7 +9,7 @@ namespace VisualRust.Project.Configuration
     public enum StartAction
     {
         Project,
-        ExternalProgram
+        Program
     }
 
     partial class Debug
@@ -22,18 +22,13 @@ namespace VisualRust.Project.Configuration
 
         private static StartAction? StartActionQFromString(string p)
         {
-            try {
-                return (StartAction)Enum.Parse(typeof(StartAction), p);
-            } catch (ArgumentException) {
-                return null;
-            }
+            StartAction action;
+            return Enum.TryParse(p, out action) ? action : (StartAction?)null;
         }
 
         private string StartActionQToString(StartAction? action)
         {
-            if (!action.HasValue)
-                return null;
-            return action.Value.ToString();
+            return action.HasValue ? action.Value.ToString() : null;
         }
     }
 }

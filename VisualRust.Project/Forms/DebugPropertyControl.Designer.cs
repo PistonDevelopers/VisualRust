@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.label1 = new System.Windows.Forms.Label();
             this.commandLineArgs = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -39,6 +40,10 @@
             this.browseProg = new System.Windows.Forms.Button();
             this.startActionGrp = new System.Windows.Forms.Panel();
             this.label4 = new System.Windows.Forms.Label();
+            this.debuggerScript = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.gdbReference = new System.Windows.Forms.LinkLabel();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.startActionGrp.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -69,7 +74,7 @@
             this.label2.Location = new System.Drawing.Point(3, 146);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(105, 15);
-            this.label2.TabIndex = 6;
+            this.label2.TabIndex = 3;
             this.label2.Text = "Working directory:";
             // 
             // workDir
@@ -81,7 +86,7 @@
             this.workDir.Location = new System.Drawing.Point(161, 143);
             this.workDir.Name = "workDir";
             this.workDir.Size = new System.Drawing.Size(458, 23);
-            this.workDir.TabIndex = 7;
+            this.workDir.TabIndex = 4;
             // 
             // browseWorkDir
             // 
@@ -90,7 +95,7 @@
             this.browseWorkDir.Margin = new System.Windows.Forms.Padding(3, 2, 3, 4);
             this.browseWorkDir.Name = "browseWorkDir";
             this.browseWorkDir.Size = new System.Drawing.Size(26, 22);
-            this.browseWorkDir.TabIndex = 8;
+            this.browseWorkDir.TabIndex = 5;
             this.browseWorkDir.Text = "...";
             this.browseWorkDir.UseVisualStyleBackColor = true;
             this.browseWorkDir.Click += new System.EventHandler(this.browseWorkDir_Click);
@@ -166,10 +171,48 @@
             this.label4.TabIndex = 0;
             this.label4.Text = "Start action:";
             // 
+            // debuggerScript
+            // 
+            this.debuggerScript.AcceptsReturn = true;
+            this.debuggerScript.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.debuggerScript.Location = new System.Drawing.Point(161, 182);
+            this.debuggerScript.Multiline = true;
+            this.debuggerScript.Name = "debuggerScript";
+            this.debuggerScript.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.debuggerScript.Size = new System.Drawing.Size(458, 120);
+            this.debuggerScript.TabIndex = 7;
+            this.toolTip.SetToolTip(this.debuggerScript, "e.g. \'set env FOO=1\'");
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 185);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(134, 15);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "Debugger startup script:";
+            // 
+            // gdbReference
+            // 
+            this.gdbReference.AutoSize = true;
+            this.gdbReference.Location = new System.Drawing.Point(6, 210);
+            this.gdbReference.Name = "gdbReference";
+            this.gdbReference.Size = new System.Drawing.Size(82, 15);
+            this.gdbReference.TabIndex = 8;
+            this.gdbReference.TabStop = true;
+            this.gdbReference.Text = "GDB reference";
+            this.toolTip.SetToolTip(this.gdbReference, "Hold Ctrl to launch in external browser");
+            this.gdbReference.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.gdbReference_LinkClicked);
+            // 
             // DebugPropertyControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
+            this.Controls.Add(this.gdbReference);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.debuggerScript);
             this.Controls.Add(this.startActionGrp);
             this.Controls.Add(this.browseWorkDir);
             this.Controls.Add(this.workDir);
@@ -178,7 +221,7 @@
             this.Controls.Add(this.label1);
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "DebugPropertyControl";
-            this.Size = new System.Drawing.Size(669, 186);
+            this.Size = new System.Drawing.Size(669, 322);
             this.startActionGrp.ResumeLayout(false);
             this.startActionGrp.PerformLayout();
             this.ResumeLayout(false);
@@ -198,5 +241,9 @@
         private System.Windows.Forms.Button browseProg;
         private System.Windows.Forms.Panel startActionGrp;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox debuggerScript;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.LinkLabel gdbReference;
+        private System.Windows.Forms.ToolTip toolTip;
     }
 }

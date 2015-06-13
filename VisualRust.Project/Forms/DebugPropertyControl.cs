@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 
 namespace VisualRust.Project.Forms
@@ -33,7 +30,7 @@ namespace VisualRust.Project.Forms
                 if (radioButton1.Checked)
                     config.StartAction = Configuration.StartAction.Project;
                 else
-                    config.StartAction = Configuration.StartAction.ExternalProgram;
+                    config.StartAction = Configuration.StartAction.Program;
                 externalProg.Enabled = !radioButton1.Checked;
                 browseProg.Enabled = !radioButton1.Checked;
             };
@@ -49,6 +46,9 @@ namespace VisualRust.Project.Forms
             workDir.Text = config.WorkingDir;
             workDir.TextChanged += (src, arg) => config.WorkingDir = workDir.Text;
 
+            debuggerScript.Text = config.DebuggerScript;
+            debuggerScript.TextChanged += (src, erg) => config.DebuggerScript = debuggerScript.Text;
+
             config.Changed += (src, arg) => isDirty(config.HasChangedFrom(originalConfig));
         }
 
@@ -61,11 +61,15 @@ namespace VisualRust.Project.Forms
         private void browseProg_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog();
-            dialog.Title = "Selectprogram";
+            dialog.Title = "Select program";
             dialog.Filter = "Executable files (*.exe)|*.exe|All files (*.*)|*.*";
-            dialog.FileName = externalProg.Text;
             dialog.DefaultExt = ".exe";
             dialog.CheckFileExists = true;
+            if (!string.IsNullOrEmpty(externalProg.Text))
+            {
+                dialog.InitialDirectory = Path.GetDirectoryName(externalProg.Text);
+                dialog.FileName = Path.GetFileName(externalProg.Text);
+            }
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
@@ -88,6 +92,22 @@ namespace VisualRust.Project.Forms
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
+            }
+        }
+
+        private void gdbReference_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            string url = "https://sourceware.org/gdb/onlinedocs/gdb/Command-and-Variable-Index.html";
+
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control || e.Button == MouseButtons.Middle)
+            {
+                Process.Start(url);
+            }
+            else
+            {
+                var service = (IVsWebBrowsingService)Package.GetGlobalService(typeof(IVsWebBrowsingService));
+                IVsWindowFrame frame;
+                service.Navigate(url, 0, out frame);
             }
         }
     }

@@ -1,28 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
 
 namespace VisualRust.Options
 {
     public partial class DebuggingOptionsPageControl : UserControl
     {
-        private DebuggingOptionsPage optionsPage;
-
-        public DebuggingOptionsPageControl(DebuggingOptionsPage optionsPage)
+        public DebuggingOptionsPageControl()
         {
-            this.optionsPage = optionsPage;
             InitializeComponent();
+        }
 
+        public void LoadSettings(DebuggingOptionsPage optionsPage)
+        {
             debuggerLocation.Text = optionsPage.DebuggerLocation;
-            debuggerLocation.TextChanged += (src, arg) => optionsPage.DebuggerLocation = debuggerLocation.Text;
             extraArgs.Text = optionsPage.ExtraArgs;
-            extraArgs.TextChanged += (src, arg) => optionsPage.ExtraArgs = extraArgs.Text;
+        }
+
+        public void ApplySettings(DebuggingOptionsPage optionsPage)
+        {
+            optionsPage.DebuggerLocation = debuggerLocation.Text;
+            optionsPage.ExtraArgs = extraArgs.Text;
         }
 
         private void browseDebugger_Click(object sender, EventArgs e)
@@ -30,9 +28,13 @@ namespace VisualRust.Options
             var dialog = new OpenFileDialog();
             dialog.Title = "Select debugger location";
             dialog.Filter = "Executable files (*.exe)|*.exe|All files (*.*)|*.*";
-            dialog.FileName = debuggerLocation.Text;
             dialog.DefaultExt = ".exe";
             dialog.CheckFileExists = true;
+            if (!string.IsNullOrEmpty(debuggerLocation.Text))
+            {
+                dialog.InitialDirectory = Path.GetDirectoryName(debuggerLocation.Text);
+                dialog.FileName = Path.GetFileName(debuggerLocation.Text);
+            }
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {

@@ -9,6 +9,6 @@
         new Field { Name = "ExternalProgram", Type = typeof(string), Key= "StartProgram" },
         new Field { Name = "CommandLineArgs", Type = typeof(string), Key= "StartArguments" },
         new Field { Name = "WorkingDir", Type = typeof(string), Key = "StartWorkingDirectory" },
-		new Field { Name = "DebuggerScript", Type = typeof(string), Key = "StartDebuggerScript" },
+        new Field { Name = "DebuggerScript", Type = typeof(string), Key = "StartDebuggerScript" },
     };
 #>

@@ -116,8 +116,8 @@ namespace VisualRust
                         {
                             UpdateMultilineDict(curSpan, lastType, RustLexer.BLOCK_COMMENT);
                         }
-                        else if( lastType == RustLexer.LIT_STR || lastType == RustLexer.LIT_STR_RAW
-                            || lastType == RustLexer.LIT_BINARY || lastType == RustLexer.LIT_BINARY_RAW
+                        else if((lastType == RustLexer.LIT_STR || lastType == RustLexer.LIT_STR_RAW
+                            || lastType == RustLexer.LIT_BINARY || lastType == RustLexer.LIT_BINARY_RAW)
                             && !lastToken.Text.EndsWith("\""))
                         {
                             UpdateMultilineDict(curSpan, lastType, RustLexer.LIT_STR);

@@ -65,7 +65,7 @@ namespace VisualRust
                 // line.LineNumber uses 0 based indexing
                 int row = line.LineNumber + 1;
                 int column = snapshotPoint.Position - line.Start.Position;
-                var args = String.Format("find-definition {0} {1} {2}", row, column, tmpFile.Path);
+                var args = String.Format("find-definition {0} {1} \"{2}\"", row, column, tmpFile.Path);
                 var findOutput = Racer.RacerSingleton.Run(args);
                 if (Regex.IsMatch(findOutput, "^MATCH"))
                 {

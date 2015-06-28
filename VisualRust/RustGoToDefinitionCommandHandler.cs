@@ -57,9 +57,11 @@ namespace VisualRust
             {
                 return false;
             }
+            
+            var dte = (EnvDTE.DTE)ServiceProvider.GetService(typeof(EnvDTE.DTE));
+            string filepath = dte.ActiveDocument.FullName;
 
-            // TODO: Taken from AugmentCompletionSession
-            using (var tmpFile = new TemporaryFile(snapshot.GetText()))
+            using (var tmpFile = new TemporaryFile(snapshot.GetText(), System.IO.Path.GetDirectoryName(filepath)))
             {
                 var line = snapshotPoint.GetContainingLine();
                 // line.LineNumber uses 0 based indexing

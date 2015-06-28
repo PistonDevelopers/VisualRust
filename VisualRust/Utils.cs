@@ -300,19 +300,20 @@ namespace VisualRust
         public string Path { get; private set; }
 
         /// <summary>
-        ///  Creates a new, empty temporary file
+        ///  Creates a new temporary file with the argument string as UTF-8 content.
         /// </summary>
-        public TemporaryFile()
+        public TemporaryFile(string content) : this(content, System.IO.Path.GetTempPath())
         {
-            Path = System.IO.Path.GetTempFileName();            
         }
 
         /// <summary>
-        ///  Creates a new temporary file with the argument string as UTF-8 content.
+        /// Creates a temporary file at path with the argument string as UTF-8 content.
         /// </summary>
-        public TemporaryFile(string content)
-            : this()
+        /// <param name="content"></param>
+        /// <param name="directoryPath"></param>
+        public TemporaryFile(string content, string directoryPath)
         {
+            Path = System.IO.Path.Combine(directoryPath, System.IO.Path.GetRandomFileName());
             using (var sw = new StreamWriter(Path, false, new UTF8Encoding(false)))
             {
                 sw.Write(content);

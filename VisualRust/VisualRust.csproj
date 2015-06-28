@@ -166,6 +166,12 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\DebuggingDisabledControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\DebuggingDisabledControl.Designer.cs">
+      <DependentUpon>DebuggingDisabledControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProjectForms\BasePropertyPage.cs" />
     <Compile Include="ProjectForms\BuildPropertyPage.cs" />
     <Compile Include="ProjectForms\DebugPropertyPage.cs" />
@@ -190,11 +196,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Racer\RacerSingleton.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="RunningDocTableEventsListener.cs" />
     <Compile Include="RustBraceMatcher.cs" />
@@ -213,22 +214,27 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VisualRustSmartIndent.cs" />
     <Compile Include="VSCommandTarget.cs" />
+    <Compile Include="VSPackage.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\DebuggingDisabledControl.resx">
+      <DependentUpon>DebuggingDisabledControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\DebuggingOptionsPageControl.resx">
       <DependentUpon>DebuggingOptionsPageControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\RustOptionsPageControl.resx">
       <DependentUpon>RustOptionsPageControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VSPackage.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -252,7 +258,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\Package.ico" />
+    <Resource Include="Resources\Package.ico" />
     <VSCTCompile Include="VisualRust.vsct" />
   </ItemGroup>
   <ItemGroup>

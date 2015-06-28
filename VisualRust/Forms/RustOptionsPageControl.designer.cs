@@ -99,10 +99,10 @@
             this.customRacer.Location = new System.Drawing.Point(8, 27);
             this.customRacer.Margin = new System.Windows.Forms.Padding(8, 3, 3, 3);
             this.customRacer.Name = "customRacer";
-            this.customRacer.Size = new System.Drawing.Size(174, 17);
+            this.customRacer.Size = new System.Drawing.Size(183, 17);
             this.customRacer.TabIndex = 4;
             this.customRacer.TabStop = true;
-            this.customRacer.Text = "Use racer from custom location:";
+            this.customRacer.Text = "Use racer from a custom location:";
             this.customRacer.UseVisualStyleBackColor = true;
             this.customRacer.CheckedChanged += new System.EventHandler(this.customRacer_CheckedChanged);
             // 
@@ -170,7 +170,8 @@
             this.envSource.Size = new System.Drawing.Size(325, 30);
             this.envSource.TabIndex = 3;
             this.envSource.TabStop = true;
-            this.envSource.Text = "Read rust sources from enviroment variable RUST_SRC_PATH\r\n(current value: <empty>)";
+            this.envSource.Text = "Read rust sources from enviroment variable RUST_SRC_PATH\r\n(current value: <empty>" +
+    ")";
             this.envSource.UseVisualStyleBackColor = true;
             // 
             // customSource
@@ -180,10 +181,10 @@
             this.customSource.Location = new System.Drawing.Point(8, 40);
             this.customSource.Margin = new System.Windows.Forms.Padding(8, 3, 3, 3);
             this.customSource.Name = "customSource";
-            this.customSource.Size = new System.Drawing.Size(211, 17);
+            this.customSource.Size = new System.Drawing.Size(220, 17);
             this.customSource.TabIndex = 4;
             this.customSource.TabStop = true;
-            this.customSource.Text = "Read rust sources from custom location";
+            this.customSource.Text = "Read rust sources from a custom location";
             this.customSource.UseVisualStyleBackColor = true;
             this.customSource.CheckedChanged += new System.EventHandler(this.customSource_CheckedChanged);
             // 

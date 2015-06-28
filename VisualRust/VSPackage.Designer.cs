@@ -22,14 +22,14 @@ namespace VisualRust {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    internal class VSPackage {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal VSPackage() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace VisualRust {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("VisualRust.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("VisualRust.VSPackage", typeof(VSPackage).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,52 @@ namespace VisualRust {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visual Rust.
+        /// </summary>
+        internal static string _110 {
+            get {
+                return ResourceManager.GetString("110", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visual Studio integration for the Rust programming language (http://www.rust-lang.org/).
+        /// </summary>
+        internal static string _112 {
+            get {
+                return ResourceManager.GetString("112", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to General.
+        /// </summary>
+        internal static string _113 {
+            get {
+                return ResourceManager.GetString("113", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Debugging.
+        /// </summary>
+        internal static string _114 {
+            get {
+                return ResourceManager.GetString("114", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon _400 {
+            get {
+                object obj = ResourceManager.GetObject("400", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }

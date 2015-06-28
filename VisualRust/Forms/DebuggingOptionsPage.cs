@@ -2,6 +2,8 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell;
+using VisualRust.Forms;
+using VisualRust.Project;
 
 namespace VisualRust.Options
 {
@@ -9,31 +11,39 @@ namespace VisualRust.Options
     [Guid("93F42A39-0AF6-40EE-AE2C-1C44AB5F8B15")]
     public partial class DebuggingOptionsPage : DialogPage
     {
+        public bool UseCustomGdbPath { get; set; }
         public string DebuggerLocation { get; set; }
         public string ExtraArgs { get; set; }
 
-        private DebuggingOptionsPageControl _page;
+        private IWin32Window page;
 
         protected override IWin32Window Window
         {
             get
             {
-                _page = new DebuggingOptionsPageControl();
-                _page.LoadSettings(this);
-                return _page;
+                if(page != null)
+                    return page;
+                if(Feature.Gdb(this.Site))
+                    page = new DebuggingOptionsPageControl(this);
+                else
+                    page = new DebuggingDisabledControl();
+                return page;
             }
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            _page.LoadSettings(this);
+            var debugControl = page as DebuggingOptionsPageControl;
+            if(debugControl != null)
+                debugControl.LoadSettings(this);
             base.OnClosed(e);
         }
 
         protected override void OnApply(PageApplyEventArgs e)
         {
-            if (e.ApplyBehavior == ApplyKind.Apply)
-                _page.ApplySettings(this);
+            var debugControl = page as DebuggingOptionsPageControl;
+            if (e.ApplyBehavior == ApplyKind.Apply && debugControl != null)
+                debugControl.ApplySettings(this);
             base.OnApply(e);
         }
     }

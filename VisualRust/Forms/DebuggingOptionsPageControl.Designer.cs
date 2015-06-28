@@ -29,112 +29,167 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.label1 = new System.Windows.Forms.Label();
-            this.debuggerLocation = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.racerBox = new System.Windows.Forms.GroupBox();
+            this.gdbBoxPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.defaultGdb = new System.Windows.Forms.RadioButton();
+            this.customGdb = new System.Windows.Forms.RadioButton();
+            this.customGdbPath = new System.Windows.Forms.TextBox();
+            this.customGdbButton = new System.Windows.Forms.Button();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.argsLabel = new System.Windows.Forms.Label();
             this.extraArgs = new System.Windows.Forms.TextBox();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.browseDebugger = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.tableLayoutPanel1.SuspendLayout();
+            this.racerBox.SuspendLayout();
+            this.gdbBoxPanel.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
-            // label1
+            // racerBox
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(8, 4);
-            this.label1.Margin = new System.Windows.Forms.Padding(8, 4, 3, 3);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(87, 15);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "GDB debugger:";
+            this.racerBox.AutoSize = true;
+            this.racerBox.Controls.Add(this.gdbBoxPanel);
+            this.racerBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.racerBox.Location = new System.Drawing.Point(0, 0);
+            this.racerBox.Margin = new System.Windows.Forms.Padding(0);
+            this.racerBox.Name = "racerBox";
+            this.racerBox.Size = new System.Drawing.Size(150, 135);
+            this.racerBox.TabIndex = 8;
+            this.racerBox.TabStop = false;
+            this.racerBox.Text = "GDB location";
             // 
-            // debuggerLocation
+            // gdbBoxPanel
             // 
-            this.debuggerLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.gdbBoxPanel.AutoSize = true;
+            this.gdbBoxPanel.ColumnCount = 2;
+            this.gdbBoxPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.gdbBoxPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.gdbBoxPanel.Controls.Add(this.defaultGdb, 0, 0);
+            this.gdbBoxPanel.Controls.Add(this.customGdb, 0, 1);
+            this.gdbBoxPanel.Controls.Add(this.customGdbPath, 0, 2);
+            this.gdbBoxPanel.Controls.Add(this.customGdbButton, 1, 2);
+            this.gdbBoxPanel.Location = new System.Drawing.Point(3, 19);
+            this.gdbBoxPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.gdbBoxPanel.Name = "gdbBoxPanel";
+            this.gdbBoxPanel.RowCount = 3;
+            this.gdbBoxPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.gdbBoxPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.gdbBoxPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.gdbBoxPanel.Size = new System.Drawing.Size(213, 97);
+            this.gdbBoxPanel.TabIndex = 5;
+            // 
+            // defaultGdb
+            // 
+            this.defaultGdb.AutoSize = true;
+            this.gdbBoxPanel.SetColumnSpan(this.defaultGdb, 2);
+            this.defaultGdb.Location = new System.Drawing.Point(8, 4);
+            this.defaultGdb.Margin = new System.Windows.Forms.Padding(8, 4, 3, 3);
+            this.defaultGdb.Name = "defaultGdb";
+            this.defaultGdb.Size = new System.Drawing.Size(202, 34);
+            this.defaultGdb.TabIndex = 3;
+            this.defaultGdb.TabStop = true;
+            this.defaultGdb.Text = "Automatically detect path to GDB\r\n(current path: <none>)";
+            this.defaultGdb.UseVisualStyleBackColor = true;
+            // 
+            // customGdb
+            // 
+            this.customGdb.AutoSize = true;
+            this.gdbBoxPanel.SetColumnSpan(this.customGdb, 2);
+            this.customGdb.Location = new System.Drawing.Point(8, 44);
+            this.customGdb.Margin = new System.Windows.Forms.Padding(8, 3, 3, 3);
+            this.customGdb.Name = "customGdb";
+            this.customGdb.Size = new System.Drawing.Size(166, 19);
+            this.customGdb.TabIndex = 4;
+            this.customGdb.TabStop = true;
+            this.customGdb.Text = "Use a custom path to GDB:";
+            this.customGdb.UseVisualStyleBackColor = true;
+            // 
+            // customGdbPath
+            // 
+            this.customGdbPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.debuggerLocation.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.debuggerLocation.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
-            this.debuggerLocation.Location = new System.Drawing.Point(141, 3);
-            this.debuggerLocation.Name = "debuggerLocation";
-            this.debuggerLocation.Size = new System.Drawing.Size(372, 23);
-            this.debuggerLocation.TabIndex = 1;
-            this.toolTip.SetToolTip(this.debuggerLocation, "Location of the debugger.");
+            this.customGdbPath.Location = new System.Drawing.Point(27, 69);
+            this.customGdbPath.Margin = new System.Windows.Forms.Padding(27, 3, 3, 4);
+            this.customGdbPath.Name = "customGdbPath";
+            this.customGdbPath.Size = new System.Drawing.Size(151, 23);
+            this.customGdbPath.TabIndex = 1;
             // 
-            // label2
+            // customGdbButton
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 33);
-            this.label2.Margin = new System.Windows.Forms.Padding(8, 4, 3, 3);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(127, 15);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Additional parameters:";
+            this.customGdbButton.Location = new System.Drawing.Point(184, 68);
+            this.customGdbButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 4);
+            this.customGdbButton.Name = "customGdbButton";
+            this.customGdbButton.Size = new System.Drawing.Size(26, 25);
+            this.customGdbButton.TabIndex = 8;
+            this.customGdbButton.Text = "...";
+            this.customGdbButton.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 1;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.Controls.Add(this.argsLabel, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.extraArgs, 0, 1);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 135);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 1;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(150, 100);
+            this.tableLayoutPanel2.TabIndex = 5;
+            // 
+            // argsLabel
+            // 
+            this.argsLabel.AutoSize = true;
+            this.argsLabel.Location = new System.Drawing.Point(0, 4);
+            this.argsLabel.Margin = new System.Windows.Forms.Padding(0, 4, 3, 3);
+            this.argsLabel.Name = "argsLabel";
+            this.argsLabel.Size = new System.Drawing.Size(127, 15);
+            this.argsLabel.TabIndex = 3;
+            this.argsLabel.Text = "Additional parameters:";
             // 
             // extraArgs
             // 
-            this.extraArgs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.extraArgs.Location = new System.Drawing.Point(141, 32);
+            this.extraArgs.Dock = System.Windows.Forms.DockStyle.Top;
+            this.extraArgs.Location = new System.Drawing.Point(3, 25);
             this.extraArgs.Name = "extraArgs";
-            this.extraArgs.Size = new System.Drawing.Size(372, 23);
+            this.extraArgs.Size = new System.Drawing.Size(144, 23);
             this.extraArgs.TabIndex = 4;
             this.toolTip.SetToolTip(this.extraArgs, "Additional parameters for debugger\'s command line.");
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46.56085F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.Controls.Add(this.extraArgs, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.debuggerLocation, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.browseDebugger, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(548, 61);
-            this.tableLayoutPanel1.TabIndex = 0;
-            // 
-            // browseDebugger
-            // 
-            this.browseDebugger.Location = new System.Drawing.Point(519, 2);
-            this.browseDebugger.Margin = new System.Windows.Forms.Padding(3, 2, 3, 4);
-            this.browseDebugger.Name = "browseDebugger";
-            this.browseDebugger.Size = new System.Drawing.Size(26, 22);
-            this.browseDebugger.TabIndex = 2;
-            this.browseDebugger.Text = "...";
-            this.browseDebugger.UseVisualStyleBackColor = true;
-            this.browseDebugger.Click += new System.EventHandler(this.browseDebugger_Click);
             // 
             // DebuggingOptionsPageControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.tableLayoutPanel2);
+            this.Controls.Add(this.racerBox);
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "DebuggingOptionsPageControl";
-            this.Size = new System.Drawing.Size(573, 84);
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
+            this.racerBox.ResumeLayout(false);
+            this.racerBox.PerformLayout();
+            this.gdbBoxPanel.ResumeLayout(false);
+            this.gdbBoxPanel.PerformLayout();
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutPanel2.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox debuggerLocation;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox extraArgs;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Button browseDebugger;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.Label argsLabel;
+        private System.Windows.Forms.GroupBox racerBox;
+        private System.Windows.Forms.TableLayoutPanel gdbBoxPanel;
+        private System.Windows.Forms.RadioButton defaultGdb;
+        private System.Windows.Forms.RadioButton customGdb;
+        private System.Windows.Forms.TextBox customGdbPath;
+        private System.Windows.Forms.Button customGdbButton;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.TextBox extraArgs;
     }
 }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools;
+using VisualRust.Project.Configuration.MsBuild;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
@@ -71,6 +72,7 @@ namespace VisualRust.Project
     {
         private ImageHandler handler;
         private bool containsEntryPoint;
+        public UserProjectConfig UserConfig { get; private set; }
         internal ModuleTracker ModuleTracker { get; private set; }
 
         public RustProjectNode(CommonProjectPackage package)
@@ -150,6 +152,7 @@ namespace VisualRust.Project
 
         protected void ReloadCore()
         {
+            this.UserConfig = new UserProjectConfig(this);
             string outputType = GetProjectProperty(ProjectFileConstants.OutputType, true);
             string entryPoint = GetCrateFileNodePath(outputType);
             containsEntryPoint = GetCrateFileNode(outputType) != null;

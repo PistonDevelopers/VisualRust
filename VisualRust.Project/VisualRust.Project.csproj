@@ -94,12 +94,14 @@
     </Compile>
     <Compile Include="Configuration\Application.Custom.cs" />
     <Compile Include="Configuration\Build.Custom.cs" />
+    <Compile Include="Configuration\MsBuild\Configuration.cs" />
     <Compile Include="Configuration\Debug.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Debug.tt</DependentUpon>
     </Compile>
     <Compile Include="Configuration\Debug.Custom.cs" />
+    <Compile Include="Configuration\MsBuild\UserProjectConfig.cs" />
     <Compile Include="Configuration\Utils.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Configuration\Build.cs">

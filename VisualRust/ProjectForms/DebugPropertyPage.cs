@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using VisualRust.Project.Configuration;
 
 namespace VisualRust.Project.Forms
 {
@@ -26,7 +27,7 @@ namespace VisualRust.Project.Forms
 
         public override void Apply()
         {
-            control.ApplyConfig(Configs);
+            control.ApplyConfig(GetUserConfigs());
             IsDirty = false;
         }
 
@@ -34,7 +35,7 @@ namespace VisualRust.Project.Forms
         {
             Loading = true;
             try {
-                control.LoadSettings(Configs);
+                control.LoadSettings(GetUserConfigs());
             } finally {
                 Loading = false;
             }
@@ -43,6 +44,11 @@ namespace VisualRust.Project.Forms
         public override string Name
         {
             get { return "Debug"; }
+        }
+
+        private MsBuildConfiguration[] GetUserConfigs()
+        {
+            return Configs.Select(c => ((RustProjectConfig)c).UserCfg).ToArray();
         }
     }
 }

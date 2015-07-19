@@ -5,7 +5,7 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace VisualRust.Project.Configuration
 {
-    partial class <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>
+    partial class <#= GetClassName() #>
     {
         public event EventHandler Changed;
 <# foreach(var f in Fields) { #>
@@ -23,7 +23,7 @@ namespace VisualRust.Project.Configuration
         } 
 <# } #>
 
-        public bool HasChangedFrom(<#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> obj)
+        public bool HasChangedFrom(<#= GetClassName() #> obj)
         {
             return false
 <# foreach(var f in Fields) { #>
@@ -32,9 +32,9 @@ namespace VisualRust.Project.Configuration
             ;
         }
 
-        public <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> Clone()
+        public <#= GetClassName() #> Clone()
         {
-            return new <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>
+            return new <#= GetClassName() #>
             {
 <# foreach(var f in Fields) { #>
                 <#= f.NameUpper #> = this.<#= f.NameUpper #>,
@@ -42,8 +42,12 @@ namespace VisualRust.Project.Configuration
             };
         }
 
-<# if(ConfigurationDependent) { /* Aggregate load */ #>
-        public static <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> LoadFrom(ProjectConfig[] configs)
+<# if(IsConfigurationDependent(Scope)) { /* Aggregate load */ 
+    if(Scope == ConfigScope.Configuration) { #>
+        public static <#= GetClassName() #> LoadFrom(ProjectConfig[] configs)
+<#  } else { #>
+        public static <#= GetClassName() #> LoadFrom(MsBuild.Configuration[] configs)
+<#  } #>
         {
             return configs.Select(LoadFromForConfig).Aggregate((prev, cur) =>
             {
@@ -56,10 +60,14 @@ namespace VisualRust.Project.Configuration
         }
 <# } #>
 
-<# if(ConfigurationDependent) { #>
-        private static <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> LoadFromForConfig(ProjectConfig cfg)
+<# if(IsConfigurationDependent(Scope)) { 
+    if(Scope == ConfigScope.Configuration) { #>
+        private static <#= GetClassName() #> LoadFromForConfig(ProjectConfig cfg)
+<#  } else { #>
+        private static <#= GetClassName() #> LoadFromForConfig(MsBuild.Configuration cfg)
+<#  } #>
         {
-            var x = new <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>();
+            var x = new <#= GetClassName() #>();
 <# foreach(var f in Fields) { 
     if(f.Normalize) { #>
             x.<#= f.NameUpper #> = <#= f.NameUpper #>FromString(cfg.GetConfigurationProperty("<#= f.Key #>", false));
@@ -70,9 +78,9 @@ namespace VisualRust.Project.Configuration
             return x;
         }
 <# } else { #>
-        public static <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#> LoadFrom(CommonProjectNode proj)
+        public static <#= GetClassName() #> LoadFrom(CommonProjectNode proj)
         {
-            var x = new <#= System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile)#>();
+            var x = new <#= GetClassName() #>();
 <# foreach(var f in Fields) { 
     if(f.Normalize) { #>
             x.<#= f.NameUpper #> = <#= f.NameUpper #>FromString(proj.GetUnevaluatedProperty("<#= f.Key #>"));
@@ -84,10 +92,14 @@ namespace VisualRust.Project.Configuration
         }
 <# } #>
 
-<# if(ConfigurationDependent) { #>
+<# if(IsConfigurationDependent(Scope)) { 
+    if(Scope == ConfigScope.Configuration) { #>
         public void SaveTo(ProjectConfig[] configs)
+<#  } else { #>
+        public void SaveTo(MsBuild.Configuration[] configs)
+<#  } #>
         {
-            foreach(ProjectConfig cfg in configs)
+            foreach(var cfg in configs)
             {
 <# foreach(Field f in Fields) { #>
                 if(<#= f.NameUpper #> != null)
@@ -114,6 +126,23 @@ namespace VisualRust.Project.Configuration
     }
 }
 <#+
+    string GetClassName()
+    {
+        return System.IO.Path.GetFileNameWithoutExtension(Host.TemplateFile);
+    }
+
+    enum ConfigScope
+    {
+        Project, // configuration independant from the current config and platform
+        Configuration, // configuration depending on the current config and platform
+        User // configuration kept in .rsproj.user file
+    }
+
+    bool IsConfigurationDependent(ConfigScope s)
+    {
+        return s == ConfigScope.Configuration || s == ConfigScope.User;
+    }
+
     class Field
     {
         public string Name { get; set; }

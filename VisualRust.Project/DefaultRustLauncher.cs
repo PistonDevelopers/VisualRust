@@ -22,7 +22,7 @@ namespace VisualRust.Project
             _project = project;
             string currConfig = _project.GetProjectProperty(ProjectFileConstants.Configuration);
             _projectConfig = (RustProjectConfig)_project.ConfigProvider.GetProjectConfiguration(currConfig);
-            _debugConfig = Configuration.Debug.LoadFrom(new ProjectConfig[] { _projectConfig });
+             _debugConfig = Configuration.Debug.LoadFrom(new[] { _projectConfig.UserCfg });
         }
 
         public int LaunchProject(bool debug)

@@ -26,7 +26,7 @@ namespace VisualRust.Project.Configuration
             return Enum.TryParse(p, out action) ? action : (StartAction?)null;
         }
 
-        private string StartActionQToString(StartAction? action)
+        private static string StartActionQToString(StartAction? action)
         {
             return action.HasValue ? action.Value.ToString() : null;
         }

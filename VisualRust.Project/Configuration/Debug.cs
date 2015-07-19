@@ -92,7 +92,7 @@ namespace VisualRust.Project.Configuration
             };
         }
 
-        public static Debug LoadFrom(ProjectConfig[] configs)
+        public static Debug LoadFrom(MsBuildConfiguration[] configs)
         {
             return configs.Select(LoadFromForConfig).Aggregate((prev, cur) =>
             {
@@ -110,7 +110,7 @@ namespace VisualRust.Project.Configuration
             });
         }
 
-        private static Debug LoadFromForConfig(ProjectConfig cfg)
+        private static Debug LoadFromForConfig(MsBuildConfiguration cfg)
         {
             var x = new Debug();
             x.StartActionQ = StartActionQFromString(cfg.GetConfigurationProperty("StartAction", false));
@@ -121,9 +121,9 @@ namespace VisualRust.Project.Configuration
             return x;
         }
 
-        public void SaveTo(ProjectConfig[] configs)
+        public void SaveTo(MsBuildConfiguration[] configs)
         {
-            foreach(ProjectConfig cfg in configs)
+            foreach(var cfg in configs)
             {
                 if(StartActionQ != null)
                     cfg.SetConfigurationProperty("StartAction", StartActionQToString(StartActionQ));

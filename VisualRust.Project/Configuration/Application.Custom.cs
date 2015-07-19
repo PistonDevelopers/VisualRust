@@ -16,7 +16,7 @@ namespace VisualRust.Project.Configuration
             return BuildOutputTypeExtension.Parse(p);
         }
 
-        private string OutputTypeToString(BuildOutputType OutputType)
+        private static string OutputTypeToString(BuildOutputType OutputType)
         {
             return OutputType.ToBuildString();
         }

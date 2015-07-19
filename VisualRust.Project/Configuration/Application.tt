@@ -2,7 +2,7 @@
 <#@ output extension=".cs" #>
 <#@ include file="ConfigurationTemplate.ttinclude" #>
 <#+
-    bool ConfigurationDependent = false;
+    ConfigScope Scope = ConfigScope.Project;
     Field[] Fields = new Field[]
     {
         new Field { Name = "OutputType", Type = "VisualRust.Shared.BuildOutputType", Key = "OutputType", Normalize = true },

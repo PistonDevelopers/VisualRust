@@ -16,7 +16,7 @@ namespace VisualRust.Project.Configuration
             return OptimizationLevelExtension.Parse(p);
         }
 
-        private string OptimizationLevelToString(OptimizationLevel? OptimizationLevel)
+        private static string OptimizationLevelToString(OptimizationLevel? optimizationLevel)
         {
             if(!optimizationLevel.HasValue)
                 return null;
@@ -30,7 +30,7 @@ namespace VisualRust.Project.Configuration
             return p;
         }
 
-        private string PlatformTargetToString(string target)
+        private static string PlatformTargetToString(string target)
         {
             return target;
         }

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Build.Execution;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
+using VisualRust.Project.Configuration.MsBuild;
 
 namespace VisualRust.Project
 {
@@ -13,12 +15,14 @@ namespace VisualRust.Project
         private static bool initialized = false;
         private static bool isGdbSupported = false;
         private static bool isGdbInstalled = false;
+        public Configuration.MsBuildConfiguration UserCfg { get; private set; }
 
         public string DebugType { get; internal set; }
 
-        public RustProjectConfig(CommonProjectNode project, string configuration)
+        public RustProjectConfig(RustProjectNode project, string configuration)
             : base(project, configuration)
         {
+            this.UserCfg = new Configuration.MsBuildConfiguration(project.UserConfig, configuration, "default");
             if (!initialized)
             {
                 // Determine IDE version and whether GDB engine is installed (only in VS2015+)

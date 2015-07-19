@@ -2,7 +2,7 @@
 <#@ output extension=".cs" #>
 <#@ include file="ConfigurationTemplate.ttinclude" #>
 <#+
-    bool ConfigurationDependent = true;
+    ConfigScope Scope = ConfigScope.User;
     Field[] Fields = new Field[]
     {
         new Field { Name = "StartActionQ", Type = "StartAction?", Key = "StartAction", Normalize = true },

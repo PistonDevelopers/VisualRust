@@ -1,19 +1,13 @@
-﻿using Microsoft.VisualStudioTools.Project;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Build.Construction;
+using Microsoft.Build.Execution;
+using VisualRust.Project.Configuration.MsBuild;
 
-namespace VisualRust.Project.Configuration.MsBuild
+namespace VisualRust.Project.Configuration
 {
-    using Microsoft.Build.Evaluation;
-    using Microsoft.Build.Construction;
-    using Microsoft.Build.Execution;
-
     // This is more or less ripped form ProjectConfig
-    class Configuration
+    class MsBuildConfiguration
     {
         private const string configString = "'$(Configuration)|$(Platform)' == '{0}|{1}'";
 
@@ -22,7 +16,7 @@ namespace VisualRust.Project.Configuration.MsBuild
         private readonly string platform;
         private ProjectInstance snapshot;
 
-        public Configuration(UserProjectConfig proj, string config, string platform)
+        public MsBuildConfiguration(UserProjectConfig proj, string config, string platform)
         {
             this.platform = platform;
             this.config = config;

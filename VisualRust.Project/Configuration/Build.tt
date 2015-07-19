@@ -2,7 +2,7 @@
 <#@ output extension=".cs" #>
 <#@ include file="ConfigurationTemplate.ttinclude" #>
 <#+
-    bool ConfigurationDependent = true;
+    ConfigScope Scope = ConfigScope.Configuration;
     Field[] Fields = new Field[]
     {
         new Field { Name = "LTO", Type = "bool?", Key= "LinkTimeOptimization" },

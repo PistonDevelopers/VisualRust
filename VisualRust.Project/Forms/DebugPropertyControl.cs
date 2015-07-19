@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
+using VisualRust.Project.Configuration;
 
 namespace VisualRust.Project.Forms
 {
@@ -21,7 +22,7 @@ namespace VisualRust.Project.Forms
             InitializeComponent();
         }
 
-        public void LoadSettings(ProjectConfig[] configs)
+        public void LoadSettings(MsBuildConfiguration[] configs)
         {
             originalConfig = Configuration.Debug.LoadFrom(configs);
             config = originalConfig.Clone();
@@ -52,7 +53,7 @@ namespace VisualRust.Project.Forms
             config.Changed += (src, arg) => isDirty(config.HasChangedFrom(originalConfig));
         }
 
-        public void ApplyConfig(ProjectConfig[] configs)
+        public void ApplyConfig(MsBuildConfiguration[] configs)
         {
             config.SaveTo(configs);
             originalConfig = config.Clone();

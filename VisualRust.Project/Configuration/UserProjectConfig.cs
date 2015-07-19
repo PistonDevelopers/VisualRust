@@ -17,7 +17,7 @@ namespace VisualRust.Project.Configuration.MsBuild
 </Project>";
 
         private readonly ProjectNode proj;
-        private readonly Project msBuildProj;
+        private Project msBuildProj;
 
         public ProjectRootElement Xml { get { return msBuildProj.Xml; } }
 
@@ -26,14 +26,19 @@ namespace VisualRust.Project.Configuration.MsBuild
             string userConfigPath = node.Url + ".user";
             try
             {
-                this.msBuildProj = new Project(userConfigPath);
+                LoadMsBuildProject(userConfigPath);
             }
             catch (InvalidProjectFileException)
             {
                 File.WriteAllText(userConfigPath, emptyUserConfig);
-                this.msBuildProj = new Project(userConfigPath);
+                LoadMsBuildProject(userConfigPath);
             }
             this.proj = node;
+        }
+
+        private void LoadMsBuildProject(string userConfigPath)
+        {
+            this.msBuildProj = new Project(userConfigPath);
         }
 
         public ProjectInstance CreateProjectInstance(string config, string platform)

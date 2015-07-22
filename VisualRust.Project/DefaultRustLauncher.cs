@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml;
+using Microsoft.MIDebugEngine;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
@@ -60,10 +61,7 @@ namespace VisualRust.Project
         {
             if (debug)
             {
-                if (_projectConfig.DebugType == Constants.BuiltinDebugger)
-                    LaunchInBuiltinDebugger(file);
-                else
-                    LaunchInGdbDebugger(file);
+                LaunchInGdbDebugger(file);
             }
             else
             {
@@ -75,29 +73,12 @@ namespace VisualRust.Project
 
         }
 
-        private void LaunchInBuiltinDebugger(string file)
-        {
-            VsDebugTargetInfo4[] targets = new VsDebugTargetInfo4[1];
-            targets[0].dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
-            targets[0].guidLaunchDebugEngine = Constants.NativeOnlyEngine;
-            targets[0].bstrExe = file;
-            if (!string.IsNullOrEmpty(_debugConfig.CommandLineArgs))
-                targets[0].bstrArg = _debugConfig.CommandLineArgs;
-            if (!string.IsNullOrEmpty(_debugConfig.WorkingDir))
-                targets[0].bstrCurDir = _debugConfig.WorkingDir;
-
-            VsDebugTargetProcessInfo[] results = new VsDebugTargetProcessInfo[targets.Length];
-
-            IVsDebugger4 vsDebugger = (IVsDebugger4)_project.GetService(typeof(SVsShellDebugger));
-            vsDebugger.LaunchDebugTargets4((uint)targets.Length, targets, results);
-        }
-
         private void LaunchInGdbDebugger(string file)
         {
             VsDebugTargetInfo4[] targets = new VsDebugTargetInfo4[1];
             targets[0].dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
             targets[0].bstrExe = file;
-            targets[0].guidLaunchDebugEngine = Constants.GdbEngine;
+            targets[0].guidLaunchDebugEngine = new Guid(EngineConstants.EngineId);
 
             string gdbPath = GetDebuggingProperty<string>("DebuggerLocation");
             if (string.IsNullOrWhiteSpace(gdbPath))

@@ -1,0 +1,4 @@
+mingw32\bin\gdb.exe
+mingw32\bin\gdborig.exe
+mingw32\opt\bin
+mingw32\opt\lib\python2.7

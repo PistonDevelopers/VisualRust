@@ -1,0 +1,27 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target
+    Name="DownloadGdb"
+    DependsOnTargets="_CheckGdbVersion;_DownloadGdbCore">
+  </Target>
+  
+  <Target Name="_CheckGdbVersion">
+    <ReadLinesFromFile File="gdb\$(MingwArch)\version.txt">
+      <Output TaskParameter="Lines" ItemName="_CurrentMingwVersion"/>
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <_SkipMingwDownload Condition="'@(_CurrentMingwVersion)' == '$(MingwVersion)'">true</_SkipMingwDownload>
+      <_SkipMingwDownload Condition="'$(_SkipMingwDownload)' != 'true'">false</_SkipMingwDownload>
+    </PropertyGroup>
+  </Target>
+  
+  <Target Name="_DownloadGdbCore" Condition="!$(_SkipMingwDownload)">
+    <Message Text="Downloading mingw-w64 ($(MingwArch))"/>
+    <Exec Command="..\..\tools\curl.exe -L -O &quot;$(MingwPath)&quot;" WorkingDirectory="obj"/>
+    <Exec Command="..\..\tools\7za.exe -ogdb-$(MingwArch) x -y -ir@..\gdb\files_$(MingwArch).txt $(MingwVersion).7z" WorkingDirectory="obj"/>
+    <ItemGroup>
+        <_SourcePath Include="obj\gdb-$(MingwArch)\$(MingwRootDir)\**\*.*"/>
+    </ItemGroup>
+    <Copy SourceFiles="@(_SourcePath)" DestinationFolder="gdb\$(MingwArch)\%(RecursiveDir)"/>
+    <WriteLinesToFile File="gdb\$(MingwArch)\version.txt" Lines="$(MingwVersion)" Overwrite="true"/>
+  </Target>
+</Project>

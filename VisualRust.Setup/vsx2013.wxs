@@ -29,6 +29,12 @@
       <Component Id="Cmp_VisualRust_Shared_dll_$(var.VsVersion)" Guid="{ACA9C549-92DB-4AF4-96B3-169E9E1AB056}">
         <File Id="File_VisualRust_Shared_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Shared.dll" />
       </Component>
+      <Component Id="Cmp_PistonDevelopers_MICore_dll_$(var.VsVersion)" Guid="{9FEEC6E1-F380-4094-9171-8847A6E76F1A}">
+        <File Id="File_PistonDevelopers_MICore_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)PistonDevelopers.MICore.dll" />
+      </Component>
+      <Component Id="Cmp_PistonDevelopers_MIDebugEngine_dll_dll_$(var.VsVersion)" Guid="{18D0DD19-FD68-4E90-AD1B-F580DEEBF402}">
+        <File Id="File_PistonDevelopers_MIDebugEngine_dll_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)PistonDevelopers.MIDebugEngine.dll" />
+      </Component>
       <!-- Racer files -->
       <ComponentGroupRef Id="CmpGroup_Racer_2013"/>
       <!-- Open .rsproj with vs launcher -->

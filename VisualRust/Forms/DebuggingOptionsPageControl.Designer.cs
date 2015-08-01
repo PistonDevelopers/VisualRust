@@ -84,17 +84,17 @@
             this.defaultGdb.Location = new System.Drawing.Point(8, 4);
             this.defaultGdb.Margin = new System.Windows.Forms.Padding(8, 4, 3, 3);
             this.defaultGdb.Name = "defaultGdb";
-            this.defaultGdb.Size = new System.Drawing.Size(202, 34);
+            this.defaultGdb.Size = new System.Drawing.Size(117, 19);
             this.defaultGdb.TabIndex = 3;
             this.defaultGdb.TabStop = true;
-            this.defaultGdb.Text = "Automatically detect path to GDB\r\n(current path: <none>)";
+            this.defaultGdb.Text = "Use bundled GDB";
             this.defaultGdb.UseVisualStyleBackColor = true;
             // 
             // customGdb
             // 
             this.customGdb.AutoSize = true;
             this.gdbBoxPanel.SetColumnSpan(this.customGdb, 2);
-            this.customGdb.Location = new System.Drawing.Point(8, 44);
+            this.customGdb.Location = new System.Drawing.Point(8, 29);
             this.customGdb.Margin = new System.Windows.Forms.Padding(8, 3, 3, 3);
             this.customGdb.Name = "customGdb";
             this.customGdb.Size = new System.Drawing.Size(166, 19);
@@ -107,7 +107,7 @@
             // 
             this.customGdbPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.customGdbPath.Location = new System.Drawing.Point(27, 69);
+            this.customGdbPath.Location = new System.Drawing.Point(27, 54);
             this.customGdbPath.Margin = new System.Windows.Forms.Padding(27, 3, 3, 4);
             this.customGdbPath.Name = "customGdbPath";
             this.customGdbPath.Size = new System.Drawing.Size(151, 23);
@@ -115,7 +115,7 @@
             // 
             // customGdbButton
             // 
-            this.customGdbButton.Location = new System.Drawing.Point(184, 68);
+            this.customGdbButton.Location = new System.Drawing.Point(184, 53);
             this.customGdbButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 4);
             this.customGdbButton.Name = "customGdbButton";
             this.customGdbButton.Size = new System.Drawing.Size(26, 25);

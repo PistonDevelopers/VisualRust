@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.MIDebugEngine;
 using Microsoft.VisualStudio;
@@ -13,46 +16,53 @@ namespace VisualRust.Project
 {
     sealed class DefaultRustLauncher : IProjectLauncher
     {
-        private readonly RustProjectNode _project;
-        private RustProjectConfig _projectConfig;
-        private readonly Configuration.Debug _debugConfig;
+        private enum BuildArchitecture
+        {
+            Unknown,
+            i686,
+            x86_64,
+        }
+
+        private readonly RustProjectNode project;
+        private readonly Configuration.Debug debugConfig;
+        private readonly RustProjectConfig projectConfig;
 
         public DefaultRustLauncher(RustProjectNode project)
         {
             Utilities.ArgumentNotNull("project", project);
-            _project = project;
-            string currConfig = _project.GetProjectProperty(ProjectFileConstants.Configuration);
-            _projectConfig = (RustProjectConfig)_project.ConfigProvider.GetProjectConfiguration(currConfig);
-             _debugConfig = Configuration.Debug.LoadFrom(new[] { _projectConfig.UserCfg });
+            this.project = project;
+            string currConfig = this.project.GetProjectProperty(ProjectFileConstants.Configuration);
+            projectConfig = (RustProjectConfig)this.project.ConfigProvider.GetProjectConfiguration(currConfig);
+            debugConfig = Configuration.Debug.LoadFrom(new[] { projectConfig.UserCfg });
         }
 
         public int LaunchProject(bool debug)
         {
-            if (_debugConfig.StartAction == Configuration.StartAction.Project &&
-                _project.GetProjectProperty("OutputType") != "exe")
+            if (debugConfig.StartAction == Configuration.StartAction.Project &&
+                project.GetProjectProperty("OutputType") != "exe")
             {
                 throw new InvalidOperationException("A project with an Output Type of Library cannot be started directly.");
             }
 
             string startupFilePath;
-            if (_debugConfig.StartAction == Configuration.StartAction.Project)
+            if (debugConfig.StartAction == Configuration.StartAction.Project)
                 startupFilePath = GetProjectStartupFile();
             else
-                startupFilePath = _debugConfig.ExternalProgram;
+                startupFilePath = debugConfig.ExternalProgram;
 
             return LaunchFile(startupFilePath, debug);
         }
 
         private string GetProjectStartupFile()
         {
-            var startupFilePath = Path.Combine(_project.GetProjectProperty("TargetDir"), _project.GetProjectProperty("TargetFileName"));
+            var startupFilePath = Path.Combine(project.GetProjectProperty("TargetDir"), project.GetProjectProperty("TargetFileName"));
             if (string.IsNullOrEmpty(startupFilePath))
             {
                 throw new ApplicationException("Visual Rust could not resolve path for your executable. Your installation of Visual Rust or .rsproj file might be corrupted.");
             }
 
             if (!File.Exists(startupFilePath))
-                _project.Build("Build");
+                project.Build("Build");
 
             return startupFilePath;
         }
@@ -65,7 +75,7 @@ namespace VisualRust.Project
             }
             else
             {
-                var processStartInfo = CreateProcessStartInfo(file, debug);
+                var processStartInfo = CreateProcessStartInfo(file);
                 Process.Start(processStartInfo);
             }
 
@@ -75,21 +85,29 @@ namespace VisualRust.Project
 
         private void LaunchInGdbDebugger(string file)
         {
-            VsDebugTargetInfo4[] targets = new VsDebugTargetInfo4[1];
+            var targets = new VsDebugTargetInfo4[1];
             targets[0].dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
             targets[0].bstrExe = file;
             targets[0].guidLaunchDebugEngine = new Guid(EngineConstants.EngineId);
-
-            string gdbPath = GetDebuggingProperty<string>("DebuggerLocation");
-            if (string.IsNullOrWhiteSpace(gdbPath))
+            
+            bool useCustomPath = GetDebugProperty<bool>("UseCustomGdbPath");
+            string gdbPath;
+            if (useCustomPath)
             {
-                gdbPath = "gdb.exe";
+                gdbPath = GetDebugProperty<string>("DebuggerLocation");
             }
-
+            else
+            {
+                gdbPath = Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    "gdb",
+                    GuessArchitecture(),
+                    "bin\\gdb");
+            }
             string gdbArgs =
                 "-q " +	// quiet
                 "-interpreter=mi " + // use machine interface
-                GetDebuggingProperty<string>("ExtraArgs"); // add extra options from Visual Rust/Debugging options page
+                GetDebugProperty<string>("ExtraArgs"); // add extra options from Visual Rust/Debugging options page
 
             var options = new StringBuilder();
             using (var writer = XmlWriter.Create(options, new XmlWriterSettings { OmitXmlDeclaration = true }))
@@ -98,15 +116,15 @@ namespace VisualRust.Project
                 writer.WriteAttributeString("PipePath", gdbPath);
                 writer.WriteAttributeString("PipeArguments", gdbArgs);
                 writer.WriteAttributeString("ExePath", EscapePath(file));
-                if (!string.IsNullOrEmpty(_debugConfig.CommandLineArgs))
+                if (!string.IsNullOrEmpty(debugConfig.CommandLineArgs))
                 {
-                    writer.WriteAttributeString("ExeArguments", _debugConfig.CommandLineArgs);
+                    writer.WriteAttributeString("ExeArguments", debugConfig.CommandLineArgs);
                 }
-                if (!string.IsNullOrEmpty(_debugConfig.WorkingDir))
+                if (!string.IsNullOrEmpty(debugConfig.WorkingDir))
                 {
-                    writer.WriteAttributeString("WorkingDirectory", EscapePath(_debugConfig.WorkingDir));
+                    writer.WriteAttributeString("WorkingDirectory", EscapePath(debugConfig.WorkingDir));
                     // GDB won't search working directory by default, but this is expected on Windows.
-                    writer.WriteAttributeString("AdditionalSOLibSearchPath", _debugConfig.WorkingDir);
+                    writer.WriteAttributeString("AdditionalSOLibSearchPath", debugConfig.WorkingDir);
                 }
                 else
                 {
@@ -122,9 +140,9 @@ namespace VisualRust.Project
                 writer.WriteElementString("Command", "alias -a gdb=echo");
                 // launch debuggee in a new console window
                 writer.WriteElementString("Command", "set new-console on");
-                if (!string.IsNullOrEmpty(_debugConfig.DebuggerScript))
+                if (!string.IsNullOrEmpty(debugConfig.DebuggerScript))
                 {
-                    foreach (string cmd in _debugConfig.DebuggerScript.Split('\r', '\n'))
+                    foreach (string cmd in debugConfig.DebuggerScript.Split('\r', '\n'))
                         if (!string.IsNullOrEmpty(cmd))
                             writer.WriteElementString("Command", cmd);
                 }
@@ -135,35 +153,95 @@ namespace VisualRust.Project
 
             VsDebugTargetProcessInfo[] results = new VsDebugTargetProcessInfo[targets.Length];
 
-            IVsDebugger4 vsDebugger = (IVsDebugger4)_project.GetService(typeof(SVsShellDebugger));
+            IVsDebugger4 vsDebugger = (IVsDebugger4)project.GetService(typeof(SVsShellDebugger));
             vsDebugger.LaunchDebugTargets4((uint)targets.Length, targets, results);
 
             // Type "gdb <command>" in the VS Command Window
-            var commandWnd = (IVsCommandWindow)_project.GetService(typeof(SVsCommandWindow));
+            var commandWnd = (IVsCommandWindow)project.GetService(typeof(SVsCommandWindow));
             commandWnd.ExecuteCommand("alias gdb Debug.GDBExec");
         }
 
-        private string EscapePath(string path)
+        private string GuessArchitecture()
+        {
+            BuildArchitecture configArch = GetArchFromConfiguration();
+            if (configArch != BuildArchitecture.Unknown)
+                return ArchitectureToString(configArch);
+            BuildArchitecture rustcArch = GetArchFromRustc();
+            if (rustcArch != BuildArchitecture.Unknown)
+                return ArchitectureToString(rustcArch);
+            if (Environment.Is64BitOperatingSystem)
+                return "x86_64";
+            return "i686";
+        }
+
+        private BuildArchitecture GetArchFromConfiguration()
+        {
+            string configuredTarget = Configuration.Build.LoadFrom(new ProjectConfig[] {this.projectConfig}).PlatformTarget;
+            return ArchitectureFromTargetTriple(configuredTarget);
+        }
+
+        private static BuildArchitecture ArchitectureFromTargetTriple(string configuredTarget)
+        {
+            int platformNameLength = configuredTarget.IndexOf('-');
+            if (platformNameLength == -1)
+                return BuildArchitecture.Unknown;
+            return ParseArchitecture(configuredTarget.Substring(0, platformNameLength));
+        }
+
+        private BuildArchitecture GetArchFromRustc()
+        {
+            string defaultInstallPath = Shared.Environment.FindInstallPath("default");
+            if(defaultInstallPath == null)
+                return BuildArchitecture.Unknown;
+            string rustcPath = Path.Combine(defaultInstallPath, "rustc.exe");
+            string rustcHost = GetRustcHost(rustcPath);
+            return ArchitectureFromTargetTriple(rustcHost);
+        }
+
+        private static string ArchitectureToString(BuildArchitecture b)
+        {
+            switch (b)
+            {
+                case  BuildArchitecture.i686:
+                    return "i686";
+                case BuildArchitecture.x86_64:
+                    return "x86_64";
+                default:
+                    throw new ArgumentException(null, "b");
+            }
+        }
+
+        private static BuildArchitecture ParseArchitecture(string name)
+        {
+            switch (name)
+            {
+                case "i686":
+                    return BuildArchitecture.i686;
+                case "x86_64":
+                    return BuildArchitecture.x86_64;
+                default:
+                    return BuildArchitecture.Unknown;
+            }
+        }
+
+        private static string EscapePath(string path)
         {
             return String.Format("\"{0}\"", path);
         }
 
-        private T GetDebuggingProperty<T>(string key)
+        private T GetDebugProperty<T>(string key)
         {
-            var env = (EnvDTE.DTE)_project.GetService(typeof(EnvDTE.DTE));
-            return (T)env.get_Properties("Visual Rust", "Debugging").Item(key).Value;
+            var env = (EnvDTE.DTE)project.GetService(typeof(EnvDTE.DTE));
+            return (T)env.Properties["Visual Rust", "Debugging"].Item(key).Value;
         }
 
-        private ProcessStartInfo CreateProcessStartInfo(string startupFile, bool debug)
+        private ProcessStartInfo CreateProcessStartInfo(string startupFile)
         {
-            var commandLineArgs = _debugConfig.CommandLineArgs;
-            if(!debug)
-            {
-                commandLineArgs = String.Format(@"/c """"{0}"" {1} & pause""", startupFile, commandLineArgs);
-                startupFile = Path.Combine(System.Environment.SystemDirectory, "cmd.exe");
-            }
+            var commandLineArgs = debugConfig.CommandLineArgs;
+            commandLineArgs = String.Format(@"/c """"{0}"" {1} & pause""", startupFile, commandLineArgs);
+            startupFile = Path.Combine(System.Environment.SystemDirectory, "cmd.exe");
             var startInfo = new ProcessStartInfo(startupFile, commandLineArgs);
-            startInfo.WorkingDirectory = _debugConfig.WorkingDir;
+            startInfo.WorkingDirectory = debugConfig.WorkingDir;
             startInfo.UseShellExecute = false;
             InjectRustBinPath(startInfo);
             return startInfo;
@@ -171,13 +249,13 @@ namespace VisualRust.Project
 
         private void InjectRustBinPath(ProcessStartInfo startInfo)
         {
-            EnvDTE.Project proj = _project.GetAutomationObject() as EnvDTE.Project;
+            EnvDTE.Project proj = project.GetAutomationObject() as EnvDTE.Project;
             if(proj == null)
                 return;
             string currentConfigName = Utilities.GetActiveConfigurationName(proj);
             if(currentConfigName == null)
                 return;
-            ProjectConfig  currentConfig = _project.ConfigProvider.GetProjectConfiguration(currentConfigName);
+            ProjectConfig  currentConfig = project.ConfigProvider.GetProjectConfiguration(currentConfigName);
             if(currentConfig == null)
                 return;
             string currentTarget = currentConfig.GetConfigurationProperty("PlatformTarget", true);
@@ -189,6 +267,24 @@ namespace VisualRust.Project
             string envPath = Environment.GetEnvironmentVariable("PATH");
             string newEnvPath = String.Format("{0};{1}", envPath, installPath);
             startInfo.EnvironmentVariables["PATH"] = newEnvPath;
+        }
+
+        public static string GetRustcHost(string exePath)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                FileName = exePath,
+                RedirectStandardOutput = true,
+                Arguments = "-Vv"
+            };
+            Process proc = Process.Start(psi);
+            string verboseVersion = proc.StandardOutput.ReadToEnd();
+            Match hostMatch = Regex.Match(verboseVersion, "^host: (.+)$", RegexOptions.Multiline);
+            if (hostMatch.Groups.Count == 1)
+                return null;
+            return hostMatch.Groups[1].Value;
         }
     }
 }

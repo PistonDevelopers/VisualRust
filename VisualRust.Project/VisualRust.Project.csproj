@@ -113,7 +113,6 @@
     </Compile>
     <Compile Include="DefaultRustLauncher.cs" />
     <Compile Include="EnvironmentPath.cs" />
-    <Compile Include="Feature.cs" />
     <Compile Include="FolderNode.cs" />
     <Compile Include="Forms\BuildPropertyControl.cs">
       <SubType>UserControl</SubType>

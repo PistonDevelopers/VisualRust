@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <DirectoryRef Id="Dir_vsx_2015">
+      <Directory Id="Dir_gdb__i686.2015.i686" Name="i686">
+        <Directory Id="Dir_gdb_i686_bin.2015.i686" Name="bin">
+          <Component Id="gdb.exe.2015.i686" Guid="{62453354-9953-4f0d-896d-3556b847fb1e}">
+            <File Id="gdb.exe.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\bin\gdb.exe" />
+          </Component>
+          <Component Id="gdborig.exe.2015.i686" Guid="{1ad57c5b-64c1-4ec4-838a-1f88a3c5f247}">
+            <File Id="gdborig.exe.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\bin\gdborig.exe" />
+          </Component>
+        </Directory>
+        <Directory Id="Dir_gdb_i686_opt.2015.i686" Name="opt">
+          <Directory Id="Dir_gdb_i686_opt_bin.2015.i686" Name="bin">
+            <Component Id="libgcc_s_dw2_1.dll.2015.i686" Guid="{6f2ffaf3-2449-469b-9343-001bfc1fe8a3}">
+              <File Id="libgcc_s_dw2_1.dll.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\bin\libgcc_s_dw2-1.dll" />
+            </Component>
+            <Component Id="libpython2.7.dll.2015.i686" Guid="{3efb62d8-8c2d-4f45-921f-447c398831b9}">
+              <File Id="libpython2.7.dll.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\bin\libpython2.7.dll" />
+            </Component>
+            <Component Id="libwinpthread_1.dll.2015.i686" Guid="{8b43a9dd-baf9-4244-8975-173ba70cd375}">
+              <File Id="libwinpthread_1.dll.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\bin\libwinpthread-1.dll" />
+            </Component>
+          </Directory>
+          <Directory Id="Dir_gdb_i686_opt_lib.2015.i686" Name="lib">
+            <Directory Id="Dir_gdb_i686_opt_lib_python2.7.2015.i686" Name="python2.7">
+              <Component Id="abc.py.2015.i686" Guid="{98608156-b203-4717-9a85-2278b703db46}">
+                <File Id="abc.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\abc.py" />
+              </Component>
+              <Component Id="codecs.py.2015.i686" Guid="{21cfc258-0037-43de-b617-30f626f96a34}">
+                <File Id="codecs.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\codecs.py" />
+              </Component>
+              <Component Id="copy_reg.py.2015.i686" Guid="{257027de-2085-45c3-99c9-24a4bd1e8d94}">
+                <File Id="copy_reg.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\copy_reg.py" />
+              </Component>
+              <Component Id="functools.py.2015.i686" Guid="{98d604b5-5175-4a97-a755-fdbd879806da}">
+                <File Id="functools.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\functools.py" />
+              </Component>
+              <Component Id="genericpath.py.2015.i686" Guid="{40c4ea65-3f9c-4739-97cc-6fbddacd1dee}">
+                <File Id="genericpath.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\genericpath.py" />
+              </Component>
+              <Component Id="linecache.py.2015.i686" Guid="{830eebd6-b7fb-43fd-a551-9aac777ebed7}">
+                <File Id="linecache.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\linecache.py" />
+              </Component>
+              <Component Id="locale.py.2015.i686" Guid="{ecaf17e5-121a-4746-b144-b2c8f8792581}">
+                <File Id="locale.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\locale.py" />
+              </Component>
+              <Component Id="ntpath.py.2015.i686" Guid="{dc770e57-c299-404d-9bf4-6e620aabf0b3}">
+                <File Id="ntpath.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\ntpath.py" />
+              </Component>
+              <Component Id="os.py.2015.i686" Guid="{26429415-4586-4038-b95b-4543f0e70978}">
+                <File Id="os.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\os.py" />
+              </Component>
+              <Component Id="re.py.2015.i686" Guid="{c8965997-97bb-47ed-a371-f58227d1fd0b}">
+                <File Id="re.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\re.py" />
+              </Component>
+              <Component Id="site.py.2015.i686" Guid="{302639d0-2a86-4cb3-8539-24299db1957d}">
+                <File Id="site.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\site.py" />
+              </Component>
+              <Component Id="sre_compile.py.2015.i686" Guid="{c63fb4f6-e695-41b6-9346-fe2c00dc096a}">
+                <File Id="sre_compile.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\sre_compile.py" />
+              </Component>
+              <Component Id="sre_constants.py.2015.i686" Guid="{7ebadd8f-c64e-4b2d-8aea-f620e363eeb7}">
+                <File Id="sre_constants.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\sre_constants.py" />
+              </Component>
+              <Component Id="sre_parse.py.2015.i686" Guid="{df890a7d-86c7-4436-86de-eba19a1fbef7}">
+                <File Id="sre_parse.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\sre_parse.py" />
+              </Component>
+              <Component Id="stat.py.2015.i686" Guid="{796b524c-9550-4b5c-952b-042a7edc2a34}">
+                <File Id="stat.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\stat.py" />
+              </Component>
+              <Component Id="sysconfig.py.2015.i686" Guid="{6c1965f6-c737-4fba-a500-9628d106d360}">
+                <File Id="sysconfig.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\sysconfig.py" />
+              </Component>
+              <Component Id="traceback.py.2015.i686" Guid="{86454d5d-789f-4ee6-b78f-866541de3750}">
+                <File Id="traceback.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\traceback.py" />
+              </Component>
+              <Component Id="types.py.2015.i686" Guid="{9ca69c4b-91a9-4922-9962-7f750676f93a}">
+                <File Id="types.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\types.py" />
+              </Component>
+              <Component Id="UserDict.py.2015.i686" Guid="{90c41c17-dbb9-477a-b17c-021cc8a0857c}">
+                <File Id="UserDict.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\UserDict.py" />
+              </Component>
+              <Component Id="warnings.py.2015.i686" Guid="{f35a29a4-0bbf-400e-b4fe-ea53f04fd8f8}">
+                <File Id="warnings.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\warnings.py" />
+              </Component>
+              <Component Id="_abcoll.py.2015.i686" Guid="{bfedb9f0-2ea0-485d-a77e-8484a61abedf}">
+                <File Id="_abcoll.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\_abcoll.py" />
+              </Component>
+              <Component Id="_sysconfigdata.py.2015.i686" Guid="{5788be03-58c7-4587-b5d7-e1fdc9cdd798}">
+                <File Id="_sysconfigdata.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\_sysconfigdata.py" />
+              </Component>
+              <Component Id="_weakrefset.py.2015.i686" Guid="{19cc08e8-98e1-4549-908c-f72e6c3279ad}">
+                <File Id="_weakrefset.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\_weakrefset.py" />
+              </Component>
+              <Directory Id="Dir_gdb_i686_opt_lib_python2.7_encodings.2015.i686" Name="encodings">
+                <Component Id="aliases.py.2015.i686" Guid="{16d8989b-0828-4de1-9b40-777c8337cda0}">
+                  <File Id="aliases.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\aliases.py" />
+                </Component>
+                <Component Id="ascii.py.2015.i686" Guid="{4e4725b7-2c3b-4f14-b2c6-fbb9b7a74071}">
+                  <File Id="ascii.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\ascii.py" />
+                </Component>
+                <Component Id="base64_codec.py.2015.i686" Guid="{d1179ac1-b810-4db2-8529-110a5ba5fedb}">
+                  <File Id="base64_codec.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\base64_codec.py" />
+                </Component>
+                <Component Id="big5.py.2015.i686" Guid="{c8a5d1b1-04eb-4e5d-b855-ebe51f0e95da}">
+                  <File Id="big5.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\big5.py" />
+                </Component>
+                <Component Id="big5hkscs.py.2015.i686" Guid="{de708691-2b43-4125-9ce0-1b7336933578}">
+                  <File Id="big5hkscs.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\big5hkscs.py" />
+                </Component>
+                <Component Id="bz2_codec.py.2015.i686" Guid="{6727062a-49e2-4f94-b12d-f39f8da864a7}">
+                  <File Id="bz2_codec.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\bz2_codec.py" />
+                </Component>
+                <Component Id="charmap.py.2015.i686" Guid="{44e0782c-d451-41dd-9aa9-602014be5452}">
+                  <File Id="charmap.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\charmap.py" />
+                </Component>
+                <Component Id="cp037.py.2015.i686" Guid="{ba870547-5403-47d7-b6b4-0ea2ab646874}">
+                  <File Id="cp037.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp037.py" />
+                </Component>
+                <Component Id="cp1006.py.2015.i686" Guid="{ec8ebfde-87c3-4012-8f44-230293189c2b}">
+                  <File Id="cp1006.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1006.py" />
+                </Component>
+                <Component Id="cp1026.py.2015.i686" Guid="{f0d62db0-c5be-4fc1-a1ed-7c98f828b64a}">
+                  <File Id="cp1026.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1026.py" />
+                </Component>
+                <Component Id="cp1140.py.2015.i686" Guid="{c4271f45-1915-46b1-a20e-1c45e09baa46}">
+                  <File Id="cp1140.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1140.py" />
+                </Component>
+                <Component Id="cp1250.py.2015.i686" Guid="{f540ce41-3f10-46e5-8413-e895067c341a}">
+                  <File Id="cp1250.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1250.py" />
+                </Component>
+                <Component Id="cp1251.py.2015.i686" Guid="{4d25347e-d6cd-47d7-91f5-3c1f631de68c}">
+                  <File Id="cp1251.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1251.py" />
+                </Component>
+                <Component Id="cp1252.py.2015.i686" Guid="{e3dd887b-134b-430f-9018-1d7effbf3d20}">
+                  <File Id="cp1252.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1252.py" />
+                </Component>
+                <Component Id="cp1253.py.2015.i686" Guid="{7eb274f4-dfc9-4d28-8087-055567ab0774}">
+                  <File Id="cp1253.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1253.py" />
+                </Component>
+                <Component Id="cp1254.py.2015.i686" Guid="{c56d0c98-a8b1-49f5-8cb4-0efa7a3d821c}">
+                  <File Id="cp1254.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1254.py" />
+                </Component>
+                <Component Id="cp1255.py.2015.i686" Guid="{73fdfd93-16de-4eec-9eb6-83b74b3d4ad1}">
+                  <File Id="cp1255.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1255.py" />
+                </Component>
+                <Component Id="cp1256.py.2015.i686" Guid="{dc3b4af9-5e54-4bf9-a7e7-379184bd98e5}">
+                  <File Id="cp1256.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1256.py" />
+                </Component>
+                <Component Id="cp1257.py.2015.i686" Guid="{2937f357-3b81-4086-9f5f-1b6b1bed3e1b}">
+                  <File Id="cp1257.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1257.py" />
+                </Component>
+                <Component Id="cp1258.py.2015.i686" Guid="{7a2ee494-0ddb-48c7-94a3-b4b0da08cfa0}">
+                  <File Id="cp1258.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp1258.py" />
+                </Component>
+                <Component Id="cp424.py.2015.i686" Guid="{7aea96d0-c577-4cde-b82a-463a0c37e2a5}">
+                  <File Id="cp424.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp424.py" />
+                </Component>
+                <Component Id="cp437.py.2015.i686" Guid="{9953536c-5bfb-4f82-9993-07f94c26c1d5}">
+                  <File Id="cp437.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp437.py" />
+                </Component>
+                <Component Id="cp500.py.2015.i686" Guid="{43831c0e-6379-4141-bca3-4a0f49342445}">
+                  <File Id="cp500.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp500.py" />
+                </Component>
+                <Component Id="cp720.py.2015.i686" Guid="{05a09e1e-2342-43f6-9746-14db4f466e54}">
+                  <File Id="cp720.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp720.py" />
+                </Component>
+                <Component Id="cp737.py.2015.i686" Guid="{9050e9a9-e4d2-405e-a933-b6484b0cf84e}">
+                  <File Id="cp737.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp737.py" />
+                </Component>
+                <Component Id="cp775.py.2015.i686" Guid="{9d0a22d8-da78-4641-938a-0359e9c2991b}">
+                  <File Id="cp775.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp775.py" />
+                </Component>
+                <Component Id="cp850.py.2015.i686" Guid="{7493fbe1-f696-4778-b991-48a3ddd7b449}">
+                  <File Id="cp850.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp850.py" />
+                </Component>
+                <Component Id="cp852.py.2015.i686" Guid="{75a00c7e-43d7-4e8f-b7bd-07a966f1e829}">
+                  <File Id="cp852.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp852.py" />
+                </Component>
+                <Component Id="cp855.py.2015.i686" Guid="{a4da0af1-b7e5-474e-be2a-75a0d36204dc}">
+                  <File Id="cp855.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp855.py" />
+                </Component>
+                <Component Id="cp856.py.2015.i686" Guid="{87149bba-b334-4502-897e-5d5e8e679cf1}">
+                  <File Id="cp856.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp856.py" />
+                </Component>
+                <Component Id="cp857.py.2015.i686" Guid="{44e451f2-4f01-4c09-9a36-8eba982ad26e}">
+                  <File Id="cp857.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp857.py" />
+                </Component>
+                <Component Id="cp858.py.2015.i686" Guid="{c8189f76-ecaf-4237-8925-d7e6f238bec8}">
+                  <File Id="cp858.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp858.py" />
+                </Component>
+                <Component Id="cp860.py.2015.i686" Guid="{e5e9b631-21c5-4749-a85a-e96a4114c50e}">
+                  <File Id="cp860.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp860.py" />
+                </Component>
+                <Component Id="cp861.py.2015.i686" Guid="{719435cb-1a4b-4e3c-b70b-514c318d3892}">
+                  <File Id="cp861.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp861.py" />
+                </Component>
+                <Component Id="cp862.py.2015.i686" Guid="{5b0de80e-ff8b-4a96-a739-adf2a97526ad}">
+                  <File Id="cp862.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp862.py" />
+                </Component>
+                <Component Id="cp863.py.2015.i686" Guid="{1535da03-a8b6-486c-a17b-85de3dd3ff8c}">
+                  <File Id="cp863.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp863.py" />
+                </Component>
+                <Component Id="cp864.py.2015.i686" Guid="{19fcc99a-7a1c-4063-b095-704095b9843e}">
+                  <File Id="cp864.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp864.py" />
+                </Component>
+                <Component Id="cp865.py.2015.i686" Guid="{41c13704-e0e0-4227-9a13-cb8cd6cfb5f7}">
+                  <File Id="cp865.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp865.py" />
+                </Component>
+                <Component Id="cp866.py.2015.i686" Guid="{bd3e1223-c84c-411c-affd-d880d8301e66}">
+                  <File Id="cp866.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp866.py" />
+                </Component>
+                <Component Id="cp869.py.2015.i686" Guid="{b81f55c2-23fc-4e48-8c1c-746a16ec3566}">
+                  <File Id="cp869.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp869.py" />
+                </Component>
+                <Component Id="cp874.py.2015.i686" Guid="{41b40e2d-cefe-4e4c-af01-561ef05321bd}">
+                  <File Id="cp874.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp874.py" />
+                </Component>
+                <Component Id="cp875.py.2015.i686" Guid="{4b004478-3e37-44e4-9cd5-3a2a7bff985e}">
+                  <File Id="cp875.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp875.py" />
+                </Component>
+                <Component Id="cp932.py.2015.i686" Guid="{f94e52e3-366c-47a4-a027-27eeb4ff24fe}">
+                  <File Id="cp932.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp932.py" />
+                </Component>
+                <Component Id="cp949.py.2015.i686" Guid="{9ad5d50c-ea62-4075-9923-c8d2d58ebe8e}">
+                  <File Id="cp949.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp949.py" />
+                </Component>
+                <Component Id="cp950.py.2015.i686" Guid="{c4774d1e-b2cf-4070-b37a-d785cebe70e9}">
+                  <File Id="cp950.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\cp950.py" />
+                </Component>
+                <Component Id="euc_jisx0213.py.2015.i686" Guid="{7a241ead-f393-4931-ab53-0e37341c331c}">
+                  <File Id="euc_jisx0213.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\euc_jisx0213.py" />
+                </Component>
+                <Component Id="euc_jis_2004.py.2015.i686" Guid="{2611aad6-9f4f-48de-84cd-b5012f642d57}">
+                  <File Id="euc_jis_2004.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\euc_jis_2004.py" />
+                </Component>
+                <Component Id="euc_jp.py.2015.i686" Guid="{0c266d2b-e643-444d-9f90-20bfc7a59b1b}">
+                  <File Id="euc_jp.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\euc_jp.py" />
+                </Component>
+                <Component Id="euc_kr.py.2015.i686" Guid="{a8e4d822-66ab-440d-811b-48bb173bbb14}">
+                  <File Id="euc_kr.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\euc_kr.py" />
+                </Component>
+                <Component Id="gb18030.py.2015.i686" Guid="{adc00f11-c136-4928-b893-66bcf68c03c7}">
+                  <File Id="gb18030.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\gb18030.py" />
+                </Component>
+                <Component Id="gb2312.py.2015.i686" Guid="{fa7a8bff-356a-4500-b39a-5c2d35a507f6}">
+                  <File Id="gb2312.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\gb2312.py" />
+                </Component>
+                <Component Id="gbk.py.2015.i686" Guid="{156f22f2-67f3-4bdd-80b7-7ee0d7950483}">
+                  <File Id="gbk.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\gbk.py" />
+                </Component>
+                <Component Id="hex_codec.py.2015.i686" Guid="{759671f4-21a8-45d9-8b56-cafeb80f44ab}">
+                  <File Id="hex_codec.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\hex_codec.py" />
+                </Component>
+                <Component Id="hp_roman8.py.2015.i686" Guid="{502f0041-e0ab-4ed0-a775-16f3479ad769}">
+                  <File Id="hp_roman8.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\hp_roman8.py" />
+                </Component>
+                <Component Id="hz.py.2015.i686" Guid="{a66c7d4d-a47c-43dc-9b00-6762c363135a}">
+                  <File Id="hz.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\hz.py" />
+                </Component>
+                <Component Id="idna.py.2015.i686" Guid="{c4c31315-e4d6-47fe-bd7c-3c1d33adfdbd}">
+                  <File Id="idna.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\idna.py" />
+                </Component>
+                <Component Id="iso2022_jp.py.2015.i686" Guid="{438d9bd1-d4d9-4b70-a830-dd0a2dcd81a3}">
+                  <File Id="iso2022_jp.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso2022_jp.py" />
+                </Component>
+                <Component Id="iso2022_jp_1.py.2015.i686" Guid="{30978684-9fd3-4490-8bd2-fc39a252e247}">
+                  <File Id="iso2022_jp_1.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso2022_jp_1.py" />
+                </Component>
+                <Component Id="iso2022_jp_2.py.2015.i686" Guid="{dfe8c24b-4388-4945-9162-fb216f292e1b}">
+                  <File Id="iso2022_jp_2.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso2022_jp_2.py" />
+                </Component>
+                <Component Id="iso2022_jp_2004.py.2015.i686" Guid="{f57e5f14-1ff5-42ca-aae5-def6735dec2d}">
+                  <File Id="iso2022_jp_2004.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso2022_jp_2004.py" />
+                </Component>
+                <Component Id="iso2022_jp_3.py.2015.i686" Guid="{82e99934-5b30-4d36-9d54-5b0ff9923174}">
+                  <File Id="iso2022_jp_3.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso2022_jp_3.py" />
+                </Component>
+                <Component Id="iso2022_jp_ext.py.2015.i686" Guid="{512f19a0-4021-4892-b4bc-b10cfeec7dac}">
+                  <File Id="iso2022_jp_ext.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso2022_jp_ext.py" />
+                </Component>
+                <Component Id="iso2022_kr.py.2015.i686" Guid="{5e67c2ce-c921-41ae-a8fe-cf3f5537d007}">
+                  <File Id="iso2022_kr.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso2022_kr.py" />
+                </Component>
+                <Component Id="iso8859_1.py.2015.i686" Guid="{c72acae0-1e4e-4483-88b8-aa57fd842ff2}">
+                  <File Id="iso8859_1.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_1.py" />
+                </Component>
+                <Component Id="iso8859_10.py.2015.i686" Guid="{4de6571a-860c-4221-95bf-8aa74f30b3c8}">
+                  <File Id="iso8859_10.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_10.py" />
+                </Component>
+                <Component Id="iso8859_11.py.2015.i686" Guid="{9a76e487-e4db-4db5-a378-6ea9a1c90147}">
+                  <File Id="iso8859_11.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_11.py" />
+                </Component>
+                <Component Id="iso8859_13.py.2015.i686" Guid="{605ec411-7d58-47b4-8e11-7c25a09f5232}">
+                  <File Id="iso8859_13.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_13.py" />
+                </Component>
+                <Component Id="iso8859_14.py.2015.i686" Guid="{48a18781-4e7a-4c65-874b-b10a17dcd647}">
+                  <File Id="iso8859_14.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_14.py" />
+                </Component>
+                <Component Id="iso8859_15.py.2015.i686" Guid="{bb660794-1cbc-4a73-a37f-2e571f33445d}">
+                  <File Id="iso8859_15.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_15.py" />
+                </Component>
+                <Component Id="iso8859_16.py.2015.i686" Guid="{7e1ed3a9-47b2-49ae-b504-ef830b0c2619}">
+                  <File Id="iso8859_16.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_16.py" />
+                </Component>
+                <Component Id="iso8859_2.py.2015.i686" Guid="{8d6eebb3-fc53-4fb4-a13e-c6d1cfb54a31}">
+                  <File Id="iso8859_2.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_2.py" />
+                </Component>
+                <Component Id="iso8859_3.py.2015.i686" Guid="{84acae6f-a085-4db8-8c93-ece8eef2d380}">
+                  <File Id="iso8859_3.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_3.py" />
+                </Component>
+                <Component Id="iso8859_4.py.2015.i686" Guid="{60ee34a5-bf9e-4f2a-8b14-9db062b79576}">
+                  <File Id="iso8859_4.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_4.py" />
+                </Component>
+                <Component Id="iso8859_5.py.2015.i686" Guid="{f189cce1-d3e9-422f-8d9d-f2f4fd673ef6}">
+                  <File Id="iso8859_5.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_5.py" />
+                </Component>
+                <Component Id="iso8859_6.py.2015.i686" Guid="{b14ea675-b9ee-4911-89dd-eb1b28899d8f}">
+                  <File Id="iso8859_6.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_6.py" />
+                </Component>
+                <Component Id="iso8859_7.py.2015.i686" Guid="{fd19c5c6-4446-480b-864c-765c77fff7cd}">
+                  <File Id="iso8859_7.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_7.py" />
+                </Component>
+                <Component Id="iso8859_8.py.2015.i686" Guid="{3935b209-a0db-4d6c-b3dd-289ee3ee5ab1}">
+                  <File Id="iso8859_8.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_8.py" />
+                </Component>
+                <Component Id="iso8859_9.py.2015.i686" Guid="{9d2874cd-6453-4253-85cb-f080bd246c4f}">
+                  <File Id="iso8859_9.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\iso8859_9.py" />
+                </Component>
+                <Component Id="johab.py.2015.i686" Guid="{75ca3a0d-fd2d-4882-9a1b-a357ece69230}">
+                  <File Id="johab.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\johab.py" />
+                </Component>
+                <Component Id="koi8_r.py.2015.i686" Guid="{9815167c-1a53-48e5-9f19-0da7c98969a4}">
+                  <File Id="koi8_r.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\koi8_r.py" />
+                </Component>
+                <Component Id="koi8_u.py.2015.i686" Guid="{71e97abb-9fa6-41e6-b8d3-1723409e7d8f}">
+                  <File Id="koi8_u.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\koi8_u.py" />
+                </Component>
+                <Component Id="latin_1.py.2015.i686" Guid="{986c3ecf-a25a-4319-b2a2-5a8daa0859fc}">
+                  <File Id="latin_1.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\latin_1.py" />
+                </Component>
+                <Component Id="mac_arabic.py.2015.i686" Guid="{51726e63-c54c-4c5e-b258-5049f821ee4d}">
+                  <File Id="mac_arabic.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_arabic.py" />
+                </Component>
+                <Component Id="mac_centeuro.py.2015.i686" Guid="{7a914aa6-c77f-4f1f-8425-38567c781f52}">
+                  <File Id="mac_centeuro.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_centeuro.py" />
+                </Component>
+                <Component Id="mac_croatian.py.2015.i686" Guid="{a2743f5d-aec7-4cc4-bad0-65395e2e687d}">
+                  <File Id="mac_croatian.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_croatian.py" />
+                </Component>
+                <Component Id="mac_cyrillic.py.2015.i686" Guid="{53939923-a3f2-4b75-902a-0130eb5878bb}">
+                  <File Id="mac_cyrillic.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_cyrillic.py" />
+                </Component>
+                <Component Id="mac_farsi.py.2015.i686" Guid="{27b430b2-bc6c-4f9c-9fab-aa16f887d5f6}">
+                  <File Id="mac_farsi.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_farsi.py" />
+                </Component>
+                <Component Id="mac_greek.py.2015.i686" Guid="{09a0f629-b0da-498a-99df-b3415950df67}">
+                  <File Id="mac_greek.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_greek.py" />
+                </Component>
+                <Component Id="mac_iceland.py.2015.i686" Guid="{439f99b2-07da-4043-a524-e32e3da9f511}">
+                  <File Id="mac_iceland.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_iceland.py" />
+                </Component>
+                <Component Id="mac_latin2.py.2015.i686" Guid="{da85652f-95ac-48e0-bb94-5ff64679398f}">
+                  <File Id="mac_latin2.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_latin2.py" />
+                </Component>
+                <Component Id="mac_roman.py.2015.i686" Guid="{5d5fb45b-7c1c-4659-a9f2-af3490bba3a3}">
+                  <File Id="mac_roman.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_roman.py" />
+                </Component>
+                <Component Id="mac_romanian.py.2015.i686" Guid="{f48adc1d-7d24-47bf-afba-9eb516773210}">
+                  <File Id="mac_romanian.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_romanian.py" />
+                </Component>
+                <Component Id="mac_turkish.py.2015.i686" Guid="{5f5676c7-e925-4348-83fd-e35c1d51cd43}">
+                  <File Id="mac_turkish.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mac_turkish.py" />
+                </Component>
+                <Component Id="mbcs.py.2015.i686" Guid="{4563e6b9-af53-46b7-9317-5b11f1cccef4}">
+                  <File Id="mbcs.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\mbcs.py" />
+                </Component>
+                <Component Id="palmos.py.2015.i686" Guid="{1e60594d-e884-47e8-9b02-b93895084712}">
+                  <File Id="palmos.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\palmos.py" />
+                </Component>
+                <Component Id="ptcp154.py.2015.i686" Guid="{eaad163b-0127-4c4b-9e08-f8e461f0d31d}">
+                  <File Id="ptcp154.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\ptcp154.py" />
+                </Component>
+                <Component Id="punycode.py.2015.i686" Guid="{472418c6-500f-40c8-a641-6790370edfb8}">
+                  <File Id="punycode.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\punycode.py" />
+                </Component>
+                <Component Id="quopri_codec.py.2015.i686" Guid="{9b283cdc-b08b-4ae0-9cb2-e7c4827402a5}">
+                  <File Id="quopri_codec.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\quopri_codec.py" />
+                </Component>
+                <Component Id="raw_unicode_escape.py.2015.i686" Guid="{6a004c55-8f3c-4337-b1c4-33786b4cc9d9}">
+                  <File Id="raw_unicode_escape.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\raw_unicode_escape.py" />
+                </Component>
+                <Component Id="rot_13.py.2015.i686" Guid="{2395800f-1557-4d5b-8888-4a74cd9b78a9}">
+                  <File Id="rot_13.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\rot_13.py" />
+                </Component>
+                <Component Id="shift_jis.py.2015.i686" Guid="{3ec49c60-8e9f-45ee-af22-c697ebec78ef}">
+                  <File Id="shift_jis.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\shift_jis.py" />
+                </Component>
+                <Component Id="shift_jisx0213.py.2015.i686" Guid="{06a7f742-679f-49fa-9a9a-f8b9d27fc7cd}">
+                  <File Id="shift_jisx0213.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\shift_jisx0213.py" />
+                </Component>
+                <Component Id="shift_jis_2004.py.2015.i686" Guid="{04b85cae-a1dc-4582-8a07-d0112f9d586c}">
+                  <File Id="shift_jis_2004.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\shift_jis_2004.py" />
+                </Component>
+                <Component Id="string_escape.py.2015.i686" Guid="{c98fa964-4e6a-4fe4-980c-1aca683db612}">
+                  <File Id="string_escape.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\string_escape.py" />
+                </Component>
+                <Component Id="tis_620.py.2015.i686" Guid="{0ff7a849-ca51-4135-b39d-be0400688dc4}">
+                  <File Id="tis_620.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\tis_620.py" />
+                </Component>
+                <Component Id="undefined.py.2015.i686" Guid="{2e705f1e-3cef-41c0-bbcd-a8318a3531fb}">
+                  <File Id="undefined.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\undefined.py" />
+                </Component>
+                <Component Id="unicode_escape.py.2015.i686" Guid="{5e4acf8b-2010-4fef-8ba7-b7b4a016e9d7}">
+                  <File Id="unicode_escape.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\unicode_escape.py" />
+                </Component>
+                <Component Id="unicode_internal.py.2015.i686" Guid="{4ca59496-3afa-4e5b-adf0-1aa2305b5c9f}">
+                  <File Id="unicode_internal.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\unicode_internal.py" />
+                </Component>
+                <Component Id="utf_16.py.2015.i686" Guid="{c8e02609-b9f1-40ad-9a7a-11a0be19c2af}">
+                  <File Id="utf_16.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\utf_16.py" />
+                </Component>
+                <Component Id="utf_16_be.py.2015.i686" Guid="{f8544287-b3bb-441b-9a98-e4cd7fa8958c}">
+                  <File Id="utf_16_be.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\utf_16_be.py" />
+                </Component>
+                <Component Id="utf_16_le.py.2015.i686" Guid="{a6edf834-5611-4ba6-83c2-e79f7e7c66b0}">
+                  <File Id="utf_16_le.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\utf_16_le.py" />
+                </Component>
+                <Component Id="utf_32.py.2015.i686" Guid="{ab60fd2e-10ee-4829-b58f-38749f7e91d9}">
+                  <File Id="utf_32.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\utf_32.py" />
+                </Component>
+                <Component Id="utf_32_be.py.2015.i686" Guid="{c501f5b3-701b-4850-8bd6-92bbca389802}">
+                  <File Id="utf_32_be.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\utf_32_be.py" />
+                </Component>
+                <Component Id="utf_32_le.py.2015.i686" Guid="{ac703d71-7e24-4d82-a172-7b13b3ae7480}">
+                  <File Id="utf_32_le.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\utf_32_le.py" />
+                </Component>
+                <Component Id="utf_7.py.2015.i686" Guid="{2d50ea17-3166-48e3-95ba-566685820a58}">
+                  <File Id="utf_7.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\utf_7.py" />
+                </Component>
+                <Component Id="utf_8.py.2015.i686" Guid="{b9474e2d-3ff0-4aa3-9b2b-83174384f224}">
+                  <File Id="utf_8.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\utf_8.py" />
+                </Component>
+                <Component Id="utf_8_sig.py.2015.i686" Guid="{f01b8d77-c9ba-49fe-a50f-a0d9dbf244bc}">
+                  <File Id="utf_8_sig.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\utf_8_sig.py" />
+                </Component>
+                <Component Id="uu_codec.py.2015.i686" Guid="{625331f2-97ee-4b18-a0e2-c35c0ba0536c}">
+                  <File Id="uu_codec.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\uu_codec.py" />
+                </Component>
+                <Component Id="zlib_codec.py.2015.i686" Guid="{7b5bd4e8-e503-4395-b6ec-3f1c35945817}">
+                  <File Id="zlib_codec.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\zlib_codec.py" />
+                </Component>
+                <Component Id="__init__.py.2015.i686" Guid="{ae476973-3331-4bb2-9d61-9bc3e3d7398d}">
+                  <File Id="__init__.py.2015.i686" KeyPath="yes" Source="$(var.VisualRust.TargetDir)gdb\i686\opt\lib\python2.7\encodings\__init__.py" />
+                </Component>
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="CmpGroup_gdb.2015.i686">
+      <ComponentRef Id="gdb.exe.2015.i686" />
+      <ComponentRef Id="gdborig.exe.2015.i686" />
+      <ComponentRef Id="libgcc_s_dw2_1.dll.2015.i686" />
+      <ComponentRef Id="libpython2.7.dll.2015.i686" />
+      <ComponentRef Id="libwinpthread_1.dll.2015.i686" />
+      <ComponentRef Id="abc.py.2015.i686" />
+      <ComponentRef Id="codecs.py.2015.i686" />
+      <ComponentRef Id="copy_reg.py.2015.i686" />
+      <ComponentRef Id="functools.py.2015.i686" />
+      <ComponentRef Id="genericpath.py.2015.i686" />
+      <ComponentRef Id="linecache.py.2015.i686" />
+      <ComponentRef Id="locale.py.2015.i686" />
+      <ComponentRef Id="ntpath.py.2015.i686" />
+      <ComponentRef Id="os.py.2015.i686" />
+      <ComponentRef Id="re.py.2015.i686" />
+      <ComponentRef Id="site.py.2015.i686" />
+      <ComponentRef Id="sre_compile.py.2015.i686" />
+      <ComponentRef Id="sre_constants.py.2015.i686" />
+      <ComponentRef Id="sre_parse.py.2015.i686" />
+      <ComponentRef Id="stat.py.2015.i686" />
+      <ComponentRef Id="sysconfig.py.2015.i686" />
+      <ComponentRef Id="traceback.py.2015.i686" />
+      <ComponentRef Id="types.py.2015.i686" />
+      <ComponentRef Id="UserDict.py.2015.i686" />
+      <ComponentRef Id="warnings.py.2015.i686" />
+      <ComponentRef Id="_abcoll.py.2015.i686" />
+      <ComponentRef Id="_sysconfigdata.py.2015.i686" />
+      <ComponentRef Id="_weakrefset.py.2015.i686" />
+      <ComponentRef Id="aliases.py.2015.i686" />
+      <ComponentRef Id="ascii.py.2015.i686" />
+      <ComponentRef Id="base64_codec.py.2015.i686" />
+      <ComponentRef Id="big5.py.2015.i686" />
+      <ComponentRef Id="big5hkscs.py.2015.i686" />
+      <ComponentRef Id="bz2_codec.py.2015.i686" />
+      <ComponentRef Id="charmap.py.2015.i686" />
+      <ComponentRef Id="cp037.py.2015.i686" />
+      <ComponentRef Id="cp1006.py.2015.i686" />
+      <ComponentRef Id="cp1026.py.2015.i686" />
+      <ComponentRef Id="cp1140.py.2015.i686" />
+      <ComponentRef Id="cp1250.py.2015.i686" />
+      <ComponentRef Id="cp1251.py.2015.i686" />
+      <ComponentRef Id="cp1252.py.2015.i686" />
+      <ComponentRef Id="cp1253.py.2015.i686" />
+      <ComponentRef Id="cp1254.py.2015.i686" />
+      <ComponentRef Id="cp1255.py.2015.i686" />
+      <ComponentRef Id="cp1256.py.2015.i686" />
+      <ComponentRef Id="cp1257.py.2015.i686" />
+      <ComponentRef Id="cp1258.py.2015.i686" />
+      <ComponentRef Id="cp424.py.2015.i686" />
+      <ComponentRef Id="cp437.py.2015.i686" />
+      <ComponentRef Id="cp500.py.2015.i686" />
+      <ComponentRef Id="cp720.py.2015.i686" />
+      <ComponentRef Id="cp737.py.2015.i686" />
+      <ComponentRef Id="cp775.py.2015.i686" />
+      <ComponentRef Id="cp850.py.2015.i686" />
+      <ComponentRef Id="cp852.py.2015.i686" />
+      <ComponentRef Id="cp855.py.2015.i686" />
+      <ComponentRef Id="cp856.py.2015.i686" />
+      <ComponentRef Id="cp857.py.2015.i686" />
+      <ComponentRef Id="cp858.py.2015.i686" />
+      <ComponentRef Id="cp860.py.2015.i686" />
+      <ComponentRef Id="cp861.py.2015.i686" />
+      <ComponentRef Id="cp862.py.2015.i686" />
+      <ComponentRef Id="cp863.py.2015.i686" />
+      <ComponentRef Id="cp864.py.2015.i686" />
+      <ComponentRef Id="cp865.py.2015.i686" />
+      <ComponentRef Id="cp866.py.2015.i686" />
+      <ComponentRef Id="cp869.py.2015.i686" />
+      <ComponentRef Id="cp874.py.2015.i686" />
+      <ComponentRef Id="cp875.py.2015.i686" />
+      <ComponentRef Id="cp932.py.2015.i686" />
+      <ComponentRef Id="cp949.py.2015.i686" />
+      <ComponentRef Id="cp950.py.2015.i686" />
+      <ComponentRef Id="euc_jisx0213.py.2015.i686" />
+      <ComponentRef Id="euc_jis_2004.py.2015.i686" />
+      <ComponentRef Id="euc_jp.py.2015.i686" />
+      <ComponentRef Id="euc_kr.py.2015.i686" />
+      <ComponentRef Id="gb18030.py.2015.i686" />
+      <ComponentRef Id="gb2312.py.2015.i686" />
+      <ComponentRef Id="gbk.py.2015.i686" />
+      <ComponentRef Id="hex_codec.py.2015.i686" />
+      <ComponentRef Id="hp_roman8.py.2015.i686" />
+      <ComponentRef Id="hz.py.2015.i686" />
+      <ComponentRef Id="idna.py.2015.i686" />
+      <ComponentRef Id="iso2022_jp.py.2015.i686" />
+      <ComponentRef Id="iso2022_jp_1.py.2015.i686" />
+      <ComponentRef Id="iso2022_jp_2.py.2015.i686" />
+      <ComponentRef Id="iso2022_jp_2004.py.2015.i686" />
+      <ComponentRef Id="iso2022_jp_3.py.2015.i686" />
+      <ComponentRef Id="iso2022_jp_ext.py.2015.i686" />
+      <ComponentRef Id="iso2022_kr.py.2015.i686" />
+      <ComponentRef Id="iso8859_1.py.2015.i686" />
+      <ComponentRef Id="iso8859_10.py.2015.i686" />
+      <ComponentRef Id="iso8859_11.py.2015.i686" />
+      <ComponentRef Id="iso8859_13.py.2015.i686" />
+      <ComponentRef Id="iso8859_14.py.2015.i686" />
+      <ComponentRef Id="iso8859_15.py.2015.i686" />
+      <ComponentRef Id="iso8859_16.py.2015.i686" />
+      <ComponentRef Id="iso8859_2.py.2015.i686" />
+      <ComponentRef Id="iso8859_3.py.2015.i686" />
+      <ComponentRef Id="iso8859_4.py.2015.i686" />
+      <ComponentRef Id="iso8859_5.py.2015.i686" />
+      <ComponentRef Id="iso8859_6.py.2015.i686" />
+      <ComponentRef Id="iso8859_7.py.2015.i686" />
+      <ComponentRef Id="iso8859_8.py.2015.i686" />
+      <ComponentRef Id="iso8859_9.py.2015.i686" />
+      <ComponentRef Id="johab.py.2015.i686" />
+      <ComponentRef Id="koi8_r.py.2015.i686" />
+      <ComponentRef Id="koi8_u.py.2015.i686" />
+      <ComponentRef Id="latin_1.py.2015.i686" />
+      <ComponentRef Id="mac_arabic.py.2015.i686" />
+      <ComponentRef Id="mac_centeuro.py.2015.i686" />
+      <ComponentRef Id="mac_croatian.py.2015.i686" />
+      <ComponentRef Id="mac_cyrillic.py.2015.i686" />
+      <ComponentRef Id="mac_farsi.py.2015.i686" />
+      <ComponentRef Id="mac_greek.py.2015.i686" />
+      <ComponentRef Id="mac_iceland.py.2015.i686" />
+      <ComponentRef Id="mac_latin2.py.2015.i686" />
+      <ComponentRef Id="mac_roman.py.2015.i686" />
+      <ComponentRef Id="mac_romanian.py.2015.i686" />
+      <ComponentRef Id="mac_turkish.py.2015.i686" />
+      <ComponentRef Id="mbcs.py.2015.i686" />
+      <ComponentRef Id="palmos.py.2015.i686" />
+      <ComponentRef Id="ptcp154.py.2015.i686" />
+      <ComponentRef Id="punycode.py.2015.i686" />
+      <ComponentRef Id="quopri_codec.py.2015.i686" />
+      <ComponentRef Id="raw_unicode_escape.py.2015.i686" />
+      <ComponentRef Id="rot_13.py.2015.i686" />
+      <ComponentRef Id="shift_jis.py.2015.i686" />
+      <ComponentRef Id="shift_jisx0213.py.2015.i686" />
+      <ComponentRef Id="shift_jis_2004.py.2015.i686" />
+      <ComponentRef Id="string_escape.py.2015.i686" />
+      <ComponentRef Id="tis_620.py.2015.i686" />
+      <ComponentRef Id="undefined.py.2015.i686" />
+      <ComponentRef Id="unicode_escape.py.2015.i686" />
+      <ComponentRef Id="unicode_internal.py.2015.i686" />
+      <ComponentRef Id="utf_16.py.2015.i686" />
+      <ComponentRef Id="utf_16_be.py.2015.i686" />
+      <ComponentRef Id="utf_16_le.py.2015.i686" />
+      <ComponentRef Id="utf_32.py.2015.i686" />
+      <ComponentRef Id="utf_32_be.py.2015.i686" />
+      <ComponentRef Id="utf_32_le.py.2015.i686" />
+      <ComponentRef Id="utf_7.py.2015.i686" />
+      <ComponentRef Id="utf_8.py.2015.i686" />
+      <ComponentRef Id="utf_8_sig.py.2015.i686" />
+      <ComponentRef Id="uu_codec.py.2015.i686" />
+      <ComponentRef Id="zlib_codec.py.2015.i686" />
+      <ComponentRef Id="__init__.py.2015.i686" />
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -15,7 +15,7 @@
     <UIRef Id="WixUI_FeatureTree" />
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of Visual Rust is already installed." />
-    <MediaTemplate EmbedCab="yes" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
 
     <Property Id="VSLAUNCHER" >
@@ -53,6 +53,8 @@
         <![CDATA[Installed OR VS2013DEVENV]]>
       </Condition>
       <ComponentGroupRef Id="CmpGroup_vsx_2013"/>
+      <ComponentGroupRef Id="CmpGroup_gdb.2013.i686"/>
+      <ComponentGroupRef Id="CmpGroup_gdb.2013.x86_64"/>
       <ComponentGroupRef Id="CmpGroup_item_templates_2013"/>
       <ComponentGroupRef Id="CmpGroup_proj_templates_2013"/>
     </Feature>
@@ -67,6 +69,8 @@
         <![CDATA[Installed OR VS14DEVENV]]>
       </Condition>
       <ComponentGroupRef Id="CmpGroup_vsx_2015"/>
+      <ComponentGroupRef Id="CmpGroup_gdb.2015.i686"/>
+      <ComponentGroupRef Id="CmpGroup_gdb.2015.x86_64"/>
       <ComponentGroupRef Id="CmpGroup_item_templates_2015"/>
       <ComponentGroupRef Id="CmpGroup_proj_templates_2015"/>
     </Feature>

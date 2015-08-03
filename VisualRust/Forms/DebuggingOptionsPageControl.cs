@@ -7,8 +7,6 @@ namespace VisualRust.Options
 {
     public partial class DebuggingOptionsPageControl : UserControl
     {
-        private const string customGdbTextFormat = "Automatically detect path to GDB\n(current path: {0})";
-
         public DebuggingOptionsPageControl()
         {
             InitializeComponent();
@@ -37,7 +35,6 @@ namespace VisualRust.Options
 
         public void LoadSettings(DebuggingOptionsPage optionsPage)
         {
-            defaultGdb.Text = String.Format(customGdbTextFormat, EnvironmentPath.FindExePath("gdb") ?? "<none>");
             defaultGdb.Checked = !optionsPage.UseCustomGdbPath;
             customGdb.Checked = optionsPage.UseCustomGdbPath;
             customGdbPath.Text = optionsPage.DebuggerLocation;

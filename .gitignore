@@ -153,3 +153,10 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
+# =========================
+# Visual Rust specific
+# =========================
+
+# Skip automatically downloaded files
+VisualRust/gdb/*/*

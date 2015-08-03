@@ -2,8 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell;
-using VisualRust.Forms;
-using VisualRust.Project;
 
 namespace VisualRust.Options
 {
@@ -19,16 +17,7 @@ namespace VisualRust.Options
 
         protected override IWin32Window Window
         {
-            get
-            {
-                if(page != null)
-                    return page;
-                if(Feature.Gdb(this.Site))
-                    page = new DebuggingOptionsPageControl(this);
-                else
-                    page = new DebuggingDisabledControl();
-                return page;
-            }
+            get { return page ?? (page = new DebuggingOptionsPageControl(this)); }
         }
 
         protected override void OnClosed(EventArgs e)

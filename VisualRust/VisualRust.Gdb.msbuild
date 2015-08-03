@@ -17,6 +17,7 @@
   
   <Target Name="_DownloadGdbCore" Condition="!$(_SkipMingwDownload)">
     <RemoveDir  Directories="gdb\$(MingwArch)"/>
+    <MakeDir Directories="obj" />
     <Message Text="Downloading mingw-w64 ($(MingwArch))"/>
     <Exec Command="..\..\tools\curl.exe -L -O &quot;$(MingwPath)&quot;" WorkingDirectory="obj"/>
     <Exec Command="..\..\tools\7za.exe -ogdb-$(MingwArch) x -y -ir@..\gdb\files_$(MingwArch).txt $(MingwVersion).7z" WorkingDirectory="obj"/>

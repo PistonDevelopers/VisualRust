@@ -90,6 +90,7 @@
     <EmbeddedResource Include="Internal\ClosedCircle\baz.rs" />
     <EmbeddedResource Include="Internal\ClosedCircle\foo.rs" />
     <EmbeddedResource Include="Internal\ClosedCircle\main.rs" />
+    <None Include="app.config" />
     <None Include="packages.config" />
     <EmbeddedResource Include="External\servo\components\layout\lib.rs" />
   </ItemGroup>

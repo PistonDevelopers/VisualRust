@@ -212,6 +212,8 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Downloader.cs" />
+    <Compile Include="gpg\Gpg.cs" />
     <Compile Include="ProjectForms\BasePropertyPage.cs" />
     <Compile Include="ProjectForms\BuildPropertyPage.cs" />
     <Compile Include="ProjectForms\DebugPropertyPage.cs" />
@@ -288,6 +290,38 @@
     <Content Include="..\LICENSE.txt">
       <Link>LICENSE.txt</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="gpg\gpg2.exe">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="gpg\gpgconf.exe">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="gpg\libadns-1.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="gpg\libassuan-0.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="gpg\libgcrypt-20.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="gpg\libgpg-error-0.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="gpg\libiconv-2.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="gpg\zlib1.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Racer\libgcc_s_dw2-1.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -51,23 +51,18 @@ namespace VisualRust.Racer
         private RacerSingleton()
         {
         }
-
-        private T GetVisualRustProperty<T>(DTE env, string key)
-        {
-            return (T)env.get_Properties("Visual Rust", "General").Item(key).Value;
-        }
-
+        
         private void ReinitializeRacerPaths()
         {
             DTE env = (DTE)VisualRustPackage.GetGlobalService(typeof(DTE));
             // If path to racer.exe is specifed, use it
-            if(GetVisualRustProperty<bool>(env, "UseCustomRacer"))
-                racerPathForExecution = GetVisualRustProperty<string>(env, "CustomRacerPath");
+            if(Utils.GetVisualRustProperty<bool>(env, "UseCustomRacer"))
+                racerPathForExecution = Utils.GetVisualRustProperty<string>(env, "CustomRacerPath");
             else
                 racerPathForExecution = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Racer", BundledRacerExecutable);
             // Same for custom RUST_SRC_PATH
-            if(GetVisualRustProperty<bool>(env, "UseCustomSources"))
-                racerSourcesLocation = GetVisualRustProperty<string>(env, "CustomSourcesPath");
+            if(Utils.GetVisualRustProperty<bool>(env, "UseCustomSources"))
+                racerSourcesLocation = Utils.GetVisualRustProperty<string>(env, "CustomSourcesPath");
             else
                 racerSourcesLocation = null;
         }
@@ -134,28 +129,6 @@ namespace VisualRust.Racer
             {
                 Utils.DebugPrintToOutput("Error executing racer.exe: {0}", ex);
                 return "";
-            }
-        }
-
-        class WindowsErrorMode : IDisposable
-        {
-            [DllImport("kernel32.dll", SetLastError = true)]
-            private static extern int SetErrorMode(int wMode);
-
-            private readonly int oldErrorMode;
-
-            /// <summary>
-            ///     Creates a new error mode context.
-            /// </summary>
-            /// <param name="mode">Error mode to use. 3 is a useful value.</param>
-            public WindowsErrorMode(int mode)
-            {
-                oldErrorMode = SetErrorMode(mode);
-            }
-
-            public void Dispose()
-            {
-                SetErrorMode(oldErrorMode);
             }
         }
     }

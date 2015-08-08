@@ -38,6 +38,8 @@
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="gpg2013.wxs" />
+    <Compile Include="gpg2015.wxs" />
     <Compile Include="gdb\gdb.2013.x86_64.wxs" />
     <Compile Include="gdb\gdb.2015.x86_64.wxs" />
     <Compile Include="gdb\gdb.2015.i686.wxs" />

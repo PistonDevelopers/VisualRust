@@ -17,6 +17,8 @@ namespace VisualRust
     using RustLexer;
     using Microsoft.VisualStudio.Text;
     using Antlr4.Runtime;
+    using System.Runtime.InteropServices;
+    using EnvDTE;
 
     static class Utils
     {
@@ -293,6 +295,11 @@ namespace VisualRust
 
             return Tuple.Create(leftToken, currentToken);
         }
+
+        public static T GetVisualRustProperty<T>(DTE env, string key)
+        {
+            return (T)env.get_Properties("Visual Rust", "General").Item(key).Value;
+        }
     }
 
     public class TemporaryFile : IDisposable
@@ -327,4 +334,25 @@ namespace VisualRust
         }
     }
 
+    public class WindowsErrorMode : IDisposable
+    {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern int SetErrorMode(int wMode);
+
+        private readonly int oldErrorMode;
+
+        /// <summary>
+        ///     Creates a new error mode context.
+        /// </summary>
+        /// <param name="mode">Error mode to use. 3 is a useful value.</param>
+        public WindowsErrorMode(int mode)
+        {
+            oldErrorMode = SetErrorMode(mode);
+        }
+
+        public void Dispose()
+        {
+            SetErrorMode(oldErrorMode);
+        }
+    }
 }

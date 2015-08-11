@@ -21,12 +21,9 @@ namespace VisualRust
     [ContentType("rust")]
     public class VisualRustSmartIndentProvider : ISmartIndentProvider
     {
-        [Import]
-        public IEditorOperationsFactoryService OperationsFactory = null;
-
         public ISmartIndent CreateSmartIndent(ITextView textView)
         {
-            return new VisualRustSmartIndent(textView, this.OperationsFactory.GetEditorOperations(textView));
+            return new VisualRustSmartIndent(textView);
         }
     }
 
@@ -34,13 +31,10 @@ namespace VisualRust
     // TODO: this indenter should take tabs into consideration
     class VisualRustSmartIndent : ISmartIndent
     {
-        private IEditorOperations ed;
-
         private ITextView _textView;
-        internal VisualRustSmartIndent(ITextView textView, IEditorOperations operations)
+        internal VisualRustSmartIndent(ITextView textView)
         {
             _textView = textView;
-            ed = operations;
         }
 
         int? ISmartIndent.GetDesiredIndentation(ITextSnapshotLine currentSnapshotLine)
@@ -51,6 +45,9 @@ namespace VisualRust
             var caretPosition = caret.Position.BufferPosition.Position;
 
             var indentStep = _textView.Options.GetIndentSize();
+
+            var caretLine = textSnapshot.GetLineFromPosition(caretPosition);
+            var lineReminder = textSnapshot.CreateTrackingSpan(caretPosition, caretLine.End - caretPosition, SpanTrackingMode.EdgeExclusive);
 
             var textToCaret = textSnapshot.GetText(0, caretPosition);
             var tokens = Utils.LexString(textToCaret);
@@ -83,7 +80,28 @@ namespace VisualRust
                 }
             }
 
+            var closeBraceAfterCaret = false;
+            foreach (var ch in lineReminder.GetText(textSnapshot))
+            {
+                if (ch == '}')
+                {
+                    closeBraceAfterCaret = true;
+                    break;
+                }
+
+                if (ch != ' ')
+                {
+                    break;
+                }
+            }
+
             var indention = indentStepsCount * indentStep;
+            if (closeBraceAfterCaret)
+            {
+                indention -= indentStep;
+            }
+
+
             return indention;
         }
 

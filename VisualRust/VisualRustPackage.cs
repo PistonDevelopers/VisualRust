@@ -16,7 +16,6 @@ using VisualRust.Project;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using VisualRust.Options;
-using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace VisualRust
 {

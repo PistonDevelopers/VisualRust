@@ -350,4 +350,10 @@
     <MsBuild Projects="VisualRust.Gdb.msbuild" Targets="DownloadGdb" Properties="MingwVersion=i686-5.1.0-release-posix-dwarf-rt_v4-rev0;MingwRootDir=mingw32;MingwArch=i686;MingwPath=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/5.1.0/threads-posix/dwarf/i686-5.1.0-release-posix-dwarf-rt_v4-rev0.7z" />
     <MsBuild Projects="VisualRust.Gdb.msbuild" Targets="DownloadGdb" Properties="MingwVersion=x86_64-5.1.0-release-win32-seh-rt_v4-rev0;MingwRootDir=mingw64;MingwArch=x86_64;MingwPath=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/5.1.0/threads-win32/seh/x86_64-5.1.0-release-win32-seh-rt_v4-rev0.7z" />
   </Target>
+  <!-- Sometimes various Visual Studio files get copied into resulting .vsix. This target removes them just before .vsix generation -->
+  <Target Name="RemoveVSSDKAssemblies" BeforeTargets="CreateVsixContainer">
+    <ItemGroup>
+      <VSIXSourceItem Remove="@(VSIXSourceItem)" Condition="$([System.String]::new('%(VSIXSourceItem.FusionName)').StartsWith('Microsoft.VisualStudio'))" />
+    </ItemGroup>
+  </Target>
 </Project>

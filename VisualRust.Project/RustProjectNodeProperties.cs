@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudioTools.Project;
+﻿using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools.Project;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,30 +18,30 @@ namespace VisualRust.Project
         { }
 
         [Browsable(false)]
-        public VSLangProj.prjOutputType OutputType
+        public __VSPROJOUTPUTTYPE OutputType
         {
             get
             {
                 string type = this.Node.ProjectMgr.GetProjectProperty("OutputType");
                 if(type.Equals("library", StringComparison.OrdinalIgnoreCase))
                 {
-                    return VSLangProj.prjOutputType.prjOutputTypeLibrary;
+                    return __VSPROJOUTPUTTYPE.VSPROJ_OUTPUTTYPE_LIBRARY;
                 }
                 else if (type.Equals("winexe", StringComparison.OrdinalIgnoreCase))
                 {
-                    return VSLangProj.prjOutputType.prjOutputTypeWinExe;
+                    return __VSPROJOUTPUTTYPE.VSPROJ_OUTPUTTYPE_WINEXE;
                 }
-                return VSLangProj.prjOutputType.prjOutputTypeExe;
+                return __VSPROJOUTPUTTYPE.VSPROJ_OUTPUTTYPE_EXE;
             }
             set
             {
                 string val;
                 switch (value)
                 {
-                    case VSLangProj.prjOutputType.prjOutputTypeWinExe:
+                    case __VSPROJOUTPUTTYPE.VSPROJ_OUTPUTTYPE_WINEXE:
                         val = "winexe";
                         break;
-                    case VSLangProj.prjOutputType.prjOutputTypeLibrary:
+                    case __VSPROJOUTPUTTYPE.VSPROJ_OUTPUTTYPE_LIBRARY:
                         val = "library";
                         break;
                     default:

@@ -83,7 +83,7 @@ namespace VisualRust
             var closeBraceAfterCaret = false;
             foreach (var ch in lineReminder.GetText(textSnapshot))
             {
-                if (ch == '}')
+                if (ch == '}' || ch == ')')
                 {
                     closeBraceAfterCaret = true;
                     break;

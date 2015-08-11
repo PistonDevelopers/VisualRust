@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.Utilities;
 using System.Diagnostics;
 using System.Text;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Formatting;
 
 namespace VisualRust
 {
@@ -113,9 +114,9 @@ namespace VisualRust
 
         private bool ProcessCharInput(char typedChar)
         {
-            if (typedChar == '}' && IsWhiteSpacesBeforeCaret())
+            if ((typedChar == '}' || typedChar == ')') && IsWhiteSpacesBeforeCaret())
             {
-                return SetDecreasedIndention();
+                return SetDecreasedIndention(typedChar);
             }
 
             return false;
@@ -126,7 +127,7 @@ namespace VisualRust
             var caret = _textView.Caret;
             var caretPosition = caret.Position.BufferPosition.Position;
             var textSnapshot = _textView.TextSnapshot;
-            var caretLine = textSnapshot.GetLineFromPosition(caretPosition - 1);
+            var caretLine = textSnapshot.GetLineFromPosition(caretPosition);
             var caretPositionInLine = caretPosition - caretLine.Start.Position;
 
             if (caretLine.Length == 0)
@@ -148,18 +149,18 @@ namespace VisualRust
             return true;
         }
 
-        private bool SetDecreasedIndention()
+        private bool SetDecreasedIndention(char typedChar)
         {
+            using (var undo = _undoHistory.CreateTransaction("set indention"))
+            {
+                _operations.InsertText(typedChar.ToString());
+
+                ISmartIndent smartIndent = new VisualRustSmartIndent(_textView);
+
             var caret = _textView.Caret;
             var caretPosition = caret.Position.BufferPosition.Position;
             var textSnapshot = _textView.TextSnapshot;
-            var caretLine = textSnapshot.GetLineFromPosition(caretPosition - 1);
-
-            using (var undo = _undoHistory.CreateTransaction("set indention"))
-            {
-                _operations.InsertText("}");
-
-                ISmartIndent smartIndent = new VisualRustSmartIndent(_textView);
+            var caretLine = textSnapshot.GetLineFromPosition(caretPosition);
                 var desiredIndentation = smartIndent.GetDesiredIndentation(caretLine);
                 if (desiredIndentation.HasValue)
                 {

@@ -6,8 +6,8 @@
       <Directory Id="Dir_Racer_$(var.VsVersion)" Name="Racer"/>
     </DirectoryRef>
     <ComponentGroup Id="CmpGroup_Racer_$(var.VsVersion)" Directory="Dir_Racer_$(var.VsVersion)">
-      <Component Id="Cmp_racer_bf2373e_exe_$(var.VsVersion)" Guid="{BC0C9FDF-6495-457E-9F8D-38FAC0202544}">
-        <File Id="File_racer_bf2373e_exe_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\racer-bf2373e.exe" />
+      <Component Id="Cmp_racer_120e98b_exe_$(var.VsVersion)" Guid="{A3019A3B-A2F6-4B06-AC42-370B2945A8FB}">
+        <File Id="File_racer_120e98b_exe_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\racer-120e98b.exe" />
       </Component>
       <Component Id="Cmp_libgcc_s_dw2_1_dll_$(var.VsVersion)" Guid="{E64B2509-45B7-485E-822A-4274127D23E4}">
         <File Id="File_libgcc_s_dw2_1_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\Racer\libgcc_s_dw2-1.dll" />

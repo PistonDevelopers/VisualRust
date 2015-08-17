@@ -142,7 +142,11 @@ namespace VisualRust
                         realStart = curSpan.Start.Position + token.StartIndex - multilinePrefixSize;
                         realTokenLength = token.Text.Length;
                     }
-                    var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(realStart, realTokenLength));
+                    // This little check is required because, we are sometimes called (eg. when copying in vs2015) on a span smaller than a whole line
+                    var tokenRange = new Span(realStart, realTokenLength).Intersection(curSpan);
+                    if (!tokenRange.HasValue)
+                        continue;
+                    var tokenSpan = new SnapshotSpan(curSpan.Snapshot, tokenRange.Value);
                     yield return new TagSpan<ClassificationTag>(tokenSpan, new ClassificationTag(_rustTypes[Utils.LexerTokenToRustToken(token.Text, token.Type)]));
                 }
             }

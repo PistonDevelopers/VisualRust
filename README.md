@@ -13,29 +13,6 @@ Unstable, but more recent builds are downloadable from [AppVeyor]
 (https://ci.appveyor.com/project/vosen/visualrust) (choose "Configuration:
 Release" and "Artifacts").
 
-### Debugging
-Starting with Visual Studio 2015, the IDE is capable of using GDB as a debugging backend.  
-Visual Rust now supports this feature!
-
-#### Pre-requisites
-- You will need to install GDB for Windows from one of the [MinGW-w64](http://mingw-w64.org) distributions **(original [MinGW](http://www.mingw.org/) won't work)**.
-- When installing Visual Studio 2015, be sure to put check mark next to 
-'Tools for Visual C++ Mobile Development' component.  This will install the GDB front-end package.
-
-#### Configuration
-If GDB installation directory is on your PATH, no further configuration should be required. 
-Otherwise, open `Tools/Options...` dialog in the IDE, navigate to `Visual Rust/Debugging` and 
-enter the full path to gdb.exe there.
-
-#### Usage
-Most of the usual VS debugger features are supported.  
-You can also issue GDB-specific commands in the VS Command Window: `Debug.GDBExec <command>`. 
-For convenience, `Debug.GDBExec` has been aliased to `gdb`.
-
-#### Known issues
-- The 64-bit GDB fails to start 32-bit executables. This appears to be a GDB problem. 
-Meanwhile, you can use the 32-bt version of GDB for 32-bit debugging.
-
 Contributing
 ============
 
@@ -68,10 +45,11 @@ the time to spend coding.
 
 ## Prerequisites
 
-To build this, you'll need the [Visual Studio
-SDK](http://msdn.microsoft.com/en-us/vstudio/vextend.aspx) for the VS plugin,
-[WiX Toolset 3.9](http://wixtoolset.org/) for the setup project and [Java RE]
-(https://www.java.com/en/download/manual.jsp).
+To build this, you'll need the Visual Studio (2013 or 2015) and matching
+[Visual Studio SDK](http://msdn.microsoft.com/en-us/vstudio/vextend.aspx) for
+the VS plugin, [WiX Toolset 3.9 or higher](http://wixtoolset.org/) (if you are
+developing from VS 2015, you will need version 3.10 or higher) for the setup
+project and [Java RE] (https://www.java.com/en/download/manual.jsp).
 Nuget will take care of the rest.
 
 ## Build configuration

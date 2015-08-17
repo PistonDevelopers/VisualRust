@@ -155,10 +155,6 @@ namespace VisualRust.Project
 
             IVsDebugger4 vsDebugger = (IVsDebugger4)project.GetService(typeof(SVsShellDebugger));
             vsDebugger.LaunchDebugTargets4((uint)targets.Length, targets, results);
-
-            // Type "gdb <command>" in the VS Command Window
-            var commandWnd = (IVsCommandWindow)project.GetService(typeof(SVsCommandWindow));
-            commandWnd.ExecuteCommand("alias gdb Debug.GDBExec");
         }
 
         private string GuessArchitecture()

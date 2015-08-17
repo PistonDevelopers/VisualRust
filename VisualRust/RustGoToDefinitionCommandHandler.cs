@@ -89,6 +89,10 @@ namespace VisualRust
                     }
                     return true;
                 }
+                else
+                {
+                    Utils.PrintToOutput(findOutput);
+                }
 
             }
             return false;

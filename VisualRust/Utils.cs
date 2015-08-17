@@ -262,7 +262,7 @@ namespace VisualRust
             IVsOutputWindowPane pane;
             ErrorHandler.ThrowOnFailure(outWindow.CreatePane(paneGuid, "General", 1, 0));            
             outWindow.GetPane(ref paneGuid, out pane);
-            pane.OutputString(string.Format("[VisualRust]: " + s, args) + "\n");
+            pane.OutputString(string.Format("[Visual Rust]: " + s, args));
             pane.Activate();
         }
 

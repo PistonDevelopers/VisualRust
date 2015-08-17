@@ -124,11 +124,20 @@ namespace VisualRust.Project
                 {
                     writer.WriteAttributeString("WorkingDirectory", EscapePath(debugConfig.WorkingDir));
                     // GDB won't search working directory by default, but this is expected on Windows.
-                    writer.WriteAttributeString("AdditionalSOLibSearchPath", debugConfig.WorkingDir);
+                    string rustBinPath = RustBinPath();
+                    string additionalPath;
+                    if (rustBinPath != null)
+                        additionalPath = rustBinPath + ";" + debugConfig.WorkingDir;
+                    else
+                        additionalPath = debugConfig.WorkingDir;
+                    writer.WriteAttributeString("AdditionalSOLibSearchPath", additionalPath);
                 }
                 else
                 {
                     writer.WriteAttributeString("WorkingDirectory", EscapePath(Path.GetDirectoryName(file)));
+                    string rustBinPath = RustBinPath();
+                    if(rustBinPath != null)
+                        writer.WriteAttributeString("AdditionalSOLibSearchPath", rustBinPath);
                 }
                 // this affects the number of bytes the engine reads when disassembling commands, 
                 // x64 has the largest maximum command size, so it should be safe to use for x86 as well
@@ -155,10 +164,6 @@ namespace VisualRust.Project
 
             IVsDebugger4 vsDebugger = (IVsDebugger4)project.GetService(typeof(SVsShellDebugger));
             vsDebugger.LaunchDebugTargets4((uint)targets.Length, targets, results);
-
-            // Type "gdb <command>" in the VS Command Window
-            var commandWnd = (IVsCommandWindow)project.GetService(typeof(SVsCommandWindow));
-            commandWnd.ExecuteCommand("alias gdb Debug.GDBExec");
         }
 
         private string GuessArchitecture()
@@ -247,21 +252,26 @@ namespace VisualRust.Project
             return startInfo;
         }
 
-        private void InjectRustBinPath(ProcessStartInfo startInfo)
+        private string RustBinPath()
         {
             EnvDTE.Project proj = project.GetAutomationObject() as EnvDTE.Project;
-            if(proj == null)
-                return;
+            if (proj == null)
+                return null;
             string currentConfigName = Utilities.GetActiveConfigurationName(proj);
-            if(currentConfigName == null)
-                return;
-            ProjectConfig  currentConfig = project.ConfigProvider.GetProjectConfiguration(currentConfigName);
-            if(currentConfig == null)
-                return;
+            if (currentConfigName == null)
+                return null;
+            ProjectConfig currentConfig = project.ConfigProvider.GetProjectConfiguration(currentConfigName);
+            if (currentConfig == null)
+                return null;
             string currentTarget = currentConfig.GetConfigurationProperty("PlatformTarget", true);
-            if(currentTarget == null)
-                currentTarget =  Shared.Environment.DefaultTarget;
-            string installPath = Shared.Environment.FindInstallPath(currentTarget);
+            if (currentTarget == null)
+                currentTarget = Shared.Environment.DefaultTarget;
+            return Shared.Environment.FindInstallPath(currentTarget);
+        }
+
+        private void InjectRustBinPath(ProcessStartInfo startInfo)
+        {
+            string installPath = RustBinPath();
             if(installPath == null)
                 return;
             string envPath = Environment.GetEnvironmentVariable("PATH");

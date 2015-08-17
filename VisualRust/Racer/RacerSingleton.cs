@@ -16,7 +16,7 @@ namespace VisualRust.Racer
     public class RacerSingleton
     {
         private const string SystemRacerExecutable = "racer.exe";
-        private const string BundledRacerExecutable = "racer-bf2373e.exe";
+        private const string BundledRacerExecutable = "racer-120e98b.exe";
         private const string RacerSourceEnviromentVariable = "RUST_SRC_PATH";
         private const int TimeoutMillis = 3000;
 

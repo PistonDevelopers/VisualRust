@@ -16,6 +16,7 @@ using VisualRust.Project;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using VisualRust.Options;
+using MICore;
 
 namespace VisualRust
 {
@@ -67,9 +68,12 @@ namespace VisualRust
     [ProvideOptionPage(typeof(DebuggingOptionsPage), "Visual Rust", "Debugging", 110, 114, true)]
     [ProvideProfile(typeof(RustOptionsPage), "Visual Rust", "General", 110, 113, true)]
     [ProvideDebugEngine("Rust GDB", typeof(AD7ProgramProvider), typeof(AD7Engine), EngineConstants.EngineId)]
-    public class VisualRustPackage : CommonProjectPackage
+    [ProvideMenuResource("Menus.ctmenu", 1)]
+    public class VisualRustPackage : CommonProjectPackage, IOleCommandTarget
     {
         private RunningDocTableEventsListener docEventsListener;
+        private IOleCommandTarget packageCommandTarget;
+
         internal static VisualRustPackage Instance { get; private set; }
 
         /// <summary>
@@ -96,11 +100,145 @@ namespace VisualRust
         protected override void Initialize()
         {
             base.Initialize();
+            packageCommandTarget = GetService(typeof(IOleCommandTarget)) as IOleCommandTarget;
             Instance = this;
 
             docEventsListener = new RunningDocTableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
 
             Racer.RacerSingleton.Init();
+        }
+
+        int IOleCommandTarget.Exec(ref Guid cmdGroup, uint nCmdID, uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
+        {
+            if (cmdGroup == GuidList.VisualRustCommandSet)
+            {
+                switch (nCmdID)
+                {
+                    case 1:
+                        return VRDebugExec(nCmdExecOpt, pvaIn, pvaOut);
+
+                    default:
+                        return VSConstants.E_NOTIMPL;
+                }
+            }
+            return packageCommandTarget.Exec(cmdGroup, nCmdID, nCmdExecOpt, pvaIn, pvaOut);
+        }
+
+        int IOleCommandTarget.QueryStatus(ref Guid cmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
+        {
+            if (cmdGroup == GuidList.VisualRustCommandSet)
+            {
+                switch (prgCmds[0].cmdID)
+                {
+                    case 1:
+                        prgCmds[0].cmdf |= (uint)(OLECMDF.OLECMDF_SUPPORTED | OLECMDF.OLECMDF_ENABLED | OLECMDF.OLECMDF_INVISIBLE);
+                        return VSConstants.S_OK;
+
+                    default:
+                        Debug.Fail("Unknown command id");
+                        return VSConstants.E_NOTIMPL;
+                }
+            }
+
+            return packageCommandTarget.QueryStatus(ref cmdGroup, cCmds, prgCmds, pCmdText);
+        }
+
+        private int VRDebugExec(uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
+        {
+            int hr;
+
+            if (IsQueryParameterList(pvaIn, pvaOut, nCmdExecOpt))
+            {
+                Marshal.GetNativeVariantForObject("$", pvaOut);
+                return VSConstants.S_OK;
+            }
+
+            string arguments;
+            hr = EnsureString(pvaIn, out arguments);
+            if (hr != VSConstants.S_OK)
+                return hr;
+
+            if (string.IsNullOrWhiteSpace(arguments))
+                throw new ArgumentException("Expected an MI command to execute (ex: Debug.VRDebugExec info sharedlibrary)");
+
+            VRDebugExecAsync(arguments);
+
+            return VSConstants.S_OK;
+        }
+
+        private async void VRDebugExecAsync(string command)
+        {
+            var commandWindow = (IVsCommandWindow)GetService(typeof(SVsCommandWindow));
+
+            string results = null;
+
+            try
+            {
+                results = await MIDebugCommandDispatcher.ExecuteCommand(command);
+            }
+            catch (Exception e)
+            {
+                if (e.InnerException != null)
+                    e = e.InnerException;
+
+                UnexpectedMIResultException miException = e as UnexpectedMIResultException;
+                string message;
+                if (miException != null && miException.MIError != null)
+                    message = miException.MIError;
+                else
+                    message = e.Message;
+
+                commandWindow.Print(string.Format("Error: {0}\r\n", message));
+                return;
+            }
+
+            if (results.Length > 0)
+            {
+                // Make sure that we are printing whole lines
+                if (!results.EndsWith("\n") && !results.EndsWith("\r\n"))
+                {
+                    results = results + "\n";
+                }
+
+                commandWindow.Print(results);
+            }
+        }
+
+        static private bool IsQueryParameterList(System.IntPtr pvaIn, System.IntPtr pvaOut, uint nCmdexecopt)
+        {
+            ushort lo = (ushort)(nCmdexecopt & (uint)0xffff);
+            ushort hi = (ushort)(nCmdexecopt >> 16);
+            if (lo == (ushort)OLECMDEXECOPT.OLECMDEXECOPT_SHOWHELP)
+            {
+                if (hi == Microsoft.VisualStudio.Shell.VsMenus.VSCmdOptQueryParameterList)
+                {
+                    if (pvaOut != IntPtr.Zero)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        static private int EnsureString(IntPtr pvaIn, out string arguments)
+        {
+            arguments = null;
+            if (pvaIn == IntPtr.Zero)
+            {
+                // No arguments.
+                return VSConstants.E_INVALIDARG;
+            }
+
+            object vaInObject = Marshal.GetObjectForNativeVariant(pvaIn);
+            if (vaInObject == null || vaInObject.GetType() != typeof(string))
+            {
+                return VSConstants.E_INVALIDARG;
+            }
+
+            arguments = vaInObject as string;
+            return VSConstants.S_OK;
         }
 
         protected override void Dispose(bool disposing)

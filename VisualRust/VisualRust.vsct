@@ -1,3 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable">
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+  <Commands package="VisualRustPackage">
+    <Buttons>
+      <Button guid="VisualRustCommandSet" id="VRDebugExec" priority="0x0100" type="Button">
+        <CommandFlag>AllowParams</CommandFlag>
+        <CommandFlag>CommandWellOnly</CommandFlag>
+        <Strings>
+          <ButtonText>Rust GDB Execute Command</ButtonText>
+          <CanonicalName>Debug.VRDebugExec</CanonicalName>
+          <LocCanonicalName>Debug.VRDebugExec</LocCanonicalName>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <Symbols>
+    <GuidSymbol name="VisualRustPackage" value="{40c1d2b5-528b-4966-a7b1-1974e3568abe}" />
+    <GuidSymbol name="VisualRustCommandSet" value="{91C8967B-EB9D-4904-AB07-4ACCA9C0ECFE}" >
+      <IDSymbol name="VRDebugExec" value="1" />
+    </GuidSymbol>
+  </Symbols>
 </CommandTable>

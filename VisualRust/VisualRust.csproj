@@ -298,12 +298,18 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="Resources\Package.ico" />
-    <VSCTCompile Include="VisualRust.vsct" />
+    <VSCTCompile Include="VisualRust.vsct" >
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">
       <Project>{cacb60a9-1e76-4f92-8831-b134a658c695}</Project>
       <Name>Microsoft.VisualStudio.Project</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MIEngine\src\MICore\MICore.csproj">
+      <Project>{12cc862d-95b7-4224-8e16-b928c6333677}</Project>
+      <Name>MICore</Name>
     </ProjectReference>
     <ProjectReference Include="..\MIEngine\src\MIDebugEngine\MIDebugEngine.csproj">
       <Project>{6D2688FE-6FD8-44A8-B96A-6037457F72A7}</Project>

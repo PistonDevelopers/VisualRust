@@ -142,19 +142,17 @@ namespace VisualRust.Project
                 // this affects the number of bytes the engine reads when disassembling commands, 
                 // x64 has the largest maximum command size, so it should be safe to use for x86 as well
                 writer.WriteAttributeString("TargetArchitecture", "x64");
-
-                // GDB engine expects to find a shell on the other end of the pipe, so the first thing it sends over is "gdb --interpreter=mi",
-                // (which GDB complains about, since this isn't a valid command).  
-                // Since we are launching GDB directly, here we create a noop alias for "gdb" to make the error message go away.
-                writer.WriteElementString("Command", "alias -a gdb=echo");
+                
+                writer.WriteStartElement("SetupCommands");
                 // launch debuggee in a new console window
-                writer.WriteElementString("Command", "set new-console on");
+                writer.WriteElementString("Command", "-gdb-set new-console on");
                 if (!string.IsNullOrEmpty(debugConfig.DebuggerScript))
                 {
                     foreach (string cmd in debugConfig.DebuggerScript.Split('\r', '\n'))
                         if (!string.IsNullOrEmpty(cmd))
                             writer.WriteElementString("Command", cmd);
                 }
+                writer.WriteEndElement();
 
                 writer.WriteEndElement();
             }
@@ -163,7 +161,9 @@ namespace VisualRust.Project
             VsDebugTargetProcessInfo[] results = new VsDebugTargetProcessInfo[targets.Length];
 
             IVsDebugger4 vsDebugger = (IVsDebugger4)project.GetService(typeof(SVsShellDebugger));
-            vsDebugger.LaunchDebugTargets4((uint)targets.Length, targets, results);
+            vsDebugger.LaunchDebugTargets4((uint)targets.Length, targets, results);            
+            var commandWnd = (IVsCommandWindow)project.GetService(typeof(SVsCommandWindow));
+            commandWnd.ExecuteCommand("alias gdb Debug.VRDebugExec");
         }
 
         private string GuessArchitecture()

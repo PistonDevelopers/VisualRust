@@ -47,7 +47,7 @@ namespace VisualRust
             var indentStep = _textView.Options.GetIndentSize();
 
             var caretLine = textSnapshot.GetLineFromPosition(caretPosition);
-            var lineReminder = textSnapshot.CreateTrackingSpan(caretPosition, caretLine.End - caretPosition, SpanTrackingMode.EdgeExclusive);
+            var lineReminder = new Span(caretPosition, caretLine.End - caretPosition);
 
             var textToCaret = textSnapshot.GetText(0, caretPosition);
             var tokens = Utils.LexString(textToCaret);
@@ -81,7 +81,7 @@ namespace VisualRust
             }
 
             var closeBraceAfterCaret = false;
-            foreach (var ch in lineReminder.GetText(textSnapshot))
+            foreach (var ch in textSnapshot.GetText(lineReminder))
             {
                 if (ch == '}' || ch == ')')
                 {

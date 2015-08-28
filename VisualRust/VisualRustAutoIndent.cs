@@ -134,9 +134,9 @@ namespace VisualRust
             {
                 return true;
             }
-
-            var trackingSpan = textSnapshot.CreateTrackingSpan(caretLine.Start, caretPositionInLine, SpanTrackingMode.EdgeExclusive);
-            var text = trackingSpan.GetText(textSnapshot);
+            
+            var span = new Span(caretLine.Start, caretPositionInLine);
+            var text = textSnapshot.GetText(span);
 
             foreach (var ch in text)
             {

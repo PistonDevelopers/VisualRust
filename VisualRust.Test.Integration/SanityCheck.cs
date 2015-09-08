@@ -20,7 +20,9 @@ namespace VisualRust.Test.Integration
         {
             IVsPackage package = new VisualRustPackage() as IVsPackage;
             OleServiceProvider serviceProvider = OleServiceProvider.CreateOleServiceProviderWithBasicServices();
+#if VS12
             serviceProvider.AddService(typeof(SVsActivityLog), new FakeIVsActivityLog(), true);
+#endif
             serviceProvider.AddService(typeof(SVsSolution), new FakeIVsSolution(), true);
             serviceProvider.AddService(typeof(SVsRegisterProjectTypes), new FakeIVsRegisterProjectTypes(), true);
             serviceProvider.AddService(typeof(SOleComponentManager), new FakeIOleComponentManager(), true);

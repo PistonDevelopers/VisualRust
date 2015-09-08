@@ -28,7 +28,11 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
+#if VS12
         [TestProperty("VsHiveName", "12.0Exp")]
+#elif VS14
+        [TestProperty("VsHiveName", "14.0Exp")]
+#endif
         public void PackageLoad()
         {
             UIThreadInvoker.Invoke((Action)delegate() 
@@ -46,7 +50,11 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
+#if VS12
         [TestProperty("VsHiveName", "12.0Exp")]
+#elif VS14
+        [TestProperty("VsHiveName", "14.0Exp")]
+#endif
         public void CreateRustLibraryProject()
         {
             UIThreadInvoker.Invoke((Action)delegate()
@@ -80,7 +88,11 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
+#if VS12
         [TestProperty("VsHiveName", "12.0Exp")]
+#elif VS14
+        [TestProperty("VsHiveName", "14.0Exp")]
+#endif
         public void ExcludedNodesAreNotTracked()
         {
             UIThreadInvoker.Invoke((Action)delegate()
@@ -116,7 +128,11 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
+#if VS12
         [TestProperty("VsHiveName", "12.0Exp")]
+#elif VS14
+        [TestProperty("VsHiveName", "14.0Exp")]
+#endif
         public void AddExistingFileFromFolder()
         {
             UIThreadInvoker.Invoke((Action)delegate()
@@ -155,7 +171,11 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
+#if VS12
         [TestProperty("VsHiveName", "12.0Exp")]
+#elif VS14
+        [TestProperty("VsHiveName", "14.0Exp")]
+#endif
         public void CreateRustApplicationProject()
         {
             UIThreadInvoker.Invoke((Action)delegate()

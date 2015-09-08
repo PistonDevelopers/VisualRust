@@ -64,21 +64,39 @@ namespace VisualRust.Test.Integration
         private void Run(HierarchyNode node)
         {
             Assert.ReferenceEquals(this.root, node);
-            var projChildren = node.AllChildren.ToList();
+            var projChildren = node.AllChildren.Where(n => !(n is FolderNode && n.IsNonMemberItem)).ToList();
             Assert.AreEqual<int>(
                 children.Count,
-                node.AllChildren.Count(),
-                "Wrong number of children in node <{0}> of type <{1}>.",
+                projChildren.Count,
+                "Wrong number of children in node <{0}> of type <{1}>.\nExpected:{2}\ngot:{3}",
                 node.Caption,
-                node.GetType());
-            string allNodes = String.Join(", ", projChildren.Select(n => String.Format("<{0} ({1})>", n.Caption, n.GetType())));
+                node.GetType(),
+                PrettyPrintChildren(children, PrettyPrintNode),
+                PrettyPrintChildren(projChildren, PrettyPrintNode));
             foreach(var child in children)
             {
-                HierarchyNode childNode = projChildren.FirstOrDefault(n => child.type.IsAssignableFrom(n.GetType()) && String.Equals(n.Caption, child.caption));
-                Assert.IsNotNull(childNode, "Node <{0} ({1})> has no subnode <{2} ({3})>. All subnodes: [{4}].", node.Caption, node.GetType(), child.caption, child.type, allNodes);
+                HierarchyNode childNode = projChildren.FirstOrDefault(n => child.type.IsInstanceOfType(n) && String.Equals(n.Caption, child.caption));
+                Assert.IsNotNull(childNode, "Node <{0} ({1})> has no subnode <{2} ({3})>.", node.Caption, node.GetType(), child.caption, child.type);
                 child.validator(childNode);
                 child.Run(childNode);
             }
+        }
+
+        private static string PrettyPrintChildren<T>(IList<T> children, Func<T, string> printer)
+        {
+            if (children.Count == 0)
+                return "(empty collection)";
+            return String.Join("", children.Select(n => "\n\t" + printer(n)));
+        }
+
+        private static string PrettyPrintNode(HierarchyNode n)
+        {
+            return String.Format("<{0} ({1})>", n.Caption, n.GetType());
+        }
+
+        private string PrettyPrintNode(HierarchyCheck arg)
+        {
+            return String.Format("<{0} ({1})>", arg.caption, arg.type);
         }
 
         public void Run()

@@ -28,7 +28,12 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
-        [TestProperty("VsHiveName", "12.0Exp")]
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RestartOptions, VsIdeTestHostContants.HostRestartOptions.Both)]
+#if VS12
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "12.0Exp")]
+#elif VS14
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "14.0Exp")]
+#endif
         public void PackageLoad()
         {
             UIThreadInvoker.Invoke((Action)delegate() 
@@ -46,7 +51,12 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
-        [TestProperty("VsHiveName", "12.0Exp")]
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RestartOptions, VsIdeTestHostContants.HostRestartOptions.Both)]
+#if VS12
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "12.0Exp")]
+#elif VS14
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "14.0Exp")]
+#endif
         public void CreateRustLibraryProject()
         {
             UIThreadInvoker.Invoke((Action)delegate()
@@ -80,7 +90,12 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
-        [TestProperty("VsHiveName", "12.0Exp")]
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RestartOptions, VsIdeTestHostContants.HostRestartOptions.Both)]
+#if VS12
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "12.0Exp")]
+#elif VS14
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "14.0Exp")]
+#endif
         public void ExcludedNodesAreNotTracked()
         {
             UIThreadInvoker.Invoke((Action)delegate()
@@ -116,14 +131,19 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
-        [TestProperty("VsHiveName", "12.0Exp")]
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RestartOptions, VsIdeTestHostContants.HostRestartOptions.Both)]
+#if VS12
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "12.0Exp")]
+#elif VS14
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "14.0Exp")]
+#endif
         public void AddExistingFileFromFolder()
         {
             UIThreadInvoker.Invoke((Action)delegate()
             {
                 // Create solution and project
                 string projName = Utils.GetCallingFunction();
-                Utils.CreateEmptySolution(TestContext.TestDir, projName);
+                Utils.CreateEmptySolution(TestContext.TestRunDirectory, projName);
                 string projectPath = Utils.CreateProjectFromTemplate(projName, "Rust Library", "Rust", false);
                 string newFile = Path.Combine(projectPath, "src", "baz.rs");
                 // Add file
@@ -155,7 +175,12 @@ namespace VisualRust.Test.Integration
         [TestMethod]
         [HostType("VS IDE")]
         [TestCategory("Explicit")]
-        [TestProperty("VsHiveName", "12.0Exp")]
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RestartOptions, VsIdeTestHostContants.HostRestartOptions.Both)]
+#if VS12
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "12.0Exp")]
+#elif VS14
+        [TestProperty(VsIdeTestHostContants.TestPropertyName.RegistryHiveName, "14.0Exp")]
+#endif
         public void CreateRustApplicationProject()
         {
             UIThreadInvoker.Invoke((Action)delegate()

@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private bool haveCachedVerbosity = false;
 
         // Queues to manage Tasks and Error output plus message logging
-        private ConcurrentQueue<Func<DocumentTask>> taskQueue;
+        private ConcurrentQueue<Func<ErrorTask>> taskQueue;
         private ConcurrentQueue<OutputQueueEntry> outputQueue;
 
         #endregion
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudioTools.Project {
         public override void Initialize(IEventSource eventSource) {
             Utilities.ArgumentNotNull("eventSource", eventSource);
 
-            this.taskQueue = new ConcurrentQueue<Func<DocumentTask>>();
+            this.taskQueue = new ConcurrentQueue<Func<ErrorTask>>();
             this.outputQueue = new ConcurrentQueue<OutputQueueEntry>();
 
             eventSource.BuildStarted += new BuildStartedEventHandler(BuildStartedHandler);
@@ -389,13 +389,15 @@ namespace Microsoft.VisualStudioTools.Project {
 
         protected void QueueTaskEvent(BuildEventArgs errorEvent) {
             // This enqueues a function that will later be run on the main (UI) thread
-            this.taskQueue.Enqueue(() => {
+            this.taskQueue.Enqueue(() =>
+            {
                 TextSpan span;
                 string file;
                 MARKERTYPE marker;
                 TaskErrorCategory category;
 
-                if (errorEvent is BuildErrorEventArgs) {
+                if (errorEvent is BuildErrorEventArgs)
+                {
                     BuildErrorEventArgs errorArgs = (BuildErrorEventArgs)errorEvent;
                     span = new TextSpan();
                     // spans require zero-based indices
@@ -403,10 +405,12 @@ namespace Microsoft.VisualStudioTools.Project {
                     span.iEndLine = errorArgs.EndLineNumber - 1;
                     span.iStartIndex = errorArgs.ColumnNumber - 1;
                     span.iEndIndex = errorArgs.EndColumnNumber - 1;
-                    file = Path.Combine(Path.GetDirectoryName(errorArgs.ProjectFile), errorArgs.File);
+                    file = GetRelativeOrProjectPath(errorArgs.ProjectFile, errorArgs.File);
                     marker = MARKERTYPE.MARKER_CODESENSE_ERROR; // red squiggles
                     category = TaskErrorCategory.Error;
-                } else if (errorEvent is BuildWarningEventArgs) {
+                }
+                else if (errorEvent is BuildWarningEventArgs)
+                {
                     BuildWarningEventArgs warningArgs = (BuildWarningEventArgs)errorEvent;
                     span = new TextSpan();
                     // spans require zero-based indices
@@ -414,11 +418,12 @@ namespace Microsoft.VisualStudioTools.Project {
                     span.iEndLine = warningArgs.EndLineNumber - 1;
                     span.iStartIndex = warningArgs.ColumnNumber - 1;
                     span.iEndIndex = warningArgs.EndColumnNumber - 1;
-                    file = Path.Combine(Path.GetDirectoryName(warningArgs.ProjectFile), warningArgs.File);
+                    file = GetRelativeOrProjectPath(warningArgs.ProjectFile, warningArgs.File);
                     marker = MARKERTYPE.MARKER_COMPILE_ERROR; // red squiggles
                     category = TaskErrorCategory.Warning;
                 }
-                else {
+                else
+                {
                     throw new NotImplementedException();
                 }
 
@@ -459,7 +464,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                 }
 
-                DocumentTask task = new DocumentTask(serviceProvider, buffer, marker, span, file);
+                ErrorTask task = CreateErrorTask(errorEvent, span, file, marker, category, buffer);
                 task.ErrorCategory = category;
                 task.Document = file;
                 task.Line = span.iStartLine;
@@ -468,12 +473,28 @@ namespace Microsoft.VisualStudioTools.Project {
                 task.Text = errorEvent.Message;
                 task.Category = TaskCategory.BuildCompile;
                 task.HierarchyItem = hierarchy;
-
                 return task;
             });
 
             // NOTE: Unlike output we dont want to interactively report the tasks. So we never queue
             // call ReportQueuedTasks here. We do this when the build finishes.
+        }
+
+        static string GetRelativeOrProjectPath(string projectFile, string file)
+        {
+            bool isInvalidFileName = file.IndexOfAny(Path.GetInvalidPathChars()) != -1;
+            if(isInvalidFileName)
+                return projectFile;
+            return Path.Combine(Path.GetDirectoryName(projectFile), file);
+
+        }
+
+        ErrorTask CreateErrorTask(BuildEventArgs errorEvent, TextSpan span, string file, MARKERTYPE marker, TaskErrorCategory category, IVsTextLines buffer)
+        {
+            if(buffer != null)
+                return new DocumentTask(serviceProvider, buffer, marker, span, file);
+            else
+                return new ErrorTask();
         }
 
         private void ReportQueuedTasks() {
@@ -482,7 +503,7 @@ namespace Microsoft.VisualStudioTools.Project {
             BeginInvokeWithErrorMessage(this.serviceProvider, this.dispatcher, () => {
                 this.taskProvider.SuspendRefresh();
                 try {
-                    Func<DocumentTask> taskFunc;
+                    Func<ErrorTask> taskFunc;
 
                     while (this.taskQueue.TryDequeue(out taskFunc)) {
                         // Create the error task
@@ -499,7 +520,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         private void ClearQueuedTasks() {
             // NOTE: This may run on a background thread!
-            this.taskQueue = new ConcurrentQueue<Func<DocumentTask>>();
+            this.taskQueue = new ConcurrentQueue<Func<ErrorTask>>();
 
             if (this.InteractiveBuild) {
                 // We need to clear this on the main thread. We must use BeginInvoke because the main thread may not be pumping events yet.

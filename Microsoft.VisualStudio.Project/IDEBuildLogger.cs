@@ -45,6 +45,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         private const string GeneralCollection = @"General";
         private const string BuildVerbosityProperty = "MSBuildLoggerVerbosity";
+        private const string StdMacrosToken = "<std macros>";
 
         private int currentIndent;
         private IVsOutputWindowPane outputWindowPane;
@@ -55,6 +56,8 @@ namespace Microsoft.VisualStudioTools.Project {
         private IServiceProvider serviceProvider;
         private Dispatcher dispatcher;
         private bool haveCachedVerbosity = false;
+
+        private BuildErrorEventArgs lastMacroError;
 
         // Queues to manage Tasks and Error output plus message logging
         private ConcurrentQueue<Func<ErrorTask>> taskQueue;
@@ -267,7 +270,15 @@ namespace Microsoft.VisualStudioTools.Project {
         protected virtual void ErrorRaisedHandler(object sender, BuildErrorEventArgs errorEvent) {
             // NOTE: This may run on a background thread!
             QueueOutputText(GetFormattedErrorMessage(errorEvent.File, errorEvent.LineNumber, errorEvent.ColumnNumber, false, errorEvent.Code, errorEvent.Message));
-            QueueTaskEvent(errorEvent);
+
+            if (errorEvent.File == StdMacrosToken)
+            {
+                HandleMacroErrorEvent(errorEvent);
+            }
+            else
+            {
+                QueueTaskEvent(errorEvent);
+            }
         }
 
         /// <summary>
@@ -276,7 +287,20 @@ namespace Microsoft.VisualStudioTools.Project {
         protected virtual void WarningHandler(object sender, BuildWarningEventArgs warningEvent) {
             // NOTE: This may run on a background thread!
             QueueOutputText(MessageImportance.High, GetFormattedErrorMessage(warningEvent.File, warningEvent.LineNumber, warningEvent.ColumnNumber, true, warningEvent.Code, warningEvent.Message));
-            QueueTaskEvent(warningEvent);
+
+            if (warningEvent.File == StdMacrosToken)
+            {
+                // Ignore these. See the comment in HandleMacroErrorEvent.
+            }
+            else
+            {
+                if (lastMacroError != null)
+                {
+                    TryQueueLastMacroError(warningEvent);
+                }
+
+                QueueTaskEvent(warningEvent);
+            }
         }
 
         /// <summary>
@@ -620,6 +644,86 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         private void ClearCachedVerbosity() {
             this.haveCachedVerbosity = false;
+        }
+
+        /// <summary>
+        /// Handle error event from inside a macro expansion.
+        /// </summary>
+        /// <param name="errorEvent"></param>
+        private void HandleMacroErrorEvent(BuildErrorEventArgs errorEvent)
+        {
+            // Errors reported from inside macros are a special case.
+            // There are 2 problems with them:
+            //    1. The errors themselves are reported for file "<std macros>", and therefore we
+            //       can't call QueueTaskEvent for them, because the path is invalid.
+            //    2. In some cases the only thing reported against the real "*.rs" file is a "warning",
+            //       so if we just ignore all the errors with "<std macros>", the error window in VS
+            //       doesn't pop up, because there are no errors, only warnings.
+            // 
+            // Let's remember the last macro error we saw, and report it the first time
+            // we see a "warning" for macro expansion in a real Rust file.
+
+            /* Sample code
+
+                    use std::sync::atomic::AtomicUsize;
+                    fn test2() {
+                        let v = vec![AtomicUsize::new(0); 2];
+                        println!("{:?}", vec![AtomicUsize::new(0); 2]);
+                    }
+
+                Sample output
+
+                     <std macros>(1,37): error E0277: the trait `core::clone::Clone` is not implemented for the type `core::sync::atomic::AtomicUsize`
+                     src\lib.rs(161,13): warning : note: in this expansion of vec! (defined in <std macros>)
+                     <std macros>(1,37): error : run `rustc --explain E0277` to see a detailed explanation
+                     note: required by `collections::vec::from_elem`
+
+                     <std macros>(1,37): error E0277: the trait `core::clone::Clone` is not implemented for the type `core::sync::atomic::AtomicUsize`
+                     src\lib.rs(162,22): warning : note: in this expansion of vec! (defined in <std macros>)
+                     <std macros>(2,25): warning : note: in this expansion of format_args!
+                     <std macros>(3,1): warning : note: in this expansion of print! (defined in <std macros>)
+                     src\lib.rs(162,5): warning : note: in this expansion of println! (defined in <std macros>)
+                     <std macros>(1,37): error : run `rustc --explain E0277` to see a detailed explanation
+                     note: required by `collections::vec::from_elem`
+            */
+
+            lastMacroError = errorEvent;
+        }
+
+        /// <summary>
+        /// Report last macro error using the information from the warning,
+        /// if the warning is of a special form.
+        /// </summary>
+        private void TryQueueLastMacroError(BuildWarningEventArgs warningEvent)
+        {
+            if (lastMacroError != null
+                && warningEvent.Message.Contains("note:")
+                && warningEvent.Message.Contains(StdMacrosToken))
+            {
+                // Assume the last macro error is related to this "warning".
+                // See the comment in HandleMacroErrorEvent.
+                // This is fragile, but if we ignore this error completely
+                // we will only display vague warning messages for macro errors.
+                var adjustedMacrosError = new BuildErrorEventArgs
+                    (
+                        lastMacroError.Subcategory,
+                        lastMacroError.Code,
+                        warningEvent.File,
+                        warningEvent.LineNumber,
+                        warningEvent.ColumnNumber,
+                        warningEvent.EndLineNumber,
+                        warningEvent.EndColumnNumber,
+                        lastMacroError.Message,
+                        lastMacroError.HelpKeyword,
+                        lastMacroError.SenderName,
+                        lastMacroError.Timestamp
+                    );
+
+                adjustedMacrosError.ProjectFile = warningEvent.ProjectFile;
+
+                lastMacroError = null;
+                QueueTaskEvent(adjustedMacrosError);
+            }
         }
 
         #endregion helpers

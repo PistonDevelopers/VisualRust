@@ -54,7 +54,7 @@ Nuget will take care of the rest.
 
 ## Build configuration
 
-If you plan to hask on Visual Rust you should understand difference between
+If you plan to hack on Visual Rust you should understand difference between
 our two build configurations. 
 * For the `Release` configuration the main project is `VisualRust.Setup`,
   its output is a .msi file that consists of two parts:

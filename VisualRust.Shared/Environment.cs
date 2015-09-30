@@ -18,12 +18,15 @@ namespace VisualRust.Shared
         public const string DefaultTarget = "default";
 
         /* 
-         * If the target is "default" just return first location
-         * Otherwise check for bin\rustlib\<target>
+         * If the target is "default" just return the first location with "bin\rustc.exe"
+         * Otherwise also require "bin\rustlib\<target>"
          */
         public static string FindInstallPath(string target)
         {
-            return GetAllInstallPaths().Select(p => Path.Combine(p, "bin")).FirstOrDefault(p => CanActuallyBuildTarget(p, target));
+            return GetAllInstallPaths()
+                .Select(p => Path.Combine(p, "bin"))
+                .Where(p => File.Exists(Path.Combine(p, "rustc.exe")))
+                .FirstOrDefault(p => CanActuallyBuildTarget(p, target));
         }
 
         public static IEnumerable<string> FindInstalledTargets()

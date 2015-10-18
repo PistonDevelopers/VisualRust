@@ -45,7 +45,7 @@ namespace VisualRust
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            if (SupportsAutomation || !VsShellUtilities.IsInAutomationFunction(VisualRustPackage.Instance))
+            if (SupportsAutomation || (VisualRustPackage.Instance != null && !VsShellUtilities.IsInAutomationFunction(VisualRustPackage.Instance)))
             {
                 if (pguidCmdGroup == CommandGroupId && CommandIdSet.Contains(nCmdID))
                 {

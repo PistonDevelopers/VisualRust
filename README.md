@@ -13,6 +13,19 @@ Unstable, but more recent builds are downloadable from [AppVeyor]
 (https://ci.appveyor.com/project/vosen/visualrust) (choose "Configuration:
 Release" and "Artifacts").
 
+## Features
+
+* Project support
+* Syntax highlighting
+* Autocomplete
+* Go to definition
+* MIEngine-powered debugging featuring
+  * Conditional breakpoints
+  * Watch window (with the ability to change the runtime state)
+  * Immediate window (with the ability to change the runtime state)
+  * Set next statement
+  * Call stack view and navigation
+
 Contributing
 ============
 

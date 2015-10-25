@@ -1,4 +1,4 @@
-﻿namespace VisualRust
+﻿namespace VisualRust.Text
 {
     using System;
     using System.Diagnostics;

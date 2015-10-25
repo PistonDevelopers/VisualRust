@@ -243,8 +243,8 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="RunningDocTableEventsListener.cs" />
     <Compile Include="RustBraceMatcher.cs" />
-    <Compile Include="RustClassifier.cs" />
-    <Compile Include="RustClassifierProvider.cs" />
+    <Compile Include="Text\RustClassifier.cs" />
+    <Compile Include="Text\RustClassifierProvider.cs" />
     <Compile Include="RustCommentSelectionCommandHandler.cs" />
     <Compile Include="RustCompletionCommandHandler.cs" />
     <Compile Include="RustCompletionSource.cs" />
@@ -256,7 +256,7 @@
     <Compile Include="Text\Antlr\Lexer.cs" />
     <Compile Include="Text\BitHelper.cs" />
     <Compile Include="Text\EnumerableHelpers.cs" />
-    <Compile Include="Text\ILexer.cs" />
+    <Compile Include="Text\IRustLexer.cs" />
     <Compile Include="Text\SortedSet.cs" />
     <Compile Include="Text\SortedSetExtensions.cs" />
     <Compile Include="Text\SpannedToken.cs" />
@@ -313,7 +313,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="Resources\Package.ico" />
-    <VSCTCompile Include="VisualRust.vsct" >
+    <VSCTCompile Include="VisualRust.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
   </ItemGroup>

@@ -60,6 +60,11 @@ namespace VisualRust.Text
             return current.GetText(comparer.Version);
         }
 
+        internal IEnumerable<TrackingToken> GetTokens(SnapshotSpan span)
+        {
+            return tree.CoveringTokens(Version, span);
+        }
+
         private Span InvalidatedSpan(ITextSnapshot oldSnapshot, IList<TrackingToken> invalid, int delta)
         {
             int invalidationStart = invalid[0].GetStart(oldSnapshot); // this position is the same in both versions
@@ -79,6 +84,8 @@ namespace VisualRust.Text
         {
             comparer.Version = currentSnapshot;
         }
+
+        public ITextSnapshot Version { get { return comparer.Version; } }
 
         public void TextChanged(TextContentChangedEventArgs args)
         {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace VisualRust.Text
 {
-    internal struct TrackingToken
+    public struct TrackingToken
     {
         public class NonOverlappingComparer : IComparer<TrackingToken>
         {
@@ -15,7 +15,12 @@ namespace VisualRust.Text
 
             public int Compare(TrackingToken x, TrackingToken y)
             {
-                return x.Start.GetPosition(Version).CompareTo(y.Start.GetPosition(Version));
+                int result = x.Start.GetPosition(Version).CompareTo(y.Start.GetPosition(Version));
+#if DEBUG
+                if(result == 0)
+                    System.Diagnostics.Debug.Assert(x.Length == y.Length);
+#endif
+                return result;
             }
         }
 
@@ -24,10 +29,11 @@ namespace VisualRust.Text
         public int Type;
 
         public bool IsEmpty { get { return Start == null; } }
+        public static TrackingToken Empty { get { return new TrackingToken(); } }
 
         internal TrackingToken(ITextSnapshot snapshot, SpannedToken arg) : this()
         {
-            Start = snapshot.CreateTrackingPoint(arg.Span.Start, PointTrackingMode.Negative);
+            Start = snapshot.CreateTrackingPoint(arg.Span.Start, PointTrackingMode.Positive);
             Length = arg.Span.Length;
             Type = arg.Type;
         }
@@ -52,5 +58,4 @@ namespace VisualRust.Text
             return snap.GetText(GetSpan(snap));
         }
     }
-
 }

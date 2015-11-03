@@ -258,10 +258,10 @@
     <Compile Include="Text\EnumerableHelpers.cs" />
     <Compile Include="Text\IRustLexer.cs" />
     <Compile Include="Text\SortedSet.cs" />
-    <Compile Include="Text\SortedSetExtensions.cs" />
+    <Compile Include="Text\SortedSetHelpers.cs" />
     <Compile Include="Text\SpannedToken.cs" />
     <Compile Include="Text\DocumentState.cs" />
-    <Compile Include="Text\TextBufferCreationListener.cs" />
+    <Compile Include="Text\TokensChangedEventArgs.cs" />
     <Compile Include="Text\TrackingToken.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="RustLanguage.cs" />

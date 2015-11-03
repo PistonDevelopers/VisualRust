@@ -15,11 +15,11 @@ namespace VisualRust.Text.Antlr
     {
         public IEnumerable<SpannedToken> Run(IEnumerable<string> segments, int offset)
         {
-            var lexer = new RustLexer.RustLexer(new AntlrInputStream(new TextSegmentsCharStream(segments)));
-            while(true)
+            var lexer = new RustLexer.RustLexer(new UnbufferedCharStream(new TextSegmentsCharStream(segments)));
+            while (true)
             {
                 IToken current = lexer.NextToken();
-                if(current.Type == RustLexer.RustLexer.Eof)
+                if (current.Type == RustLexer.RustLexer.Eof)
                     break;
                 yield return new SpannedToken(current.Type, new Span(current.StartIndex + offset, current.StopIndex - current.StartIndex + 1));
             }

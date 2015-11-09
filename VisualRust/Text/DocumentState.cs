@@ -48,22 +48,23 @@ namespace VisualRust.Text
 
         public void ApplyTextChanges(TextContentChangedEventArgs args)
         {
-            foreach(var change in args.Changes)
-            {
-                List<TrackingToken> forRemoval = GetInvalidated(args.Before, change);
-                // Some of the tokens marked for removal must be deleted before applying a new version,
-                // because otherwise some trackingtokens will have broken spans
-                int i = 0;
-                for(; i < forRemoval.Count; i++)
-                    tree.Remove(forRemoval[i]);
-                CurrentSnapshot = args.After;
-                IList<TrackingToken> updated = Rescan(forRemoval, args.Before, change.Delta);
-                for(; i < forRemoval.Count; i++)
-                    tree.Remove(forRemoval[i]);
-                foreach(var token in updated)
-                    tree.Add(token);
-                RaiseTokensChanged(change, updated);
-            }
+            ApplyTextChange(args.Before, args.After, new JoinedTextChange(args.Changes));
+        }
+
+        public void ApplyTextChange(ITextSnapshot before, ITextSnapshot after, ITextChange change)
+        {
+            List<TrackingToken> forRemoval = GetInvalidated(before, change);
+            // Some of the tokens marked for removal must be deleted before applying a new version,
+            // because otherwise some trackingtokens will have broken spans
+            int i = 0;
+            for (; i < forRemoval.Count; i++)
+                tree.Remove(forRemoval[i]);
+            CurrentSnapshot = after;
+            IList<TrackingToken> updated = Rescan(forRemoval, before, change.Delta);
+            for (; i < forRemoval.Count; i++)
+                tree.Remove(forRemoval[i]);
+            foreach (var token in updated)
+                tree.Add(token);
         }
 
         private void RaiseTokensChanged(ITextChange change, IList<TrackingToken> updated)

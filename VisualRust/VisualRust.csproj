@@ -243,6 +243,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="RunningDocTableEventsListener.cs" />
     <Compile Include="RustBraceMatcher.cs" />
+    <Compile Include="Text\JoinedTextChange.cs" />
     <Compile Include="Text\RustClassifier.cs" />
     <Compile Include="Text\RustClassifierProvider.cs" />
     <Compile Include="RustCommentSelectionCommandHandler.cs" />

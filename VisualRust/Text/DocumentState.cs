@@ -65,6 +65,7 @@ namespace VisualRust.Text
                 tree.Remove(forRemoval[i]);
             foreach (var token in updated)
                 tree.Add(token);
+            RaiseTokensChanged(change, updated);
         }
 
         private void RaiseTokensChanged(ITextChange change, IList<TrackingToken> updated)

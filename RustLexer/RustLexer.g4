@@ -175,7 +175,7 @@ IDENT : XID_Start XID_Continue* ;
 
 fragment QUESTION_IDENTIFIER : QUESTION? IDENT;
 
-LIFETIME : '\'' IDENT ;
+LIFETIME : '\'' IDENT? ;
 
 WHITESPACE : [ \r\n\t]+ ;
 

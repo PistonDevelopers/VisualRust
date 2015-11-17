@@ -248,7 +248,7 @@ namespace VisualRust
         [Conditional("DEBUG")]
         internal static void DebugPrintToOutput(string s, params object[] args)
         {        
-            PrintToOutput("[DEBUG] "+s, args);
+            PrintToOutput("[DEBUG] " + s + "\n", args);
         }
 
         internal static void PrintToOutput(string s, params object[] args)

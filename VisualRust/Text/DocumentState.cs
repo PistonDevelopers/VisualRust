@@ -48,7 +48,16 @@ namespace VisualRust.Text
 
         public void ApplyTextChanges(TextContentChangedEventArgs args)
         {
-            ApplyTextChange(args.Before, args.After, new JoinedTextChange(args.Changes));
+            try
+            {
+                ApplyTextChange(args.Before, args.After, new JoinedTextChange(args.Changes));
+            }
+            catch(Exception ex)
+            {
+                Utils.PrintToOutput("Exception during parsing:\n{0}", ex.Message);
+                Initialize();
+                RaiseTokensChanged(tree.ToList());
+            }
         }
 
         public void ApplyTextChange(ITextSnapshot before, ITextSnapshot after, ITextChange change)
@@ -65,10 +74,28 @@ namespace VisualRust.Text
                 tree.Remove(forRemoval[i]);
             foreach (var token in updated)
                 tree.Add(token);
-            RaiseTokensChanged(change, updated);
+            RaiseTokensChanged(updated);
+            CheckChanges(change);
         }
 
-        private void RaiseTokensChanged(ITextChange change, IList<TrackingToken> updated)
+        [System.Diagnostics.Conditional("DEBUG")]
+        private void CheckChanges(ITextChange change)
+        {
+            Span[] expected = lexer.Run(new [] { CurrentSnapshot.GetText() }, 0).Select(x => x.Span).ToArray();
+            Span[] actual = GetTokens(new Span(0, CurrentSnapshot.Length)).Select(x => x.GetSpan(CurrentSnapshot)).ToArray();
+            var wrong = expected.Zip(actual, (_1, _2) => new { _1, _2 }).FirstOrDefault(x => x._1 != x._2);
+            if(wrong != null)
+            {
+                Utils.DebugPrintToOutput(
+                    "Parser state mismatch.\nExpected span: {0} `{1}`\nActual span: {2} `{3}`",
+                    wrong._1,
+                    CurrentSnapshot.GetText(wrong._1),
+                    wrong._2,
+                    CurrentSnapshot.GetText(wrong._2));
+            }
+        }
+
+        private void RaiseTokensChanged(IList<TrackingToken> updated)
         {
             var temp = TokensChanged;
             if(TokensChanged != null)

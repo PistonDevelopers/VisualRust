@@ -1,14 +1,21 @@
 lexer grammar RustLexer;
 
+@lexer::members {
+  public bool is_at(int pos) {
+    return _input.Index == pos;
+  }
+}
+
+
 tokens {
-    EQ, LT, LE, EQEQ, NE, GE, GT, ANDAND, OROR, NOT, TILDE,
+    EQ, LT, LE, EQEQ, NE, GE, GT, ANDAND, OROR, NOT, TILDE, PLUS,
     MINUS, STAR, SLASH, PERCENT, CARET, AND, OR, SHL, SHR, BINOP,
-    BINOPEQ, AT, DOT, DOTDOT, DOTDOTDOT, COMMA, SEMI, COLON,
+    BINOPEQ, LARROW, AT, DOT, DOTDOT, DOTDOTDOT, COMMA, SEMI, COLON,
     MOD_SEP, RARROW, FAT_ARROW, LPAREN, RPAREN, LBRACKET, RBRACKET,
-    LBRACE, RBRACE, POUND, DOLLAR, UNDERSCORE, LIT_CHAR,
-    LIT_INTEGER, LIT_FLOAT, LIT_STR, LIT_STR_RAW, LIT_BINARY,
-    LIT_BINARY_RAW, IDENT, LIFETIME, WHITESPACE, DOC_COMMENT,
-    COMMENT, SHEBANG, DOC_BLOCK_COMMENT, BLOCK_COMMENT
+    LBRACE, RBRACE, POUND, DOLLAR, UNDERSCORE, LIT_CHAR, LIT_BYTE,
+    LIT_INTEGER, LIT_FLOAT, LIT_STR, LIT_STR_RAW, LIT_BYTE_STR,
+    LIT_BYTE_STR_RAW, QUESTION, IDENT, LIFETIME, WHITESPACE, DOC_COMMENT,
+    COMMENT, SHEBANG, UTF8_BOM
 }
 
 import xidstart , xidcontinue;
@@ -37,6 +44,7 @@ AND     : '&' ;
 OR      : '|' ;
 SHL     : '<<' ;
 SHR     : '>>' ;
+LARROW  : '<-' ;
 
 BINOP
     : PLUS
@@ -49,6 +57,7 @@ BINOP
     | OR
     | SHL
     | SHR
+    | LARROW
     ;
 
 BINOPEQ : BINOP EQ ;
@@ -107,7 +116,7 @@ LIT_CHAR
          | ~[\\'\n\t\r]
          | '\ud800' .. '\udbff' '\udc00' .. '\udfff'
          )
-    ('\'' SUFFIX? | '\n'| '\r\n' | EOF)
+    '\'' SUFFIX?
   ;
 
 LIT_BYTE
@@ -115,7 +124,7 @@ LIT_BYTE
                  | [nrt\\'"0] )
           | ~[\\'\n\t\r] '\udc00'..'\udfff'?
           )
-    ('\'' SUFFIX? | '\n'| '\r\n' | EOF)
+    '\'' SUFFIX?
   ;
 
 LIT_INTEGER
@@ -138,21 +147,21 @@ LIT_FLOAT
   ;
 
 LIT_STR
-  : '"' ('\\\n' | '\\\r\n' | '\\' CHAR_ESCAPE | .)*? ('"' SUFFIX? | '\n'| '\r\n' | EOF)
+  : '"' ('\\\n' | '\\\r\n' | '\\' CHAR_ESCAPE | .)*? ('"' SUFFIX? | EOF)
   ;
 
-LIT_BINARY : 'b' LIT_STR ;
-LIT_BINARY_RAW : 'b' LIT_STR_RAW ;
+LIT_BYTE_STR : 'b' LIT_STR ;
+LIT_BYTE_STR_RAW : 'b' LIT_STR_RAW ;
 
 /* this is a bit messy */
 
 fragment LIT_STR_RAW_INNER
-  : '"' .*? '"'
+  : '"' .*? ('"'| EOF)
   | LIT_STR_RAW_INNER2
   ;
 
 fragment LIT_STR_RAW_INNER2
-  : POUND LIT_STR_RAW_INNER POUND
+  : POUND LIT_STR_RAW_INNER (POUND | EOF)
   ;
 
 LIT_STR_RAW
@@ -166,7 +175,7 @@ IDENT : XID_Start XID_Continue* ;
 
 fragment QUESTION_IDENTIFIER : QUESTION? IDENT;
 
-LIFETIME : '\'' IDENT ;
+LIFETIME : '\'' IDENT? ;
 
 WHITESPACE : [ \r\n\t]+ ;
 
@@ -176,13 +185,13 @@ OUTER_DOC_COMMENT : '//!' ~[\r\n]* -> type(DOC_COMMENT) ;
 LINE_COMMENT      : '//' ( ~[/\n] ~[\n]* )? -> type(COMMENT) ;
 
 DOC_BLOCK_COMMENT
-  : ('/**' ~[*] | '/*!') (DOC_BLOCK_COMMENT | .)*? ('*/' | '\n'| '\r\n'  | EOF)  -> type(DOC_BLOCK_COMMENT)
+  : ('/**' ~[*] | '/*!') (DOC_BLOCK_COMMENT | .)*? ('*/' | EOF) -> type(DOC_COMMENT)
   ;
 
-BLOCK_COMMENT : '/*' (BLOCK_COMMENT | .)*? ('*/' | '\n'| '\r\n' | EOF)  -> type(BLOCK_COMMENT) ;
+BLOCK_COMMENT : '/*' (BLOCK_COMMENT | .)*? ('*/' | EOF) -> type(COMMENT) ;
 
 /* these appear at the beginning of a file */
 
-SHEBANG : '#!' { isAt(2) && _input.La(1) != '[' }? ~[\r\n]* -> type(SHEBANG) ;
+SHEBANG : '#!' { is_at(2) && _input.La(1) != '[' }? ~[\r\n]* -> type(SHEBANG) ;
 
-UTF8_BOM : '\ufeff' { isAt(1) }? -> skip ;
+UTF8_BOM : '\ufeff' { is_at(1) }? -> skip ;

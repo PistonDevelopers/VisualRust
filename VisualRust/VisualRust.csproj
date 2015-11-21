@@ -31,6 +31,7 @@
     <ErrorReport>prompt</ErrorReport>
     <DeployExtension>false</DeployExtension>
     <CreateVsixContainer>true</CreateVsixContainer>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,6 +43,7 @@
     <WarningLevel>4</WarningLevel>
     <DeployExtension>true</DeployExtension>
     <CreateVsixContainer>true</CreateVsixContainer>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,6 +54,7 @@
     <WarningLevel>4</WarningLevel>
     <DeployExtension>false</DeployExtension>
     <CreateVsixContainer>false</CreateVsixContainer>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Debug-CI'">
     <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\ApplicationProject.zip">
@@ -240,8 +243,9 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="RunningDocTableEventsListener.cs" />
     <Compile Include="RustBraceMatcher.cs" />
-    <Compile Include="RustClassifier.cs" />
-    <Compile Include="RustClassifierProvider.cs" />
+    <Compile Include="Text\JoinedTextChange.cs" />
+    <Compile Include="Text\RustClassifier.cs" />
+    <Compile Include="Text\RustClassifierProvider.cs" />
     <Compile Include="RustCommentSelectionCommandHandler.cs" />
     <Compile Include="RustCompletionCommandHandler.cs" />
     <Compile Include="RustCompletionSource.cs" />
@@ -249,6 +253,17 @@
     <Compile Include="RustF1HelpCommandHandler.cs" />
     <Compile Include="RustGoToDefinitionCommandHandler.cs" />
     <Compile Include="RustTokenTypes.cs" />
+    <Compile Include="Text\Antlr\TextSegmentsCharStream.cs" />
+    <Compile Include="Text\Antlr\Lexer.cs" />
+    <Compile Include="Text\BitHelper.cs" />
+    <Compile Include="Text\EnumerableHelpers.cs" />
+    <Compile Include="Text\IRustLexer.cs" />
+    <Compile Include="Text\SortedSet.cs" />
+    <Compile Include="Text\SortedSetHelpers.cs" />
+    <Compile Include="Text\SpannedToken.cs" />
+    <Compile Include="Text\DocumentState.cs" />
+    <Compile Include="Text\TokensChangedEventArgs.cs" />
+    <Compile Include="Text\TrackingToken.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="RustLanguage.cs" />
     <Compile Include="VisualRustAutoIndent.cs" />
@@ -299,7 +314,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="Resources\Package.ico" />
-    <VSCTCompile Include="VisualRust.vsct" >
+    <VSCTCompile Include="VisualRust.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
   </ItemGroup>

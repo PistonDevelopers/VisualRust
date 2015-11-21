@@ -33,7 +33,7 @@ namespace VisualRust
             { RustLexer.OROR, RustTokenTypes.OP },
             { RustLexer.NOT, RustTokenTypes.OP },
             { RustLexer.TILDE, RustTokenTypes.OP },
-
+            { RustLexer.PLUS, RustTokenTypes.OP },
             { RustLexer.MINUS, RustTokenTypes.OP },
             { RustLexer.STAR, RustTokenTypes.OP },
             { RustLexer.SLASH, RustTokenTypes.OP },
@@ -44,8 +44,9 @@ namespace VisualRust
             { RustLexer.SHL, RustTokenTypes.OP },
             { RustLexer.SHR, RustTokenTypes.OP },
             { RustLexer.BINOP, RustTokenTypes.OP },
-
             { RustLexer.BINOPEQ, RustTokenTypes.OP },
+            { RustLexer.LARROW, RustTokenTypes.OP },
+
             { RustLexer.AT, RustTokenTypes.STRUCTURAL },
             { RustLexer.DOT, RustTokenTypes.STRUCTURAL },
             { RustLexer.DOTDOT, RustTokenTypes.STRUCTURAL },
@@ -53,7 +54,6 @@ namespace VisualRust
             { RustLexer.COMMA, RustTokenTypes.STRUCTURAL },
             { RustLexer.SEMI, RustTokenTypes.STRUCTURAL },
             { RustLexer.COLON, RustTokenTypes.STRUCTURAL },
-
             { RustLexer.MOD_SEP, RustTokenTypes.STRUCTURAL },
             { RustLexer.RARROW, RustTokenTypes.STRUCTURAL },
             { RustLexer.FAT_ARROW, RustTokenTypes.STRUCTURAL },
@@ -61,32 +61,28 @@ namespace VisualRust
             { RustLexer.RPAREN, RustTokenTypes.STRUCTURAL },
             { RustLexer.LBRACKET, RustTokenTypes.STRUCTURAL },
             { RustLexer.RBRACKET, RustTokenTypes.STRUCTURAL },
-
             { RustLexer.LBRACE, RustTokenTypes.STRUCTURAL },
             { RustLexer.RBRACE, RustTokenTypes.STRUCTURAL },
             { RustLexer.POUND, RustTokenTypes.STRUCTURAL },
             { RustLexer.DOLLAR, RustTokenTypes.STRUCTURAL },
             { RustLexer.UNDERSCORE, RustTokenTypes.STRUCTURAL },
             { RustLexer.LIT_CHAR, RustTokenTypes.CHAR },
+            { RustLexer.LIT_BYTE, RustTokenTypes.STRING },
 
             { RustLexer.LIT_INTEGER, RustTokenTypes.NUMBER },
             { RustLexer.LIT_FLOAT, RustTokenTypes.NUMBER },
             { RustLexer.LIT_STR, RustTokenTypes.STRING },
             { RustLexer.LIT_STR_RAW, RustTokenTypes.STRING },
-            { RustLexer.LIT_BINARY, RustTokenTypes.STRING },
-
-            { RustLexer.LIT_BINARY_RAW, RustTokenTypes.STRING },
+            { RustLexer.LIT_BYTE_STR, RustTokenTypes.STRING },
+            { RustLexer.LIT_BYTE_STR_RAW, RustTokenTypes.STRING },
+            { RustLexer.QUESTION, RustTokenTypes.OP },
+            
             { RustLexer.IDENT, RustTokenTypes.IDENT },
             { RustLexer.LIFETIME, RustTokenTypes.LIFETIME },
             { RustLexer.WHITESPACE, RustTokenTypes.WHITESPACE },
             { RustLexer.DOC_COMMENT, RustTokenTypes.DOC_COMMENT },
             { RustLexer.COMMENT, RustTokenTypes.COMMENT },
             { RustLexer.SHEBANG, RustTokenTypes.COMMENT },
-            { RustLexer.DOC_BLOCK_COMMENT, RustTokenTypes.DOC_COMMENT },
-            { RustLexer.BLOCK_COMMENT, RustTokenTypes.COMMENT },
-            { RustLexer.PLUS, RustTokenTypes.OP },
-            { RustLexer.LIT_BYTE, RustTokenTypes.STRING },
-            { RustLexer.QUESTION, RustTokenTypes.OP },
             { RustLexer.UTF8_BOM, RustTokenTypes.WHITESPACE }
         };
 
@@ -252,7 +248,7 @@ namespace VisualRust
         [Conditional("DEBUG")]
         internal static void DebugPrintToOutput(string s, params object[] args)
         {        
-            PrintToOutput("[DEBUG] "+s, args);
+            PrintToOutput("[DEBUG] " + s + "\n", args);
         }
 
         internal static void PrintToOutput(string s, params object[] args)

@@ -1,4 +1,4 @@
-﻿namespace VisualRust
+﻿namespace VisualRust.Text
 {
     using System;
     using System.Diagnostics;
@@ -29,9 +29,18 @@
         [Import]
         internal IStandardClassificationService StandardClassificationService = null;
 
+        [Import]
+        readonly IRustLexer lexer;
+
+        [ImportingConstructor]
+        public RustClassifierProvider(IRustLexer lexer)
+        {
+            this.lexer = lexer;
+        }
+
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
-            return new RustClassifier(buffer, StandardClassificationService) as ITagger<T>;
+            return new RustClassifier(lexer, buffer, StandardClassificationService) as ITagger<T>;
         }
     }
 

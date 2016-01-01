@@ -29,9 +29,10 @@ namespace VisualRust.Shared
                 .FirstOrDefault(p => CanActuallyBuildTarget(p, target));
         }
 
-        public static IEnumerable<string> FindInstalledTargets()
+        public static IEnumerable<TargetTriple> FindInstalledTargets()
         {
-            return GetAllInstallPaths().SelectMany(SniffTargets);
+            return GetAllInstallPaths()
+                   .SelectMany(SniffTargets);
         }
 
         public static IEnumerable<string> FindCurrentUserInstallPaths()
@@ -101,17 +102,30 @@ namespace VisualRust.Shared
             return Directory.Exists(Path.Combine(binPath, "rustlib", target));
         }
 
-        private static IEnumerable<string> SniffTargets(string installPath)
+        private static IEnumerable<TargetTriple> SniffTargets(string installPath)
         {
             try
             {
-                string root = Path.Combine(installPath, "bin", "rustlib");
-                return Directory.GetDirectories(root, "*-*-*").Select(p => p.Substring(root.Length + 1).ToLowerInvariant());
+                // This path is used in the installers for versions < 1.6
+                string oldRoot = Path.Combine(installPath, "bin", "rustlib");
+                // This path is used in the installers >= 1.6
+                string newRoot = Path.Combine(installPath, "lib", "rustlib");
+                var oldSourceTargets = GetTargetCandidates(oldRoot);
+                var newSourceTargets = GetTargetCandidates(newRoot);
+                return oldSourceTargets
+                       .Union(newSourceTargets)
+                       .Select(name => TargetTriple.Create(name))
+                       .Where(triple => triple != null);
             }
             catch(IOException)
             {
-                return new string[0];
+                return new TargetTriple[0];
             }
+        }
+
+        private static IEnumerable<string> GetTargetCandidates(string path)
+        {
+            return Directory.GetDirectories(path, "*-*-*-*").Select(p => p.Substring(path.Length + 1));
         }
     }
 }

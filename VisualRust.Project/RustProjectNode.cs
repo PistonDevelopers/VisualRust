@@ -453,7 +453,7 @@ namespace VisualRust.Project
 
         public override IProjectLauncher GetLauncher()
         {
-            var defaultLauncher = new DefaultRustLauncher(this);
+            var defaultLauncher = new RustProjectLauncher(this);
             return defaultLauncher;
         }
 

@@ -163,7 +163,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Build.tt</DependentUpon>
     </Compile>
-    <Compile Include="DefaultRustLauncher.cs" />
+    <Compile Include="Launcher\GnuDebugLauncher.cs" />
+    <Compile Include="Launcher\IRustProjectLauncher.cs" />
+    <Compile Include="Launcher\MsvcDebugLauncher.cs" />
+    <Compile Include="Launcher\ReleaseLauncher.cs" />
+    <Compile Include="Launcher\LauncherEnviroment.cs" />
+    <Compile Include="RustProjectLauncher.cs" />
     <Compile Include="EnvironmentPath.cs" />
     <Compile Include="FolderNode.cs" />
     <Compile Include="Forms\BuildPropertyControl.cs">
@@ -214,6 +219,10 @@
     <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">
       <Project>{cacb60a9-1e76-4f92-8831-b134a658c695}</Project>
       <Name>Microsoft.VisualStudio.Project</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MIEngine\src\MICore\MICore.csproj">
+      <Project>{12cc862d-95b7-4224-8e16-b928c6333677}</Project>
+      <Name>MICore</Name>
     </ProjectReference>
     <ProjectReference Include="..\MIEngine\src\MIDebugEngine\MIDebugEngine.csproj">
       <Project>{6D2688FE-6FD8-44A8-B96A-6037457F72A7}</Project>

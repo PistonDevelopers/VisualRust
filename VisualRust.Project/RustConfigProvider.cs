@@ -32,7 +32,8 @@ namespace VisualRust.Project
         {
             string[] platforms  = 
                 new string[] { Shared.Environment.DefaultTarget }
-                .Union(Shared.Environment.FindInstalledTargets(), StringComparer.OrdinalIgnoreCase ).ToArray();
+                .Union(Shared.Environment.FindInstalledTargets().Select(tt => tt.ToString()) )
+                .ToArray();
             return GetPlatforms(celt, names, actual, platforms);
         }
 

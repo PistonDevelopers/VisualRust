@@ -19,7 +19,7 @@ namespace VisualRust.Shared
 
         /* 
          * If the target is "default" just return the first location with "bin\rustc.exe"
-         * Otherwise also require "bin\rustlib\<target>"
+         * Otherwise also require "bin\rustlib\<target>" or "lib\rustlib\<target>"
          */
         public static string FindInstallPath(string target)
         {
@@ -29,14 +29,15 @@ namespace VisualRust.Shared
                 .FirstOrDefault(p => CanActuallyBuildTarget(p, target));
         }
 
-        public static IEnumerable<string> FindInstalledTargets()
+        public static IEnumerable<TargetTriple> FindInstalledTargets()
         {
-            return GetAllInstallPaths().SelectMany(SniffTargets);
+            return GetAllInstallPaths()
+                   .SelectMany(SniffTargets);
         }
 
         public static IEnumerable<string> FindCurrentUserInstallPaths()
         {
-            if(System.Environment.Is64BitOperatingSystem)
+            if (System.Environment.Is64BitOperatingSystem)
             {
                 return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64)
                     .Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32));
@@ -49,7 +50,7 @@ namespace VisualRust.Shared
 
         private static IEnumerable<string> GetAllInstallPaths()
         {
-            if(System.Environment.Is64BitOperatingSystem)
+            if (System.Environment.Is64BitOperatingSystem)
             {
                 return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64)
                     .Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32))
@@ -68,12 +69,12 @@ namespace VisualRust.Shared
         private static string[] GetInnoInstallRoot()
         {
             RegistryKey innoKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default).OpenSubKey(InnoPath);
-            if(innoKey == null)
+            if (innoKey == null)
                 return new string[0];
             string installPath = innoKey.GetValue("InstallLocation") as string;
-            if(installPath == null)
+            if (installPath == null)
                 return new string[0];
-            return new [] { installPath };
+            return new[] { installPath };
         }
 
         private static IEnumerable<string> GetInstallRoots(RegistryHive hive, RegistryView view)
@@ -96,19 +97,33 @@ namespace VisualRust.Shared
 
         private static bool CanActuallyBuildTarget(string binPath, string target)
         {
-            if(String.Equals(DefaultTarget, target, StringComparison.OrdinalIgnoreCase))
+            if (String.Equals(DefaultTarget, target, StringComparison.OrdinalIgnoreCase))
                 return true;
-            return Directory.Exists(Path.Combine(binPath, "rustlib", target));
+            return Directory.Exists(Path.Combine(binPath, "rustlib", target))
+                   || Directory.Exists(Path.Combine(binPath, "..", "lib", "rustlib", target));
         }
 
-        private static IEnumerable<string> SniffTargets(string installPath)
+        private static IEnumerable<TargetTriple> SniffTargets(string installPath)
+        {
+            // This path is used in the installers for versions < 1.6
+            string oldRoot = Path.Combine(installPath, "bin", "rustlib");
+            // This path is used in the installers >= 1.6
+            string newRoot = Path.Combine(installPath, "lib", "rustlib");
+            var oldSourceTargets = GetTargetCandidates(oldRoot);
+            var newSourceTargets = GetTargetCandidates(newRoot);
+            return oldSourceTargets
+                   .Union(newSourceTargets)
+                   .Select(name => TargetTriple.Create(name))
+                   .Where(triple => triple != null);
+        }
+
+        private static IEnumerable<string> GetTargetCandidates(string path)
         {
             try
             {
-                string root = Path.Combine(installPath, "bin", "rustlib");
-                return Directory.GetDirectories(root, "*-*-*").Select(p => p.Substring(root.Length + 1).ToLowerInvariant());
+                return Directory.GetDirectories(path, "*-*-*-*").Select(p => p.Substring(path.Length + 1));
             }
-            catch(IOException)
+            catch (IOException)
             {
                 return new string[0];
             }

@@ -24,7 +24,9 @@ namespace VisualRust.Project.Forms
         public BuildPropertyControl(Action<bool> isDirtyAction)
         {
             isDirty = isDirtyAction;
-            knownTargets = new string[] { Shared.Environment.DefaultTarget }.Union(Shared.Environment.FindInstalledTargets()).ToArray();
+            knownTargets = new string[] { Shared.Environment.DefaultTarget }
+                           .Union(Shared.Environment.FindInstalledTargets().Select(tt => tt.ToString()))
+                           .ToArray();
             // This looks nonsensical but is required to avoid getting "Microsoft Sans Serif, 8.25pt"
             // http://stackoverflow.com/questions/297701/default-font-for-windows-forms-application
             this.Font = System.Drawing.SystemFonts.MessageBoxFont;

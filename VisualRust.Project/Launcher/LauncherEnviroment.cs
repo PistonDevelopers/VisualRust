@@ -6,6 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using VisualRust.Shared;
 
 namespace VisualRust.Project.Launcher
 {
@@ -13,11 +16,13 @@ namespace VisualRust.Project.Launcher
     {
         readonly RustProjectNode project;
         readonly Configuration.Debug debugConfig;
+        readonly RustProjectConfig projectConfig;
 
-        public LauncherEnvironment(RustProjectNode project, Configuration.Debug debugConfig)
+        public LauncherEnvironment(RustProjectNode project, Configuration.Debug debugConfig, RustProjectConfig  projConfig)
         {
             this.project = project;
             this.debugConfig = debugConfig;
+            this.projectConfig = projConfig;
         }
 
         public string GetRustInstallPath()
@@ -50,47 +55,62 @@ namespace VisualRust.Project.Launcher
             vsDebugger.LaunchDebugTargets4((uint)targets.Length, targets, results);
         }
 
-        public string GetStartupExecutable()
-        {
-            return Path.Combine(project.GetProjectProperty("TargetDir"), project.GetProjectProperty("TargetFileName"));
-        }
-
-        public string GdbCustomPath()
-        {
-            bool useCustomPath = GetDebugProperty<bool>("UseCustomGdbPath");
-            if(!useCustomPath)
-                return null;
-            return GetDebugProperty<string>("DebuggerLocation");
-        }
-
-        public string GdbExtraArguments()
-        {
-            return GetDebugProperty<string>("ExtraArgs");
-        }
-
-        public string[] GdbScriptLines()
-        {
-            if(String.IsNullOrEmpty(debugConfig.DebuggerScript))
-                return new string[0];
-            return debugConfig.DebuggerScript.Split(new [] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-        }
-
-        T GetDebugProperty<T>(string key)
+        public T GetDebugConfigurationProperty<T>(string key)
         {
             var env = (EnvDTE.DTE)project.GetService(typeof(EnvDTE.DTE));
             return (T)env.Properties["Visual Rust", "Debugging"].Item(key).Value;
         }
 
-        public bool IsMsvcToolchain()
+        public string GetProjectProperty(string key)
         {
-            return false;
+            return project.GetProjectProperty(key);
         }
 
-        public string GetArchitectureName()
+        public TargetTriple GetTargetTriple()
         {
-            if (Environment.Is64BitOperatingSystem)
-                return "x86_64";
-            return "i686";
+            TargetTriple confTriple = TryGetTripleFromConfiguration();
+            if(confTriple != null)
+                return confTriple;
+            return TryGetTripleFromRustc();
+        }
+
+        public void ForceBuild()
+        {
+            project.Build("Build");
+        }
+
+        TargetTriple TryGetTripleFromConfiguration()
+        {
+            string triple = Configuration.Build.LoadFrom(new ProjectConfig[] { projectConfig }).PlatformTarget;
+            return TargetTriple.Create(triple);
+        }
+
+        TargetTriple TryGetTripleFromRustc()
+        {
+            string defaultInstallPath = Shared.Environment.FindInstallPath("default");
+            if(defaultInstallPath == null)
+                return null;
+            string rustcPath = Path.Combine(defaultInstallPath, "rustc.exe");
+            string rustcHost = GetRustcHost(rustcPath);
+            return TargetTriple.Create(rustcHost);
+        }
+
+        static string GetRustcHost(string exePath)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                FileName = exePath,
+                RedirectStandardOutput = true,
+                Arguments = "-Vv"
+            };
+            Process proc = Process.Start(psi);
+            string verboseVersion = proc.StandardOutput.ReadToEnd();
+            Match hostMatch = Regex.Match(verboseVersion, "^host:\\s*(.+)$", RegexOptions.Multiline);
+            if (hostMatch.Groups.Count == 1)
+                return null;
+            return hostMatch.Groups[1].Value;
         }
     }
 }

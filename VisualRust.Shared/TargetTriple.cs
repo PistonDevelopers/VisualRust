@@ -23,6 +23,8 @@ namespace VisualRust.Shared
 
         public static TargetTriple Create(string text)
         {
+            if(text == null)
+                return null;
             string[] parts = text.ToLowerInvariant().Split('-');
             if(parts.Length != 4)
                 return null;

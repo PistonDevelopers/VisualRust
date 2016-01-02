@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using VisualRust.Project.Launcher;
+using VisualRust.Shared;
 
 namespace VisualRust.Project
 {
@@ -31,14 +32,14 @@ namespace VisualRust.Project
             {
                 throw new InvalidOperationException("A project with an Output Type of Library cannot be started directly.");
             }
-            this.environment = new LauncherEnvironment(project, debugConfig);
+            this.environment = new LauncherEnvironment(project, debugConfig, projectConfig);
         }
 
         public int LaunchProject(bool debug)
         {
             string startupFilePath;
             if (debugConfig.StartAction == Configuration.StartAction.Project)
-                startupFilePath = environment.GetStartupExecutable();
+                startupFilePath = GetStartupExecutable();
             else
                 startupFilePath = debugConfig.ExternalProgram;
             return LaunchFile(startupFilePath, debug);
@@ -46,23 +47,33 @@ namespace VisualRust.Project
 
         public int LaunchFile(string file, bool debug)
         {
+            if (debugConfig.StartAction == Configuration.StartAction.Project 
+                && !File.Exists(file))
+            {
+                environment.ForceBuild();
+            }
             IRustProjectLauncher launcher = ChooseLauncher(debug);
             launcher.Launch(
                 file,
                 debugConfig.CommandLineArgs,
                 debugConfig.WorkingDir);
             return VSConstants.S_OK;
+        }
 
+        string GetStartupExecutable()
+        {
+            return Path.Combine(environment.GetProjectProperty("TargetDir"), environment.GetProjectProperty("TargetFileName"));
         }
 
         private IRustProjectLauncher ChooseLauncher(bool debug)
         {
             if(!debug)
                 return new ReleaseLauncher(environment);
-            if(environment.IsMsvcToolchain())
-                return new MsvcDebugLauncher();
+            TargetTriple triple = environment.GetTargetTriple();
+            if(triple.Abi == "msvc")
+                return new MsvcDebugLauncher(environment);
             else
-                return new GnuDebugLauncher(environment);
+                return new GnuDebugLauncher(environment, triple);
         }
     }
 }

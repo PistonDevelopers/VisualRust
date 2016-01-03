@@ -91,26 +91,7 @@ namespace VisualRust.Project.Launcher
             if(defaultInstallPath == null)
                 return null;
             string rustcPath = Path.Combine(defaultInstallPath, "rustc.exe");
-            string rustcHost = GetRustcHost(rustcPath);
-            return TargetTriple.Create(rustcHost);
-        }
-
-        static string GetRustcHost(string exePath)
-        {
-            ProcessStartInfo psi = new ProcessStartInfo
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                FileName = exePath,
-                RedirectStandardOutput = true,
-                Arguments = "-Vv"
-            };
-            Process proc = Process.Start(psi);
-            string verboseVersion = proc.StandardOutput.ReadToEnd();
-            Match hostMatch = Regex.Match(verboseVersion, "^host:\\s*(.+)$", RegexOptions.Multiline);
-            if (hostMatch.Groups.Count == 1)
-                return null;
-            return hostMatch.Groups[1].Value;
+            return Shared.Environment.GetTarget(rustcPath);
         }
     }
 }

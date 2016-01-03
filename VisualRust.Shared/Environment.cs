@@ -1,9 +1,12 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace VisualRust.Shared
@@ -13,26 +16,22 @@ namespace VisualRust.Shared
         private const string InnoPath = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\Rust_is1";
         private const string MozillaPath = @"Software\Mozilla Foundation";
         private const string install = "InstallLocation";
-
-        // I'm really torn between "default", "local", "native", "unspecified" and "any"
+        
         public const string DefaultTarget = "default";
 
-        /* 
-         * If the target is "default" just return the first location with "bin\rustc.exe"
-         * Otherwise also require "bin\rustlib\<target>" or "lib\rustlib\<target>"
-         */
         public static string FindInstallPath(string target)
         {
             return GetAllInstallPaths()
                 .Select(p => Path.Combine(p, "bin"))
-                .Where(p => File.Exists(Path.Combine(p, "rustc.exe")))
-                .FirstOrDefault(p => CanActuallyBuildTarget(p, target));
+                .FirstOrDefault(p => CanBuildTarget(Path.Combine(p, "rustc.exe"), target));
         }
 
         public static IEnumerable<TargetTriple> FindInstalledTargets()
         {
             return GetAllInstallPaths()
-                   .SelectMany(SniffTargets);
+                   .Select(path => Path.Combine(path, "bin", "rustc.exe"))
+                   .Select(GetTarget)
+                   .Where(t => t != null);
         }
 
         public static IEnumerable<string> FindCurrentUserInstallPaths()
@@ -48,6 +47,38 @@ namespace VisualRust.Shared
             }
         }
 
+        public static TargetTriple GetTarget(string exePath)
+        {
+            if(!File.Exists(exePath))
+                return null;
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                FileName = exePath,
+                RedirectStandardOutput = true,
+                Arguments = "-Vv"
+            };
+            string verboseVersion;
+            try
+            {
+                Process proc = Process.Start(psi);
+                verboseVersion = proc.StandardOutput.ReadToEnd();
+            }
+            catch (Win32Exception) 
+            {
+                return null;
+            }
+            catch (IOException)
+            {
+                return null;
+            }
+            Match hostMatch = Regex.Match(verboseVersion, "^host:\\s*(.+)$", RegexOptions.Multiline);
+            if (hostMatch.Groups.Count == 1)
+                return null;
+            return TargetTriple.Create(hostMatch.Groups[1].Value);
+        }
+
         private static IEnumerable<string> GetAllInstallPaths()
         {
             if (System.Environment.Is64BitOperatingSystem)
@@ -56,14 +87,27 @@ namespace VisualRust.Shared
                     .Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32))
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry64))
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32))
-                    .Union(GetInnoInstallRoot());
+                    .Union(GetInnoInstallRoot())
+                    .Union(new string[] { GetMultirustInstallRoot() });
             }
             else
             {
                 return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32)
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32))
-                    .Union(GetInnoInstallRoot());
+                    .Union(GetInnoInstallRoot())
+                    .Union(new string[] { GetMultirustInstallRoot() });
             }
+        }
+
+        static string GetMultirustInstallRoot()
+        {
+            string multirustHome = System.Environment.GetEnvironmentVariable("MULTIRUST_HOME");
+            if(String.IsNullOrEmpty(multirustHome))
+            {
+                string localAppData = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+                return Path.Combine(localAppData, ".multirust");
+            }
+            return multirustHome;
         }
 
         private static string[] GetInnoInstallRoot()
@@ -95,38 +139,15 @@ namespace VisualRust.Shared
             return key.GetSubKeyNames().Select(n => key.OpenSubKey(n));
         }
 
-        private static bool CanActuallyBuildTarget(string binPath, string target)
+        private static bool CanBuildTarget(string exePath, string target)
         {
+            if(!File.Exists(exePath))
+                return false;
             if (String.Equals(DefaultTarget, target, StringComparison.OrdinalIgnoreCase))
                 return true;
-            return Directory.Exists(Path.Combine(binPath, "rustlib", target))
-                   || Directory.Exists(Path.Combine(binPath, "..", "lib", "rustlib", target));
-        }
-
-        private static IEnumerable<TargetTriple> SniffTargets(string installPath)
-        {
-            // This path is used in the installers for versions < 1.6
-            string oldRoot = Path.Combine(installPath, "bin", "rustlib");
-            // This path is used in the installers >= 1.6
-            string newRoot = Path.Combine(installPath, "lib", "rustlib");
-            var oldSourceTargets = GetTargetCandidates(oldRoot);
-            var newSourceTargets = GetTargetCandidates(newRoot);
-            return oldSourceTargets
-                   .Union(newSourceTargets)
-                   .Select(name => TargetTriple.Create(name))
-                   .Where(triple => triple != null);
-        }
-
-        private static IEnumerable<string> GetTargetCandidates(string path)
-        {
-            try
-            {
-                return Directory.GetDirectories(path, "*-*-*-*").Select(p => p.Substring(path.Length + 1));
-            }
-            catch (IOException)
-            {
-                return new string[0];
-            }
+            TargetTriple triple = GetTarget(exePath);
+            return triple != null
+                   && String.Equals(triple.ToString(), target, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

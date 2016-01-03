@@ -184,12 +184,6 @@ namespace VisualRust.Build
 
         private bool ExecuteInner()
         {
-            string rustBinPath = VisualRust.Shared.Environment.FindInstallPath(VisualRust.Shared.Environment.DefaultTarget);
-            if(rustBinPath == null)
-            {
-              Log.LogError("No Rust installation detected. You can download official Rust installer from rust-lang.org/install.");
-                return false;
-            }
             StringBuilder sb = new StringBuilder();
             if (ConfigFlags.Length > 0)
                 sb.AppendFormat(" --cfg {0}", String.Join(",", ConfigFlags));
@@ -231,7 +225,7 @@ namespace VisualRust.Build
             if(installPath == null)
             {
                 if(String.Equals(target, Shared.Environment.DefaultTarget, StringComparison.OrdinalIgnoreCase))
-                    Log.LogError("Could not find a Rust installation.");
+                    Log.LogError("No Rust installation detected. You can download official Rust installer from rust-lang.org/install.");
                 else
                     Log.LogError("Could not find a Rust installation that can compile target {0}.", target);
                 return false;

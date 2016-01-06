@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.ComponentModel.Composition;
-using System.Linq.Expressions;
-using Microsoft.VisualStudio.Utilities;
-using Microsoft.VisualStudio.Text;
+﻿using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Operations;
-using Antlr4.Runtime;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
-using Microsoft.VisualStudio.Text.Formatting;
+using Microsoft.VisualStudio.Utilities;
+using System.ComponentModel.Composition;
+using VisualRust.Text;
 
 namespace VisualRust
 {
@@ -31,26 +21,26 @@ namespace VisualRust
     // TODO: this indenter should take tabs into consideration
     class VisualRustSmartIndent : ISmartIndent
     {
-        private ITextView _textView;
+        private readonly ITextView textView;
+        private readonly DocumentState state;
+
         internal VisualRustSmartIndent(ITextView textView)
         {
-            _textView = textView;
+            this.textView = textView;
+            textView.TextBuffer.Properties.TryGetProperty(DocumentState.Key, out state);
         }
 
         int? ISmartIndent.GetDesiredIndentation(ITextSnapshotLine currentSnapshotLine)
         {
-            var textView = _textView;
             var textSnapshot = textView.TextSnapshot;
-            var caret = textView.Caret;
-            var caretPosition = caret.Position.BufferPosition.Position;
+            var position = textView.Caret.Position.BufferPosition.Position;
 
-            var indentStep = _textView.Options.GetIndentSize();
+            var indentStep = textView.Options.GetIndentSize();
 
-            var caretLine = textSnapshot.GetLineFromPosition(caretPosition);
-            var lineReminder = new Span(caretPosition, caretLine.End - caretPosition);
+            var caretLine = textSnapshot.GetLineFromPosition(position);
+            var lineRemainder = new Span(position, caretLine.End - position);
 
-            var textToCaret = textSnapshot.GetText(0, caretPosition);
-            var tokens = Utils.LexString(textToCaret);
+            var tokens = state.GetTokens(new Span(0, position));
 
             var indentStepsCount = 0;
             foreach (var token in tokens)
@@ -81,7 +71,7 @@ namespace VisualRust
             }
 
             var closeBraceAfterCaret = false;
-            foreach (var ch in textSnapshot.GetText(lineReminder))
+            foreach (var ch in textSnapshot.GetText(lineRemainder))
             {
                 if (ch == '}' || ch == ')')
                 {

@@ -169,13 +169,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="MSBuild\rust-1.0.0-beta.2-i686-pc-windows-gnu.msi">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="MSBuild\multi_lib\src\lib.rs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="MSBuild\multi_lib\multi_lib.rsproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="MSBuild\rust-1.5.0-i686-pc-windows-gnu.msi">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="MSBuild\trivial\trivial.rsproj">

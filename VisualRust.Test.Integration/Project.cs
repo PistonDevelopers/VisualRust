@@ -38,14 +38,17 @@ namespace VisualRust.Test.Integration
             AssertNoRustInstalled();
             Installer.SetInternalUI(InstallUIOptions.Silent);
             Installer.InstallProduct(
-                @"MSBuild\rust-1.0.0-beta.2-i686-pc-windows-gnu.msi",
+                @"MSBuild\rust-1.5.0-i686-pc-windows-gnu.msi",
                 String.Format("INSTALLDIR_USER=\"{0}\"", Path.Combine(Path.GetTempPath(), Path.GetRandomFileName())));
         }
 
         [ClassCleanup]
         public static void UninstallRustLocally()
         {
-            Installer.ConfigureProduct("{35295818-DAA6-43A9-997B-11EB194EFB2F}", 0, InstallState.Absent, "");
+            // NOTE-yacoder-2016-01-17: I used Powershell to find the product code for the new version:
+            // get-wmiobject Win32_Product | where {$_.Name -like "*Rust*"} | Format-Table IdentifyingNumber, Name, LocalPackage
+            // http://stackoverflow.com/questions/29937568/how-can-i-find-the-product-guid-of-an-installed-msi-setup
+            Installer.ConfigureProduct("{4CDA27CB-A984-456D-B418-71B5B64D74C2}", 0, InstallState.Absent, "");
         }
 
         [TestCategory("Explicit")]

@@ -225,7 +225,7 @@ namespace VisualRust.Build
             if(installPath == null)
             {
                 if(String.Equals(target, Shared.Environment.DefaultTarget, StringComparison.OrdinalIgnoreCase))
-                    Log.LogError("No Rust installation detected. You can download official Rust installer from rust-lang.org/install.");
+                    Log.LogError("No Rust installation detected. You can download official Rust installer from https://www.rust-lang.org/downloads.html");
                 else
                     Log.LogError("Could not find a Rust installation that can compile target {0}.", target);
                 return false;

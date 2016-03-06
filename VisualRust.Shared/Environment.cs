@@ -14,9 +14,9 @@ namespace VisualRust.Shared
     public class Environment
     {
         private const string InnoPath = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\Rust_is1";
-        private const string MozillaPath = @"Software\Mozilla Foundation";
+        private static readonly string[] MozillaPaths = { @"Software\Mozilla Foundation", @"Software\The Rust Project Developers" };
         private const string install = "InstallLocation";
-        
+
         public const string DefaultTarget = "default";
 
         public static string FindInstallPath(string target)
@@ -49,7 +49,7 @@ namespace VisualRust.Shared
 
         public static TargetTriple GetTarget(string exePath)
         {
-            if(!File.Exists(exePath))
+            if (!File.Exists(exePath))
                 return null;
             ProcessStartInfo psi = new ProcessStartInfo
             {
@@ -65,7 +65,7 @@ namespace VisualRust.Shared
                 Process proc = Process.Start(psi);
                 verboseVersion = proc.StandardOutput.ReadToEnd();
             }
-            catch (Win32Exception) 
+            catch (Win32Exception)
             {
                 return null;
             }
@@ -102,7 +102,7 @@ namespace VisualRust.Shared
         static string GetMultirustInstallRoot()
         {
             string multirustHome = System.Environment.GetEnvironmentVariable("MULTIRUST_HOME");
-            if(String.IsNullOrEmpty(multirustHome))
+            if (String.IsNullOrEmpty(multirustHome))
             {
                 string localAppData = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
                 return Path.Combine(localAppData, ".multirust");
@@ -123,15 +123,20 @@ namespace VisualRust.Shared
 
         private static IEnumerable<string> GetInstallRoots(RegistryHive hive, RegistryView view)
         {
-            RegistryKey mozillaKey = RegistryKey.OpenBaseKey(hive, view).OpenSubKey(MozillaPath);
-            if (mozillaKey == null)
-                return new string[0];
-            return mozillaKey
-                .GetSubKeyNames()
-                .Where(n => n.StartsWith("Rust", StringComparison.OrdinalIgnoreCase))
-                .SelectMany(n => AllSubKeys(mozillaKey.OpenSubKey(n)))
-                .Select(k => k.GetValue("InstallDir") as string)
-                .Where(x => x != null);
+            foreach (string root in MozillaPaths)
+            {
+                RegistryKey mozillaKey = RegistryKey.OpenBaseKey(hive, view).OpenSubKey(root);
+                if (mozillaKey == null)
+                    continue;
+                var paths = mozillaKey
+                    .GetSubKeyNames()
+                    .Where(n => n.StartsWith("Rust", StringComparison.OrdinalIgnoreCase))
+                    .SelectMany(n => AllSubKeys(mozillaKey.OpenSubKey(n)))
+                    .Select(k => k.GetValue("InstallDir") as string)
+                    .Where(x => x != null);
+                foreach(string path in paths)
+                    yield return path;
+            }
         }
 
         private static IEnumerable<RegistryKey> AllSubKeys(RegistryKey key)
@@ -141,7 +146,7 @@ namespace VisualRust.Shared
 
         private static bool CanBuildTarget(string exePath, string target)
         {
-            if(!File.Exists(exePath))
+            if (!File.Exists(exePath))
                 return false;
             if (String.Equals(DefaultTarget, target, StringComparison.OrdinalIgnoreCase))
                 return true;

@@ -85,17 +85,17 @@ namespace VisualRust.Shared
             {
                 return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64)
                     .Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32))
+                    .Union(new string[] { GetMultirustInstallRoot() })
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry64))
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32))
-                    .Union(GetInnoInstallRoot())
-                    .Union(new string[] { GetMultirustInstallRoot() });
+                    .Union(GetInnoInstallRoot());
             }
             else
             {
                 return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32)
+                    .Union(new string[] { GetMultirustInstallRoot() })
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32))
-                    .Union(GetInnoInstallRoot())
-                    .Union(new string[] { GetMultirustInstallRoot() });
+                    .Union(GetInnoInstallRoot());
             }
         }
 

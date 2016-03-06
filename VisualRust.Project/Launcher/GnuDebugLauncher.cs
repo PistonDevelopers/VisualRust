@@ -144,7 +144,7 @@ namespace VisualRust.Project.Launcher
 
         string[] GetScriptLines()
         {
-            string debuggerScript = env.GetDebugConfigurationProperty<string>("DebuggerScript");
+            string debuggerScript = env.DebugConfig.DebuggerScript;
             if(String.IsNullOrEmpty(debuggerScript))
                 return new string[0];
             return debuggerScript.Split(new [] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);

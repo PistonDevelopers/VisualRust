@@ -15,13 +15,13 @@ namespace VisualRust.Project.Launcher
     class LauncherEnvironment
     {
         readonly RustProjectNode project;
-        readonly Configuration.Debug debugConfig;
         readonly RustProjectConfig projectConfig;
+        public Configuration.Debug DebugConfig { get; private set; }
 
         public LauncherEnvironment(RustProjectNode project, Configuration.Debug debugConfig, RustProjectConfig  projConfig)
         {
             this.project = project;
-            this.debugConfig = debugConfig;
+            this.DebugConfig = debugConfig;
             this.projectConfig = projConfig;
         }
 

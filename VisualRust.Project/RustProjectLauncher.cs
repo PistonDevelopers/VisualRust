@@ -70,7 +70,7 @@ namespace VisualRust.Project
             if(!debug)
                 return new ReleaseLauncher(environment);
             TargetTriple triple = environment.GetTargetTriple();
-            if(triple.Abi == "msvc")
+            if(triple != null && triple.Abi == "msvc")
                 return new MsvcDebugLauncher(environment);
             else
                 return new GnuDebugLauncher(environment, triple);

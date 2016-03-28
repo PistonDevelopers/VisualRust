@@ -49,7 +49,10 @@
     <AddModules Include="$(IntermediateOutputPath)lib$(CrateName).a"/>
   </ItemGroup>
 
-  <Target Name="CoreCompile">
+  <Target Name="CoreCompile"
+          Inputs="@(Code -> '$(MSBuildProjectDirectory)\%(RelativeDir)%(Filename)%(Extension)')"
+          Outputs="$(IntermediateOutputPath)\$(TargetName)$(TargetExt)"
+          Returns="">
     <Rustc Input="$(_EntryPoint)"
            OutputDirectory="$(IntermediateOutputPath)"
            WorkingDirectory="$(ProjectDir)"

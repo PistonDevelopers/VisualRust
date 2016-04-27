@@ -53,6 +53,7 @@
     <EmbeddedResource Include="Internal\Circular\foo.rs" />
     <EmbeddedResource Include="Internal\CircularNested\in\foo.rs" />
     <EmbeddedResource Include="Internal\CircularNested\main.rs" />
+    <Compile Include="Cargo\ManifestTests.cs" />
     <Compile Include="Project\ModuleImportTests.cs" />
     <Compile Include="Project\ModuleParserTests.cs" />
     <Compile Include="Project\ModuleTrackerTests.cs" />
@@ -95,6 +96,10 @@
     <EmbeddedResource Include="External\servo\components\layout\lib.rs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\VisualRust.Cargo\VisualRust.Cargo.csproj">
+      <Project>{2594db0d-03ff-40ea-8d27-9930e5d3ff83}</Project>
+      <Name>VisualRust.Cargo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VisualRust.Project\VisualRust.Project.csproj">
       <Project>{475c4df2-4d4b-4f2c-9f27-414148dd6f11}</Project>
       <Name>VisualRust.Project</Name>

@@ -1,0 +1,12 @@
+[package]
+name = "vist_toml"
+version = "0.0.1"
+authors = ["Andrzej Janik <vosen@vosen.pl>"]
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]
+toml_document = "0.1.0"
+winapi = "0.2"
+kernel32-sys = "0.2"

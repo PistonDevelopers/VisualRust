@@ -43,11 +43,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dependency.cs" />
+    <Compile Include="EntryMismatchError.cs" />
+    <Compile Include="LoadError.cs" />
     <Compile Include="Manifest.cs" />
+    <Compile Include="ParseResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryError.cs" />
+    <Compile Include="RawSlice.cs" />
     <Compile Include="Rust.cs" />
     <Compile Include="RustException.cs" />
-    <Compile Include="StrBox.cs" />
+    <Compile Include="SafeNativeMethods.cs" />
+    <Compile Include="StringArrayQueryResult.cs" />
+    <Compile Include="StringQueryResult.cs" />
+    <Compile Include="Utf8String.cs" />
+    <Compile Include="Utf8StringArray.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\vist_toml\target\release\vist_toml.dll">

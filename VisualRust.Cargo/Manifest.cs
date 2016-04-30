@@ -8,94 +8,27 @@ namespace VisualRust.Cargo
 {
     public class Manifest : IDisposable
     {
+        class MismatchComparer : IEqualityComparer<EntryMismatchError>
+        {
+            public bool Equals(EntryMismatchError x, EntryMismatchError y)
+            {
+                if (x == null || y == null)
+                    return x == y;
+                return String.Equals(x.Path, y.Path, StringComparison.Ordinal);
+            }
+
+            public int GetHashCode(EntryMismatchError obj)
+            {
+                return obj.Path.GetHashCode();
+            }
+        }
+
         static Manifest()
         {
-            global_init();
-        }
-
-        [DllImport("vist_toml.dll")]
-        static extern void global_init();
-
-        [DllImport("vist_toml.dll")]
-        static extern ParseResult load_from_utf16(IntPtr data, int length);
-
-        [DllImport("vist_toml.dll")]
-        static extern void free_manifest(IntPtr manifest);
-
-        [DllImport("vist_toml.dll")]
-        static extern StringQueryResult get_string(IntPtr manifest, RawSlice slice);
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct ParseResult
-        {
-            public IntPtr Manifest;
-            public StrBox Error;
-        }
-
-        struct EntryMismatch
-        {
-            public string Path { get; set; }
-            public string Expected { get; private set; }
-            public string Got { get; private set; }
-
-            public EntryMismatch(string path, string expected, string got) : this()
-            {
-                Path = path;
-                this.Expected = expected;
-                this.Got = got;
-            }
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct QueryError
-        {
-            public int Depth;
-            public StrBox Kind;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct StringQueryResult
-        {
-            public StrBox Result;
-            public QueryError Error;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct RawSlice
-        {
-            public IntPtr Buffer;
-            public int Length;
-
-            public unsafe RawSlice(void* buf, int length)
-                : this()
-            {
-                Buffer = new IntPtr(buf);
-                Length = length;
-            }
+            SafeNativeMethods.global_init();
         }
 
         private readonly IntPtr manifest;
-
-        public Manifest(string text)
-        {
-            unsafe
-            {
-                fixed (char* p = text)
-                {
-                    ParseResult result = Rust.Call(load_from_utf16, new IntPtr(p), text.Length);
-                    this.manifest = result.Manifest;
-                    if (this.manifest == IntPtr.Zero)
-                    {
-                        string error = result.Error.ToString();
-                        StrBox.Drop(result.Error);
-                        throw new ArgumentException(error);
-                    }
-                }
-            }
-            EntryMismatch temp;
-            name = GetString(out temp, "package", "name");
-            version = GetString(out temp, "package", "version");
-        }
 
         private string name;
         public string Name
@@ -109,34 +42,140 @@ namespace VisualRust.Cargo
             get { return version; }
         }
 
-        private string GetString(out EntryMismatch error, params string[] path)
+        private string description;
+        public string Description
+        {
+            get { return description; }
+        }
+
+        private string[] authors;
+        public string[] Authors
+        {
+            get { return authors; }
+        }
+
+        private string documentation;
+        public string Documentation
+        {
+            get { return documentation; }
+        }
+
+        private string homepage;
+        public string Homepage
+        {
+            get { return homepage; }
+        }
+
+        private string repository;
+        public string Repository
+        {
+            get { return repository; }
+        }
+
+        private string license;
+        public string License
+        {
+            get { return license; }
+        }
+
+        private Manifest(IntPtr handle)
+        {
+            this.manifest = handle;
+        }
+
+        static IntPtr Parse(string text, out string error)
+        {
+            unsafe
+            {
+                fixed (char* p = text)
+                {
+                    ParseResult result = Rust.Call(SafeNativeMethods.load_from_utf16, new IntPtr(p), text.Length);
+                    if (result.Manifest == IntPtr.Zero)
+                    {
+                        error = result.Error.ToString();
+                        Utf8String.Drop(result.Error);
+                    }
+                    else
+                    {
+                        error = null;
+                    }
+                    return result.Manifest;
+                }
+            }
+        }
+
+        public static Manifest TryCreate(string text, out LoadError loadErrors)
+        {
+            string error;
+            IntPtr manifestPtr = Parse(text, out error);
+            if (manifestPtr == IntPtr.Zero)
+            {
+                loadErrors = new LoadError(error);
+                return null;
+            }
+            Manifest manifest = new Manifest(manifestPtr);
+            HashSet<EntryMismatchError> errors = manifest.Load();
+            if (errors.Count > 0)
+            {
+                loadErrors = new LoadError(errors);
+                return null;
+            }
+            loadErrors = null;
+            return manifest;
+        }
+
+        private HashSet<EntryMismatchError> Load()
+        {
+            HashSet<EntryMismatchError> errors = new HashSet<EntryMismatchError>(new MismatchComparer());
+            name = GetString(errors, "package", "name");
+            version = GetString(errors, "package", "version");
+            authors = GetStringArray(errors, "package", "authors");
+            description = GetString(errors, "package", "description");
+            documentation = GetString(errors, "package", "documentation");
+            homepage = GetString(errors, "package", "homepage");
+            repository = GetString(errors, "package", "repository");
+            license = GetString(errors, "package", "license");
+            return errors;
+        }
+
+        private string GetString(HashSet<EntryMismatchError> errors, params string[] path)
+        {
+            EntryMismatchError error;
+            string value = GetString(path, out error);
+            if (error != null)
+                errors.Add(error);
+            return value;
+        }
+
+        private string GetString(string[] path, out EntryMismatchError error)
         {
             unsafe
             {
                 var handles = new GCHandle[path.Length];
-                var buffers = new StrBox[path.Length];
+                var buffers = new Utf8String[path.Length];
                 for (int i = 0; i < path.Length; i++)
                 {
                     byte[] buffer = Encoding.UTF8.GetBytes(path[i]);
                     handles[i] = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-                    buffers[i] = new StrBox(handles[i].AddrOfPinnedObject(), buffer.Length);
+                    buffers[i] = new Utf8String(handles[i].AddrOfPinnedObject(), buffer.Length);
                 }
                 string result;
-                fixed (StrBox* arr = buffers)
+                fixed (Utf8String* arr = buffers)
                 {
-                    StringQueryResult ffiResult = Rust.Call(get_string, manifest, new RawSlice(arr, buffers.Length));
-                    result = ffiResult.Result.TryToString();
-                    if (result == null && ffiResult.Error.Kind.Buffer != IntPtr.Zero)
+                    using (StringQueryResult ffiResult = Rust.Call(SafeNativeMethods.get_string, manifest, new RawSlice(arr, buffers.Length)))
                     {
-                        int length = ffiResult.Error.Depth;
-                        string expectedType = length < path.Length - 1 ? "table" : "string";
-                        error = new EntryMismatch(String.Join(".", path.Take(length + 1)), expectedType, ffiResult.Error.Kind.TryToString());
+                        result = ffiResult.Result.ToString();
+                        if (result == null && ffiResult.Error.Kind.Buffer != IntPtr.Zero)
+                        {
+                            int length = ffiResult.Error.Depth;
+                            string expectedType = length < path.Length - 1 ? "table" : "string";
+                            error = new EntryMismatchError(String.Join(".", path.Take(length + 1)), expectedType, ffiResult.Error.Kind.ToString());
+                        }
+                        else
+                        {
+                            error = default(EntryMismatchError);
+                        }
                     }
-                    else
-                    {
-                        error = default(EntryMismatch);
-                    }
-                    StrBox.Drop(ffiResult.Result);
                 }
                 for (int i = 0; i < handles.Length; i++)
                     handles[i].Free();
@@ -144,14 +183,54 @@ namespace VisualRust.Cargo
             }
         }
 
-        private void SetString(string value, params string[] path)
+        private string[] GetStringArray(HashSet<EntryMismatchError> errors, params string[] path)
         {
-            //return StrBox.With(value, str => Rust.Call(get_string, str));
+            EntryMismatchError error;
+            string[] value = GetStringArray(path, out error);
+            if (error != null)
+                errors.Add(error);
+            return value;
+        }
+
+        private string[] GetStringArray(string[] path, out EntryMismatchError error)
+        {
+            unsafe
+            {
+                var handles = new GCHandle[path.Length];
+                var buffers = new Utf8String[path.Length];
+                for (int i = 0; i < path.Length; i++)
+                {
+                    byte[] buffer = Encoding.UTF8.GetBytes(path[i]);
+                    handles[i] = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+                    buffers[i] = new Utf8String(handles[i].AddrOfPinnedObject(), buffer.Length);
+                }
+                string[] result;
+                fixed (Utf8String* arr = buffers)
+                {
+                    using (StringArrayQueryResult ffiResult = Rust.Call(SafeNativeMethods.get_string_array, manifest, new RawSlice(arr, buffers.Length)))
+                    {
+                        result = ffiResult.Result.ToStringArray();
+                        if (result == null && ffiResult.Error.Kind.Buffer != IntPtr.Zero)
+                        {
+                            int length = ffiResult.Error.Depth;
+                            string expectedType = length < path.Length - 1 ? "table" : "string";
+                            error = new EntryMismatchError(String.Join(".", path.Take(length + 1)), expectedType, ffiResult.Error.Kind.ToString());
+                        }
+                        else
+                        {
+                            error = default(EntryMismatchError);
+                        }
+                    }
+                }
+                for (int i = 0; i < handles.Length; i++)
+                    handles[i].Free();
+                return result;
+            }
         }
 
         public void Dispose()
         {
-            Rust.Invoke(free_manifest, this.manifest);
+            Rust.Invoke(SafeNativeMethods.free_manifest, this.manifest);
         }
     }
 }

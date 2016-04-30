@@ -30,8 +30,8 @@ namespace VisualRust.Cargo
         [StructLayout(LayoutKind.Sequential)]
         struct FFIPanicInfo
         {
-            public StrBox Message;
-            public StrBox File;
+            public Utf8String Message;
+            public Utf8String File;
             public int Line;
         }
 

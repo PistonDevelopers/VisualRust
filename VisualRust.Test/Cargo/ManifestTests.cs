@@ -11,14 +11,31 @@ namespace VisualRust.Test.Cargo
     class ManifestTests
     {
         [Test]
-        public void ParsesSimple()
+        public void ParseSimple()
         {
-            var m = new Manifest(
+            LoadError temp;
+            var m = Manifest.TryCreate(
                 @"[package]
                   name=""foo""
-                  version=""0.1""");
+                  authors = [ ""asd"", ""fgh"" ]
+                  version=""0.1""",
+                out temp);
             Assert.AreEqual("foo", m.Name);
             Assert.AreEqual("0.1", m.Version);
+            CollectionAssert.AreEqual(new [] { "asd", "fgh" }, m.Authors);
+        }
+
+        [Test]
+        public void FailOnWrongStructure()
+        {
+            LoadError temp;
+            var m = Manifest.TryCreate(
+                @"[[package]]
+                  name=""foo""",
+                out temp);
+            EntryMismatchError error = temp.LoadErrors.First(e => e.Path == "package");
+            Assert.AreEqual("table", error.Expected);
+            Assert.AreEqual("array", error.Got);
         }
     }
 }

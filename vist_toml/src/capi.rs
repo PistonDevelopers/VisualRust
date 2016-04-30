@@ -1,4 +1,3 @@
-use std::marker::PhantomData;
 use std::panic as std_panic;
 use std::ptr;
 use std::slice;
@@ -12,76 +11,23 @@ use panic::*;
 #[repr(C)]
 pub struct ParseResult {
     pub manifest: *mut Manifest,
-    pub error: OwnedStrBox
+    pub error: OwnedSlice<u8>
 }
 
 impl ParseResult {
     fn success(doc: Document) -> ParseResult {
         ParseResult {
             manifest: Box::into_raw(Box::new(Manifest::new(doc))),
-            error: OwnedStrBox::empty()
+            error: OwnedSlice::<u8>::empty()
         }
     }
 
     fn error(err: ParserError) -> ParseResult {
         ParseResult {
             manifest: ptr::null_mut(),
-            error: OwnedStrBox::new(&err.desc)
+            error: OwnedSlice::from_str(&err.desc)
         }
     }
-}
-
-#[repr(C)]
-pub struct PathMismatch {
-    pub path: StrBox,
-    pub expected: StrBox,
-    pub got: StrBox
-}
-
-pub struct BorrowedStrBox<'a> {
-    data: StrBox,
-    marker: PhantomData<&'a StrBox>
-}
-
-impl<'a> BorrowedStrBox<'a> {
-    fn empty() -> BorrowedStrBox<'static> {
-        BorrowedStrBox {
-            data: StrBox::empty(),
-            marker: PhantomData
-        }
-    }
-
-    fn from_static(string: &'static str) -> BorrowedStrBox<'static> {
-        BorrowedStrBox {
-            data: StrBox {
-                buff: string.as_ptr() as *mut _,
-                len: string.len() as INT32
-            },
-            marker: PhantomData
-        }
-    }
-
-    fn as_str(&'a self) -> &'a str {
-        self.data.as_str()
-    }
-}
-
-impl Drop for OwnedStrBox {
-    fn drop(&mut self) {
-        let this = &mut self.data;
-        if this.buff != ptr::null_mut() {
-            let slice = unsafe { slice::from_raw_parts_mut(this.buff, this.len as usize) };
-            drop(unsafe { Box::<[u8]>::from_raw(slice) });
-            this.buff = ptr::null_mut();
-            this.len = 0;
-        }
-    }
-}
-
-#[repr(C)]
-pub struct RawSlice<T> {
-    arr: *mut T,
-    len: INT32
 }
 
 #[repr(C)]
@@ -90,19 +36,37 @@ pub struct QueryResult<T> {
     error: QueryErrorFFI
 }
 
-impl QueryResult<OwnedStrBox> {
-    fn from_string_result(r: Result<&str, QueryError>) -> QueryResult<OwnedStrBox> {
+impl QueryResult<OwnedSlice<u8>> {
+    fn from_string_result(r: Result<&str, QueryError>) -> QueryResult<OwnedSlice<u8>> {
         match r {
             Ok(string) => QueryResult {
-                result: OwnedStrBox::new(string),
+                result: OwnedSlice::from_str(string),
                 error: QueryErrorFFI::empty()
             },
             Err(QueryError::Vacant{ depth }) => QueryResult {
-                result: OwnedStrBox::empty(),
+                result: OwnedSlice::empty(),
                 error: QueryErrorFFI::vacant(depth)
             },
             Err(QueryError::Conflict{ depth, kind }) => QueryResult {
-                result: OwnedStrBox::empty(),
+                result: OwnedSlice::empty(),
+                error: QueryErrorFFI::conflict(depth, kind)
+            },
+        }
+    }
+
+    fn from_string_array_result(r: Result<Vec<&str>, QueryError>)
+                                -> QueryResult<OwnedSlice<OwnedSlice<u8>>> {
+        match r {
+            Ok(vec) => QueryResult {
+                result: OwnedSlice::from_str_slice(&vec),
+                error: QueryErrorFFI::empty()
+            },
+            Err(QueryError::Vacant{ depth }) => QueryResult {
+                result: OwnedSlice::empty(),
+                error: QueryErrorFFI::vacant(depth)
+            },
+            Err(QueryError::Conflict{ depth, kind }) => QueryResult {
+                result: OwnedSlice::empty(),
                 error: QueryErrorFFI::conflict(depth, kind)
             },
         }
@@ -112,28 +76,28 @@ impl QueryResult<OwnedStrBox> {
 #[repr(C)]
 pub struct QueryErrorFFI {
     depth: INT32,
-    found_entry: BorrowedStrBox<'static>
+    found_entry: BorrowedSlice<'static, u8>
 }
 
 impl QueryErrorFFI {
     fn empty() -> QueryErrorFFI {
         QueryErrorFFI {
             depth: 0,
-            found_entry: BorrowedStrBox::empty()
+            found_entry: BorrowedSlice::empty()
         }
     }
 
     fn vacant(depth: usize) -> QueryErrorFFI {
         QueryErrorFFI {
             depth: depth as INT32,
-            found_entry: BorrowedStrBox::empty()
+            found_entry: BorrowedSlice::empty()
         }
     }
 
     fn conflict(depth: usize, kind: &'static str) -> QueryErrorFFI {
         QueryErrorFFI {
             depth: depth as INT32,
-            found_entry: BorrowedStrBox::from_static(kind)
+            found_entry: BorrowedSlice::from_static(kind)
         }
     }
 }
@@ -164,19 +128,22 @@ pub extern "C" fn free_manifest(manifest: *mut Manifest) {
 }
 
 #[no_mangle]
-pub extern "C" fn free_strbox(s: OwnedStrBox) {
+pub extern "C" fn free_strbox(s: OwnedSlice<u8>) {
     drop(s)
 }
 
 #[no_mangle]
-pub extern "C" fn get_string(manifest: *mut Manifest,
-                             path: RawSlice<BorrowedStrBox>)
-                             -> QueryResult<OwnedStrBox> {
+pub extern "C" fn free_strbox_array(s: OwnedSlice<OwnedSlice<u8>>) {
+    drop(s)
+}
+
+#[no_mangle]
+#[allow(no_mangle_generic_items)]
+pub extern "C" fn get_string<'a>(manifest: *mut Manifest,
+                                 path: BorrowedSlice<'a, BorrowedSlice<'a, u8>>)
+                                 -> QueryResult<OwnedSlice<u8>> {
     unwindable_call(move || {
-        let mut vec = Vec::with_capacity(path.len as usize);
-        for i in 0..(path.len as isize) {
-            vec.push(unsafe { &*path.arr.offset(i) }.as_str());
-        }
+        let vec = path.as_str_vec();
         let value = unsafe { &*manifest }.get_string(&vec);
         QueryResult::from_string_result(value)
     })
@@ -184,9 +151,21 @@ pub extern "C" fn get_string(manifest: *mut Manifest,
 
 #[no_mangle]
 pub extern "C" fn set_string(_: *mut Manifest,
-                             _: RawSlice<BorrowedStrBox>)
+                             _: RawSlice<RawSlice<u8>>)
                              -> QueryResult<BOOL> {
     unwindable_call(move || {
         unimplemented!()
+    })
+}
+
+#[no_mangle]
+#[allow(no_mangle_generic_items)]
+pub extern "C" fn get_string_array<'a>(manifest: *mut Manifest,
+                                       path: BorrowedSlice<'a, BorrowedSlice<'a, u8>>)
+                                       -> QueryResult<OwnedSlice<OwnedSlice<u8>>> {
+    unwindable_call(move || {
+        let vec = path.as_str_vec();
+        let value = unsafe { &*manifest }.get_string_array(&vec);
+        QueryResult::from_string_array_result(value)
     })
 }

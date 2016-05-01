@@ -26,6 +26,7 @@ namespace VisualRust.Project.Controls
         public string FileName { get; private set; }
         public string Errors { get; private set; }
         public string NewManifest { get; private set; }
+        public bool Reload { get; private set; }
 
         public OpenManifestErrorWindow(Window owner, string fileName, string[] errors) : this()
         {
@@ -35,7 +36,7 @@ namespace VisualRust.Project.Controls
             DataContext = this;
         }
 
-        private void Browse(object sender, RoutedEventArgs e)
+        private void OnBrowse(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFile = new OpenFileDialog()
             {
@@ -51,13 +52,14 @@ namespace VisualRust.Project.Controls
             }
         }
 
-        private void Reload(object sender, RoutedEventArgs e)
+        private void OnReload(object sender, RoutedEventArgs e)
         {
-            DialogResult = null;
+            DialogResult = false;
+            Reload = true;
             this.Close();
         }
 
-        private void Cancel(object sender, RoutedEventArgs e)
+        private void OnCancel(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
             this.Close();

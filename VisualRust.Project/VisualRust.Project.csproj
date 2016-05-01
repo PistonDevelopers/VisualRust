@@ -173,6 +173,7 @@
     <Compile Include="Launcher\MsvcDebugLauncher.cs" />
     <Compile Include="Launcher\ReleaseLauncher.cs" />
     <Compile Include="Launcher\LauncherEnviroment.cs" />
+    <Compile Include="ManifestLoadResult.cs" />
     <Compile Include="RustProjectLauncher.cs" />
     <Compile Include="EnvironmentPath.cs" />
     <Compile Include="FolderNode.cs" />

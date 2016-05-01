@@ -8,6 +8,7 @@
     SizeToContent="WidthAndHeight"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner"
     Title="Visual Rust"
     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
     TextOptions.TextFormattingMode="Display"
@@ -26,9 +27,9 @@
     <Window.Content>
         <DockPanel Margin="12">
             <DockPanel DockPanel.Dock="Bottom">
-                <Button Click="Cancel">_Cancel</Button>
-                <Button Click="Reload">_Retry</Button>
-                <Button Click="Browse">_Browse...</Button>
+                <Button Click="OnCancel">_Cancel</Button>
+                <Button Click="OnReload">_Retry</Button>
+                <Button Click="OnBrowse">_Browse...</Button>
             </DockPanel>
             <TextBox DockPanel.Dock="Top"
                 Padding="2"
@@ -41,6 +42,7 @@
                 Cargo manifest could not be loaded due to errors:
             </TextBlock>
             <TextBox  DockPanel.Dock="Top"
+                Padding="3"
                 Margin="-2,3,-2,0"
                 IsReadOnly="True"
                 Text="{Binding Errors, Mode=OneWay}"/>

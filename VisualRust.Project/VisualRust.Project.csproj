@@ -130,10 +130,12 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UIAutomationTypes" />
@@ -162,6 +164,9 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Build.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\OpenManifestErrorWindow.xaml.cs">
+      <DependentUpon>OpenManifestErrorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Launcher\GnuDebugLauncher.cs" />
     <Compile Include="Launcher\IRustProjectLauncher.cs" />
@@ -228,6 +233,10 @@
       <Project>{6D2688FE-6FD8-44A8-B96A-6037457F72A7}</Project>
       <Name>MIDebugEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Cargo\VisualRust.Cargo.csproj">
+      <Project>{2594DB0D-03FF-40EA-8D27-9930E5D3FF83}</Project>
+      <Name>VisualRust.Cargo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VisualRust.Shared\VisualRust.Shared.csproj">
       <Project>{b99cc9eb-90f2-4040-9e66-418cc7042153}</Project>
       <Name>VisualRust.Shared</Name>
@@ -272,6 +281,12 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Debug.cs</LastGenOutput>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Controls\OpenManifestErrorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

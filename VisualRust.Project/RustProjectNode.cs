@@ -13,6 +13,7 @@ using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VisualRust.Shared;
+using VisualRust.Cargo;
 
 namespace VisualRust.Project
 {
@@ -92,7 +93,8 @@ namespace VisualRust.Project
                 TrackedFileNode crateNode =  this.GetCrateFileNode(e.OldValue);
                 if(crateNode != null)
                     crateNode.IsEntryPoint = false;
-                this.ReloadCore();
+                int temp;
+                this.ReloadCore(out temp);
                 this.GetCrateFileNode(e.NewValue).IsEntryPoint = true;
             }
         }
@@ -124,12 +126,12 @@ namespace VisualRust.Project
             return RustImageHandler.GetIconHandle((int)IconIndex.RustProject);
         }
 
-        protected override void Reload()
+        protected override void Reload(out int canceled)
         {
             EventTriggeringFlag = ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents | ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
             try
             {
-                ReloadCore();
+                ReloadCore(out canceled);
             }
             finally
             {
@@ -150,14 +152,17 @@ namespace VisualRust.Project
             return FindNodeByFullPath(GetCrateFileNodePath(outputType)) as TrackedFileNode;
         }
 
-        protected void ReloadCore()
+        protected void ReloadCore(out int canceled)
         {
+            LoadManifest(out canceled);
+            if(canceled != 0)
+                return;
             this.UserConfig = new UserProjectConfig(this);
             string outputType = GetProjectProperty(ProjectFileConstants.OutputType, true);
             string entryPoint = GetCrateFileNodePath(outputType);
             containsEntryPoint = GetCrateFileNode(outputType) != null;
             ModuleTracker = new ModuleTracker(entryPoint);
-            base.Reload();
+            base.Reload(out canceled);
             // This project for some reason doesn't include entrypoint node, add it
             if (!containsEntryPoint)
             {
@@ -172,6 +177,28 @@ namespace VisualRust.Project
                 HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file), false);
                 parent.AddChild(CreateUntrackedNode(file));
             }
+        }
+
+        void LoadManifest(out int canceled)
+        {
+            string manifestPath = this.BuildProject.GetPropertyValue("ManifestPath");
+            string manifestPathFull = Path.GetFullPath(Path.Combine(this.ProjectFolder, manifestPath));
+            string manifestContent = "";
+            try
+            {
+                 manifestContent = File.ReadAllText(manifestPathFull);
+            }
+            catch(IOException ex)
+            {
+                var window = new Controls.OpenManifestErrorWindow(System.Windows.Application.Current.MainWindow, manifestPathFull, new string[] { ex.Message });
+                bool? result = window.ShowDialog();
+                if(result == null || result == false)
+                {
+                    canceled = 1;
+                    return;
+                }
+            }
+            canceled = 0;
         }
 
         private void MarkEntryPointFolders(string outputType)

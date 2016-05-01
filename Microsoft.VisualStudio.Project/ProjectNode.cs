@@ -1581,7 +1581,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     _diskNodes[this.filename] = this;
 
                     // now reload to fix up references
-                    this.Reload();
+                    this.Reload(out canceled);
                     successful = true;
                 } finally {
                     this.disableQueryEdit = false;
@@ -2194,9 +2194,9 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Reload project from project file
         /// </summary>
-        protected virtual void Reload() {
+        protected virtual void Reload(out int canceled) {
             Debug.Assert(this.buildEngine != null, "There is no build engine defined for this project");
-
+            canceled = 0;
             try {
                 disableQueryEdit = true;
 

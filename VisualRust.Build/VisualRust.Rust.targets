@@ -5,6 +5,7 @@
              TaskName="Rustc"/>
 
   <PropertyGroup>
+    <ManifestPath Condition="'$(ManifestPath)' == ''">Cargo.toml</ManifestPath>
     <VisualRustTasksPath>$(MSBuildExtensionsPath)\VisualRust</VisualRustTasksPath>
     <OutputType Condition="'$(OutputType)' != 'library'">exe</OutputType>
     <_EntryPoint Condition="'$(OutputType)'=='exe'">src\main.rs</_EntryPoint>

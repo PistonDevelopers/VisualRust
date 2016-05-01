@@ -24,8 +24,8 @@ pub fn unwindable_call<F:FnOnce() -> T + UnwindSafe, T>(f: F) -> T {
 
 #[repr(C)]
 pub struct FFIPanicInfo {
-    msg: OwnedStrBox,
-    file: OwnedStrBox,
+    msg: OwnedSlice<u8>,
+    file: OwnedSlice<u8>,
     line: UINT32
 }
 
@@ -33,15 +33,15 @@ impl FFIPanicInfo {
    	pub fn set(panic: &PanicInfo) {
         PANIC_INFO.with(|pi| {
             let mut result = FFIPanicInfo {
-                msg: OwnedStrBox::empty(),
-                file: OwnedStrBox::empty(),
+                msg: OwnedSlice::empty(),
+                file: OwnedSlice::empty(),
                 line: 0
             };
             if let Some(text) = panic.payload().downcast_ref::<&'static str>() {
-                result.msg = OwnedStrBox::new(text);
+                result.msg = OwnedSlice::from_str(text);
             };
             if let Some(loc) = panic.location() {
-                result.file = OwnedStrBox::new(loc.file());
+                result.file = OwnedSlice::from_str(loc.file());
                 result.line = loc.line();
             };
             *pi.borrow_mut() = Some(result);

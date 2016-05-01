@@ -30,8 +30,8 @@ namespace VisualRust.Cargo
         [StructLayout(LayoutKind.Sequential)]
         struct FFIPanicInfo
         {
-            public StrBox Message;
-            public StrBox File;
+            public Utf8String Message;
+            public Utf8String File;
             public int Line;
         }
 
@@ -84,6 +84,10 @@ namespace VisualRust.Cargo
                     throw new RustException(fullMessage, exc);
                 }
             }
+        }
+        public static TResult Call<T1, TResult>(Func<T1, TResult> f, T1 t1)
+        {
+            return Call(() => f(t1));
         }
 
         public static TResult Call<T1, T2, TResult>(Func<T1, T2, TResult> f, T1 t1, T2 t2)

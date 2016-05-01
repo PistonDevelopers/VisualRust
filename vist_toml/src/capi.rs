@@ -3,7 +3,7 @@ use std::ptr;
 use std::slice;
 
 use toml_document::{Document, ParserError};
-use winapi::{INT32, BOOL};
+use winapi::INT32;
 
 use super::*;
 use panic::*;
@@ -53,12 +53,14 @@ impl QueryResult<OwnedSlice<u8>> {
             },
         }
     }
+}
 
+impl QueryResult<OwnedSlice<OwnedSlice<u8>>> {
     fn from_string_array_result(r: Result<Vec<&str>, QueryError>)
                                 -> QueryResult<OwnedSlice<OwnedSlice<u8>>> {
         match r {
             Ok(vec) => QueryResult {
-                result: OwnedSlice::from_str_slice(&vec),
+                result: OwnedSlice::from_slice(&vec, |s| OwnedSlice::from_str(s)),
                 error: QueryErrorFFI::empty()
             },
             Err(QueryError::Vacant{ depth }) => QueryResult {
@@ -102,6 +104,44 @@ impl QueryErrorFFI {
     }
 }
 
+#[repr(C)]
+pub struct DependencyPathError {
+    path: OwnedSlice<u8>,
+    expected: BorrowedSlice<'static, u8>,
+    got: BorrowedSlice<'static, u8>
+}
+
+impl DependencyPathError {
+    fn new(e: &DependencyError) -> DependencyPathError {
+        DependencyPathError {
+            path: OwnedSlice::from_str(&e.path),
+            expected: BorrowedSlice::from_static(e.expected),
+            got: BorrowedSlice::from_static(e.got)
+        }
+    }
+}
+
+#[repr(C)]
+pub struct DependenciesResult {
+    deps: OwnedSlice<RawDependency>,
+    errors: OwnedSlice<DependencyPathError>
+}
+
+impl DependenciesResult {
+    fn new(r: Result<Vec<Dependency>, Vec<DependencyError>>) -> DependenciesResult {
+        match r {
+            Ok(deps) => DependenciesResult {
+                deps: OwnedSlice::from_slice(&deps, RawDependency::from),
+                errors: OwnedSlice::empty(),
+            },
+            Err(errors) => DependenciesResult {
+                deps: OwnedSlice::empty(),
+                errors: OwnedSlice::from_slice(&errors, DependencyPathError::new),
+            }
+        }
+    }
+}
+
 #[no_mangle]
 pub extern "C" fn global_init() {
     std_panic::set_hook(Box::new(FFIPanicInfo::set));
@@ -138,6 +178,11 @@ pub extern "C" fn free_strbox_array(s: OwnedSlice<OwnedSlice<u8>>) {
 }
 
 #[no_mangle]
+pub extern "C" fn free_dependencies_result(r: DependenciesResult) {
+    drop(r)
+}
+
+#[no_mangle]
 #[allow(no_mangle_generic_items)]
 pub extern "C" fn get_string<'a>(manifest: *mut Manifest,
                                  path: BorrowedSlice<'a, BorrowedSlice<'a, u8>>)
@@ -150,15 +195,6 @@ pub extern "C" fn get_string<'a>(manifest: *mut Manifest,
 }
 
 #[no_mangle]
-pub extern "C" fn set_string(_: *mut Manifest,
-                             _: RawSlice<RawSlice<u8>>)
-                             -> QueryResult<BOOL> {
-    unwindable_call(move || {
-        unimplemented!()
-    })
-}
-
-#[no_mangle]
 #[allow(no_mangle_generic_items)]
 pub extern "C" fn get_string_array<'a>(manifest: *mut Manifest,
                                        path: BorrowedSlice<'a, BorrowedSlice<'a, u8>>)
@@ -167,5 +203,13 @@ pub extern "C" fn get_string_array<'a>(manifest: *mut Manifest,
         let vec = path.as_str_vec();
         let value = unsafe { &*manifest }.get_string_array(&vec);
         QueryResult::from_string_array_result(value)
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn get_dependencies(manifest: *mut Manifest) -> DependenciesResult {
+    unwindable_call(move || {
+        let dependencies = unsafe { &*manifest }.get_dependencies();
+        DependenciesResult::new(dependencies)
     })
 }

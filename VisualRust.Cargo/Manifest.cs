@@ -78,6 +78,12 @@ namespace VisualRust.Cargo
             get { return license; }
         }
 
+        Dependency[] dependencies;
+        public Dependency[] Dependencies
+        {
+            get { return dependencies; }
+        }
+
         private Manifest(IntPtr handle)
         {
             this.manifest = handle;
@@ -104,20 +110,20 @@ namespace VisualRust.Cargo
             }
         }
 
-        public static Manifest TryCreate(string text, out LoadError loadErrors)
+        public static Manifest TryCreate(string text, out ManifestErrors loadErrors)
         {
             string error;
             IntPtr manifestPtr = Parse(text, out error);
             if (manifestPtr == IntPtr.Zero)
             {
-                loadErrors = new LoadError(error);
+                loadErrors = new ManifestErrors(error);
                 return null;
             }
             Manifest manifest = new Manifest(manifestPtr);
             HashSet<EntryMismatchError> errors = manifest.Load();
             if (errors.Count > 0)
             {
-                loadErrors = new LoadError(errors);
+                loadErrors = new ManifestErrors(errors);
                 return null;
             }
             loadErrors = null;
@@ -135,7 +141,22 @@ namespace VisualRust.Cargo
             homepage = GetString(errors, "package", "homepage");
             repository = GetString(errors, "package", "repository");
             license = GetString(errors, "package", "license");
+            dependencies = GetDependencies(errors);
             return errors;
+        }
+
+        private Dependency[] GetDependencies(HashSet<EntryMismatchError> errors)
+        {
+            using (DependenciesQueryResult deps = Rust.Call(SafeNativeMethods.get_dependencies, manifest))
+            {
+                EntryMismatchError[] callErrors = deps.Errors.ToArray();
+                if (callErrors != null)
+                {
+                    foreach (var error in callErrors)
+                        errors.Add(error);
+                }
+                return deps.Dependencies.ToArray();
+            }
         }
 
         private string GetString(HashSet<EntryMismatchError> errors, params string[] path)
@@ -209,7 +230,7 @@ namespace VisualRust.Cargo
                 {
                     using (StringArrayQueryResult ffiResult = Rust.Call(SafeNativeMethods.get_string_array, manifest, new RawSlice(arr, buffers.Length)))
                     {
-                        result = ffiResult.Result.ToStringArray();
+                        result = ffiResult.Result.ToArray();
                         if (result == null && ffiResult.Error.Kind.Buffer != IntPtr.Zero)
                         {
                             int length = ffiResult.Error.Depth;

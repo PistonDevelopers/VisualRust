@@ -85,6 +85,10 @@ namespace VisualRust.Cargo
                 }
             }
         }
+        public static TResult Call<T1, TResult>(Func<T1, TResult> f, T1 t1)
+        {
+            return Call(() => f(t1));
+        }
 
         public static TResult Call<T1, T2, TResult>(Func<T1, T2, TResult> f, T1 t1, T2 t2)
         {

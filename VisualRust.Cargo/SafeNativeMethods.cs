@@ -19,6 +19,9 @@ namespace VisualRust.Cargo
         internal static extern void free_strbox_array(Utf8StringArray s);
 
         [DllImport("vist_toml.dll")]
+        internal static extern void free_dependencies_result(DependenciesQueryResult s);
+
+        [DllImport("vist_toml.dll")]
         internal static extern ParseResult load_from_utf16(IntPtr data, int length);
 
         [DllImport("vist_toml.dll")]
@@ -29,5 +32,8 @@ namespace VisualRust.Cargo
 
         [DllImport("vist_toml.dll")]
         internal static extern StringArrayQueryResult get_string_array(IntPtr manifest, RawSlice slice);
+
+        [DllImport("vist_toml.dll")]
+        internal static extern DependenciesQueryResult get_dependencies(IntPtr manifest);
     }
 }

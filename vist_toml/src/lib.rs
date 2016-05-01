@@ -11,7 +11,7 @@ use std::slice;
 use std::str;
 use std::marker::PhantomData;
 
-use toml_document::{Document, EntryRef};
+use toml_document::{Document, EntryRef, TableEntry};
 use winapi::INT32;
 
 mod panic;
@@ -82,6 +82,118 @@ impl Manifest {
         }
     }
 
+    pub fn get_dependencies(&self) -> Result<Vec<Dependency>, Vec<DependencyError>> {
+        fn get_inner<'a>(deps: &mut Vec<Dependency<'a>>,
+                         errors: &mut Vec<DependencyError>,
+                         target: Option<&'a str>,
+                         entry: EntryRef<'a>) {
+            match entry {
+                EntryRef::Table(table) => {
+                    for (name, entry) in table.iter() {
+                        match entry {
+                            EntryRef::String(version) => {
+                                deps.push(Dependency::simple(name, target, version.get()));
+                            }
+                            EntryRef::Table(table) => {
+                                deps.push(Dependency::complex(name, target, table));
+                            }
+                            entry => {
+                                let path = match target {
+                                    Some(target) => {
+                                        format!("target.{}.dependencies.{}", target, name)
+                                    }
+                                    None => format!("dependencies.{}", name)
+                                };
+                                let error = DependencyError {
+                                    path: path,
+                                    expected: "string",
+                                    got: entry_kind(entry)
+                                };
+                                errors.push(error);
+                            }
+                        }
+                    }
+                }
+                entry => {
+                    let path = match target {
+                        Some(target) => {
+                            format!("target.{}.dependencies", target)
+                        }
+                        None => "dependencies".to_owned()
+                    };
+                    let error = DependencyError {
+                        path: path,
+                        expected: "table",
+                        got: entry_kind(entry)
+                    };
+                    errors.push(error);
+                }
+            }
+        }
+        let mut deps = Vec::new();
+        let mut errors = Vec::new();
+        if let Some(entry) = self.doc.get("dependencies") {
+            get_inner(&mut deps, &mut errors, None, entry);
+        }
+        if let Some(EntryRef::Table(targets)) = self.doc.get("target") {
+            for (target, target_entry) in targets.iter() {
+                if let EntryRef::Table(target_table) = target_entry {
+                    if let Some(entry) = target_table.get("dependencies") {
+                        get_inner(&mut deps, &mut errors, Some(target), entry);
+                    }
+                }
+            }
+        }
+        /*
+        match self.doc.get("dependencies") {
+            Some(EntryRef::Table(table)) => {
+                for (name, entry) in table.iter() {
+                    match entry {
+                        EntryRef::String(version) => {
+                            deps.push(Dependency::simple(name, version.get()));
+                        }
+                        EntryRef::Table(table) => {
+                            deps.push(Dependency::complex(name, table));
+                        }
+                        entry => {
+                            let error = DependencyError {
+                                path: format!("dependencies.{}", name),
+                                expected: "string",
+                                got: entry_kind(entry)
+                            };
+                            errors.push(error);
+                        }
+                    }
+                }
+            }
+            Some(entry) => {
+                let mut errors = Vec::new();
+                let error = DependencyError {
+                    path: "dependencies".to_owned(),
+                    expected: "table",
+                    got: entry_kind(entry)
+                };
+                errors.push(error);
+            }
+            None => { }
+        }
+        */
+        /*
+        match self.doc.get("target") {
+            Some(EntryRef::Table(targets)) => {
+                for (target, target_table) in targets.iter() {
+                    target_table.get("dependencies")
+                }
+            }
+        }
+        */
+        if errors.len() > 0 {
+            Err(errors)
+        } else {
+            Ok(deps)
+        }
+    }
+
     fn lookup<'a>(doc: &'a Document,path: &'a [&'a str]) -> Result<EntryRef<'a>, QueryError> {
         fn lookup_inner<'a>(entry: EntryRef<'a>,
                             path: &'a [&'a str],
@@ -112,6 +224,48 @@ impl std::panic::RefUnwindSafe for Manifest { }
 pub enum QueryError {
     Vacant{ depth: usize },
     Conflict{ depth: usize, kind: &'static str }
+}
+
+pub struct Dependency<'a> {
+    name: &'a str,
+    version: Option<&'a str>,
+    git: Option<&'a str>,
+    path: Option<&'a str>,
+    target: Option<&'a str>
+}
+
+impl<'a> Dependency<'a> {
+    fn simple(name: &'a str, target: Option<&'a str>, version: &'a str) -> Dependency<'a> {
+        Dependency {
+            name: name,
+            version: Some(version),
+            git: None,
+            path: None,
+            target: target
+        }
+    }
+
+    fn complex(name: &'a str, target: Option<&'a str>, table: TableEntry<'a>) -> Dependency<'a> {
+        fn get_string<'b>(tabl: TableEntry<'b>, key: &'b str) -> Option<&'b str> {
+            match tabl.get(key) {
+                Some(EntryRef::String(s)) => Some(s.get()),
+                _ => None
+            }
+        }
+        Dependency {
+            name: name,
+            version: get_string(table, "version"),
+            git: get_string(table, "git"),
+            path: get_string(table, "path"),
+            target: target,
+        }
+    }
+}
+
+pub struct DependencyError {
+    path: String,
+    expected: &'static str,
+    got: &'static str,
 }
 
 #[repr(C)]
@@ -164,6 +318,15 @@ impl<T> OwnedSlice<T> {
     }
 }
 
+impl<T> OwnedSlice<T> {
+    fn from_slice<F, E>(src: &[E], f:F) -> OwnedSlice<T> where F: FnMut(&E) -> T {
+        let vec = src.iter().map(f).collect::<Vec<_>>();
+        OwnedSlice {
+            data: RawSlice::from_vec(vec)
+        }
+    }
+}
+
 impl OwnedSlice<u8> {
     fn from_str(src: &str) -> OwnedSlice<u8> {
         let mut text = src.to_string().into_bytes().into_boxed_slice();
@@ -175,13 +338,11 @@ impl OwnedSlice<u8> {
         mem::forget(text);
         result
     }
-}
 
-impl OwnedSlice<OwnedSlice<u8>> {
-    fn from_str_slice(slice: &[&str]) -> OwnedSlice<OwnedSlice<u8>> {
-        let vec = slice.iter().map(|s| OwnedSlice::from_str(s)).collect::<Vec<_>>();
-        OwnedSlice {
-            data: RawSlice::from_vec(vec)
+    fn from_str_opt(src: Option<&str>) -> OwnedSlice<u8> {
+        match src {
+            Some(s) => OwnedSlice::from_str(s),
+            None => OwnedSlice::empty()
         }
     }
 }
@@ -228,6 +389,27 @@ impl<T> BorrowedSlice<'static, T> {
                 len: string.len() as INT32
             },
             marker: PhantomData
+        }
+    }
+}
+
+#[repr(C)]
+pub struct RawDependency {
+    name: OwnedSlice<u8>,
+    version: OwnedSlice<u8>,
+    git: OwnedSlice<u8>,
+    path: OwnedSlice<u8>,
+    target: OwnedSlice<u8>
+}
+
+impl RawDependency {
+    fn from(d: &Dependency) -> RawDependency {
+        RawDependency {
+            name: OwnedSlice::from_str(d.name),
+            version: OwnedSlice::from_str_opt(d.version),
+            git: OwnedSlice::from_str_opt(d.git),
+            path: OwnedSlice::from_str_opt(d.path),
+            target: OwnedSlice::from_str_opt(d.target)
         }
     }
 }

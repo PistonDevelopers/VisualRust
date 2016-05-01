@@ -19,6 +19,13 @@ namespace VisualRust.Cargo
             Got = got;
         }
 
+        internal EntryMismatchError(RawDependencyError e)
+        {
+            Path = e.Path.ToString();
+            Expected = e.Expected.ToString();
+            Got = e.Got.ToString();
+        }
+
         public override string ToString()
         {
             return String.Format(
@@ -26,17 +33,6 @@ namespace VisualRust.Cargo
                 Expected,
                 Got,
                 Path);
-        }
-
-        public override bool Equals(object obj)
-        {
-            EntryMismatchError other = obj as EntryMismatchError;
-            return other != null && String.Equals(Path, other.Path, StringComparison.Ordinal);
-        }
-
-        public override int GetHashCode()
-        {
-            return Path.GetHashCode();
         }
     }
 }

@@ -8,31 +8,33 @@ using System.Threading.Tasks;
 namespace VisualRust.Cargo
 {
     [StructLayout(LayoutKind.Sequential)]
-    struct Utf8StringArray
+    struct RawDependencyError
+    {
+        public Utf8String Path;
+        public Utf8String Expected;
+        public Utf8String Got;
+    }
+    
+    [StructLayout(LayoutKind.Sequential)]
+    struct RawDependencyErrorArray
     {
         public IntPtr Buffer;
         public int Length;
 
-        public string[] ToArray()
+        public EntryMismatchError[] ToArray()
         {
             if (Buffer == IntPtr.Zero)
                 return null;
-            var buffer = new string[Length];
+            var buffer = new EntryMismatchError[Length];
             for (int i = 0; i < Length; i++)
             {
                 unsafe
                 {
-                    Utf8String* current = ((Utf8String*)Buffer) + i;
-                    buffer[i] = (*current).ToString();
+                    RawDependencyError* current = ((RawDependencyError*)Buffer) + i;
+                    buffer[i] = new EntryMismatchError(*current);
                 }
             }
             return buffer;
-
-        }
-
-        public static void Drop(Utf8StringArray s)
-        {
-            SafeNativeMethods.free_strbox_array(s);
         }
     }
 }

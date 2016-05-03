@@ -3,7 +3,7 @@ use std::ptr;
 use std::slice;
 
 use toml_document::{Document, ParserError};
-use winapi::INT32;
+use winapi::{BOOL, INT32};
 
 use super::*;
 use panic::*;
@@ -105,15 +105,15 @@ impl QueryErrorFFI {
 }
 
 #[repr(C)]
-pub struct DependencyPathError {
+pub struct PathErrorFFI {
     path: OwnedSlice<u8>,
     expected: BorrowedSlice<'static, u8>,
     got: BorrowedSlice<'static, u8>
 }
 
-impl DependencyPathError {
-    fn new(e: &DependencyError) -> DependencyPathError {
-        DependencyPathError {
+impl PathErrorFFI {
+    fn new(e: &PathError) -> PathErrorFFI {
+        PathErrorFFI {
             path: OwnedSlice::from_str(&e.path),
             expected: BorrowedSlice::from_static(e.expected),
             got: BorrowedSlice::from_static(e.got)
@@ -122,22 +122,66 @@ impl DependencyPathError {
 }
 
 #[repr(C)]
-pub struct DependenciesResult {
-    deps: OwnedSlice<RawDependency>,
-    errors: OwnedSlice<DependencyPathError>
+pub struct MultiQueryResult<T> {
+    result: T,
+    errors: OwnedSlice<PathErrorFFI>
 }
 
-impl DependenciesResult {
-    fn new(r: Result<Vec<Dependency>, Vec<DependencyError>>) -> DependenciesResult {
+impl MultiQueryResult<OwnedSlice<RawDependency>> {
+    fn from_dependencies(r: Result<Vec<Dependency>, Vec<PathError>>)
+                         -> MultiQueryResult<OwnedSlice<RawDependency>> {
         match r {
-            Ok(deps) => DependenciesResult {
-                deps: OwnedSlice::from_slice(&deps, RawDependency::from),
+            Ok(deps) => MultiQueryResult {
+                result: OwnedSlice::from_slice(&deps, RawDependency::from),
                 errors: OwnedSlice::empty(),
             },
-            Err(errors) => DependenciesResult {
-                deps: OwnedSlice::empty(),
-                errors: OwnedSlice::from_slice(&errors, DependencyPathError::new),
+            Err(errors) => MultiQueryResult {
+                result: OwnedSlice::empty(),
+                errors: OwnedSlice::from_slice(&errors, PathErrorFFI::new),
             }
+        }
+    }
+}
+
+impl MultiQueryResult<OwnedSlice<OutputTargetFFI>> {
+    fn from_output_targets(r: Result<Vec<OutputTarget>, Vec<PathError>>)
+                         -> MultiQueryResult<OwnedSlice<OutputTargetFFI>> {
+        match r {
+            Ok(targets) => MultiQueryResult {
+                result: OwnedSlice::from_slice(&targets, OutputTargetFFI::from),
+                errors: OwnedSlice::empty(),
+            },
+            Err(errors) => MultiQueryResult {
+                result: OwnedSlice::empty(),
+                errors: OwnedSlice::from_slice(&errors, PathErrorFFI::new),
+            }
+        }
+    }
+}
+
+#[repr(C)]
+pub struct OutputTargetFFI {
+    name: OwnedSlice<u8>,
+    path: OwnedSlice<u8>,
+    test: BOOL,
+    doctest: BOOL,
+    bench: BOOL,
+    doc: BOOL,
+    plugin: BOOL,
+    harness: BOOL
+}
+
+impl OutputTargetFFI {
+    fn from(t: &OutputTarget) -> OutputTargetFFI {
+        OutputTargetFFI {
+            name: OwnedSlice::from_str_opt(t.name),
+            path: OwnedSlice::from_str_opt(t.path),
+            test: t.test as BOOL,
+            doctest: t.doctest as BOOL,
+            bench: t.bench as BOOL,
+            doc: t.doc as BOOL,
+            plugin: t.plugin as BOOL,
+            harness: t.harness as BOOL,
         }
     }
 }
@@ -178,7 +222,7 @@ pub extern "C" fn free_strbox_array(s: OwnedSlice<OwnedSlice<u8>>) {
 }
 
 #[no_mangle]
-pub extern "C" fn free_dependencies_result(r: DependenciesResult) {
+pub extern "C" fn free_dependencies_result(r: MultiQueryResult<OwnedSlice<RawDependency>>) {
     drop(r)
 }
 
@@ -207,9 +251,19 @@ pub extern "C" fn get_string_array<'a>(manifest: *mut Manifest,
 }
 
 #[no_mangle]
-pub extern "C" fn get_dependencies(manifest: *mut Manifest) -> DependenciesResult {
+pub extern "C" fn get_dependencies(manifest: *mut Manifest)
+                                   -> MultiQueryResult<OwnedSlice<RawDependency>> {
     unwindable_call(move || {
         let dependencies = unsafe { &*manifest }.get_dependencies();
-        DependenciesResult::new(dependencies)
+        MultiQueryResult::from_dependencies(dependencies)
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn get_output_targets(manifest: *mut Manifest)
+                                     -> MultiQueryResult<OwnedSlice<OutputTargetFFI>> {
+    unwindable_call(move || {
+        let targets = unsafe { &*manifest }.get_output_targets();
+        MultiQueryResult::from_output_targets(targets)
     })
 }

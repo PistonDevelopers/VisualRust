@@ -11,7 +11,7 @@ use std::slice;
 use std::str;
 use std::marker::PhantomData;
 
-use toml_document::{Document, EntryRef, TableEntry};
+use toml_document::{ArrayEntry, Document, EntryRef, TableEntry};
 use winapi::INT32;
 
 mod panic;
@@ -26,6 +26,22 @@ fn entry_kind(e: EntryRef) -> &'static str {
         EntryRef::Datetime(..) => "datetime",
         EntryRef::Array(..) => "array",
         EntryRef::Table(..) => "table",
+    }
+}
+
+fn array_kind(e: ArrayEntry) -> Option<&'static str> {
+    if e.len() == 0 {
+        None
+    } else {
+        match e.get(0) {
+            EntryRef::String(..) => Some("array of strings"),
+            EntryRef::Integer(..) => Some("array of integers"),
+            EntryRef::Float(..) => Some("array of floats"),
+            EntryRef::Boolean(..) => Some("array of booleans"),
+            EntryRef::Datetime(..) => Some("array of datetimes"),
+            EntryRef::Array(..) => Some("array of arrays"),
+            EntryRef::Table(..) => Some("array of tables"),
+        }
     }
 }
 
@@ -82,9 +98,9 @@ impl Manifest {
         }
     }
 
-    pub fn get_dependencies(&self) -> Result<Vec<Dependency>, Vec<DependencyError>> {
+    pub fn get_dependencies(&self) -> Result<Vec<Dependency>, Vec<PathError>> {
         fn get_inner<'a>(deps: &mut Vec<Dependency<'a>>,
-                         errors: &mut Vec<DependencyError>,
+                         errors: &mut Vec<PathError>,
                          target: Option<&'a str>,
                          entry: EntryRef<'a>) {
             match entry {
@@ -104,7 +120,7 @@ impl Manifest {
                                     }
                                     None => format!("dependencies.{}", name)
                                 };
-                                let error = DependencyError {
+                                let error = PathError {
                                     path: path,
                                     expected: "string",
                                     got: entry_kind(entry)
@@ -121,7 +137,7 @@ impl Manifest {
                         }
                         None => "dependencies".to_owned()
                     };
-                    let error = DependencyError {
+                    let error = PathError {
                         path: path,
                         expected: "table",
                         got: entry_kind(entry)
@@ -144,53 +160,144 @@ impl Manifest {
                 }
             }
         }
-        /*
-        match self.doc.get("dependencies") {
-            Some(EntryRef::Table(table)) => {
-                for (name, entry) in table.iter() {
-                    match entry {
-                        EntryRef::String(version) => {
-                            deps.push(Dependency::simple(name, version.get()));
-                        }
-                        EntryRef::Table(table) => {
-                            deps.push(Dependency::complex(name, table));
-                        }
-                        entry => {
-                            let error = DependencyError {
-                                path: format!("dependencies.{}", name),
-                                expected: "string",
-                                got: entry_kind(entry)
-                            };
-                            errors.push(error);
-                        }
-                    }
-                }
-            }
-            Some(entry) => {
-                let mut errors = Vec::new();
-                let error = DependencyError {
-                    path: "dependencies".to_owned(),
-                    expected: "table",
-                    got: entry_kind(entry)
-                };
-                errors.push(error);
-            }
-            None => { }
-        }
-        */
-        /*
-        match self.doc.get("target") {
-            Some(EntryRef::Table(targets)) => {
-                for (target, target_table) in targets.iter() {
-                    target_table.get("dependencies")
-                }
-            }
-        }
-        */
         if errors.len() > 0 {
             Err(errors)
         } else {
             Ok(deps)
+        }
+    }
+
+    pub fn get_output_targets(&self) -> Result<Vec<OutputTarget>, Vec<PathError>> {
+        fn get_string<'a>(entry: Option<EntryRef<'a>>,
+                          path: String)
+                          -> Result<Option<&'a str>, PathError> {
+            match entry {
+                Some(EntryRef::String(s)) => Ok(Some(s.get())),
+                Some(entry) => {
+                    let error = PathError {
+                        path: path,
+                        expected: "string",
+                        got: entry_kind(entry)
+                    };
+                    Err(error)
+                }
+                None => Ok(None)
+            }
+        }
+        fn get_bool<'a>(entry: Option<EntryRef<'a>>,
+                        path: String)
+                        -> Result<Option<bool>, PathError> {
+            match entry {
+                Some(EntryRef::Boolean(b)) => Ok(Some(b.get())),
+                Some(entry) => {
+                    let error = PathError {
+                        path: path,
+                        expected: "boolean",
+                        got: entry_kind(entry)
+                    };
+                    Err(error)
+                }
+                None => Ok(None)
+            }
+        }
+        fn get_target<'a>(src: &'a str,
+                         entry: TableEntry<'a>,
+                         mut target: OutputTarget<'a>)
+                         -> Result<OutputTarget<'a>, PathError> {
+            target.name = try!(get_string(entry.get("name"), format!("{}.name", src)));
+            target.path = try!(get_string(entry.get("path"), format!("{}.path", src)));
+            if let Some(value) = try!(get_bool(entry.get("test"), format!("{}.test", src))) {
+                target.test = value;
+            }
+            if let Some(value) = try!(get_bool(entry.get("doctest"), format!("{}.doctest", src))) {
+                target.doctest = value;
+            }
+            if let Some(value) = try!(get_bool(entry.get("bench"), format!("{}.bench", src))) {
+                target.bench = value;
+            }
+            if let Some(value) = try!(get_bool(entry.get("doc"), format!("{}.doc", src))) {
+                target.doc = value;
+            }
+            if let Some(value) = try!(get_bool(entry.get("plugin"), format!("{}.plugin", src))) {
+                target.plugin = value;
+            }
+            if let Some(value) = try!(get_bool(entry.get("harness"), format!("{}.harness", src))) {
+                target.harness = value;
+            }
+            Ok(target)
+        }
+        fn get_table<'a>(src: &'a str,
+                         entry: Option<EntryRef<'a>>,
+                         target: OutputTarget<'a>,
+                         targets: &mut Vec<OutputTarget<'a>>,
+                         errors: &mut Vec<PathError>) {
+            match entry {
+                Some(EntryRef::Table(table)) => {
+                    match get_target(src, table, target) {
+                        Ok(target) => targets.push(target),
+                        Err(error) => errors.push(error)
+                    }
+                }
+                Some(entry) => {
+                    let error = PathError {
+                        path: src.to_owned(),
+                        expected: "table",
+                        got: entry_kind(entry)
+                    };
+                    errors.push(error);
+                }
+                None => {}
+            }
+        }
+        fn get_array<'a, F>(src: &'a str,
+                            entry: Option<EntryRef<'a>>,
+                            mut ctor: F,
+                            mut targets: &mut Vec<OutputTarget<'a>>,
+                            mut errors: &mut Vec<PathError>)
+                            where F: FnMut() -> OutputTarget<'a> {
+            match entry {
+                Some(EntryRef::Array(array)) => {
+                    let kind = array_kind(array);
+                    if kind != None && kind != Some("array of tables") {
+                        let error = PathError {
+                            path: src.to_owned(),
+                            expected: "array of tables",
+                            got: kind.unwrap()
+                        };
+                        errors.push(error);
+                        return;
+                    }
+                    for entry in array.iter() {
+                        let target = ctor();
+                        get_table(src, Some(entry), target, &mut targets, &mut errors);
+                    }
+                }
+                Some(entry) => {
+                    let error = PathError {
+                        path: src.to_owned(),
+                        expected: "array",
+                        got: entry_kind(entry)
+                    };
+                    errors.push(error);
+                }
+                None => { }
+            }
+        }
+        let mut targets = Vec::new();
+        let mut errors = Vec::new();
+        get_table("lib", self.doc.get("lib"), OutputTarget::lib(), &mut targets, &mut errors);
+        get_array("bin", self.doc.get("bin"), OutputTarget::bin, &mut targets, &mut errors);
+        get_array("bench", self.doc.get("bench"), OutputTarget::bench, &mut targets, &mut errors);
+        get_array("test", self.doc.get("test"), OutputTarget::test, &mut targets, &mut errors);
+        get_array("example",
+                  self.doc.get("example"),
+                  OutputTarget::example,
+                  &mut targets,
+                  &mut errors);
+        if errors.len() > 0 {
+            Err(errors)
+        } else {
+            Ok(targets)
         }
     }
 
@@ -262,10 +369,72 @@ impl<'a> Dependency<'a> {
     }
 }
 
-pub struct DependencyError {
+pub struct PathError {
     path: String,
     expected: &'static str,
     got: &'static str,
+}
+
+pub struct OutputTarget<'a> {
+    name: Option<&'a str>,
+    path: Option<&'a str>,
+    test: bool,
+    doctest: bool,
+    bench: bool,
+    doc: bool,
+    plugin: bool,
+    harness: bool
+}
+
+impl<'a> OutputTarget<'a> {
+    fn default() -> OutputTarget<'a> {
+        OutputTarget {
+            name: None,
+            path: None,
+            test: true,
+            doctest: false,
+            bench: true,
+            doc: false,
+            plugin: false,
+            harness: true
+        }
+    }
+
+    fn bin() -> OutputTarget<'a> {
+        OutputTarget {
+            doc: true,
+            ..OutputTarget::default()
+        }
+    }
+
+    fn lib() -> OutputTarget<'a> {
+        OutputTarget {
+            doctest: true,
+            doc: true,
+            ..OutputTarget::default()
+        }
+    }
+
+    fn bench() -> OutputTarget<'a> {
+        OutputTarget {
+            test: false,
+            ..OutputTarget::default()
+        }
+    }
+
+    fn test() -> OutputTarget<'a> {
+        OutputTarget {
+            bench: false,
+            ..OutputTarget::default()
+        }
+    }
+
+    fn example() -> OutputTarget<'a> {
+        OutputTarget {
+            bench: false,
+            ..OutputTarget::default()
+        }
+    }
 }
 
 #[repr(C)]

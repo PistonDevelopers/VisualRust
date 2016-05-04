@@ -3,10 +3,12 @@ use std::ptr;
 use std::slice;
 
 use toml_document::{Document, ParserError};
-use winapi::{BOOL, INT32};
+use winapi::INT32;
 
 use super::*;
 use panic::*;
+
+type Boolean = u8;
 
 #[repr(C)]
 pub struct ParseResult {
@@ -161,27 +163,29 @@ impl MultiQueryResult<OwnedSlice<OutputTargetFFI>> {
 
 #[repr(C)]
 pub struct OutputTargetFFI {
+    kind: OwnedSlice<u8>,
     name: OwnedSlice<u8>,
     path: OwnedSlice<u8>,
-    test: BOOL,
-    doctest: BOOL,
-    bench: BOOL,
-    doc: BOOL,
-    plugin: BOOL,
-    harness: BOOL
+    test: Boolean,
+    doctest: Boolean,
+    bench: Boolean,
+    doc: Boolean,
+    plugin: Boolean,
+    harness: Boolean
 }
 
 impl OutputTargetFFI {
     fn from(t: &OutputTarget) -> OutputTargetFFI {
         OutputTargetFFI {
+            kind: OwnedSlice::from_str(t.kind),
             name: OwnedSlice::from_str_opt(t.name),
             path: OwnedSlice::from_str_opt(t.path),
-            test: t.test as BOOL,
-            doctest: t.doctest as BOOL,
-            bench: t.bench as BOOL,
-            doc: t.doc as BOOL,
-            plugin: t.plugin as BOOL,
-            harness: t.harness as BOOL,
+            test: t.test as Boolean,
+            doctest: t.doctest as Boolean,
+            bench: t.bench as Boolean,
+            doc: t.doc as Boolean,
+            plugin: t.plugin as Boolean,
+            harness: t.harness as Boolean,
         }
     }
 }
@@ -223,6 +227,11 @@ pub extern "C" fn free_strbox_array(s: OwnedSlice<OwnedSlice<u8>>) {
 
 #[no_mangle]
 pub extern "C" fn free_dependencies_result(r: MultiQueryResult<OwnedSlice<RawDependency>>) {
+    drop(r)
+}
+
+#[no_mangle]
+pub extern "C" fn free_output_targets_result(r: MultiQueryResult<OwnedSlice<OutputTargetFFI>>) {
     drop(r)
 }
 

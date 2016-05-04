@@ -20,6 +20,9 @@ namespace VisualRust.Cargo
 
         [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern void free_dependencies_result(DependenciesQueryResult s);
+        
+        [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void free_output_targets_result(OutputTargetsQueryResult s);
 
         [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern ParseResult load_from_utf16(IntPtr data, int length);
@@ -35,5 +38,8 @@ namespace VisualRust.Cargo
 
         [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern DependenciesQueryResult get_dependencies(IntPtr manifest);
+
+        [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern OutputTargetsQueryResult get_output_targets(IntPtr manifest);
     }
 }

@@ -376,6 +376,7 @@ pub struct PathError {
 }
 
 pub struct OutputTarget<'a> {
+    kind: &'static str,
     name: Option<&'a str>,
     path: Option<&'a str>,
     test: bool,
@@ -389,6 +390,7 @@ pub struct OutputTarget<'a> {
 impl<'a> OutputTarget<'a> {
     fn default() -> OutputTarget<'a> {
         OutputTarget {
+            kind: "",
             name: None,
             path: None,
             test: true,
@@ -402,6 +404,7 @@ impl<'a> OutputTarget<'a> {
 
     fn bin() -> OutputTarget<'a> {
         OutputTarget {
+            kind: "bin",
             doc: true,
             ..OutputTarget::default()
         }
@@ -409,6 +412,7 @@ impl<'a> OutputTarget<'a> {
 
     fn lib() -> OutputTarget<'a> {
         OutputTarget {
+            kind: "lib",
             doctest: true,
             doc: true,
             ..OutputTarget::default()
@@ -417,6 +421,7 @@ impl<'a> OutputTarget<'a> {
 
     fn bench() -> OutputTarget<'a> {
         OutputTarget {
+            kind: "bench",
             test: false,
             ..OutputTarget::default()
         }
@@ -424,6 +429,7 @@ impl<'a> OutputTarget<'a> {
 
     fn test() -> OutputTarget<'a> {
         OutputTarget {
+            kind: "test",
             bench: false,
             ..OutputTarget::default()
         }
@@ -431,6 +437,7 @@ impl<'a> OutputTarget<'a> {
 
     fn example() -> OutputTarget<'a> {
         OutputTarget {
+            kind: "example",
             bench: false,
             ..OutputTarget::default()
         }

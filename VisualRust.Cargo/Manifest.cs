@@ -84,9 +84,42 @@ namespace VisualRust.Cargo
             get { return dependencies; }
         }
 
+        OutputTarget[] outputTargets;
+        public OutputTarget[] OutputTargets
+        {
+            get { return outputTargets; }
+        }
+
+        public string libName { get; private set; }
+        public string path { get; private set; }
+
         private Manifest(IntPtr handle)
         {
             this.manifest = handle;
+        }
+
+        public static Manifest TryCreate(string text, out ManifestErrors loadErrors)
+        {
+            string error;
+            IntPtr manifestPtr = Parse(text, out error);
+            if (manifestPtr == IntPtr.Zero)
+            {
+                loadErrors = new ManifestErrors(error);
+                return null;
+            }
+            Manifest manifest = new Manifest(manifestPtr);
+            HashSet<EntryMismatchError> mismatchErrors = manifest.Load();
+            IList<FieldMalformedError> validateErrors = manifest.Validate();
+            if(mismatchErrors.Count > 0 || validateErrors.Count > 0)
+            {
+                loadErrors = new ManifestErrors(mismatchErrors, validateErrors);
+                return null;
+            }
+            else
+            {
+                loadErrors = null;
+                return manifest;
+            }
         }
 
         static IntPtr Parse(string text, out string error)
@@ -110,27 +143,7 @@ namespace VisualRust.Cargo
             }
         }
 
-        public static Manifest TryCreate(string text, out ManifestErrors loadErrors)
-        {
-            string error;
-            IntPtr manifestPtr = Parse(text, out error);
-            if (manifestPtr == IntPtr.Zero)
-            {
-                loadErrors = new ManifestErrors(error);
-                return null;
-            }
-            Manifest manifest = new Manifest(manifestPtr);
-            HashSet<EntryMismatchError> errors = manifest.Load();
-            if (errors.Count > 0)
-            {
-                loadErrors = new ManifestErrors(errors);
-                return null;
-            }
-            loadErrors = null;
-            return manifest;
-        }
-
-        private HashSet<EntryMismatchError> Load()
+        HashSet<EntryMismatchError> Load()
         {
             HashSet<EntryMismatchError> errors = new HashSet<EntryMismatchError>(new MismatchComparer());
             name = GetString(errors, "package", "name");
@@ -141,7 +154,20 @@ namespace VisualRust.Cargo
             homepage = GetString(errors, "package", "homepage");
             repository = GetString(errors, "package", "repository");
             license = GetString(errors, "package", "license");
+            libName = GetString(errors, "lib", "name");
+            path = GetString(errors, "lib", "path");
             dependencies = GetDependencies(errors);
+            outputTargets = GetOutputTargets(errors);
+            return errors;
+        }
+
+        IList<FieldMalformedError> Validate()
+        {
+            List<FieldMalformedError> errors = new List<FieldMalformedError>(2);
+            if(String.IsNullOrWhiteSpace(Name))
+                errors.Add(new FieldMalformedError("package.name", Name == null));
+            if(String.IsNullOrWhiteSpace(Version))
+                errors.Add(new FieldMalformedError("package.version", Version == null));
             return errors;
         }
 
@@ -156,6 +182,20 @@ namespace VisualRust.Cargo
                         errors.Add(error);
                 }
                 return deps.Dependencies.ToArray();
+            }
+        }
+
+        private OutputTarget[] GetOutputTargets(HashSet<EntryMismatchError> errors)
+        {
+            using (OutputTargetsQueryResult result = Rust.Call(SafeNativeMethods.get_output_targets, manifest))
+            {
+                EntryMismatchError[] callErrors = result.Errors.ToArray();
+                if (callErrors != null)
+                {
+                    foreach (var error in callErrors)
+                        errors.Add(error);
+                }
+                return result.Targets.ToArray();
             }
         }
 

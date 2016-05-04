@@ -24,10 +24,11 @@ namespace VisualRust.Test.Cargo
                 out temp);
             Assert.AreEqual("foo", m.Name);
             Assert.AreEqual("0.1", m.Version);
-            CollectionAssert.AreEqual(new [] { "asd", "fgh" }, m.Authors);
+            CollectionAssert.AreEqual(new[] { "asd", "fgh" }, m.Authors);
             Assert.AreEqual(1, m.Dependencies.Length);
             Assert.AreEqual("foo", m.Dependencies[0].Name);
             Assert.AreEqual("0.1", m.Dependencies[0].Version);
+            Assert.AreEqual(0, m.OutputTargets.Length);
         }
 
         [Test]
@@ -61,7 +62,10 @@ namespace VisualRust.Test.Cargo
         {
             ManifestErrors temp;
             var m = Manifest.TryCreate(
-                @"[dependencies]
+                @"[package]
+                  name=""foo""
+                  version = ""0.1.0""
+                  [dependencies]
                   hammer  = { version = ""0.5.0"", git = ""https://github.com/wycats/hammer.rs"" }",
                 out temp);
             Assert.AreEqual(1, m.Dependencies.Length);
@@ -75,7 +79,10 @@ namespace VisualRust.Test.Cargo
         {
             ManifestErrors temp;
             var m = Manifest.TryCreate(
-                @"[target.x86_64-pc-windows-gnu.dependencies]
+                @"[package]
+                  name=""foo""
+                  version = ""0.1.0""
+                  [target.x86_64-pc-windows-gnu.dependencies]
                   winhttp = ""0.4.0""",
                 out temp);
             Assert.AreEqual(1, m.Dependencies.Length);
@@ -95,6 +102,76 @@ namespace VisualRust.Test.Cargo
             EntryMismatchError error = temp.LoadErrors.First(e => e.Path == "target.x86_64-pc-windows-gnu.dependencies.winhttp");
             Assert.AreEqual("string", error.Expected);
             Assert.AreEqual("integer", error.Got);
+        }
+
+        [Test]
+        public void EmptyDependencies()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                @"[package]
+                  name=""foo""
+                  version=""0.1""",
+                out temp);
+            Assert.AreEqual(0, m.Dependencies.Length);
+        }
+
+        [Test]
+        public void LibOutputTarget()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                @"[package]
+                  name=""foo""
+                  version=""0.1""
+                  [lib]
+                  name = ""bar""
+                  path = ""src.rs""",
+                out temp);
+            Assert.AreEqual(1, m.OutputTargets.Length);
+            Assert.AreEqual("bar", m.OutputTargets[0].Name);
+            Assert.AreEqual("src.rs", m.OutputTargets[0].Path);
+        }
+
+        [Test]
+        public void MultipleLibOutputTargets()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                @"[package]
+                  name=""foo""
+                  version=""0.1""
+                  [[bench]]
+                  name = ""bench1""
+                  path = ""bench1.rs""
+                  [lib]
+                  name = ""bar""
+                  path = ""src.rs""
+                  [[bin]]
+                  name = ""bin1""
+                  path = ""bin1.rs""
+                  [[bench]]
+                  name = ""bench2""
+                  path = ""bench2.rs""
+                  [[bin]]
+                  name = ""bin2""
+                  path = ""bin2.rs""",
+                out temp);
+            OutputTarget t1 = GetOutputTarget(m.OutputTargets, "bench", "bench1");
+            Assert.AreEqual("bench1.rs", t1.Path);
+            OutputTarget t2 = GetOutputTarget(m.OutputTargets, "lib", "bar");
+            Assert.AreEqual("src.rs", t2.Path);
+            OutputTarget t3 = GetOutputTarget(m.OutputTargets, "bin", "bin1");
+            Assert.AreEqual("bin1.rs", t3.Path);
+            OutputTarget t4 = GetOutputTarget(m.OutputTargets, "bench", "bench2");
+            Assert.AreEqual("bench2.rs", t4.Path);
+            OutputTarget t5 = GetOutputTarget(m.OutputTargets, "bin", "bin2");
+            Assert.AreEqual("bin2.rs", t5.Path);
+        }
+
+        static OutputTarget GetOutputTarget(OutputTarget[] targets, string type, string name)
+        {
+            return targets.First(t => t.Type == type && t.Name == name);
         }
     }
 }

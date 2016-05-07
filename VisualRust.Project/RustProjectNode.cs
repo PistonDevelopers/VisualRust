@@ -213,9 +213,7 @@ namespace VisualRust.Project
             Manifest manifest = Manifest.TryCreate(manifestContent, out errors);
             if (manifest == null)
             {
-                string[] parseError = String.IsNullOrEmpty(errors.ParseError) ? new string[0] : new[] { errors.ParseError };
-                IEnumerable<string> errorsText = parseError.Union(errors.LoadErrors.Select(e => e.ToString()));
-                var window = new Controls.OpenManifestErrorWindow(System.Windows.Application.Current.MainWindow, manifestPathFull, errorsText.ToArray());
+                var window = new Controls.OpenManifestErrorWindow(System.Windows.Application.Current.MainWindow, manifestPathFull, errors.GetErrors());
                 bool? result = window.ShowDialog();
                 if (result == false)
                 {
@@ -537,6 +535,7 @@ namespace VisualRust.Project
         {
             return new[] {
                 new Guid(Constants.ApplicationPropertyPage),
+                new Guid(Constants.TargetOutputsPage),
             };
         }
     }

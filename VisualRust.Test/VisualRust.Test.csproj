@@ -54,6 +54,7 @@
     <EmbeddedResource Include="Internal\CircularNested\in\foo.rs" />
     <EmbeddedResource Include="Internal\CircularNested\main.rs" />
     <Compile Include="Cargo\ManifestTests.cs" />
+    <Compile Include="Project\Controls\OutputTargetSectionViewModelTests.cs" />
     <Compile Include="Project\ModuleImportTests.cs" />
     <Compile Include="Project\ModuleParserTests.cs" />
     <Compile Include="Project\ModuleTrackerTests.cs" />

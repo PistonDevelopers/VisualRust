@@ -165,9 +165,23 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Build.tt</DependentUpon>
     </Compile>
+    <Compile Include="Controls\AutoOutputTargetViewModel.cs" />
+    <Compile Include="Controls\BenchmarkAutoOutputTargetViewModel.cs" />
+    <Compile Include="Controls\BinaryAutoOutputTargetViewModel.cs" />
+    <Compile Include="Controls\ExampleAutoOutputTargetViewModel.cs" />
+    <Compile Include="Controls\IOutputTargetViewModel.cs" />
+    <Compile Include="Controls\IPropertyPageContext.cs" />
+    <Compile Include="Controls\LibraryAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\OpenManifestErrorWindow.xaml.cs">
       <DependentUpon>OpenManifestErrorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\OutputPage.xaml.cs">
+      <DependentUpon>OutputPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\OutputTargetSectionViewModel.cs" />
+    <Compile Include="Controls\OutputTargetViewModel.cs" />
+    <Compile Include="Controls\TestAutoOutputTargetViewModel.cs" />
+    <Compile Include="Controls\ViewModelBase.cs" />
     <Compile Include="Launcher\GnuDebugLauncher.cs" />
     <Compile Include="Launcher\IRustProjectLauncher.cs" />
     <Compile Include="Launcher\MsvcDebugLauncher.cs" />
@@ -285,6 +299,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\OpenManifestErrorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\OutputPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

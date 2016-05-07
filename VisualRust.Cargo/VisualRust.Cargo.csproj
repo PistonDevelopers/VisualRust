@@ -53,6 +53,7 @@
     <Compile Include="Manifest.cs" />
     <Compile Include="OutputTarget.cs" />
     <Compile Include="OutputTargetsQueryResult.cs" />
+    <Compile Include="OutputTargetType.cs" />
     <Compile Include="ParseResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DependencyError.cs" />

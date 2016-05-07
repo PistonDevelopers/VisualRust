@@ -7,12 +7,15 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using VisualRust.Cargo;
 
 namespace VisualRust.Project
 {
     [CLSCompliant(false), ComVisible(true)]
     public class RustProjectNodeProperties : ProjectNodeProperties
     {
+        public Manifest Manifest { get { return ((RustProjectNode)this.Node).Manifest; } }
+
         internal RustProjectNodeProperties(CommonProjectNode node)
             : base(node)
         { }

@@ -64,6 +64,7 @@ namespace VisualRust
     [ProvideObject(typeof(Project.Forms.ApplicationPropertyPage))]
     [ProvideObject(typeof(Project.Forms.BuildPropertyPage))]
     [ProvideObject(typeof(Project.Forms.DebugPropertyPage))]
+    [ProvideObject(typeof(Project.Forms.TargetOutputsPropertyPage))]
     [ProvideOptionPage(typeof(RustOptionsPage), "Visual Rust", "General", 110, 113, true)]
     [ProvideOptionPage(typeof(DebuggingOptionsPage), "Visual Rust", "Debugging", 110, 114, true)]
     [ProvideProfile(typeof(RustOptionsPage), "Visual Rust", "General", 110, 113, true)]

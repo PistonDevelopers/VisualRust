@@ -227,6 +227,8 @@
     <Compile Include="Forms\DebuggingOptionsPageControl.Designer.cs">
       <DependentUpon>DebuggingOptionsPageControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProjectForms\TargetOutputsPropertyPage.cs" />
+    <Compile Include="ProjectForms\WpfPropertyPage.cs" />
     <Compile Include="ProjectForms\GeneralPropertyPage.cs" />
     <Compile Include="Forms\RustOptionsPageControl.cs">
       <SubType>UserControl</SubType>
@@ -334,6 +336,10 @@
     <ProjectReference Include="..\RustLexer\RustLexer.csproj">
       <Project>{e983e989-f83a-4643-896a-ad496bf647d0}</Project>
       <Name>RustLexer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Cargo\VisualRust.Cargo.csproj">
+      <Project>{2594DB0D-03FF-40EA-8D27-9930E5D3FF83}</Project>
+      <Name>VisualRust.Cargo</Name>
     </ProjectReference>
     <ProjectReference Include="..\VisualRust.Templates\VisualRust.Templates.csproj">
       <Project>{59D94B96-1AF7-46F2-8790-AAB6DFAE8D9A}</Project>

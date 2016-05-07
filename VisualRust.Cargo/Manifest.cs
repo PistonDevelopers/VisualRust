@@ -29,69 +29,16 @@ namespace VisualRust.Cargo
         }
 
         private readonly IntPtr manifest;
-
-        private string name;
-        public string Name
-        {
-            get { return name; }
-        }
-
-        private string version;
-        public string Version
-        {
-            get { return version; }
-        }
-
-        private string description;
-        public string Description
-        {
-            get { return description; }
-        }
-
-        private string[] authors;
-        public string[] Authors
-        {
-            get { return authors; }
-        }
-
-        private string documentation;
-        public string Documentation
-        {
-            get { return documentation; }
-        }
-
-        private string homepage;
-        public string Homepage
-        {
-            get { return homepage; }
-        }
-
-        private string repository;
-        public string Repository
-        {
-            get { return repository; }
-        }
-
-        private string license;
-        public string License
-        {
-            get { return license; }
-        }
-
-        Dependency[] dependencies;
-        public Dependency[] Dependencies
-        {
-            get { return dependencies; }
-        }
-
-        OutputTarget[] outputTargets;
-        public OutputTarget[] OutputTargets
-        {
-            get { return outputTargets; }
-        }
-
-        public string libName { get; private set; }
-        public string path { get; private set; }
+        public string Name { get; set; }
+        public string Version { get; set; }
+        public string Description { get; set; }
+        public string[] Authors { get; set; }
+        public string Documentation { get; set; }
+        public string Homepage { get; set; }
+        public string Repository { get; set; }
+        public string License { get; set; }
+        public Dependency[] Dependencies { get; set; }
+        public OutputTarget[] OutputTargets { get; set; }
 
         private Manifest(IntPtr handle)
         {
@@ -110,7 +57,7 @@ namespace VisualRust.Cargo
             Manifest manifest = new Manifest(manifestPtr);
             HashSet<EntryMismatchError> mismatchErrors = manifest.Load();
             IList<FieldMalformedError> validateErrors = manifest.Validate();
-            if(mismatchErrors.Count > 0 || validateErrors.Count > 0)
+            if (mismatchErrors.Count > 0 || validateErrors.Count > 0)
             {
                 loadErrors = new ManifestErrors(mismatchErrors, validateErrors);
                 return null;
@@ -120,6 +67,16 @@ namespace VisualRust.Cargo
                 loadErrors = null;
                 return manifest;
             }
+        }
+
+        public static Manifest CreateFake(string name, string version)
+        {
+            var manifest = new Manifest(IntPtr.Zero);
+            manifest.Name = name;
+            manifest.Version = version;
+            manifest.Dependencies = new Dependency[0];
+            manifest.OutputTargets = new OutputTarget[0];
+            return manifest;
         }
 
         static IntPtr Parse(string text, out string error)
@@ -146,27 +103,25 @@ namespace VisualRust.Cargo
         HashSet<EntryMismatchError> Load()
         {
             HashSet<EntryMismatchError> errors = new HashSet<EntryMismatchError>(new MismatchComparer());
-            name = GetString(errors, "package", "name");
-            version = GetString(errors, "package", "version");
-            authors = GetStringArray(errors, "package", "authors");
-            description = GetString(errors, "package", "description");
-            documentation = GetString(errors, "package", "documentation");
-            homepage = GetString(errors, "package", "homepage");
-            repository = GetString(errors, "package", "repository");
-            license = GetString(errors, "package", "license");
-            libName = GetString(errors, "lib", "name");
-            path = GetString(errors, "lib", "path");
-            dependencies = GetDependencies(errors);
-            outputTargets = GetOutputTargets(errors);
+            Name = GetString(errors, "package", "name");
+            Version = GetString(errors, "package", "version");
+            Authors = GetStringArray(errors, "package", "authors");
+            Description = GetString(errors, "package", "description");
+            Documentation = GetString(errors, "package", "documentation");
+            Homepage = GetString(errors, "package", "homepage");
+            Repository = GetString(errors, "package", "repository");
+            License = GetString(errors, "package", "license");
+            Dependencies = GetDependencies(errors);
+            OutputTargets = GetOutputTargets(errors);
             return errors;
         }
 
         IList<FieldMalformedError> Validate()
         {
             List<FieldMalformedError> errors = new List<FieldMalformedError>(2);
-            if(String.IsNullOrWhiteSpace(Name))
+            if (String.IsNullOrWhiteSpace(Name))
                 errors.Add(new FieldMalformedError("package.name", Name == null));
-            if(String.IsNullOrWhiteSpace(Version))
+            if (String.IsNullOrWhiteSpace(Version))
                 errors.Add(new FieldMalformedError("package.version", Version == null));
             return errors;
         }

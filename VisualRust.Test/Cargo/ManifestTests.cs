@@ -157,19 +157,19 @@ namespace VisualRust.Test.Cargo
                   name = ""bin2""
                   path = ""bin2.rs""",
                 out temp);
-            OutputTarget t1 = GetOutputTarget(m.OutputTargets, "bench", "bench1");
+            OutputTarget t1 = GetOutputTarget(m.OutputTargets, OutputTargetType.Benchmark, "bench1");
             Assert.AreEqual("bench1.rs", t1.Path);
-            OutputTarget t2 = GetOutputTarget(m.OutputTargets, "lib", "bar");
+            OutputTarget t2 = GetOutputTarget(m.OutputTargets, OutputTargetType.Library, "bar");
             Assert.AreEqual("src.rs", t2.Path);
-            OutputTarget t3 = GetOutputTarget(m.OutputTargets, "bin", "bin1");
+            OutputTarget t3 = GetOutputTarget(m.OutputTargets, OutputTargetType.Binary, "bin1");
             Assert.AreEqual("bin1.rs", t3.Path);
-            OutputTarget t4 = GetOutputTarget(m.OutputTargets, "bench", "bench2");
+            OutputTarget t4 = GetOutputTarget(m.OutputTargets, OutputTargetType.Benchmark, "bench2");
             Assert.AreEqual("bench2.rs", t4.Path);
-            OutputTarget t5 = GetOutputTarget(m.OutputTargets, "bin", "bin2");
+            OutputTarget t5 = GetOutputTarget(m.OutputTargets, OutputTargetType.Binary, "bin2");
             Assert.AreEqual("bin2.rs", t5.Path);
         }
 
-        static OutputTarget GetOutputTarget(OutputTarget[] targets, string type, string name)
+        static OutputTarget GetOutputTarget(OutputTarget[] targets, OutputTargetType type, string name)
         {
             return targets.First(t => t.Type == type && t.Name == name);
         }

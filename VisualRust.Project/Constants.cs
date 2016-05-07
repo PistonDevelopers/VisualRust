@@ -11,6 +11,7 @@ namespace VisualRust.Project
         public const string BuildPropertyPage = "10C47C08-3645-42C8-BBCA-BCBAA0129DF5";
         public const string ApplicationPropertyPage = "7B1CA802-91F7-4EF4-A1C0-83E40BA72429";
         public const string DebugPropertyPage = "F85DDD2A-EA8D-4CAD-A796-43407E8D91A0";
+        public const string TargetOutputsPage = "63BBED13-1954-42C7-AEE0-4A60AF397AF3";
 
         public const string BuiltinDebugger = "Built-in Debugger";
         public const string GdbDebugger = "GDB Debugger";

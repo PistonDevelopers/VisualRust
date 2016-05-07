@@ -5,7 +5,7 @@ namespace VisualRust.Cargo
 {
     public class OutputTarget
     {
-        public string Type { get; private set; }
+        public OutputTargetType Type { get; private set; }
         public string Name { get; private set; }
         public string Path { get; private set; }
         public bool Test { get; private set; }
@@ -17,7 +17,7 @@ namespace VisualRust.Cargo
 
         internal OutputTarget(RawOutputTarget t)
         {
-            Type = t.Type.ToString();
+            Type = OutputTargetTypeExtensions.FromString(t.Type.ToString());
             Name = t.Name.ToString();
             Path = t.Path.ToString();
             Test = t.Test;

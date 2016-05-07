@@ -131,6 +131,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
         DWL_MSGRESULT = 0,
 
+        SW_HIDE = 0,
+        SW_SHOW = 5,
         SW_SHOWNORMAL = 1,
 
         HTMENU = 5,
@@ -577,6 +579,12 @@ namespace Microsoft.VisualStudioTools.Project {
 
         [DllImport("user32", CallingConvention = CallingConvention.Winapi)]
         public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32", CallingConvention = CallingConvention.Winapi)]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, int flags);
+
+        [DllImport("user32", CallingConvention = CallingConvention.Winapi)]
+        public static extern bool GetWindowRect(IntPtr hWnd, out RECT[] rect);
 
         public static void SetErrorDescription(string description, params object[] args) {
             ICreateErrorInfo errInfo;
@@ -1182,5 +1190,6 @@ namespace Microsoft.VisualStudioTools.Project {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
         public string cAlternateFileName;
     }
+
 }
 

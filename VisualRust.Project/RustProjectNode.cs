@@ -13,6 +13,7 @@ using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VisualRust.Shared;
+using VisualRust.Cargo;
 
 namespace VisualRust.Project
 {
@@ -74,6 +75,7 @@ namespace VisualRust.Project
         private bool containsEntryPoint;
         public UserProjectConfig UserConfig { get; private set; }
         internal ModuleTracker ModuleTracker { get; private set; }
+        internal Manifest Manifest { get; private set; }
 
         public RustProjectNode(CommonProjectPackage package)
             : base(package, Utilities.GetImageList(new System.Drawing.Bitmap(typeof(RustProjectNode).Assembly.GetManifestResourceStream("VisualRust.Project.Resources.IconList.bmp"))))
@@ -86,13 +88,14 @@ namespace VisualRust.Project
 
         void ReloadOnOutputChange(object sender, ProjectPropertyChangedArgs e)
         {
-            if(String.Equals(e.PropertyName, "OutputType", StringComparison.OrdinalIgnoreCase)
+            if (String.Equals(e.PropertyName, "OutputType", StringComparison.OrdinalIgnoreCase)
                 && !String.Equals(e.OldValue, e.NewValue, StringComparison.OrdinalIgnoreCase))
             {
-                TrackedFileNode crateNode =  this.GetCrateFileNode(e.OldValue);
-                if(crateNode != null)
+                TrackedFileNode crateNode = this.GetCrateFileNode(e.OldValue);
+                if (crateNode != null)
                     crateNode.IsEntryPoint = false;
-                this.ReloadCore();
+                int temp;
+                this.ReloadCore(out temp);
                 this.GetCrateFileNode(e.NewValue).IsEntryPoint = true;
             }
         }
@@ -124,12 +127,12 @@ namespace VisualRust.Project
             return RustImageHandler.GetIconHandle((int)IconIndex.RustProject);
         }
 
-        protected override void Reload()
+        protected override void Reload(out int canceled)
         {
             EventTriggeringFlag = ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents | ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
             try
             {
-                ReloadCore();
+                ReloadCore(out canceled);
             }
             finally
             {
@@ -150,14 +153,21 @@ namespace VisualRust.Project
             return FindNodeByFullPath(GetCrateFileNodePath(outputType)) as TrackedFileNode;
         }
 
-        protected void ReloadCore()
+        protected void ReloadCore(out int canceled)
         {
+            ManifestLoadResult manifestResult = LoadManifest();
+            if (manifestResult.Cancel)
+            {
+                canceled = 1;
+                return;
+            }
+            this.Manifest = manifestResult.Manifest;
             this.UserConfig = new UserProjectConfig(this);
             string outputType = GetProjectProperty(ProjectFileConstants.OutputType, true);
             string entryPoint = GetCrateFileNodePath(outputType);
             containsEntryPoint = GetCrateFileNode(outputType) != null;
             ModuleTracker = new ModuleTracker(entryPoint);
-            base.Reload();
+            base.Reload(out canceled);
             // This project for some reason doesn't include entrypoint node, add it
             if (!containsEntryPoint)
             {
@@ -174,13 +184,59 @@ namespace VisualRust.Project
             }
         }
 
+        ManifestLoadResult LoadManifest()
+        {
+            string manifestPath = this.BuildProject.GetPropertyValue("ManifestPath");
+            string manifestPathFull = Path.GetFullPath(Path.Combine(this.ProjectFolder, manifestPath));
+            string manifestContent;
+            try
+            {
+                manifestContent = File.ReadAllText(manifestPathFull);
+            }
+            catch (IOException ex)
+            {
+                var window = new Controls.OpenManifestErrorWindow(System.Windows.Application.Current.MainWindow, manifestPathFull, new string[] { ex.Message });
+                bool? result = window.ShowDialog();
+                if (result == false)
+                {
+                    if(window.Reload)
+                        return LoadManifest();
+                    return ManifestLoadResult.CreateCancel();
+                }
+                else
+                {
+                    this.BuildProject.SetProperty("ManifestPath", CommonUtils.GetRelativeFilePath(this.ProjectFolder, manifestPathFull));
+                    return LoadManifest();
+                }
+            }
+            ManifestErrors errors;
+            Manifest manifest = Manifest.TryCreate(manifestContent, out errors);
+            if (manifest == null)
+            {
+                var window = new Controls.OpenManifestErrorWindow(System.Windows.Application.Current.MainWindow, manifestPathFull, errors.GetErrors());
+                bool? result = window.ShowDialog();
+                if (result == false)
+                {
+                    if(window.Reload)
+                        return LoadManifest();
+                    return ManifestLoadResult.CreateCancel();
+                }
+                else
+                {
+                    this.BuildProject.SetProperty("ManifestPath", CommonUtils.GetRelativeFilePath(this.ProjectFolder, manifestPathFull));
+                    return LoadManifest();
+                }
+            }
+            return ManifestLoadResult.CreateSuccess(manifest);
+        }
+
         private void MarkEntryPointFolders(string outputType)
         {
             HierarchyNode node = GetCrateFileNode(outputType);
-            while(true)
+            while (true)
             {
                 node = node.Parent;
-                if(!(node is RustFolderNode))
+                if (!(node is RustFolderNode))
                     break;
                 ((RustFolderNode)node).IsEntryPoint = true;
             }
@@ -203,7 +259,7 @@ namespace VisualRust.Project
             else
             {
                 HashSet<string> children = ModuleTracker.AddRootModuleIncremental(node.Url);
-                foreach(string child in children)
+                foreach (string child in children)
                 {
                     HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(child), false);
                     parent.AddChild(CreateUntrackedNode(child));
@@ -242,7 +298,7 @@ namespace VisualRust.Project
         protected override HierarchyNode AddIndependentFileNode(Microsoft.Build.Evaluation.ProjectItem item, HierarchyNode parent)
         {
             var node = (TrackedFileNode)base.AddIndependentFileNode(item, parent);
-            if(node.GetModuleTracking())
+            if (node.GetModuleTracking())
             {
                 if (node.Url.Equals(ModuleTracker.EntryPoint, StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -305,7 +361,7 @@ namespace VisualRust.Project
         internal void ReparseFileNode(BaseFileNode n)
         {
             var diff = ModuleTracker.Reparse(n.Url);
-            foreach(string mod in diff.Removed)
+            foreach (string mod in diff.Removed)
             {
                 TreeOperations.RemoveSubnodeFromHierarchy(this, mod, false);
             }
@@ -319,7 +375,7 @@ namespace VisualRust.Project
         public override int SaveItem(VSSAVEFLAGS saveFlag, string silentSaveAsName, uint itemid, IntPtr docData, out int cancelled)
         {
             BaseFileNode node = this.NodeFromItemId(itemid) as BaseFileNode;
-            if(node != null)
+            if (node != null)
             {
                 int result = base.SaveItem(saveFlag, silentSaveAsName, itemid, docData, out cancelled);
                 if (result == VSConstants.S_OK)
@@ -384,14 +440,14 @@ namespace VisualRust.Project
             return VSConstants.S_OK;
         }
 
-#region Disable "Add references..."
+        #region Disable "Add references..."
         protected override ReferenceContainerNode CreateReferenceContainerNode()
         {
             return null;
         }
 
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
-        { 
+        {
             if (cmdGroup == VsMenus.guidStandardCommandSet2K && (VsCommands2K)cmd == VsCommands2K.ADDCOMPONENTS
                 || cmdGroup == VSConstants.CMDSETID.StandardCommandSet12_guid && (VSConstants.VSStd12CmdID)cmd == VSConstants.VSStd12CmdID.AddReferenceProjectOnly)
             {
@@ -415,7 +471,7 @@ namespace VisualRust.Project
         {
             return VSConstants.E_NOTIMPL;
         }
-#endregion
+        #endregion
 
         // This is OK, because this function is only called by
         // ProjectGuid getter, which we override anyway
@@ -423,7 +479,7 @@ namespace VisualRust.Project
         {
             throw new InvalidOperationException();
         }
-        
+
         // This is OK, because this function is only called by
         // GetSpecificEditorType(...), which we override anyway
         public override Type GetEditorFactoryType()
@@ -479,6 +535,7 @@ namespace VisualRust.Project
         {
             return new[] {
                 new Guid(Constants.ApplicationPropertyPage),
+                new Guid(Constants.TargetOutputsPage),
             };
         }
     }

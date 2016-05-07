@@ -388,8 +388,8 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Overriding main project loading method to inject our hierarachy of nodes.
         /// </summary>
-        protected override void Reload() {
-            base.Reload();
+        protected override void Reload(out int canceled) {
+            base.Reload(out canceled);
 
             BoldStartupItem();
 

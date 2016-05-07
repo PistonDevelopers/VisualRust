@@ -11,6 +11,8 @@
     <AssemblyName>VisualRust.Cargo</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\VisualRust\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -46,8 +48,12 @@
     <Compile Include="DependenciesQueryResult.cs" />
     <Compile Include="Dependency.cs" />
     <Compile Include="EntryMismatchError.cs" />
+    <Compile Include="FieldMalformedError.cs" />
     <Compile Include="ManifestErrors.cs" />
     <Compile Include="Manifest.cs" />
+    <Compile Include="OutputTarget.cs" />
+    <Compile Include="OutputTargetsQueryResult.cs" />
+    <Compile Include="OutputTargetType.cs" />
     <Compile Include="ParseResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DependencyError.cs" />

@@ -20,7 +20,7 @@ namespace VisualRust
             return true;
         }
 
-        private void RaisePropertyChanged(string property)
+        protected void RaisePropertyChanged(string property)
         {
             var handler = PropertyChanged;
             if (handler != null)

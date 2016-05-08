@@ -172,6 +172,7 @@
     <Compile Include="Controls\IOutputTargetViewModel.cs" />
     <Compile Include="Controls\IPropertyPageContext.cs" />
     <Compile Include="Controls\LibraryAutoOutputTargetViewModel.cs" />
+    <Compile Include="Controls\NegateConverter.cs" />
     <Compile Include="Controls\OpenManifestErrorWindow.xaml.cs">
       <DependentUpon>OpenManifestErrorWindow.xaml</DependentUpon>
     </Compile>

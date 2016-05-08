@@ -10,7 +10,9 @@ namespace VisualRust.Project.Controls
         }
 
         public override OutputTargetType Type { get { return OutputTargetType.Test; } }
+        public override string TabName { get { return "Autodetect tests"; } }
         public override string Name { get { return AutoDetect; } }
         public override string Path { get { return @"tests\*.rs"; } }
+        public override bool Bench { get { return false; } }
     }
 }

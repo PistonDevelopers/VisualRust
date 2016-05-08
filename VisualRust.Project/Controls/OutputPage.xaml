@@ -1,47 +1,227 @@
 ﻿<DockPanel x:Class="VisualRust.Project.Controls.OutputPage"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:VisualRust.Project.Controls">
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options" 
+           xmlns:local="clr-namespace:VisualRust.Project.Controls"
+           mc:Ignorable="d"
+           TextOptions.TextFormattingMode="Display"
+           Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+           UseLayoutRounding="True" d:DesignHeight="408" d:DesignWidth="615">
     <DockPanel.Resources>
+        <Style BasedOn="{StaticResource {x:Type GroupBox}}" TargetType="{x:Type GroupBox}">
+            <Setter Property="Padding" Value="3"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type RadioButton}}" TargetType="{x:Type RadioButton}">
+            <Setter Property="Margin" Value="3,5,0,5"/>
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type CheckBox}}" TargetType="{x:Type CheckBox}">
+            <Setter Property="Margin" Value="3,5,0,5"/>
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type TextBox}">
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <DrawingGroup x:Key="BinaryDrawing" PresentationOptions:Freeze="True">
+            <DrawingGroup.Children>
+                <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M0,15L16,15 16,1 0,1z" />
+                <GeometryDrawing Brush="#FF424242" Geometry="F1M14,13L2,13 2,5 14,5z M1,14L15,14 15,2 1,2z" />
+                <GeometryDrawing Brush="#FFEFEFF0" Geometry="F1M14,13L2,13 2,5 14,5z" />
+            </DrawingGroup.Children>
+        </DrawingGroup>
+        <DrawingGroup x:Key="BenchmarkDrawing" PresentationOptions:Freeze="True">
+            <DrawingGroup.Children>
+                <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M16,10L16,10C15.101,6.525 11.654,3 8,3 4.346,3 0.898999999999999,6.525 0,10L0,13 16,13z" />
+                <GeometryDrawing Brush="#FF414141" Geometry="F1M15,11C14.514,7.609 11.525,4 8,4 4.474,4 1.486,7.609 1,11L1,12 2,12 5,12 5,11 2.09,11C2.569,8.167 5.033,5 8,5 10.967,5 13.432,8.167 13.91,11L11,11 11,12 14,12 15,12z" />
+                <GeometryDrawing Brush="#FF414141" Geometry="F1M9.9023,11C9.9023,11.553 9.4533,12 8.9003,12 8.3473,12 7.8993,11.553 7.8993,11 7.8993,10.447 8.3473,10 8.9003,10 9.4533,10 9.9023,10.447 9.9023,11" />
+                <GeometryDrawing Brush="#FF414141" Geometry="F1M9.9023,11L8.5323,9.727 5.4753,8 5.2313,8.115 5.2003,8.875 5.9193,9.613 7.7493,12 9.9503,11.975z" />
+            </DrawingGroup.Children>
+        </DrawingGroup>
+        <DrawingGroup x:Key="LibraryDrawing" PresentationOptions:Freeze="True">
+            <DrawingGroup.Children>
+                <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M5.0004,0.999700000000001L5.0004,1.9997 0.000399999999999956,1.9997 0.000399999999999956,14.9997 16.0004,14.9997 16.0004,1.9997 10.9994,1.9997 10.9994,0.999700000000001z" />
+                <GeometryDrawing Brush="#FF414141" Geometry="F1M14,6L12,6 12,4 14,4z M14,11L12,11 12,10 14,10z M14,13L12,13 12,12 14,12z M11,14L15,14 15,3 11,3z" />
+                <GeometryDrawing Brush="#FF414141" Geometry="F1M7,12L9,12 9,13 7,13z M7,10L9,10 9,11 7,11z M7,3L9,3 9,4 7,4z M6,14L10,14 10,2 6,2z" />
+                <GeometryDrawing Brush="#FF414141" Geometry="F1M2,12L4,12 4,13 2,13z M2,10L4,10 4,11 2,11z M2,4L4,4 4,6 2,6z M1,14L5,14 5,3 1,3z" />
+                <GeometryDrawing Brush="#FFF0EFF1" Geometry="F1M4,4L2,4 2,6 4,6z M4,10L2,10 2,11 4,11z M4,12L2,12 2,13 4,13z M9,3L7,3 7,4 9,4z M9,10L7,10 7,11 9,11z M9,12L7,12 7,13 9,13z M14,4L12,4 12,6 14,6z M14,10L12,10 12,11 14,11z M14,13L12,13 12,12 14,12z" />
+            </DrawingGroup.Children>
+        </DrawingGroup>
+        <DrawingGroup x:Key="TestDrawing" PresentationOptions:Freeze="True">
+            <DrawingGroup.Children>
+                <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M3.9996,-0.000199999999999534L3.9996,3.0008 5.0006,3.0008 5.0006,4.7278 0.3206,12.6798 2.5356,15.9998 13.7596,15.9998 15.9236,12.7188 11.9996,4.7658 11.9996,3.0008 12.9996,3.0008 12.9996,-0.000199999999999534z" />
+                <GeometryDrawing Brush="#FF424242" Geometry="F1M7.7979,7L5.0199,11.99 3.0689,12 6.9999,5 6.9999,2 8.9999,2 8.9999,5 10.0199,7z M10.9999,5L10.9999,2 11.9999,2 11.9999,1 4.9999,1 4.9999,2 5.9999,2 5.9999,5 1.4999,12.646 3.0699,15 13.2209,15 14.7739,12.646z" />
+                <GeometryDrawing Brush="#FFF0EFF1" Geometry="F1M7.7979,7L5.0199,11.99 3.0099,12 6.9999,5 6.9999,2 8.9999,2 8.9999,5 10.0199,7z" />
+            </DrawingGroup.Children>
+        </DrawingGroup>
+        <DrawingGroup x:Key="ExampleDrawing" PresentationOptions:Freeze="True">
+            <DrawingGroup.Children>
+                <GeometryDrawing Brush="#FFF6F6F6" Geometry="M6,14L5.84562492370605,13.5 5.47898435592651,13.15625 4.7649998664856,13 0,13 0,1 6,1 7.14274978637695,1.35862493515015 7.99900007247925,2 8.85999965667725,1.35675001144409 10,1 16,1 16,13 11.2340002059937,13 10.5205936431885,13.15625 10.1542501449585,13.5 10,14 6,14z" />
+                <GeometryDrawing Brush="#FF414141" Geometry="M14,11L10.7340002059937,11 9.80249977111816,11.0364999771118 9,11.3280000686646 9,3.96700000762939 9.44537544250488,3.31137490272522 10.6280002593994,3 14,3 14,11z M7,11.3280000686646L6.19775009155273,11.0364999771118 5.2649998664856,11 2,11 2,3 5.34100008010864,3 6.52487468719482,3.34999990463257 7,4 7,11.3280000686646z M10,2L8.94212532043457,2.26150012016296 7.99900007247925,3 7.06812524795532,2.26787495613098 6,2 1,2 1,12 5.2649998664856,12 6.30387496948242,12.3031253814697 7,13 9,13 9.69524955749512,12.3031253814697 10.7340002059937,12 15,12 15,2 10,2z" />
+                <GeometryDrawing Brush="#FFF0EFF1" Geometry="M5.34100008010864,3L2,3 2,11 5.26500034332275,11 6.19775009155273,11.0364999771118 7,11.3280000686646 7,4 6.52487468719482,3.34999990463257 5.34100008010864,3 M10.6280002593994,3L14,3 14,11 10.7349996566772,11 9.80262470245361,11.0364999771118 9,11.3280000686646 9,3.96700000762939 9.44537544250488,3.31137490272522 10.6280002593994,3" />
+            </DrawingGroup.Children>
+        </DrawingGroup>
+        <DataTemplate x:Key="Binary">
+            <StackPanel Orientation="Horizontal">
+                <Image Width="16" Height="16">
+                    <Image.Source>
+                        <DrawingImage Drawing="{StaticResource BinaryDrawing}"/>
+                    </Image.Source>
+                </Image>
+                <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="Benchmark">
+            <StackPanel Orientation="Horizontal">
+                <Image Width="16" Height="16">
+                    <Image.Source>
+                        <DrawingImage Drawing="{StaticResource BenchmarkDrawing}"/>
+                    </Image.Source>
+                </Image>
+                <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
+            </StackPanel>
+        </DataTemplate>
         <DataTemplate x:Key="Library">
             <StackPanel Orientation="Horizontal">
-                <Canvas Width="16" Height="16">
-                    <Path Data="F1M5,0L5,1 0,1 0,14 16,14 16,1 10.999,1 10.999,0z" Fill="#FFF6F6F6" Height="14" Width="16"/>
-                    <Path Data="F1M8,2L6,2 6,1 8,1z M8,9L6,9 6,8 8,8z M8,11L6,11 6,10 8,10z M5,12L9,12 9,0 5,0z M3,4L1,4 1,2 3,2z M3,9L1,9 1,8 3,8z M3,11L1,11 1,10 3,10z M0,12L4,12 4,1 0,1z M13,4L11,4 11,2 13,2z M13,9L11,9 11,8 13,8z M13,11L11,11 11,10 13,10z M10,12L14,12 14,1 10,1z" Fill="#FF414141" Height="12" Canvas.Left="1" Canvas.Top="1" Width="14"/>
-                    <Path Data="F1M2,1L0,1 0,3 2,3z M2,7L0,7 0,8 2,8z M2,9L0,9 0,10 2,10z M7,0L5,0 5,1 7,1z M7,7L5,7 5,8 7,8z M7,9L5,9 5,10 7,10z M12,1L10,1 10,3 12,3z M12,7L10,7 10,8 12,8z M12,10L10,10 10,9 12,9z" Fill="#FFF0EFF1" Height="10" Canvas.Left="2" Canvas.Top="2" Width="12"/>
-                </Canvas>
+                <Image Width="16" Height="16">
+                    <Image.Source>
+                        <DrawingImage Drawing="{StaticResource LibraryDrawing}"/>
+                    </Image.Source>
+                </Image>
+                <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="Test">
+            <StackPanel Orientation="Horizontal">
+                <Image Width="16" Height="16">
+                    <Image.Source>
+                        <DrawingImage Drawing="{StaticResource TestDrawing}"/>
+                    </Image.Source>
+                </Image>
+                <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="Example">
+            <StackPanel Orientation="Horizontal">
+                <Image Width="16" Height="16">
+                    <Image.Source>
+                        <DrawingImage Drawing="{StaticResource ExampleDrawing}"/>
+                    </Image.Source>
+                </Image>
                 <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
             </StackPanel>
         </DataTemplate>
         <local:ItemTemplateSelector x:Key="ItemTemplateSelector"
-            Binary="{StaticResource Library}"
-            Benchmark="{StaticResource Library}"
-            Example="{StaticResource Library}"
+            Binary="{StaticResource Binary}"
+            Benchmark="{StaticResource Benchmark}"
+            Example="{StaticResource Example}"
             Library="{StaticResource Library}"
-            Test="{StaticResource Library}"/>
+            Test="{StaticResource Test}"/>
+        <DataTemplate x:Key="AutoContent">
+            <StackPanel VerticalAlignment="Top">
+                <!-- In this and the next box we could avoid radio button,
+                     but i think it shows certain consistency with custom targets -->
+                <GroupBox Header="Path" VerticalAlignment="Top">
+                    <RadioButton IsChecked="True" IsEnabled="False">
+                        <RadioButton.Content>
+                            <TextBlock Text="{Binding Path=Path, StringFormat=Autodetect in path: \{0\}}"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+                </GroupBox>
+                <GroupBox Header="Configuration" IsEnabled="False">
+                    <StackPanel>
+                        <CheckBox IsChecked="{Binding Test, Mode=OneWay}">Enable unit tests</CheckBox>
+                        <CheckBox IsChecked="{Binding Doctest, Mode=OneWay}">Enable documentation tests</CheckBox>
+                        <CheckBox IsChecked="{Binding Bench, Mode=OneWay}">Enable benchmarks</CheckBox>
+                        <CheckBox IsChecked="{Binding Doc, Mode=OneWay}">Enable documentation</CheckBox>
+                        <CheckBox IsChecked="{Binding Plugin, Mode=OneWay}">Compiler plugin</CheckBox>
+                        <CheckBox IsChecked="{Binding Harness, Mode=OneWay}">Build test harness</CheckBox>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </DataTemplate>
+        <local:NegateConverter x:Key="NegateConverter"/>
+        <DataTemplate x:Key="CustomContent">
+            <StackPanel VerticalAlignment="Top" Grid.IsSharedSizeScope="True">
+                <GroupBox Header="Name" VerticalAlignment="Top">
+                    <StackPanel>
+                        <RadioButton IsEnabled="False" IsChecked="{Binding IsNameOverriden, Mode=OneWay, Converter={StaticResource NegateConverter}}">
+                            <RadioButton.Content>
+                                <TextBlock Text="{Binding Path=DefaultName, StringFormat=Use default name: \{0\}}"/>
+                            </RadioButton.Content>
+                        </RadioButton>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <RadioButton IsEnabled="False" IsChecked="{Binding IsNameOverriden, Mode=OneWay}" Content="Use custom name:"/>
+                            <DockPanel Grid.Column="1">
+                                <TextBox IsEnabled="{Binding IsNameOverriden}" Text="{Binding Name}"/>
+                            </DockPanel>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Path" VerticalAlignment="Top">
+                    <StackPanel>
+                        <RadioButton IsEnabled="False" IsChecked="{Binding IsPathOverriden, Mode=OneWay, Converter={StaticResource NegateConverter}}" >
+                            <RadioButton.Content>
+                                <TextBlock Text="{Binding Path=DefaultPath, StringFormat=Use default path: \{0\}}"/>
+                            </RadioButton.Content>
+                        </RadioButton>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <RadioButton IsEnabled="False" IsChecked="{Binding IsPathOverriden, Mode=OneWay}" Content="Use custom path:"/>
+                            <DockPanel Grid.Column="1">
+                                <Button IsEnabled="{Binding IsPathOverriden}" DockPanel.Dock="Right" Margin="7,0,0,0" Content=" ... "/>
+                                <TextBox IsEnabled="{Binding IsPathOverriden}" Text="{Binding Path}"/>
+                            </DockPanel>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Configuration" IsEnabled="False">
+                    <StackPanel>
+                        <CheckBox IsChecked="{Binding Test}">Enable unit tests</CheckBox>
+                        <CheckBox IsChecked="{Binding Doctest}">Enable documentation tests</CheckBox>
+                        <CheckBox IsChecked="{Binding Bench}">Enable benchmarks</CheckBox>
+                        <CheckBox IsChecked="{Binding Doc}">Enable documentation</CheckBox>
+                        <CheckBox IsChecked="{Binding Plugin}">Compiler plugin</CheckBox>
+                        <CheckBox IsChecked="{Binding Harness}">Build test harness</CheckBox>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </DataTemplate>
+        <local:ContentTemplateSelector x:Key="ContentTemplateSelector"
+            Auto="{StaticResource AutoContent}"
+            Custom="{StaticResource CustomContent}"/>
+        <CollectionViewSource x:Key="TargetItems" Source="{Binding Targets}">
+            <CollectionViewSource.GroupDescriptions>
+                <local:OutputTargetGroupDescription/>
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
     </DockPanel.Resources>
-    <ListBox DockPanel.Dock="Left" ItemTemplateSelector="{StaticResource ItemTemplateSelector}">
-        <!-- https://wilberbeast.com/2011/05/31/compositecollection-binding-problem/ -->
-        <ListBox.Resources>
-            <CollectionViewSource x:Key="LibrariesBridge" Source="{Binding Path=Libraries}" />
-            <CollectionViewSource x:Key="BinariesBridge" Source="{Binding Path=Binaries}" />
-            <CollectionViewSource x:Key="TestsBridge" Source="{Binding Path=Tests}" />
-            <CollectionViewSource x:Key="BenchmarksBridge" Source="{Binding Path=Benchmarks}" />
-            <CollectionViewSource x:Key="ExamplesBridge" Source="{Binding Path=Examples}" />
-        </ListBox.Resources>
-        <ListBox.ItemsSource>
-            <CompositeCollection>
-                <CollectionContainer Collection="{Binding Source={StaticResource LibrariesBridge}}"/>
-                <CollectionContainer Collection="{Binding Source={StaticResource BinariesBridge}}"/>
-                <CollectionContainer Collection="{Binding Source={StaticResource TestsBridge}}"/>
-                <CollectionContainer Collection="{Binding Source={StaticResource BenchmarksBridge}}"/>
-                <CollectionContainer Collection="{Binding Source={StaticResource ExamplesBridge}}"/>
-            </CompositeCollection>
-        </ListBox.ItemsSource>
+    <ListBox x:Name="TargetsList" DockPanel.Dock="Left" ItemTemplateSelector="{StaticResource ItemTemplateSelector}" Margin="0,0,9,0" ItemsSource="{Binding Source={StaticResource TargetItems}}">
+        <ListBox.GroupStyle>
+            <GroupStyle>
+                <GroupStyle.HeaderTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <TextBlock Margin="3,2" DockPanel.Dock="Left" Text="{Binding Name}"/>
+                            <Separator Margin="3,0,7,0"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </GroupStyle.HeaderTemplate>
+            </GroupStyle>
+        </ListBox.GroupStyle>
     </ListBox>
-    <Grid>
-        
-    </Grid>
+    <ContentControl
+        Content="{Binding ElementName=TargetsList, Path=SelectedItem}"
+        ContentTemplateSelector="{StaticResource ContentTemplateSelector}"/>
 </DockPanel>

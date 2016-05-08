@@ -16,11 +16,7 @@ namespace VisualRust.Test.Project.Controls
         {
             var manifest = Manifest.CreateFake("foo", null);
             var vm = new OutputTargetSectionViewModel(manifest);
-            Assert.NotNull(vm.Library);
-            Assert.AreEqual(1, vm.Binaries.Count);
-            Assert.AreEqual(1, vm.Benchmarks.Count);
-            Assert.AreEqual(1, vm.Tests.Count);
-            Assert.AreEqual(1, vm.Examples.Count);
+            Assert.AreEqual(5, vm.Targets.Count);
         }
     }
 }

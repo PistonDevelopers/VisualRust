@@ -12,58 +12,25 @@ namespace VisualRust.Project.Controls
     public class OutputTargetSectionViewModel: ViewModelBase, IPropertyPageContext
     {
         readonly Manifest manifest;
+        // We keep all the targets in a one big collection because
+        // CompositeCollection doesn't support grouping
+        readonly int libraries = 1;
+        int binaries;
+        int tests;
+        int benchmarks;
+        int examples;
 
-        private IOutputTargetViewModel library;
-        public IOutputTargetViewModel Library
+        ObservableCollection<IOutputTargetViewModel> targets;
+        public ObservableCollection<IOutputTargetViewModel> Targets
         {
-            get { return library; }
+            get { return targets; }
             set
             {
-                Set(ref library, value);
-                Libraries = new IOutputTargetViewModel[] { library };
+                Set(ref targets, value);
             }
         }
 
-        IOutputTargetViewModel[] libraries;
-        public IOutputTargetViewModel[] Libraries
-        {
-            get { return libraries; }
-            set { Set(ref libraries, value); }
-        }
-
-        private ObservableCollection<IOutputTargetViewModel> binaries;
-        public ObservableCollection<IOutputTargetViewModel> Binaries
-        {
-            get { return binaries; }
-            set { Set(ref binaries, value); }
-        }
-
-        private ObservableCollection<IOutputTargetViewModel> benchmarks;
-        public ObservableCollection<IOutputTargetViewModel> Benchmarks
-        {
-            get { return benchmarks; }
-            set { Set(ref benchmarks, value); }
-        }
-
-        private ObservableCollection<IOutputTargetViewModel> tests;
-        public ObservableCollection<IOutputTargetViewModel> Tests
-        {
-            get { return tests; }
-            set { Set(ref tests, value); }
-        }
-
-        private ObservableCollection<IOutputTargetViewModel> examples;
-        public ObservableCollection<IOutputTargetViewModel> Examples
-        {
-            get { return examples; }
-            set { Set(ref examples, value); }
-        }
-
-        public OutputTargetSectionViewModel(Manifest m)
-        {
-            this.manifest = m;
-            Load();
-        }
+        public event EventHandler DirtyChanged;
 
         private bool isDirty;
         public bool IsDirty
@@ -78,7 +45,18 @@ namespace VisualRust.Project.Controls
             }
         }
 
-        public event EventHandler DirtyChanged;
+        public OutputTargetSectionViewModel(Manifest m)
+        {
+            this.manifest = m;
+            targets = new ObservableCollection<IOutputTargetViewModel>();
+            var lookup = manifest.OutputTargets.ToLookup(t => t.Type);
+            OutputTarget rawLibraryTarget = lookup[OutputTargetType.Library].FirstOrDefault();
+            targets.Add(CreateLibraryTarget(rawLibraryTarget));
+            binaries =  LoadTargets(lookup[OutputTargetType.Binary], () => new BinaryAutoOutputTargetViewModel(manifest));
+            tests =  LoadTargets(lookup[OutputTargetType.Test], () => new TestAutoOutputTargetViewModel(manifest));
+            benchmarks =  LoadTargets(lookup[OutputTargetType.Benchmark], () => new BenchmarkAutoOutputTargetViewModel(manifest));
+            examples =  LoadTargets(lookup[OutputTargetType.Example], () => new ExampleAutoOutputTargetViewModel(manifest));
+        }
 
         public void Apply()
         {
@@ -86,26 +64,27 @@ namespace VisualRust.Project.Controls
             throw new NotImplementedException();
         }
 
-        private void Load()
+        IOutputTargetViewModel CreateLibraryTarget(OutputTarget rawLibraryTarget)
         {
-            var lookup = manifest.OutputTargets.ToLookup(t => t.Type);
-            var rawLibrary = lookup[OutputTargetType.Library].FirstOrDefault();
-            if(rawLibrary != null)
-                Library = new OutputTargetViewModel(rawLibrary);
-            else 
-                Library = new LibraryAutoOutputTargetViewModel(manifest);
-            binaries =  LoadTargets(lookup[OutputTargetType.Binary], () => new BinaryAutoOutputTargetViewModel(manifest));
-            benchmarks =  LoadTargets(lookup[OutputTargetType.Benchmark], () => new BenchmarkAutoOutputTargetViewModel(manifest));
-            tests =  LoadTargets(lookup[OutputTargetType.Test], () => new TestAutoOutputTargetViewModel(manifest));
-            examples =  LoadTargets(lookup[OutputTargetType.Example], () => new ExampleAutoOutputTargetViewModel(manifest));
+            if(rawLibraryTarget == null)
+                return new LibraryAutoOutputTargetViewModel(manifest);
+            return new OutputTargetViewModel(manifest, rawLibraryTarget);
         }
 
-        static ObservableCollection<IOutputTargetViewModel> LoadTargets(IEnumerable<OutputTarget> targets, Func<IOutputTargetViewModel> ctor)
+        int LoadTargets(IEnumerable<OutputTarget> rawTargets, Func<IOutputTargetViewModel> ctor)
         {
-            List<OutputTargetViewModel> vms = targets.Select(t => new OutputTargetViewModel(t)).ToList();
+            List<OutputTargetViewModel> vms = rawTargets.Select(t => new OutputTargetViewModel(manifest, t)).ToList();
             if(vms.Count == 0)
-                return new ObservableCollection<IOutputTargetViewModel> { ctor() };
-            return new ObservableCollection<IOutputTargetViewModel>();
+            {
+                Targets.Add(ctor());
+                return 1;
+            }
+            else
+            {
+                foreach(OutputTargetViewModel vm in vms)
+                    Targets.Add(vm);
+                return vms.Count;
+            }
         }
     }
 }

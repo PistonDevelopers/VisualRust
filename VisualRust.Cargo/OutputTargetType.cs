@@ -35,8 +35,7 @@ namespace VisualRust.Cargo
             throw new ArgumentException(null, "type");
         }
 
-        
-        public static string ToTypeString(OutputTargetType type)
+        public static string ToTypeString(this OutputTargetType type)
         {
             switch(type)
             {
@@ -50,6 +49,23 @@ namespace VisualRust.Cargo
                     return "test";
                 case OutputTargetType.Example:
                     return "example";
+            }
+            throw new ArgumentException(null, "type");
+        }
+        public static string DefaultPath(this OutputTargetType type, string name)
+        {
+            switch(type)
+            {
+                case OutputTargetType.Library:
+                    return @"src\lib.rs";
+                case OutputTargetType.Binary:
+                    return @"src\main.rs";
+                case OutputTargetType.Benchmark:
+                    return String.Format(@"benches\{0}.rs", name);
+                case OutputTargetType.Test:
+                    return String.Format(@"tests\{0}.rs", name);
+                case OutputTargetType.Example:
+                    return String.Format(@"examples\{0}.rs", name);
             }
             throw new ArgumentException(null, "type");
         }

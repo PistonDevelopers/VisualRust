@@ -15,7 +15,10 @@ namespace VisualRust.Project.Controls
         }
 
         public override OutputTargetType Type { get { return OutputTargetType.Library; } }
+        public override string TabName { get { return "Autodetect library"; } }
         public override string Name { get { return Manifest.Name; } }
         public override string Path { get { return @"src\lib.rs"; } }
+        public override bool Doctest { get { return true; } }
+        public override bool Doc { get { return true; } }
     }
 }

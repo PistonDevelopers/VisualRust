@@ -28,7 +28,7 @@ namespace VisualRust.Project.Controls
         public bool IsNameOverriden { get { return name != null; } } 
 
         
-        public string DefaultPath { get { return Type.DefaultPath(DefaultName); } }
+        public string DefaultPath { get { return Type.DefaultPath(Name ?? DefaultName); } }
         private string path;
         public string Path
         {

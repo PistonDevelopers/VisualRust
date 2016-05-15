@@ -80,7 +80,7 @@ namespace VisualRust.Project.Forms
                 int width = pRect[0].right - pRect[0].left;
                 int height = pRect[0].bottom - pRect[0].top;
                 info.SIZE.cx = width;
-                info.SIZE.cx = height;
+                info.SIZE.cy = height;
             }
             pPageInfo[0] = info;
         }

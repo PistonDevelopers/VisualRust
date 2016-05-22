@@ -57,9 +57,9 @@ namespace VisualRust.Cargo
             switch(type)
             {
                 case OutputTargetType.Library:
-                    return @"src\lib.rs";
+                    return String.Format(@"src\{0}.rs", name);
                 case OutputTargetType.Binary:
-                    return @"src\main.rs";
+                    return String.Format(@"src\{0}.rs", name);
                 case OutputTargetType.Benchmark:
                     return String.Format(@"benches\{0}.rs", name);
                 case OutputTargetType.Test:

@@ -169,6 +169,11 @@ namespace VisualRust.Test.Cargo
             Assert.AreEqual("bin2.rs", t5.Path);
         }
 
+        static OutputTarget GetOutputTarget(OutputTarget[] targets, OutputTargetType type)
+        {
+            return targets.First(t => t.Type == type);
+        }
+
         static OutputTarget GetOutputTarget(OutputTarget[] targets, OutputTargetType type, string name)
         {
             return targets.First(t => t.Type == type && t.Name == name);

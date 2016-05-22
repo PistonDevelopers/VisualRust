@@ -165,11 +165,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Build.tt</DependentUpon>
     </Compile>
+    <Compile Include="Controls\AlwaysEnabledButton.cs" />
     <Compile Include="Controls\AutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\BenchmarkAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\BinaryAutoOutputTargetViewModel.cs" />
+    <Compile Include="Controls\ButtonListBox.cs" />
+    <Compile Include="Controls\ButtonListBoxItem.cs" />
+    <Compile Include="Controls\CommandTargetOutput.cs" />
     <Compile Include="Controls\ExampleAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\IOutputTargetViewModel.cs" />
+    <Compile Include="Controls\IPanelLayout.cs" />
     <Compile Include="Controls\IPropertyPageContext.cs" />
     <Compile Include="Controls\LibraryAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\NegateConverter.cs" />
@@ -181,6 +186,7 @@
     </Compile>
     <Compile Include="Controls\OutputTargetSectionViewModel.cs" />
     <Compile Include="Controls\OutputTargetViewModel.cs" />
+    <Compile Include="Controls\RelayCommand.cs" />
     <Compile Include="Controls\TestAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\ViewModelBase.cs" />
     <Compile Include="Launcher\GnuDebugLauncher.cs" />

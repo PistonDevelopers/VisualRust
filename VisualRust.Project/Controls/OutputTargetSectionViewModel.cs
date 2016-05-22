@@ -45,8 +45,11 @@ namespace VisualRust.Project.Controls
             }
         }
 
-        public OutputTargetSectionViewModel(Manifest m)
+        readonly Func<OutputTargetType> addSelector;
+
+        public OutputTargetSectionViewModel(Manifest m, Func<OutputTargetType> addSelector)
         {
+            this.addSelector = addSelector;
             this.manifest = m;
             targets = new ObservableCollection<IOutputTargetViewModel>();
             var lookup = manifest.OutputTargets.ToLookup(t => t.Type);
@@ -56,6 +59,18 @@ namespace VisualRust.Project.Controls
             tests =  LoadTargets(lookup[OutputTargetType.Test], () => new TestAutoOutputTargetViewModel(manifest));
             benchmarks =  LoadTargets(lookup[OutputTargetType.Benchmark], () => new BenchmarkAutoOutputTargetViewModel(manifest));
             examples =  LoadTargets(lookup[OutputTargetType.Example], () => new ExampleAutoOutputTargetViewModel(manifest));
+            targets.Add(new CommandOutputTargetViewModel(this.Add));
+        }
+
+        public void Add()
+        {
+            OutputTargetType type = addSelector();
+            throw new NotImplementedException();
+        }
+
+        public void Remove(IOutputTargetViewModel target)
+        {
+            throw new NotImplementedException();
         }
 
         public void Apply()
@@ -68,12 +83,12 @@ namespace VisualRust.Project.Controls
         {
             if(rawLibraryTarget == null)
                 return new LibraryAutoOutputTargetViewModel(manifest);
-            return new OutputTargetViewModel(manifest, rawLibraryTarget);
+            return new OutputTargetViewModel(manifest, this, rawLibraryTarget);
         }
 
         int LoadTargets(IEnumerable<OutputTarget> rawTargets, Func<IOutputTargetViewModel> ctor)
         {
-            List<OutputTargetViewModel> vms = rawTargets.Select(t => new OutputTargetViewModel(manifest, t)).ToList();
+            List<OutputTargetViewModel> vms = rawTargets.Select(t => new OutputTargetViewModel(manifest, this, t)).ToList();
             if(vms.Count == 0)
             {
                 Targets.Add(ctor());

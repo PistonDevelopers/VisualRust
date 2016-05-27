@@ -124,4 +124,52 @@ namespace VisualRust.Project.Controls
             return false;
         }
     }
+
+    class CollapseNullConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value == null ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return DependencyProperty.UnsetValue;
+        }
+    }
+
+    class TargetIconConverter : IValueConverter
+    {
+        public DrawingGroup Benchmark { get; set; }
+        public DrawingGroup Binary { get; set; }
+        public DrawingGroup Example { get; set; }
+        public DrawingGroup Library { get; set; }
+        public DrawingGroup Test { get; set; }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if(value is OutputTargetType)
+            {
+                switch((OutputTargetType)value)
+                {
+                    case OutputTargetType.Benchmark:
+                        return Benchmark;
+                    case OutputTargetType.Binary:
+                        return Binary;
+                    case OutputTargetType.Example:
+                        return Example;
+                    case OutputTargetType.Library:
+                        return Library;
+                    case OutputTargetType.Test:
+                        return Test;
+                }
+            }
+            return DependencyProperty.UnsetValue;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return DependencyProperty.UnsetValue;
+        }
+    }
 }

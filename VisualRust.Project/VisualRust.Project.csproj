@@ -169,8 +169,6 @@
     <Compile Include="Controls\AutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\BenchmarkAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\BinaryAutoOutputTargetViewModel.cs" />
-    <Compile Include="Controls\ButtonListBox.cs" />
-    <Compile Include="Controls\ButtonListBoxItem.cs" />
     <Compile Include="Controls\CommandTargetOutput.cs" />
     <Compile Include="Controls\ExampleAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\IOutputTargetViewModel.cs" />
@@ -187,6 +185,7 @@
     <Compile Include="Controls\OutputTargetSectionViewModel.cs" />
     <Compile Include="Controls\OutputTargetViewModel.cs" />
     <Compile Include="Controls\RelayCommand.cs" />
+    <Compile Include="Controls\SideContentGrid.cs" />
     <Compile Include="Controls\TestAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\ViewModelBase.cs" />
     <Compile Include="Launcher\GnuDebugLauncher.cs" />

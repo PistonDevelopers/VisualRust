@@ -105,11 +105,11 @@ namespace VisualRust.Project.Controls
             }
         }
 
-        RelayCommand IOutputTargetViewModel.Remove
+        public RelayCommand Remove
         {
             get
             {
-                throw new InvalidOperationException();
+                return null;
             }
         }
         #endregion

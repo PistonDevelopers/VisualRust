@@ -76,5 +76,116 @@ namespace VisualRust.Test.Project.Controls
         {
             return targets.First(t => t.Type == type);
         }
+
+        [Test]
+        public void DuplicateTarget()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                @"[package]
+                  name=""foo""
+                  version=""0.1""
+                  [[bin]]
+                  name=""foo""",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, () => OutputTargetType.Binary);
+            vm.Add();
+            ((OutputTargetViewModel)vm.Targets[vm.Targets.Count - 1]).Name = "foo";
+            ((OutputTargetViewModel)vm.Targets[vm.Targets.Count - 1]).Path = @"src\bar.rs";
+            Assert.True(vm.IsDirty);
+            var changes = vm.PendingChanges();
+            Assert.AreEqual(1, changes.TargetsAdded.Count);
+            Assert.AreEqual("foo", changes.TargetsAdded[0].Name);
+            Assert.AreEqual(@"src\bar.rs", changes.TargetsAdded[0].Path);
+        }
+
+        [Test]
+        public void RemoveFirstDuplicate()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                @"[package]
+                  name=""foo""
+                  version=""0.1""
+                  [[bin]]
+                  name=""foo""
+                  path=""src\foo1.rs""
+                  [[bin]]
+                  name=""src\foo2.rs""",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, null);
+            var first = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
+            var second = (OutputTargetViewModel)Second(vm.Targets, t => t.Type == OutputTargetType.Binary);
+            Assert.AreNotEqual(first.Handle, second.Handle);
+            vm.Remove(first);
+            Assert.True(vm.IsDirty);
+            var changes = vm.PendingChanges();
+            Assert.AreEqual(1, changes.TargetsRemoved.Count);
+            Assert.AreEqual(first.Handle, changes.TargetsRemoved[0]);
+        }
+
+        [Test]
+        public void RemoveSecondDuplicate()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                @"[package]
+                  name=""foo""
+                  version=""0.1""
+                  [[bin]]
+                  name=""foo""
+                  path=""src\foo1.rs""
+                  [[bin]]
+                  name=""src\foo2.rs""",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, null);
+            var first = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
+            var second = (OutputTargetViewModel)Second(vm.Targets, t => t.Type == OutputTargetType.Binary);
+            Assert.AreNotEqual(first.Handle, second.Handle);
+            vm.Remove(second);
+            Assert.True(vm.IsDirty);
+            var changes = vm.PendingChanges();
+            Assert.AreEqual(1, changes.TargetsRemoved.Count);
+            Assert.AreEqual(second.Handle, changes.TargetsRemoved[0]);
+        }
+
+        static T Second<T>(IEnumerable<T> coll, Func<T, bool> picker)
+        {
+            return coll.Where(x => picker(x)).Skip(1).First();
+        }
+
+        [Test]
+        public void ExposeChanges()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                @"[package]
+                  name=""foo""
+                  version=""0.1""
+                  [[bin]]
+                  name=""foo""
+                  path=""src\foo1.rs""
+                  [[bin]]
+                  name=""src\foo2.rs""",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, null);
+            var first = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
+            var second = (OutputTargetViewModel)Second(vm.Targets, t => t.Type == OutputTargetType.Binary);
+            Assert.AreNotEqual(first.Handle, second.Handle);
+            first.Harness = true;
+            Assert.True(vm.IsDirty);
+            var changes = vm.PendingChanges();
+            Assert.AreEqual(1, changes.TargetsChanged.Count);
+            var changed = changes.TargetsChanged[0];
+            Assert.AreEqual(first.Handle, changed.Handle);
+            Assert.AreEqual(true, changed.Harness);
+            Assert.Null(changed.Name);
+            Assert.Null(changed.Path);
+            Assert.Null(changed.Test);
+            Assert.Null(changed.Doctest);
+            Assert.Null(changed.Bench);
+            Assert.Null(changed.Doc);
+            Assert.Null(changed.Plugin);
+        }
     }
 }

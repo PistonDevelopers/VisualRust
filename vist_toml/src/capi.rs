@@ -161,31 +161,50 @@ impl MultiQueryResult<OwnedSlice<OutputTargetFFI>> {
     }
 }
 
+#[repr(u8)]
+pub enum Trilean {
+    False = 0,
+    True = 1,
+    Unknown = 2,
+}
+
+impl Trilean {
+    fn new(maybe: Option<bool>) -> Trilean {
+        match maybe {
+            Some(false) => Trilean::False,
+            Some(true) => Trilean::True,
+            None => Trilean::Unknown,
+        }
+    }
+}
+
 #[repr(C)]
 pub struct OutputTargetFFI {
+    handle: usize,
     kind: OwnedSlice<u8>,
     name: OwnedSlice<u8>,
     path: OwnedSlice<u8>,
-    test: Boolean,
-    doctest: Boolean,
-    bench: Boolean,
-    doc: Boolean,
-    plugin: Boolean,
-    harness: Boolean
+    test: Trilean,
+    doctest: Trilean,
+    bench: Trilean,
+    doc: Trilean,
+    plugin: Trilean,
+    harness: Trilean
 }
 
 impl OutputTargetFFI {
     fn from(t: &OutputTarget) -> OutputTargetFFI {
         OutputTargetFFI {
+            handle: t.handle,
             kind: OwnedSlice::from_str(t.kind),
             name: OwnedSlice::from_str_opt(t.name),
             path: OwnedSlice::from_str_opt(t.path),
-            test: t.test as Boolean,
-            doctest: t.doctest as Boolean,
-            bench: t.bench as Boolean,
-            doc: t.doc as Boolean,
-            plugin: t.plugin as Boolean,
-            harness: t.harness as Boolean,
+            test: Trilean::new(t.test),
+            doctest: Trilean::new(t.doctest),
+            bench: Trilean::new(t.bench),
+            doc: Trilean::new(t.doc),
+            plugin: Trilean::new(t.plugin),
+            harness: Trilean::new(t.harness),
         }
     }
 }

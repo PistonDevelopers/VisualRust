@@ -5,27 +5,35 @@ namespace VisualRust.Cargo
 {
     public class OutputTarget
     {
-        public OutputTargetType Type { get; private set; }
-        public string Name { get; private set; }
-        public string Path { get; private set; }
-        public bool Test { get; private set; }
-        public bool Doctest { get; private set; }
-        public bool Bench { get; private set; }
-        public bool Doc { get; private set; }
-        public bool Plugin { get; private set; }
-        public bool Harness { get; private set; }
+        public OutputTargetType Type { get; set; }
+        public UIntPtr? Handle { get; set; }
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public bool? Test { get; set; }
+        public bool? Doctest { get; set; }
+        public bool? Bench { get; set; }
+        public bool? Doc { get; set; }
+        public bool? Plugin { get; set; }
+        public bool? Harness { get; set; }
 
         internal OutputTarget(RawOutputTarget t)
         {
             Type = OutputTargetTypeExtensions.FromString(t.Type.ToString());
+            Handle = t.Handle;
             Name = t.Name.ToString();
             Path = t.Path.ToString();
-            Test = t.Test;
-            Doctest = t.Doctest;
-            Bench = t.Bench;
-            Doc = t.Doc;
-            Plugin = t.Plugin;
-            Harness = t.Harness;
+            Test = t.Test.ToBool();
+            Doctest = t.Doctest.ToBool();
+            Bench = t.Bench.ToBool();
+            Doc = t.Doc.ToBool();
+            Plugin = t.Plugin.ToBool();
+            Harness = t.Harness.ToBool();
+        }
+
+        public OutputTarget(OutputTargetType type)
+        {
+            Type = type;
+            Handle = null;
         }
     }
 
@@ -33,15 +41,16 @@ namespace VisualRust.Cargo
     [StructLayout(LayoutKind.Sequential)]
     struct RawOutputTarget
     {
+        public UIntPtr Handle;
         public Utf8String Type;
         public Utf8String Name;
         public Utf8String Path;
-        public bool Test;
-        public bool Doctest;
-        public bool Bench;
-        public bool Doc;
-        public bool Plugin;
-        public bool Harness;
+        public Trilean Test;
+        public Trilean Doctest;
+        public Trilean Bench;
+        public Trilean Doc;
+        public Trilean Plugin;
+        public Trilean Harness;
     }
 
     [StructLayout(LayoutKind.Sequential)]

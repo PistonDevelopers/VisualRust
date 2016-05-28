@@ -19,6 +19,7 @@ namespace VisualRust.Project.Controls
         int tests;
         int benchmarks;
         int examples;
+        List<OutputTargetChanges> changes = new List<OutputTargetChanges>();
 
         ObservableCollection<IOutputTargetViewModel> targets;
         public ObservableCollection<IOutputTargetViewModel> Targets
@@ -65,12 +66,15 @@ namespace VisualRust.Project.Controls
         public void Add()
         {
             OutputTargetType type = addSelector();
-            throw new NotImplementedException();
+            var vm = new OutputTargetViewModel(this.manifest, this, new OutputTarget(type));
+            this.Targets.Add(vm);
+            IsDirty = true;
         }
 
         public void Remove(IOutputTargetViewModel target)
         {
-            throw new NotImplementedException();
+            Targets.Remove(target);
+            IsDirty = true;
         }
 
         public void Apply()
@@ -100,6 +104,13 @@ namespace VisualRust.Project.Controls
                     Targets.Add(vm);
                 return vms.Count;
             }
+        }
+
+        public OutputTargetChanges PendingChanges()
+        {
+            return new OutputTargetChanges(
+                this.manifest,
+                this.Targets.OfType<OutputTargetViewModel>());
         }
     }
 }

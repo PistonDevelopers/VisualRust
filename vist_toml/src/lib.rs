@@ -11,7 +11,7 @@ use std::slice;
 use std::str;
 use std::marker::PhantomData;
 
-use toml_document::{ArrayEntry, Document, EntryRef, TableEntry};
+use toml_document::{ArrayEntry, Document, EntryRef, InternalNode, TableEntry, TableValue};
 use winapi::INT32;
 
 mod panic;
@@ -206,33 +206,34 @@ impl Manifest {
                          -> Result<OutputTarget<'a>, PathError> {
             target.name = try!(get_string(entry.get("name"), format!("{}.name", src)));
             target.path = try!(get_string(entry.get("path"), format!("{}.path", src)));
-            if let Some(value) = try!(get_bool(entry.get("test"), format!("{}.test", src))) {
-                target.test = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("doctest"), format!("{}.doctest", src))) {
-                target.doctest = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("bench"), format!("{}.bench", src))) {
-                target.bench = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("doc"), format!("{}.doc", src))) {
-                target.doc = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("plugin"), format!("{}.plugin", src))) {
-                target.plugin = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("harness"), format!("{}.harness", src))) {
-                target.harness = value;
-            }
+            target.test = try!(get_bool(entry.get("test"), format!("{}.test", src)));
+            target.doctest = try!(get_bool(entry.get("doctest"), format!("{}.doctest", src)));
+            target.bench = try!(get_bool(entry.get("bench"), format!("{}.bench", src)));
+            target.doc = try!(get_bool(entry.get("doc"), format!("{}.doc", src)));
+            target.plugin = try!(get_bool(entry.get("plugin"), format!("{}.plugin", src)));
+            target.harness= try!(get_bool(entry.get("harness"), format!("{}.harness", src)));
             Ok(target)
         }
-        fn get_table<'a>(src: &'a str,
-                         entry: Option<EntryRef<'a>>,
-                         target: OutputTarget<'a>,
-                         targets: &mut Vec<OutputTarget<'a>>,
-                         errors: &mut Vec<PathError>) {
+        fn get_table<'a, F>(src: &'a str,
+                            entry: Option<EntryRef<'a>>,
+                            ctor: &F,
+                            targets: &mut Vec<OutputTarget<'a>>,
+                            errors: &mut Vec<PathError>)
+                            where F: Fn(usize) -> OutputTarget<'a> {
+            // This is a-ok, because only way we can spot an implicit table is in [lib]:
+            // Some deranged mind might have a definition like [lib.fuck_your_parsing] in his
+            // manifest, in which case it's pretty easy to just throw away all containers whose
+            // keys start with `lib`.
+            fn get_table_ptr(table: TableEntry) -> usize {
+                match table.to_value() {
+                    TableValue::Inline(inline_table) => inline_table.ptr(),
+                    TableValue::Explicit(container) => container.ptr(),
+                    TableValue::Implicit => 0
+                }
+            }
             match entry {
                 Some(EntryRef::Table(table)) => {
+                    let target = ctor(get_table_ptr(table));
                     match get_target(src, table, target) {
                         Ok(target) => targets.push(target),
                         Err(error) => errors.push(error)
@@ -251,10 +252,10 @@ impl Manifest {
         }
         fn get_array<'a, F>(src: &'a str,
                             entry: Option<EntryRef<'a>>,
-                            mut ctor: F,
+                            ctor: &F,
                             mut targets: &mut Vec<OutputTarget<'a>>,
                             mut errors: &mut Vec<PathError>)
-                            where F: FnMut() -> OutputTarget<'a> {
+                            where F: Fn(usize) -> OutputTarget<'a> {
             match entry {
                 Some(EntryRef::Array(array)) => {
                     let kind = array_kind(array);
@@ -268,8 +269,7 @@ impl Manifest {
                         return;
                     }
                     for entry in array.iter() {
-                        let target = ctor();
-                        get_table(src, Some(entry), target, &mut targets, &mut errors);
+                        get_table(src, Some(entry), ctor, &mut targets, &mut errors);
                     }
                 }
                 Some(entry) => {
@@ -285,13 +285,13 @@ impl Manifest {
         }
         let mut targets = Vec::new();
         let mut errors = Vec::new();
-        get_table("lib", self.doc.get("lib"), OutputTarget::lib(), &mut targets, &mut errors);
-        get_array("bin", self.doc.get("bin"), OutputTarget::bin, &mut targets, &mut errors);
-        get_array("bench", self.doc.get("bench"), OutputTarget::bench, &mut targets, &mut errors);
-        get_array("test", self.doc.get("test"), OutputTarget::test, &mut targets, &mut errors);
+        get_table("lib", self.doc.get("lib"), &OutputTarget::lib, &mut targets, &mut errors);
+        get_array("bin", self.doc.get("bin"), &OutputTarget::bin, &mut targets, &mut errors);
+        get_array("bench", self.doc.get("bench"), &OutputTarget::bench, &mut targets, &mut errors);
+        get_array("test", self.doc.get("test"), &OutputTarget::test, &mut targets, &mut errors);
         get_array("example",
                   self.doc.get("example"),
-                  OutputTarget::example,
+                  &OutputTarget::example,
                   &mut targets,
                   &mut errors);
         if errors.len() > 0 {
@@ -376,71 +376,52 @@ pub struct PathError {
 }
 
 pub struct OutputTarget<'a> {
+    handle: usize,
     kind: &'static str,
     name: Option<&'a str>,
     path: Option<&'a str>,
-    test: bool,
-    doctest: bool,
-    bench: bool,
-    doc: bool,
-    plugin: bool,
-    harness: bool
+    test: Option<bool>,
+    doctest: Option<bool>,
+    bench: Option<bool>,
+    doc: Option<bool>,
+    plugin: Option<bool>,
+    harness: Option<bool>
 }
 
 impl<'a> OutputTarget<'a> {
-    fn default() -> OutputTarget<'a> {
+    fn new(handle: usize, kind: &'static str) -> OutputTarget<'a> {
         OutputTarget {
-            kind: "",
+            handle: handle,
+            kind: kind,
             name: None,
             path: None,
-            test: true,
-            doctest: false,
-            bench: true,
-            doc: false,
-            plugin: false,
-            harness: true
+            test: None,
+            doctest: None,
+            bench: None,
+            doc: None,
+            plugin: None,
+            harness: None
         }
     }
 
-    fn bin() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "bin",
-            doc: true,
-            ..OutputTarget::default()
-        }
+    fn bin(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "bin")
     }
 
-    fn lib() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "lib",
-            doctest: true,
-            doc: true,
-            ..OutputTarget::default()
-        }
+    fn lib(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "lib")
     }
 
-    fn bench() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "bench",
-            test: false,
-            ..OutputTarget::default()
-        }
+    fn bench(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "bench")
     }
 
-    fn test() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "test",
-            bench: false,
-            ..OutputTarget::default()
-        }
+    fn test(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "test")
     }
 
-    fn example() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "example",
-            bench: false,
-            ..OutputTarget::default()
-        }
+    fn example(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "example")
     }
 }
 

@@ -218,23 +218,27 @@
         </CollectionViewSource>
         <local:CollapseNullConverter x:Key="CollapseNullConverter"/>
         <DataTemplate x:Key="ListBoxSideItemTemplae">
-            <Button Margin="0,0,6,0" Visibility="{Binding Remove, Converter={StaticResource CollapseNullConverter}}">
-                <Button.Style>
-                    <Style TargetType="Button" >
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="False">
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="BorderBrush" Value="Transparent"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-                <Image Width="16" Height="16">
-                    <Image.Source>
-                        <DrawingImage Drawing="{StaticResource RemoveDrawing}"/>
-                    </Image.Source>
-                </Image>
-            </Button>
+            <Border Margin="0,0,6,0" BorderThickness="0">
+                <Button
+                    Command="{Binding Remove}"
+                    Visibility="{Binding Remove, Converter={StaticResource CollapseNullConverter}}">
+                    <Button.Style>
+                        <Style TargetType="Button" >
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="False">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Image Width="16" Height="16">
+                        <Image.Source>
+                            <DrawingImage Drawing="{StaticResource RemoveDrawing}"/>
+                        </Image.Source>
+                    </Image>
+                </Button>
+            </Border>
         </DataTemplate>
     </DockPanel.Resources>
     <ListBox x:Name="TargetsList"

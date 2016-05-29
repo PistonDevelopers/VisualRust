@@ -121,7 +121,7 @@ namespace VisualRust.Test.Project.Controls
             Assert.True(vm.IsDirty);
             var changes = vm.PendingChanges();
             Assert.AreEqual(1, changes.TargetsRemoved.Count);
-            Assert.AreEqual(first.Handle, changes.TargetsRemoved[0]);
+            Assert.AreEqual(first.Handle, changes.TargetsRemoved[0].Handle);
         }
 
         [Test]
@@ -146,7 +146,7 @@ namespace VisualRust.Test.Project.Controls
             Assert.True(vm.IsDirty);
             var changes = vm.PendingChanges();
             Assert.AreEqual(1, changes.TargetsRemoved.Count);
-            Assert.AreEqual(second.Handle, changes.TargetsRemoved[0]);
+            Assert.AreEqual(second.Handle, changes.TargetsRemoved[0].Handle);
         }
 
         static T Second<T>(IEnumerable<T> coll, Func<T, bool> picker)
@@ -186,6 +186,100 @@ namespace VisualRust.Test.Project.Controls
             Assert.Null(changed.Bench);
             Assert.Null(changed.Doc);
             Assert.Null(changed.Plugin);
+        }
+
+        [Test]
+        public void RemoveTarget()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                "[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n"
+               +"[[bin]]\n"
+               +"name=\"foo\"\n"
+               +"path=\"src\\foo1.rs\"\n"
+               +"[[bin]]\n"
+               +"name=\"src\\foo2.rs\"\n",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, null);
+            var first = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
+            vm.Remove(first);
+            vm.Apply();
+            Assert.AreEqual(
+                "[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n"
+               +"[[bin]]\n"
+               +"name=\"src\\foo2.rs\"\n",
+                m.ToString());
+            Assert.False(vm.IsDirty);
+        }
+
+        [Test]
+        public void AddTarget()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                "[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n"
+               +"[[bin]]\n"
+               +"name=\"asdf\"",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, () => OutputTargetType.Test);
+            vm.Add();
+            ((OutputTargetViewModel)vm.Targets[vm.Targets.Count - 1]).Name = "bar";
+            ((OutputTargetViewModel)vm.Targets[vm.Targets.Count - 1]).Path = "src\\baz.rs";
+            ((OutputTargetViewModel)vm.Targets[vm.Targets.Count - 1]).Plugin = false;
+            vm.Apply();
+            Assert.AreEqual(
+                "[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n"
+               +"[[bin]]\n"
+               +"name=\"asdf\"\n"
+               +"[[test]]\n"
+               +"name = \"bar\"\n"
+               +"path = \"src\\\\baz.rs\"\n"
+               +"plugin = false\n",
+                m.ToString());
+            Assert.False(vm.IsDirty);
+        }
+
+        [Test]
+        public void SetTarget()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                "[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n"
+               +"[[bin]]\n"
+               +"name=\"asdf\"\n"
+               +"[[test]]\n"
+               +"name = \"bar\"\n"
+               +"path = \"src\\\\baz.rs\"\n"
+               +"plugin = false\n",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, null);
+            var test = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Test);
+            test.Plugin = true;
+            test.Doctest = true;
+            Assert.True(vm.IsDirty);
+            vm.Apply();
+            Assert.AreEqual(
+                "[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n"
+               +"[[bin]]\n"
+               +"name=\"asdf\"\n"
+               +"[[test]]\n"
+               +"name = \"bar\"\n"
+               +"path = \"src\\\\baz.rs\"\n"
+               +"doctest = true\n"
+               +"plugin = true\n",
+                m.ToString());
         }
     }
 }

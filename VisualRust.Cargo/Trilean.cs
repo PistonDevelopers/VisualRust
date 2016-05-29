@@ -28,5 +28,18 @@ namespace VisualRust.Cargo
             }
             return null;
         }
+        public static Trilean ToTrilean(this bool? value)
+        {
+            switch(value)
+            {
+                case false:
+                    return Trilean.False;
+                case true:
+                    return Trilean.True;
+                case null:
+                    return Trilean.Unknown;
+            }
+            return Trilean.Unknown;
+        }
     }
 }

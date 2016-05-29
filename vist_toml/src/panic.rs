@@ -38,10 +38,10 @@ impl FFIPanicInfo {
                 line: 0
             };
             if let Some(text) = panic.payload().downcast_ref::<&'static str>() {
-                result.msg = OwnedSlice::from_str(text);
+                result.msg = OwnedSlice::from_string(*text);
             };
             if let Some(loc) = panic.location() {
-                result.file = OwnedSlice::from_str(loc.file());
+                result.file = OwnedSlice::from_string(loc.file());
                 result.line = loc.line();
             };
             *pi.borrow_mut() = Some(result);

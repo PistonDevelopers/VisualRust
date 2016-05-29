@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace VisualRust.Cargo
 {
@@ -34,6 +35,39 @@ namespace VisualRust.Cargo
         {
             Type = type;
             Handle = null;
+        }
+
+        internal void WithRaw(Action<RawOutputTarget> action)
+        {
+            byte[] type = Encoding.UTF8.GetBytes(Type.ToTypeString());
+            byte[] name = Name != null ? Encoding.UTF8.GetBytes(Name) : null;
+            byte[] path = Path != null ? Encoding.UTF8.GetBytes(Path) : null;
+            unsafe
+            {
+                fixed (byte* typePtr = type)
+                {
+                    fixed (byte* namePtr = name)
+                    {
+                        fixed (byte* pathPtr = path)
+                        {
+                            var rawtarget = new RawOutputTarget
+                            {
+                                Handle = this.Handle ?? UIntPtr.Zero,
+                                Type = new Utf8String(new IntPtr(typePtr), type.Length),
+                                Name = new Utf8String(new IntPtr(namePtr), name != null ? name.Length : 0),
+                                Path = new Utf8String(new IntPtr(pathPtr), path != null ? path.Length : 0),
+                                Test = this.Test.ToTrilean(),
+                                Doctest = this.Doctest.ToTrilean(),
+                                Bench = this.Bench.ToTrilean(),
+                                Doc = this.Doc.ToTrilean(),
+                                Plugin = this.Plugin.ToTrilean(),
+                                Harness = this.Harness.ToTrilean(),
+                            };
+                            action(rawtarget);
+                        }
+                    }
+                }
+            }
         }
     }
 

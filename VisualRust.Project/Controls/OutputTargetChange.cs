@@ -6,10 +6,21 @@ using VisualRust.Cargo;
 
 namespace VisualRust.Project.Controls
 {
+    public struct OutputTargetRemoval
+    {
+        public UIntPtr Handle { get; private set; }
+        public string Type { get; private set; }
+        internal OutputTargetRemoval(OutputTarget vm) : this()
+        {
+            Handle = vm.Handle.Value;
+            Type = vm.Type.ToTypeString();
+        }
+    }
+
     public class OutputTargetChanges
     {
         public IReadOnlyList<OutputTarget> TargetsAdded { get; private set; }
-        public IReadOnlyList<UIntPtr> TargetsRemoved { get; private set; }
+        public IReadOnlyList<OutputTargetRemoval> TargetsRemoved { get; private set; }
         public IReadOnlyList<OutputTarget> TargetsChanged { get; private set; }
 
         public OutputTargetChanges(Manifest manifest, IEnumerable<OutputTargetViewModel> models)
@@ -32,7 +43,7 @@ namespace VisualRust.Project.Controls
                 }
             }
             TargetsAdded = added;
-            TargetsRemoved = existingTargets.Keys.ToList();
+            TargetsRemoved = existingTargets.Select(kvp => new OutputTargetRemoval(kvp.Value)).ToList();
             TargetsChanged = changed;
         }
 

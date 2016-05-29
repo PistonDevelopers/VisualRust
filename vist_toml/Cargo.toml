@@ -7,6 +7,6 @@ authors = ["Andrzej Janik <vosen@vosen.pl>"]
 crate-type = ["dylib"]
 
 [dependencies]
-toml_document = "0.1.0"
+toml_document = "0.1.2"
 winapi = "0.2"
 kernel32-sys = "0.2"

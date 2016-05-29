@@ -5,13 +5,16 @@ extern crate toml_document;
 extern crate winapi;
 extern crate kernel32;
 
+use std::fmt::{Display, Error, Formatter};
+use std::iter;
 use std::mem;
 use std::ptr;
 use std::slice;
 use std::str;
 use std::marker::PhantomData;
 
-use toml_document::{ArrayEntry, Document, EntryRef, InternalNode, TableEntry, TableValue};
+use toml_document::{ArrayEntry, Container, ContainerKind, Document, EntryRef, InternalNode};
+use toml_document::{TableEntry, TableValue};
 use winapi::INT32;
 
 mod panic;
@@ -47,6 +50,12 @@ fn array_kind(e: ArrayEntry) -> Option<&'static str> {
 
 pub struct Manifest {
     doc: Document
+}
+
+impl Display for Manifest {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        self.doc.fmt(f)
+    }
 }
 
 // Set functions:
@@ -325,8 +334,134 @@ impl Manifest {
            .map_or(Err(QueryError::Vacant{ depth: 0 }),
                    |entry| lookup_inner(entry, &path[1..], 0))
     }
+
+    fn add_output_target(&mut self, target: OutputTarget) -> usize {
+        let kind = if target.kind == "lib" {
+            ContainerKind::Table
+        } else {
+            ContainerKind::ArrayMember
+        };
+        let index = self.doc.len();
+        let mut container = self.doc.insert_container(index, iter::once(target.kind), kind);
+        Manifest::add_output_target_inner(&mut container, target);
+        container.ptr()
+    }
+
+    fn add_output_target_inner(container: &mut Container, target: OutputTarget) {
+        fn append_bool(cnt: &mut Container, key: &'static str, value: Option<bool>) {
+            if let Some(value) = value {
+                let index = cnt.len_children();
+                cnt.insert_boolean(index, key, value);
+            }
+        }
+        fn append_string<'a>(cnt: &mut Container, key: &'static str, value: Option<&'a str>) {
+            if let Some(value) = value {
+                let index = cnt.len_children();
+                cnt.insert_string(index, key, value);
+            }
+        }
+        append_string(container, "name", target.name);
+        append_string(container, "path", target.path);
+        append_bool(container, "test", target.test);
+        append_bool(container, "doctest", target.doctest);
+        append_bool(container, "bench", target.bench);
+        append_bool(container, "doc", target.doc);
+        append_bool(container, "plugin", target.plugin);
+        append_bool(container, "harness", target.harness);
+    }
+
+    fn set_output_target(&mut self, target: OutputTarget) {
+        let index = self.doc.find(&NodeCursor(target.handle));
+        let container = self.doc.get_container_mut(index.unwrap());
+        Manifest::set_output_target_inner(container, target);
+    }
+
+    fn set_output_target_inner(container: &mut Container, target: OutputTarget) {
+        fn set_bool(cnt: &mut Container, key: &'static str, value: Option<bool>) {
+            if let Some(value) = value {
+                Manifest::remove_child(cnt, key);
+                let index = cnt.len_children();
+                cnt.insert_boolean(index, key, value);
+            }
+        }
+        fn set_string<'a>(cnt: &mut Container, key: &'static str, value: Option<&'a str>) {
+            if let Some(value) = value {
+                Manifest::remove_child(cnt, key);
+                let index = cnt.len_children();
+                cnt.insert_string(index, key, value);
+            }
+        }
+        set_string(container, "name", target.name);
+        set_string(container, "path", target.path);
+        set_bool(container, "test", target.test);
+        set_bool(container, "doctest", target.doctest);
+        set_bool(container, "bench", target.bench);
+        set_bool(container, "doc", target.doc);
+        set_bool(container, "plugin", target.plugin);
+        set_bool(container, "harness", target.harness);
+    }
+
+    fn remove_output_target(&mut self, handle: usize, kind: &str) {
+        fn remove_child(doc: &mut Document, key: &str) {
+            if let Some(idx) = doc.iter_children().position(|c| key == c.key().get()) {
+                doc.remove(idx)
+            }
+        }
+        /*
+        fn remove_container(doc: &mut Document, k: &str) -> bool {
+            let len_children = doc.len_children();
+            if let Some(idx) = doc.iter_containers().position(|c| k == c.keys().markup()[0].get()){
+                doc.remove(idx + len_children);
+                true
+            } else {
+                false
+            }
+        }
+        */
+        if handle == 0 {
+            remove_child(&mut self.doc, kind);
+            Manifest::remove_containers(&mut self.doc, iter::once(kind));
+        } else {
+            let position = self.doc.find(&NodeCursor(handle)).unwrap();
+            self.doc.remove(position);
+        }
+    }
+
+    fn remove_child(cnt: &mut Container, key: &str) {
+        if let Some(idx) = cnt.iter_children().position(|c| key == c.key().get()) {
+            cnt.remove(idx)
+        }
+    }
+
+    fn remove_containers<'a, I:Iterator<Item=&'a str>+Clone>(doc: &mut Document, keys: I) {
+        fn find_container<'a, I>(doc: &mut Document, keys: I)
+                                -> Option<usize> where I:Iterator<Item=&'a str>+Clone {
+            doc.iter_containers().position(|c| {
+                c.keys().markup().iter().zip(keys.clone()).all(|(m, k)| m.get() == k)
+            })
+        }
+        loop {
+            let position = find_container(doc, keys.clone());
+            match position {
+                Some(position) => {
+                    let len_children = doc.len_children();
+                    doc.remove(position + len_children);
+                }
+                None => break
+            }
+        }
+    }
 }
 impl std::panic::RefUnwindSafe for Manifest { }
+
+struct NodeCursor(usize);
+impl InternalNode for NodeCursor {
+    fn ptr(&self) -> usize {
+        self.0
+    }
+}
+
+
 
 pub enum QueryError {
     Vacant{ depth: usize },
@@ -377,7 +512,7 @@ pub struct PathError {
 
 pub struct OutputTarget<'a> {
     handle: usize,
-    kind: &'static str,
+    kind: &'a str,
     name: Option<&'a str>,
     path: Option<&'a str>,
     test: Option<bool>,
@@ -485,8 +620,15 @@ impl<T> OwnedSlice<T> {
 }
 
 impl OwnedSlice<u8> {
-    fn from_str(src: &str) -> OwnedSlice<u8> {
-        let mut text = src.to_string().into_bytes().into_boxed_slice();
+    fn from_str_opt(src: Option<&str>) -> OwnedSlice<u8> {
+        match src {
+            Some(s) => OwnedSlice::from_string(s),
+            None => OwnedSlice::empty()
+        }
+    }
+
+    fn from_string<S:Into<String>>(src: S) -> OwnedSlice<u8> {
+        let mut text = src.into().into_bytes().into_boxed_slice();
         let inner = RawSlice {
             arr: text.as_mut_ptr(),
             len: text.len() as INT32
@@ -494,13 +636,6 @@ impl OwnedSlice<u8> {
         let result = OwnedSlice{ data: inner };
         mem::forget(text);
         result
-    }
-
-    fn from_str_opt(src: Option<&str>) -> OwnedSlice<u8> {
-        match src {
-            Some(s) => OwnedSlice::from_str(s),
-            None => OwnedSlice::empty()
-        }
     }
 }
 
@@ -515,6 +650,14 @@ impl<'a> BorrowedSlice<'a, u8> {
         unsafe {
             let slice = slice::from_raw_parts(self.data.arr, self.data.len as usize);
             str::from_utf8_unchecked(slice)
+        }
+    }
+
+    fn as_str_opt(&'a self) -> Option<&'a str> {
+        if self.data.arr == ptr::null_mut() {
+            None
+        } else {
+            Some(self.as_str())
         }
     }
 }
@@ -562,7 +705,7 @@ pub struct RawDependency {
 impl RawDependency {
     fn from(d: &Dependency) -> RawDependency {
         RawDependency {
-            name: OwnedSlice::from_str(d.name),
+            name: OwnedSlice::from_string(d.name),
             version: OwnedSlice::from_str_opt(d.version),
             git: OwnedSlice::from_str_opt(d.git),
             path: OwnedSlice::from_str_opt(d.path),

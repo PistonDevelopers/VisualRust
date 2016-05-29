@@ -182,6 +182,7 @@
     <Compile Include="Controls\OutputPage.xaml.cs">
       <DependentUpon>OutputPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\OutputTargetChange.cs" />
     <Compile Include="Controls\OutputTargetSectionViewModel.cs" />
     <Compile Include="Controls\OutputTargetViewModel.cs" />
     <Compile Include="Controls\RelayCommand.cs" />

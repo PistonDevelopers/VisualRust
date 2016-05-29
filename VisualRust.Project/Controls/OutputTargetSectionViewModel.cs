@@ -19,7 +19,6 @@ namespace VisualRust.Project.Controls
         int tests;
         int benchmarks;
         int examples;
-        List<OutputTargetChanges> changes = new List<OutputTargetChanges>();
 
         ObservableCollection<IOutputTargetViewModel> targets;
         public ObservableCollection<IOutputTargetViewModel> Targets
@@ -79,8 +78,20 @@ namespace VisualRust.Project.Controls
 
         public void Apply()
         {
+            OutputTargetChanges changes = PendingChanges();
+            foreach(OutputTargetRemoval removed in changes.TargetsRemoved)
+            {
+                this.manifest.Remove(removed.Handle, removed.Type);
+            }
+            foreach(OutputTarget target in changes.TargetsChanged)
+            {
+                this.manifest.Set(target);
+            }
+            foreach(OutputTarget target in changes.TargetsAdded)
+            {
+                this.manifest.Add(target);
+            }
             IsDirty = false;
-            throw new NotImplementedException();
         }
 
         IOutputTargetViewModel CreateLibraryTarget(OutputTarget rawLibraryTarget)

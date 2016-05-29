@@ -248,5 +248,47 @@ namespace VisualRust.Cargo
         {
             Rust.Invoke(SafeNativeMethods.free_manifest, this.manifest);
         }
+
+        public UIntPtr Add(OutputTarget target)
+        {
+            UIntPtr result = default(UIntPtr);
+            target.WithRaw(raw =>
+            {
+                result = Rust.Call(SafeNativeMethods.add_output_target, this.manifest, raw);
+            });
+            return result;
+        }
+
+        public void Set(OutputTarget target)
+        {
+            target.WithRaw(raw => Rust.Invoke(SafeNativeMethods.set_output_target, this.manifest, raw));
+        }
+
+        public void Remove(UIntPtr handle, string type)
+        {
+            byte[] utf8String = Encoding.UTF8.GetBytes(type);
+            unsafe
+            {
+                fixed (byte* p = utf8String)
+                {
+                    var rawString = new Utf8String(new IntPtr(p), utf8String.Length);
+                    Rust.Invoke(SafeNativeMethods.remove_output_target, this.manifest, handle, rawString);
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            Utf8String str = default(Utf8String);
+            try
+            {
+                str = Rust.Call(SafeNativeMethods.manifest_to_string, this.manifest);
+                return str.ToString();
+            }
+            finally
+            {
+                SafeNativeMethods.free_strbox(str);
+            }
+        }
     }
 }

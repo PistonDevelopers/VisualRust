@@ -13,12 +13,26 @@ use std::slice;
 use std::str;
 use std::marker::PhantomData;
 
-use toml_document::{ArrayEntry, Container, ContainerKind, Document, EntryRef, InternalNode};
-use toml_document::{TableEntry, TableValue};
+use toml_document::{ArrayEntry, ArrayValueMut, Container, ContainerKind, Document};
+use toml_document::{EntryRef, EntryRefMut, InlineArray, InternalNode, InlineTable, TableEntry};
+use toml_document::{TableValue, ValueRefMut};
 use winapi::INT32;
 
 mod panic;
 pub mod capi;
+
+macro_rules! set_output_target {
+    ($container: ident, $target: ident, $set_string: ident, $set_bool: ident) => (
+        $set_string($container, "name", $target.name);
+        $set_string($container, "path", $target.path);
+        $set_bool($container, "test", $target.test);
+        $set_bool($container, "doctest", $target.doctest);
+        $set_bool($container, "bench", $target.bench);
+        $set_bool($container, "doc", $target.doc);
+        $set_bool($container, "plugin", $target.plugin);
+        $set_bool($container, "harness", $target.harness);
+    )
+}
 
 fn entry_kind(e: EntryRef) -> &'static str {
     match e {
@@ -360,20 +374,51 @@ impl Manifest {
                 cnt.insert_string(index, key, value);
             }
         }
-        append_string(container, "name", target.name);
-        append_string(container, "path", target.path);
-        append_bool(container, "test", target.test);
-        append_bool(container, "doctest", target.doctest);
-        append_bool(container, "bench", target.bench);
-        append_bool(container, "doc", target.doc);
-        append_bool(container, "plugin", target.plugin);
-        append_bool(container, "harness", target.harness);
+        set_output_target!(container, target, append_string, append_bool);
     }
 
-    fn set_output_target(&mut self, target: OutputTarget) {
-        let index = self.doc.find(&NodeCursor(target.handle));
-        let container = self.doc.get_container_mut(index.unwrap());
-        Manifest::set_output_target_inner(container, target);
+    fn set_output_target(&mut self, target: OutputTarget) -> Option<usize> {
+        if target.handle == 0 {
+            let length = self.doc.len();
+            let container = self.doc.insert_container(length,
+                                                      iter::once(target.kind),
+                                                      ContainerKind::Table);
+            Manifest::set_output_target_inner(container, target);
+            Some(container.ptr())
+        } else {
+            let cursor = NodeCursor(target.handle);
+            let maybe_index = self.doc.find(&cursor);
+            match maybe_index {
+                Some(index) => {
+                    if index < self.doc.len_children() {
+                        let child = self.doc.get_child_mut(index);
+                        if let ValueRefMut::Table(table) = child.value_mut() {
+                            Manifest::set_output_target_inline_table(table, target);
+                        } else {
+                            unreachable!()
+                        }
+                    } else {
+                        let children_len = self.doc.len_children();
+                        let container = self.doc.get_container_mut(index - children_len);
+                        Manifest::set_output_target_inner(container, target);
+                    }
+                }
+                None => {
+                    match self.doc.get_mut(target.kind) {
+                        Some(EntryRefMut::Array(array)) => {
+                            match array.to_value() {
+                                ArrayValueMut::Inline(mut inline_array) => {
+                                    Manifest::set_output_target_inline_array(inline_array, target);
+                                }
+                                ArrayValueMut::OfTables => unreachable!()
+                            }
+                        }
+                        _ => unreachable!()
+                    }
+                }
+            }
+            None
+        }
     }
 
     fn set_output_target_inner(container: &mut Container, target: OutputTarget) {
@@ -391,14 +436,36 @@ impl Manifest {
                 cnt.insert_string(index, key, value);
             }
         }
-        set_string(container, "name", target.name);
-        set_string(container, "path", target.path);
-        set_bool(container, "test", target.test);
-        set_bool(container, "doctest", target.doctest);
-        set_bool(container, "bench", target.bench);
-        set_bool(container, "doc", target.doc);
-        set_bool(container, "plugin", target.plugin);
-        set_bool(container, "harness", target.harness);
+        set_output_target!(container, target, set_string, set_bool);
+    }
+
+    fn set_output_target_inline_array(inline_array: &mut InlineArray, target: OutputTarget) {
+        let idx = inline_array.find(&NodeCursor(target.handle)).unwrap();
+        let value = inline_array.get_mut(idx);
+        let table = if let ValueRefMut::Table(table) = value {
+            table
+        } else {
+            panic!("Invalid operation");
+        };
+        Manifest::set_output_target_inline_table(table, target);
+    }
+
+    fn set_output_target_inline_table(table: &mut InlineTable, target: OutputTarget) {
+        fn set_bool(table: &mut InlineTable, key: &'static str, value: Option<bool>) {
+            if let Some(value) = value {
+                Manifest::remove_child_inline(table, key);
+                let index = table.len();
+                table.insert_boolean(index, key, value);
+            }
+        }
+        fn set_string<'a>(table: &mut InlineTable, key: &'static str, value: Option<&'a str>) {
+            if let Some(value) = value {
+                Manifest::remove_child_inline(table, key);
+                let index = table.len();
+                table.insert_string(index, key, value);
+            }
+        }
+        set_output_target!(table, target, set_string, set_bool);
     }
 
     fn remove_output_target(&mut self, handle: usize, kind: &str) {
@@ -407,17 +474,6 @@ impl Manifest {
                 doc.remove(idx)
             }
         }
-        /*
-        fn remove_container(doc: &mut Document, k: &str) -> bool {
-            let len_children = doc.len_children();
-            if let Some(idx) = doc.iter_containers().position(|c| k == c.keys().markup()[0].get()){
-                doc.remove(idx + len_children);
-                true
-            } else {
-                false
-            }
-        }
-        */
         if handle == 0 {
             remove_child(&mut self.doc, kind);
             Manifest::remove_containers(&mut self.doc, iter::once(kind));
@@ -430,6 +486,12 @@ impl Manifest {
     fn remove_child(cnt: &mut Container, key: &str) {
         if let Some(idx) = cnt.iter_children().position(|c| key == c.key().get()) {
             cnt.remove(idx)
+        }
+    }
+
+    fn remove_child_inline(table: &mut InlineTable, key: &str) {
+        if let Some(idx) = table.iter().position(|c| key == c.key().get()) {
+            table.remove(idx)
         }
     }
 

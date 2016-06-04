@@ -37,7 +37,7 @@ namespace VisualRust.Cargo
             Handle = null;
         }
 
-        internal void WithRaw(Action<RawOutputTarget> action)
+        internal T WithRaw<T>(Func<RawOutputTarget, T> action)
         {
             byte[] type = Encoding.UTF8.GetBytes(Type.ToTypeString());
             byte[] name = Name != null ? Encoding.UTF8.GetBytes(Name) : null;
@@ -63,7 +63,7 @@ namespace VisualRust.Cargo
                                 Plugin = this.Plugin.ToTrilean(),
                                 Harness = this.Harness.ToTrilean(),
                             };
-                            action(rawtarget);
+                            return action(rawtarget);
                         }
                     }
                 }

@@ -49,7 +49,7 @@ namespace VisualRust.Cargo
         internal static extern UIntPtr add_output_target(IntPtr manifest, RawOutputTarget target);
 
         [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void set_output_target(IntPtr manifest, RawOutputTarget target);
+        internal static extern UIntPtr set_output_target(IntPtr manifest, RawOutputTarget target);
 
         [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern Utf8String manifest_to_string(IntPtr manifest);

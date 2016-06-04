@@ -177,15 +177,15 @@ namespace VisualRust.Test.Project.Controls
             var changes = vm.PendingChanges();
             Assert.AreEqual(1, changes.TargetsChanged.Count);
             var changed = changes.TargetsChanged[0];
-            Assert.AreEqual(first.Handle, changed.Handle);
-            Assert.AreEqual(true, changed.Harness);
-            Assert.Null(changed.Name);
-            Assert.Null(changed.Path);
-            Assert.Null(changed.Test);
-            Assert.Null(changed.Doctest);
-            Assert.Null(changed.Bench);
-            Assert.Null(changed.Doc);
-            Assert.Null(changed.Plugin);
+            Assert.AreEqual(first.Handle, changed.Value.Handle);
+            Assert.AreEqual(true, changed.Value.Harness);
+            Assert.Null(changed.Value.Name);
+            Assert.Null(changed.Value.Path);
+            Assert.Null(changed.Value.Test);
+            Assert.Null(changed.Value.Doctest);
+            Assert.Null(changed.Value.Bench);
+            Assert.Null(changed.Value.Doc);
+            Assert.Null(changed.Value.Plugin);
         }
 
         [Test]
@@ -280,6 +280,90 @@ namespace VisualRust.Test.Project.Controls
                +"doctest = true\n"
                +"plugin = true\n",
                 m.ToString());
+        }
+
+        [Test]
+        public void SetInlineTarget()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                "bin = [ { name = \"asdf\" } ]\n"
+               +"[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, null);
+            var binary = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
+            binary.Name = "qwer";
+            binary.Plugin = true;
+            binary.Doctest = true;
+            Assert.True(vm.IsDirty);
+            vm.Apply();
+            Assert.AreEqual(
+                "bin = [ { name = \"qwer\", doctest = true, plugin = true } ]\n"
+               +"[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n",
+                m.ToString());
+        }
+
+        [Test]
+        public void SetInlineTargetLib()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                "lib = { name = \"asdf\" }\n"
+               +"[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, null);
+            var library = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Library);
+            library.Name = "qwer";
+            library.Plugin = true;
+            library.Doctest = true;
+            Assert.True(vm.IsDirty);
+            vm.Apply();
+            Assert.AreEqual(
+                "lib = { name = \"qwer\", doctest = true, plugin = true }\n"
+               +"[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"",
+                m.ToString());
+        }
+
+        [Test]
+        public void SetTargetLibExotic()
+        {
+            ManifestErrors temp;
+            var m = Manifest.TryCreate(
+                "[lib.asdf]\n"
+               +"name = \"foo\"\n"
+               +"[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"",
+                out temp);
+            var vm = new OutputTargetSectionViewModel(m, null);
+            var library = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Library);
+            Assert.AreEqual(UIntPtr.Zero, library.Handle);
+            library.Name = "qwer";
+            library.Plugin = true;
+            library.Doctest = true;
+            Assert.True(vm.IsDirty);
+            vm.Apply();
+            Assert.AreEqual(
+                "[lib.asdf]\n"
+               +"name = \"foo\"\n"
+               +"[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n"
+               +"[lib]\n"
+               +"name = \"qwer\"\n"
+               +"doctest = true\n"
+               +"plugin = true\n",
+                m.ToString());
+            var libraryAfter = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Library);
+            Assert.AreNotEqual(UIntPtr.Zero, libraryAfter.Handle);
         }
     }
 }

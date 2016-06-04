@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using VisualRust.Cargo;
+using TargetPair = System.Collections.Generic.KeyValuePair<VisualRust.Project.Controls.OutputTargetViewModel, VisualRust.Cargo.OutputTarget>;
 
 namespace VisualRust.Project.Controls
 {
@@ -21,12 +22,12 @@ namespace VisualRust.Project.Controls
     {
         public IReadOnlyList<OutputTarget> TargetsAdded { get; private set; }
         public IReadOnlyList<OutputTargetRemoval> TargetsRemoved { get; private set; }
-        public IReadOnlyList<OutputTarget> TargetsChanged { get; private set; }
+        public IReadOnlyList<TargetPair> TargetsChanged { get; private set; }
 
         public OutputTargetChanges(Manifest manifest, IEnumerable<OutputTargetViewModel> models)
         {
             List<OutputTarget> added = new List<OutputTarget>();
-            List<OutputTarget> changed = new List<OutputTarget>();
+            List<TargetPair> changed = new List<TargetPair>();
             Dictionary<UIntPtr, OutputTarget> existingTargets = manifest.OutputTargets.ToDictionary(t => t.Handle.Value);
             foreach (var vm in models)
             {
@@ -38,7 +39,7 @@ namespace VisualRust.Project.Controls
                 {
                     OutputTarget diff = Difference(existingTargets[vm.Handle.Value], vm);
                     if (diff != null)
-                        changed.Add(diff);
+                        changed.Add(new TargetPair(vm, diff));
                     existingTargets.Remove(vm.Handle.Value);
                 }
             }

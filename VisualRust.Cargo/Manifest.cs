@@ -251,17 +251,12 @@ namespace VisualRust.Cargo
 
         public UIntPtr Add(OutputTarget target)
         {
-            UIntPtr result = default(UIntPtr);
-            target.WithRaw(raw =>
-            {
-                result = Rust.Call(SafeNativeMethods.add_output_target, this.manifest, raw);
-            });
-            return result;
+            return target.WithRaw(raw => Rust.Call(SafeNativeMethods.add_output_target, this.manifest, raw));
         }
 
-        public void Set(OutputTarget target)
+        public UIntPtr Set(OutputTarget target)
         {
-            target.WithRaw(raw => Rust.Invoke(SafeNativeMethods.set_output_target, this.manifest, raw));
+            return target.WithRaw(raw => Rust.Call(SafeNativeMethods.set_output_target, this.manifest, raw));
         }
 
         public void Remove(UIntPtr handle, string type)

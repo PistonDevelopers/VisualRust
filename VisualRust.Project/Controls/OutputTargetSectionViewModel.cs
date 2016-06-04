@@ -83,9 +83,11 @@ namespace VisualRust.Project.Controls
             {
                 this.manifest.Remove(removed.Handle, removed.Type);
             }
-            foreach(OutputTarget target in changes.TargetsChanged)
+            foreach(KeyValuePair<OutputTargetViewModel, OutputTarget> target in changes.TargetsChanged)
             {
-                this.manifest.Set(target);
+               UIntPtr handle = this.manifest.Set(target.Value);
+                if(handle != UIntPtr.Zero)
+                    target.Key.Handle = handle;
             }
             foreach(OutputTarget target in changes.TargetsAdded)
             {

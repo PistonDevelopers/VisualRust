@@ -351,11 +351,12 @@ pub extern "C" fn add_output_target<'a>(manifest: *mut Manifest,
 #[no_mangle]
 #[allow(no_mangle_generic_items)]
 pub extern "C" fn set_output_target<'a>(manifest: *mut Manifest,
-                                        raw_target: BorrowedOutputTarget<'a>) {
+                                        raw_target: BorrowedOutputTarget<'a>)
+                                        -> usize {
     unwindable_call(move || {
         let manifest = unsafe { &mut*manifest };
         let target = raw_target.to_target();
-        manifest.set_output_target(target)
+        manifest.set_output_target(target).unwrap_or(0)
     })
 }
 

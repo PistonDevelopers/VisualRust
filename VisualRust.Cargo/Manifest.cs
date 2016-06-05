@@ -38,7 +38,8 @@ namespace VisualRust.Cargo
         public string Repository { get; set; }
         public string License { get; set; }
         public Dependency[] Dependencies { get; set; }
-        public OutputTarget[] OutputTargets { get; set; }
+        private List<OutputTarget> targets;
+        public IReadOnlyList<OutputTarget> OutputTargets { get { return targets; } }
 
         private Manifest(IntPtr handle)
         {
@@ -75,7 +76,7 @@ namespace VisualRust.Cargo
             manifest.Name = name;
             manifest.Version = version;
             manifest.Dependencies = new Dependency[0];
-            manifest.OutputTargets = new OutputTarget[0];
+            manifest.targets = new List<OutputTarget>();
             return manifest;
         }
 
@@ -112,7 +113,7 @@ namespace VisualRust.Cargo
             Repository = GetString(errors, "package", "repository");
             License = GetString(errors, "package", "license");
             Dependencies = GetDependencies(errors);
-            OutputTargets = GetOutputTargets(errors);
+            targets = GetOutputTargets(errors);
             return errors;
         }
 
@@ -140,7 +141,7 @@ namespace VisualRust.Cargo
             }
         }
 
-        private OutputTarget[] GetOutputTargets(HashSet<EntryMismatchError> errors)
+        private List<OutputTarget> GetOutputTargets(HashSet<EntryMismatchError> errors)
         {
             using (OutputTargetsQueryResult result = Rust.Call(SafeNativeMethods.get_output_targets, manifest))
             {
@@ -150,7 +151,7 @@ namespace VisualRust.Cargo
                     foreach (var error in callErrors)
                         errors.Add(error);
                 }
-                return result.Targets.ToArray();
+                return result.Targets.ToList();
             }
         }
 
@@ -247,6 +248,78 @@ namespace VisualRust.Cargo
         public void Dispose()
         {
             Rust.Invoke(SafeNativeMethods.free_manifest, this.manifest);
+        }
+
+        public UIntPtr Add(OutputTarget target)
+        {
+            target.Handle = target.WithRaw(raw => Rust.Call(SafeNativeMethods.add_output_target, this.manifest, raw));
+            this.targets.Add(target);
+            return target.Handle.Value;
+        }
+
+        public UIntPtr Set(OutputTarget target)
+        {
+            OutputTarget managedTarget = this.targets.Find(t => t.Handle == target.Handle);
+            UIntPtr newHandle = target.WithRaw(raw => Rust.Call(SafeNativeMethods.set_output_target, this.manifest, raw));
+            if(newHandle != UIntPtr.Zero)
+                managedTarget.Handle = newHandle;
+            ApplyDifference(managedTarget, target);
+            return newHandle;
+        }
+
+        static void ApplyDifference(OutputTarget target, OutputTarget diff)
+        {
+            target.Name = SetString(target.Name, diff.Name);
+            target.Path = SetString(target.Path, diff.Path);
+            target.Test = SetBool(target.Test, diff.Test);
+            target.Doctest = SetBool(target.Doctest, diff.Doctest);
+            target.Bench = SetBool(target.Bench, diff.Bench);
+            target.Doc = SetBool(target.Doc, diff.Doc);
+            target.Plugin = SetBool(target.Plugin, diff.Plugin);
+            target.Harness = SetBool(target.Harness, diff.Harness);
+        }
+
+        static string SetString(string oldS, string newS)
+        {
+            if(newS != null)
+                return newS;
+            return oldS;
+        }
+
+        static bool? SetBool(bool? oldV, bool? newV)
+        {
+            if(newV.HasValue)
+                return newV;
+            return oldV;
+        }
+
+        public void Remove(UIntPtr handle, string type)
+        {
+            byte[] utf8String = Encoding.UTF8.GetBytes(type);
+            unsafe
+            {
+                fixed (byte* p = utf8String)
+                {
+                    var rawString = new Utf8String(new IntPtr(p), utf8String.Length);
+                    Rust.Invoke(SafeNativeMethods.remove_output_target, this.manifest, handle, rawString);
+                }
+            }
+            int forRemoval = targets.FindIndex(t => t.Handle == handle);
+            targets.RemoveAt(forRemoval);
+        }
+
+        public override string ToString()
+        {
+            Utf8String str = default(Utf8String);
+            try
+            {
+                str = Rust.Call(SafeNativeMethods.manifest_to_string, this.manifest);
+                return str.ToString();
+            }
+            finally
+            {
+                SafeNativeMethods.free_strbox(str);
+            }
         }
     }
 }

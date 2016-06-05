@@ -28,7 +28,7 @@ namespace VisualRust.Test.Cargo
             Assert.AreEqual(1, m.Dependencies.Length);
             Assert.AreEqual("foo", m.Dependencies[0].Name);
             Assert.AreEqual("0.1", m.Dependencies[0].Version);
-            Assert.AreEqual(0, m.OutputTargets.Length);
+            Assert.AreEqual(0, m.OutputTargets.Count);
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace VisualRust.Test.Cargo
                   name = ""bar""
                   path = ""src.rs""",
                 out temp);
-            Assert.AreEqual(1, m.OutputTargets.Length);
+            Assert.AreEqual(1, m.OutputTargets.Count);
             Assert.AreEqual("bar", m.OutputTargets[0].Name);
             Assert.AreEqual("src.rs", m.OutputTargets[0].Path);
         }
@@ -169,7 +169,7 @@ namespace VisualRust.Test.Cargo
             Assert.AreEqual("bin2.rs", t5.Path);
         }
 
-        static OutputTarget GetOutputTarget(OutputTarget[] targets, OutputTargetType type, string name)
+        static OutputTarget GetOutputTarget(IReadOnlyList<OutputTarget> targets, OutputTargetType type, string name)
         {
             return targets.First(t => t.Type == type && t.Name == name);
         }

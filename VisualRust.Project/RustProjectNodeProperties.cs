@@ -14,7 +14,7 @@ namespace VisualRust.Project
     [CLSCompliant(false), ComVisible(true)]
     public class RustProjectNodeProperties : ProjectNodeProperties
     {
-        public Manifest Manifest { get { return ((RustProjectNode)this.Node).Manifest; } }
+        public ManifestFile Manifest { get { return ((RustProjectNode)this.Node).Manifest; } }
 
         internal RustProjectNodeProperties(CommonProjectNode node)
             : base(node)

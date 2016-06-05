@@ -3,7 +3,6 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +13,7 @@ using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VisualRust.Shared;
 using VisualRust.Cargo;
+using System.IO.Abstractions;
 
 namespace VisualRust.Project
 {
@@ -73,9 +73,11 @@ namespace VisualRust.Project
     {
         private ImageHandler handler;
         private bool containsEntryPoint;
+        private FileSystem fs;
+
         public UserProjectConfig UserConfig { get; private set; }
         internal ModuleTracker ModuleTracker { get; private set; }
-        internal Manifest Manifest { get; private set; }
+        internal ManifestFile Manifest { get; private set; }
 
         public RustProjectNode(CommonProjectPackage package)
             : base(package, Utilities.GetImageList(new System.Drawing.Bitmap(typeof(RustProjectNode).Assembly.GetManifestResourceStream("VisualRust.Project.Resources.IconList.bmp"))))
@@ -84,6 +86,7 @@ namespace VisualRust.Project
             this.CanProjectDeleteItems = true;
             this.ListenForStartupFileUpdates = false;
             this.OnProjectPropertyChanged += ReloadOnOutputChange;
+            this.fs = new FileSystem();
         }
 
         void ReloadOnOutputChange(object sender, ProjectPropertyChangedArgs e)
@@ -145,7 +148,7 @@ namespace VisualRust.Project
         public string GetCrateFileNodePath(string outputType)
         {
             BuildOutputType output = BuildOutputTypeExtension.Parse(outputType);
-            return Path.Combine(Path.GetDirectoryName(this.FileName), "src", output.ToCrateFile());
+            return fs.Path.Combine(fs.Path.GetDirectoryName(this.FileName), "src", output.ToCrateFile());
         }
 
         public TrackedFileNode GetCrateFileNode(string outputType)
@@ -155,13 +158,16 @@ namespace VisualRust.Project
 
         protected void ReloadCore(out int canceled)
         {
-            ManifestLoadResult manifestResult = LoadManifest();
-            if (manifestResult.Cancel)
+            string manifestPath = fs.Path.GetFullPath(fs.Path.Combine(this.ProjectFolder, this.BuildProject.GetPropertyValue("ManifestPath")));
+            ManifestFile manifestFile = ManifestFile.Create(fs, manifestPath, LoadManifest);
+            if(manifestFile.Path != null)
+                this.BuildProject.SetProperty("ManifestPath", CommonUtils.GetRelativeFilePath(this.ProjectFolder, manifestFile.Path));
+            if (manifestFile.Manifest == null)
             {
                 canceled = 1;
                 return;
             }
-            this.Manifest = manifestResult.Manifest;
+            this.Manifest = manifestFile;
             this.UserConfig = new UserProjectConfig(this);
             string outputType = GetProjectProperty(ProjectFileConstants.OutputType, true);
             string entryPoint = GetCrateFileNodePath(outputType);
@@ -171,7 +177,7 @@ namespace VisualRust.Project
             // This project for some reason doesn't include entrypoint node, add it
             if (!containsEntryPoint)
             {
-                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(entryPoint), true);
+                HierarchyNode parent = this.CreateFolderNodes(fs.Path.GetDirectoryName(entryPoint), true);
                 TrackedFileNode node = (TrackedFileNode)this.CreateFileNode(entryPoint);
                 node.IsEntryPoint = true;
                 parent.AddChild(node);
@@ -179,55 +185,53 @@ namespace VisualRust.Project
             MarkEntryPointFolders(outputType);
             foreach (string file in ModuleTracker.ExtractReachableAndMakeIncremental())
             {
-                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(file), false);
+                HierarchyNode parent = this.CreateFolderNodes(fs.Path.GetDirectoryName(file), false);
                 parent.AddChild(CreateUntrackedNode(file));
             }
         }
 
-        ManifestLoadResult LoadManifest()
+        ManifestLoadResult LoadManifest(string path)
         {
-            string manifestPath = this.BuildProject.GetPropertyValue("ManifestPath");
-            string manifestPathFull = Path.GetFullPath(Path.Combine(this.ProjectFolder, manifestPath));
             string manifestContent;
             try
             {
-                manifestContent = File.ReadAllText(manifestPathFull);
+                manifestContent = fs.File.ReadAllText(path);
             }
-            catch (IOException ex)
+            catch (System.IO.IOException ex)
             {
-                var window = new Controls.OpenManifestErrorWindow(System.Windows.Application.Current.MainWindow, manifestPathFull, new string[] { ex.Message });
+                var window = new Controls.OpenManifestErrorWindow(System.Windows.Application.Current.MainWindow, path, new string[] { ex.Message });
                 bool? result = window.ShowDialog();
                 if (result == false)
                 {
                     if(window.Reload)
-                        return LoadManifest();
-                    return ManifestLoadResult.CreateCancel();
+                        return LoadManifest(path);
+                    else
+                        return ManifestLoadResult.CreateCancel(path);
                 }
                 else
                 {
-                    this.BuildProject.SetProperty("ManifestPath", CommonUtils.GetRelativeFilePath(this.ProjectFolder, manifestPathFull));
-                    return LoadManifest();
+                    return LoadManifest(window.NewManifest);
                 }
             }
             ManifestErrors errors;
-            Manifest manifest = Manifest.TryCreate(manifestContent, out errors);
+            Manifest manifest = Cargo.Manifest.TryCreate(manifestContent, out errors);
             if (manifest == null)
             {
-                var window = new Controls.OpenManifestErrorWindow(System.Windows.Application.Current.MainWindow, manifestPathFull, errors.GetErrors());
+                var window = new Controls.OpenManifestErrorWindow(System.Windows.Application.Current.MainWindow, path, errors.GetErrors());
                 bool? result = window.ShowDialog();
                 if (result == false)
                 {
                     if(window.Reload)
-                        return LoadManifest();
-                    return ManifestLoadResult.CreateCancel();
+                        return LoadManifest(path);
+                    else
+                        return ManifestLoadResult.CreateCancel(path);
                 }
                 else
                 {
-                    this.BuildProject.SetProperty("ManifestPath", CommonUtils.GetRelativeFilePath(this.ProjectFolder, manifestPathFull));
-                    return LoadManifest();
+                    return LoadManifest(window.NewManifest);
                 }
             }
-            return ManifestLoadResult.CreateSuccess(manifest);
+            return ManifestLoadResult.CreateSuccess(path, manifest);
         }
 
         private void MarkEntryPointFolders(string outputType)
@@ -261,7 +265,7 @@ namespace VisualRust.Project
                 HashSet<string> children = ModuleTracker.AddRootModuleIncremental(node.Url);
                 foreach (string child in children)
                 {
-                    HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(child), false);
+                    HierarchyNode parent = this.CreateFolderNodes(fs.Path.GetDirectoryName(child), false);
                     parent.AddChild(CreateUntrackedNode(child));
                 }
             }
@@ -290,7 +294,7 @@ namespace VisualRust.Project
         internal override MsBuildProjectElement AddFileToMsBuild(string file)
         {
             string itemPath = Microsoft.VisualStudio.Shell.PackageUtilities.MakeRelativeIfRooted(file, this.BaseURI);
-            System.Diagnostics.Debug.Assert(!Path.IsPathRooted(itemPath), "Cannot add item with full path.");
+            System.Diagnostics.Debug.Assert(!fs.Path.IsPathRooted(itemPath), "Cannot add item with full path.");
             return this.CreateMsBuildFileItem(itemPath, "File");
         }
 
@@ -353,7 +357,7 @@ namespace VisualRust.Project
             var newMods = ModuleTracker.EnableTracking(node.Url);
             foreach (string mod in newMods)
             {
-                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(mod), false);
+                HierarchyNode parent = this.CreateFolderNodes(fs.Path.GetDirectoryName(mod), false);
                 parent.AddChild(CreateUntrackedNode(mod));
             }
         }
@@ -367,7 +371,7 @@ namespace VisualRust.Project
             }
             foreach (string mod in diff.Added)
             {
-                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(mod), false);
+                HierarchyNode parent = this.CreateFolderNodes(fs.Path.GetDirectoryName(mod), false);
                 parent.AddChild(CreateUntrackedNode(mod));
             }
         }
@@ -424,7 +428,7 @@ namespace VisualRust.Project
             HashSet<string> children = ModuleTracker.AddRootModuleIncremental(node.Url);
             foreach (string child in children)
             {
-                HierarchyNode parent = this.CreateFolderNodes(Path.GetDirectoryName(child), false);
+                HierarchyNode parent = this.CreateFolderNodes(fs.Path.GetDirectoryName(child), false);
                 parent.AddChild(CreateUntrackedNode(child));
             }
         }

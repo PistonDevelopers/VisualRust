@@ -64,6 +64,7 @@
     <Compile Include="SafeNativeMethods.cs" />
     <Compile Include="StringArrayQueryResult.cs" />
     <Compile Include="StringQueryResult.cs" />
+    <Compile Include="Trilean.cs" />
     <Compile Include="Utf8String.cs" />
     <Compile Include="Utf8StringArray.cs" />
   </ItemGroup>

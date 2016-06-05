@@ -41,5 +41,17 @@ namespace VisualRust.Cargo
 
         [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern OutputTargetsQueryResult get_output_targets(IntPtr manifest);
+
+        [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void remove_output_target(IntPtr manifest, UIntPtr handle, Utf8String kind);
+
+        [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern UIntPtr add_output_target(IntPtr manifest, RawOutputTarget target);
+
+        [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern UIntPtr set_output_target(IntPtr manifest, RawOutputTarget target);
+
+        [DllImport("vist_toml.dll", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern Utf8String manifest_to_string(IntPtr manifest);
     }
 }

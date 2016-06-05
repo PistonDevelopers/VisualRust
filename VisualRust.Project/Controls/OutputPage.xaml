@@ -4,7 +4,9 @@
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options" 
+           xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
            xmlns:local="clr-namespace:VisualRust.Project.Controls"
+           xmlns:shared="clr-namespace:Microsoft.VisualStudioTools.Wpf;assembly=Microsoft.VisualStudio.Project"
            mc:Ignorable="d"
            TextOptions.TextFormattingMode="Display"
            Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
@@ -65,72 +67,76 @@
                 <GeometryDrawing Brush="#FFF0EFF1" Geometry="M5.34100008010864,3L2,3 2,11 5.26500034332275,11 6.19775009155273,11.0364999771118 7,11.3280000686646 7,4 6.52487468719482,3.34999990463257 5.34100008010864,3 M10.6280002593994,3L14,3 14,11 10.7349996566772,11 9.80262470245361,11.0364999771118 9,11.3280000686646 9,3.96700000762939 9.44537544250488,3.31137490272522 10.6280002593994,3" />
             </DrawingGroup.Children>
         </DrawingGroup>
-        <DataTemplate x:Key="Binary">
-            <StackPanel Orientation="Horizontal">
-                <Image Width="16" Height="16">
-                    <Image.Source>
-                        <DrawingImage Drawing="{StaticResource BinaryDrawing}"/>
-                    </Image.Source>
-                </Image>
-                <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="Benchmark">
-            <StackPanel Orientation="Horizontal">
-                <Image Width="16" Height="16">
-                    <Image.Source>
-                        <DrawingImage Drawing="{StaticResource BenchmarkDrawing}"/>
-                    </Image.Source>
-                </Image>
-                <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="Library">
-            <StackPanel Orientation="Horizontal">
-                <Image Width="16" Height="16">
-                    <Image.Source>
-                        <DrawingImage Drawing="{StaticResource LibraryDrawing}"/>
-                    </Image.Source>
-                </Image>
-                <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="Test">
-            <StackPanel Orientation="Horizontal">
-                <Image Width="16" Height="16">
-                    <Image.Source>
-                        <DrawingImage Drawing="{StaticResource TestDrawing}"/>
-                    </Image.Source>
-                </Image>
-                <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="Example">
-            <StackPanel Orientation="Horizontal">
-                <Image Width="16" Height="16">
-                    <Image.Source>
-                        <DrawingImage Drawing="{StaticResource ExampleDrawing}"/>
-                    </Image.Source>
-                </Image>
-                <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneTime}"/>
-            </StackPanel>
-        </DataTemplate>
-        <local:ItemTemplateSelector x:Key="ItemTemplateSelector"
-            Binary="{StaticResource Binary}"
-            Benchmark="{StaticResource Benchmark}"
-            Example="{StaticResource Example}"
-            Library="{StaticResource Library}"
-            Test="{StaticResource Test}"/>
+        <DrawingGroup x:Key="AddDrawing" PresentationOptions:Freeze="True">
+            <DrawingGroup.Children>
+                <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M5.0004,-0.000199999999999534L5.0004,4.9998 0.000399999999999956,4.9998 0.000399999999999956,10.9998 5.0004,10.9998 5.0004,15.9998 10.9994,15.9998 10.9994,10.9998 16.0004,10.9998 16.0004,4.9998 10.9994,4.9998 10.9994,-0.000199999999999534z" />
+                <GeometryDrawing Brush="#FF388A34" Geometry="F1M10,6L15,6 15,10 10,10 10,15 6,15 6,10 1,10 1,6 6,6 6,1 10,1z" />
+            </DrawingGroup.Children>
+        </DrawingGroup>
+        <DrawingGroup x:Key="RemoveDrawing" PresentationOptions:Freeze="True">
+            <DrawingGroup.Children>
+                <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M0,11L16,11 16,5.001 0,5.001z" />
+                <GeometryDrawing Brush="#FFA1260D" Geometry="F1M15,10L1,10 1,6 15,6z" />
+            </DrawingGroup.Children>
+        </DrawingGroup>
+        <local:TargetIconConverter x:Key="TargetIconConverter"
+                                  Benchmark="{StaticResource BenchmarkDrawing}"
+                                  Binary="{StaticResource BinaryDrawing}"
+                                  Example="{StaticResource ExampleDrawing}"
+                                  Library="{StaticResource LibraryDrawing}"
+                                  Test="{StaticResource TestDrawing}" />
+        <Style x:Key="ButtonListBoxItem" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="IsEnabled" Value="False"/>
+            <Setter Property="Margin" Value="0,1,6,0"/>
+            <Setter Property="Grid.ColumnSpan" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <local:AlwaysEnabledButton
+                            IsEnabled="True"
+                            Command="{Binding Execute}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                            <DockPanel>
+                                <Image Width="16" Height="16" DockPanel.Dock="Left">
+                                    <Image.Source>
+                                        <DrawingImage Drawing="{StaticResource AddDrawing}"/>
+                                    </Image.Source>
+                                </Image>
+                                <TextBlock Text=" Add target" />
+                            </DockPanel>
+                        </local:AlwaysEnabledButton>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <local:InvisibilityConverter x:Key="InvisibilityConverter"/>
+        <Style x:Key="DefaultListBoxItem"  TargetType="{x:Type ListBoxItem}">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Width="16" Height="16">
+                                <Image.Source>
+                                    <DrawingImage Drawing="{Binding Type, Converter={StaticResource TargetIconConverter}}"/>
+                                </Image.Source>
+                            </Image>
+                            <TextBlock Text="{Binding TabName, StringFormat={} {0}, Mode=OneWay}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <local:ItemContainerStyleSelector x:Key="ItemContainerStyleSelector"
+                                          Default="{StaticResource DefaultListBoxItem}"
+                                          Button="{StaticResource ButtonListBoxItem}"/>
         <DataTemplate x:Key="AutoContent">
             <StackPanel VerticalAlignment="Top">
-                <!-- In this and the next box we could avoid radio button,
-                     but i think it shows certain consistency with custom targets -->
                 <GroupBox Header="Path" VerticalAlignment="Top">
-                    <RadioButton IsChecked="True" IsEnabled="False">
-                        <RadioButton.Content>
-                            <TextBlock Text="{Binding Path=Path, StringFormat=Autodetect in path: \{0\}}"/>
-                        </RadioButton.Content>
-                    </RadioButton>
+                    <TextBlock Text="{Binding Path=Path, StringFormat=Autodetect in path: \{0\}}"/>
                 </GroupBox>
                 <GroupBox Header="Configuration" IsEnabled="False">
                     <StackPanel>
@@ -149,7 +155,7 @@
             <StackPanel VerticalAlignment="Top" Grid.IsSharedSizeScope="True">
                 <GroupBox Header="Name" VerticalAlignment="Top">
                     <StackPanel>
-                        <RadioButton IsEnabled="False" IsChecked="{Binding IsNameOverriden, Mode=OneWay, Converter={StaticResource NegateConverter}}">
+                        <RadioButton IsChecked="{Binding IsNameOverriden, Converter={StaticResource NegateConverter}}">
                             <RadioButton.Content>
                                 <TextBlock Text="{Binding Path=DefaultName, StringFormat=Use default name: \{0\}}"/>
                             </RadioButton.Content>
@@ -159,16 +165,16 @@
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <RadioButton IsEnabled="False" IsChecked="{Binding IsNameOverriden, Mode=OneWay}" Content="Use custom name:"/>
+                            <RadioButton IsChecked="{Binding IsNameOverriden}" Content="Use custom name:"/>
                             <DockPanel Grid.Column="1">
-                                <TextBox IsEnabled="{Binding IsNameOverriden}" Text="{Binding Name}"/>
+                                <TextBox IsEnabled="{Binding IsNameOverriden}" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
                             </DockPanel>
                         </Grid>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Path" VerticalAlignment="Top">
                     <StackPanel>
-                        <RadioButton IsEnabled="False" IsChecked="{Binding IsPathOverriden, Mode=OneWay, Converter={StaticResource NegateConverter}}" >
+                        <RadioButton IsChecked="{Binding IsPathOverriden, Converter={StaticResource NegateConverter}}" >
                             <RadioButton.Content>
                                 <TextBlock Text="{Binding Path=DefaultPath, StringFormat=Use default path: \{0\}}"/>
                             </RadioButton.Content>
@@ -178,15 +184,22 @@
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <RadioButton IsEnabled="False" IsChecked="{Binding IsPathOverriden, Mode=OneWay}" Content="Use custom path:"/>
+                            <RadioButton IsChecked="{Binding IsPathOverriden}" Content="Use custom path:"/>
                             <DockPanel Grid.Column="1">
-                                <Button IsEnabled="{Binding IsPathOverriden}" DockPanel.Dock="Right" Margin="7,0,0,0" Content=" ... "/>
-                                <TextBox IsEnabled="{Binding IsPathOverriden}" Text="{Binding Path}"/>
+                                <Button 
+                                    Command="{x:Static shared:Commands.BrowseOpenFile}"
+                                    CommandTarget="{Binding ElementName=PathTextBox}"
+                                    CommandParameter="Rust Files (*.rs)|*.rs|All Files (*.*)|*.*"
+                                    IsEnabled="{Binding IsPathOverriden}" 
+                                    DockPanel.Dock="Right"
+                                    Margin="7,0,0,0"
+                                    Content=" ... "/>
+                                <TextBox x:Name="PathTextBox" IsEnabled="{Binding IsPathOverriden}" Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"/>
                             </DockPanel>
                         </Grid>
                     </StackPanel>
                 </GroupBox>
-                <GroupBox Header="Configuration" IsEnabled="False">
+                <GroupBox Header="Configuration">
                     <StackPanel>
                         <CheckBox IsChecked="{Binding Test}">Enable unit tests</CheckBox>
                         <CheckBox IsChecked="{Binding Doctest}">Enable documentation tests</CheckBox>
@@ -201,25 +214,66 @@
         <local:ContentTemplateSelector x:Key="ContentTemplateSelector"
             Auto="{StaticResource AutoContent}"
             Custom="{StaticResource CustomContent}"/>
-        <CollectionViewSource x:Key="TargetItems" Source="{Binding Targets}">
+        <CollectionViewSource x:Key="TargetItems" Source="{Binding Targets}" IsLiveSortingRequested="True">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Type"/>
+                <scm:SortDescription PropertyName="TabName"/>
+            </CollectionViewSource.SortDescriptions>
             <CollectionViewSource.GroupDescriptions>
                 <local:OutputTargetGroupDescription/>
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
+        <local:CollapseNullConverter x:Key="CollapseNullConverter"/>
+        <DataTemplate x:Key="ListBoxSideItemTemplae">
+            <Border Margin="0,0,6,0" BorderThickness="0">
+                <Button
+                    Command="{Binding Remove}"
+                    Visibility="{Binding Remove, Converter={StaticResource CollapseNullConverter}}">
+                    <Button.Style>
+                        <Style TargetType="Button" >
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="False">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Image Width="16" Height="16">
+                        <Image.Source>
+                            <DrawingImage Drawing="{StaticResource RemoveDrawing}"/>
+                        </Image.Source>
+                    </Image>
+                </Button>
+            </Border>
+        </DataTemplate>
     </DockPanel.Resources>
-    <ListBox x:Name="TargetsList" DockPanel.Dock="Left" ItemTemplateSelector="{StaticResource ItemTemplateSelector}" Margin="0,0,9,0" ItemsSource="{Binding Source={StaticResource TargetItems}}">
+    <DockPanel.CommandBindings>
+        <CommandBinding Command="{x:Static shared:Commands.BrowseOpenFile}" Executed="BrowseOpenFileExecuted" />
+    </DockPanel.CommandBindings>
+    <ListBox x:Name="TargetsList"
+                             Margin="0,0,9,0"
+                 DockPanel.Dock="Left"
+                 ItemContainerStyleSelector="{StaticResource ItemContainerStyleSelector}"
+                 ItemsSource="{Binding Source={StaticResource TargetItems}}"
+                 SelectedItem="{Binding SelectedTarget}">
         <ListBox.GroupStyle>
             <GroupStyle>
                 <GroupStyle.HeaderTemplate>
                     <DataTemplate>
                         <DockPanel>
                             <TextBlock Margin="3,2" DockPanel.Dock="Left" Text="{Binding Name}"/>
-                            <Separator Margin="3,0,7,0"/>
+                            <Separator Margin="3,0,6,0"/>
                         </DockPanel>
                     </DataTemplate>
                 </GroupStyle.HeaderTemplate>
             </GroupStyle>
         </ListBox.GroupStyle>
+        <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+                <local:SideContentGrid SideContentTemplate="{StaticResource ListBoxSideItemTemplae}"/>
+            </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
     </ListBox>
     <ContentControl
         Content="{Binding ElementName=TargetsList, Path=SelectedItem}"

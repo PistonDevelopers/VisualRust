@@ -5,17 +5,34 @@ extern crate toml_document;
 extern crate winapi;
 extern crate kernel32;
 
+use std::fmt::{Display, Error, Formatter};
+use std::iter;
 use std::mem;
 use std::ptr;
 use std::slice;
 use std::str;
 use std::marker::PhantomData;
 
-use toml_document::{ArrayEntry, Document, EntryRef, TableEntry};
+use toml_document::{ArrayEntry, ArrayValueMut, Container, ContainerKind, Document};
+use toml_document::{EntryRef, EntryRefMut, InlineArray, InternalNode, InlineTable, TableEntry};
+use toml_document::{TableValue, ValueRefMut};
 use winapi::INT32;
 
 mod panic;
 pub mod capi;
+
+macro_rules! set_output_target {
+    ($container: ident, $target: ident, $set_string: ident, $set_bool: ident) => (
+        $set_string($container, "name", $target.name);
+        $set_string($container, "path", $target.path);
+        $set_bool($container, "test", $target.test);
+        $set_bool($container, "doctest", $target.doctest);
+        $set_bool($container, "bench", $target.bench);
+        $set_bool($container, "doc", $target.doc);
+        $set_bool($container, "plugin", $target.plugin);
+        $set_bool($container, "harness", $target.harness);
+    )
+}
 
 fn entry_kind(e: EntryRef) -> &'static str {
     match e {
@@ -47,6 +64,12 @@ fn array_kind(e: ArrayEntry) -> Option<&'static str> {
 
 pub struct Manifest {
     doc: Document
+}
+
+impl Display for Manifest {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        self.doc.fmt(f)
+    }
 }
 
 // Set functions:
@@ -206,33 +229,34 @@ impl Manifest {
                          -> Result<OutputTarget<'a>, PathError> {
             target.name = try!(get_string(entry.get("name"), format!("{}.name", src)));
             target.path = try!(get_string(entry.get("path"), format!("{}.path", src)));
-            if let Some(value) = try!(get_bool(entry.get("test"), format!("{}.test", src))) {
-                target.test = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("doctest"), format!("{}.doctest", src))) {
-                target.doctest = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("bench"), format!("{}.bench", src))) {
-                target.bench = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("doc"), format!("{}.doc", src))) {
-                target.doc = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("plugin"), format!("{}.plugin", src))) {
-                target.plugin = value;
-            }
-            if let Some(value) = try!(get_bool(entry.get("harness"), format!("{}.harness", src))) {
-                target.harness = value;
-            }
+            target.test = try!(get_bool(entry.get("test"), format!("{}.test", src)));
+            target.doctest = try!(get_bool(entry.get("doctest"), format!("{}.doctest", src)));
+            target.bench = try!(get_bool(entry.get("bench"), format!("{}.bench", src)));
+            target.doc = try!(get_bool(entry.get("doc"), format!("{}.doc", src)));
+            target.plugin = try!(get_bool(entry.get("plugin"), format!("{}.plugin", src)));
+            target.harness= try!(get_bool(entry.get("harness"), format!("{}.harness", src)));
             Ok(target)
         }
-        fn get_table<'a>(src: &'a str,
-                         entry: Option<EntryRef<'a>>,
-                         target: OutputTarget<'a>,
-                         targets: &mut Vec<OutputTarget<'a>>,
-                         errors: &mut Vec<PathError>) {
+        fn get_table<'a, F>(src: &'a str,
+                            entry: Option<EntryRef<'a>>,
+                            ctor: &F,
+                            targets: &mut Vec<OutputTarget<'a>>,
+                            errors: &mut Vec<PathError>)
+                            where F: Fn(usize) -> OutputTarget<'a> {
+            // This is a-ok, because only way we can spot an implicit table is in [lib]:
+            // Some deranged mind might have a definition like [lib.fuck_your_parsing] in his
+            // manifest, in which case it's pretty easy to just throw away all containers whose
+            // keys start with `lib`.
+            fn get_table_ptr(table: TableEntry) -> usize {
+                match table.to_value() {
+                    TableValue::Inline(inline_table) => inline_table.ptr(),
+                    TableValue::Explicit(container) => container.ptr(),
+                    TableValue::Implicit => 0
+                }
+            }
             match entry {
                 Some(EntryRef::Table(table)) => {
+                    let target = ctor(get_table_ptr(table));
                     match get_target(src, table, target) {
                         Ok(target) => targets.push(target),
                         Err(error) => errors.push(error)
@@ -251,10 +275,10 @@ impl Manifest {
         }
         fn get_array<'a, F>(src: &'a str,
                             entry: Option<EntryRef<'a>>,
-                            mut ctor: F,
+                            ctor: &F,
                             mut targets: &mut Vec<OutputTarget<'a>>,
                             mut errors: &mut Vec<PathError>)
-                            where F: FnMut() -> OutputTarget<'a> {
+                            where F: Fn(usize) -> OutputTarget<'a> {
             match entry {
                 Some(EntryRef::Array(array)) => {
                     let kind = array_kind(array);
@@ -268,8 +292,7 @@ impl Manifest {
                         return;
                     }
                     for entry in array.iter() {
-                        let target = ctor();
-                        get_table(src, Some(entry), target, &mut targets, &mut errors);
+                        get_table(src, Some(entry), ctor, &mut targets, &mut errors);
                     }
                 }
                 Some(entry) => {
@@ -285,13 +308,13 @@ impl Manifest {
         }
         let mut targets = Vec::new();
         let mut errors = Vec::new();
-        get_table("lib", self.doc.get("lib"), OutputTarget::lib(), &mut targets, &mut errors);
-        get_array("bin", self.doc.get("bin"), OutputTarget::bin, &mut targets, &mut errors);
-        get_array("bench", self.doc.get("bench"), OutputTarget::bench, &mut targets, &mut errors);
-        get_array("test", self.doc.get("test"), OutputTarget::test, &mut targets, &mut errors);
+        get_table("lib", self.doc.get("lib"), &OutputTarget::lib, &mut targets, &mut errors);
+        get_array("bin", self.doc.get("bin"), &OutputTarget::bin, &mut targets, &mut errors);
+        get_array("bench", self.doc.get("bench"), &OutputTarget::bench, &mut targets, &mut errors);
+        get_array("test", self.doc.get("test"), &OutputTarget::test, &mut targets, &mut errors);
         get_array("example",
                   self.doc.get("example"),
-                  OutputTarget::example,
+                  &OutputTarget::example,
                   &mut targets,
                   &mut errors);
         if errors.len() > 0 {
@@ -325,8 +348,182 @@ impl Manifest {
            .map_or(Err(QueryError::Vacant{ depth: 0 }),
                    |entry| lookup_inner(entry, &path[1..], 0))
     }
+
+    fn add_output_target(&mut self, target: OutputTarget) -> usize {
+        let kind = if target.kind == "lib" {
+            ContainerKind::Table
+        } else {
+            ContainerKind::ArrayMember
+        };
+        let index = self.doc.len();
+        let mut container = self.doc.insert_container(index, iter::once(target.kind), kind);
+        Manifest::add_output_target_inner(&mut container, target);
+        container.ptr()
+    }
+
+    fn add_output_target_inner(container: &mut Container, target: OutputTarget) {
+        fn append_bool(cnt: &mut Container, key: &'static str, value: Option<bool>) {
+            if let Some(value) = value {
+                let index = cnt.len_children();
+                cnt.insert_boolean(index, key, value);
+            }
+        }
+        fn append_string<'a>(cnt: &mut Container, key: &'static str, value: Option<&'a str>) {
+            if let Some(value) = value {
+                let index = cnt.len_children();
+                cnt.insert_string(index, key, value);
+            }
+        }
+        set_output_target!(container, target, append_string, append_bool);
+    }
+
+    fn set_output_target(&mut self, target: OutputTarget) -> Option<usize> {
+        if target.handle == 0 {
+            let length = self.doc.len();
+            let container = self.doc.insert_container(length,
+                                                      iter::once(target.kind),
+                                                      ContainerKind::Table);
+            Manifest::set_output_target_inner(container, target);
+            Some(container.ptr())
+        } else {
+            let cursor = NodeCursor(target.handle);
+            let maybe_index = self.doc.find(&cursor);
+            match maybe_index {
+                Some(index) => {
+                    if index < self.doc.len_children() {
+                        let child = self.doc.get_child_mut(index);
+                        if let ValueRefMut::Table(table) = child.value_mut() {
+                            Manifest::set_output_target_inline_table(table, target);
+                        } else {
+                            unreachable!()
+                        }
+                    } else {
+                        let children_len = self.doc.len_children();
+                        let container = self.doc.get_container_mut(index - children_len);
+                        Manifest::set_output_target_inner(container, target);
+                    }
+                }
+                None => {
+                    match self.doc.get_mut(target.kind) {
+                        Some(EntryRefMut::Array(array)) => {
+                            match array.to_value() {
+                                ArrayValueMut::Inline(mut inline_array) => {
+                                    Manifest::set_output_target_inline_array(inline_array, target);
+                                }
+                                ArrayValueMut::OfTables => unreachable!()
+                            }
+                        }
+                        _ => unreachable!()
+                    }
+                }
+            }
+            None
+        }
+    }
+
+    fn set_output_target_inner(container: &mut Container, target: OutputTarget) {
+        fn set_bool(cnt: &mut Container, key: &'static str, value: Option<bool>) {
+            if let Some(value) = value {
+                Manifest::remove_child(cnt, key);
+                let index = cnt.len_children();
+                cnt.insert_boolean(index, key, value);
+            }
+        }
+        fn set_string<'a>(cnt: &mut Container, key: &'static str, value: Option<&'a str>) {
+            if let Some(value) = value {
+                Manifest::remove_child(cnt, key);
+                let index = cnt.len_children();
+                cnt.insert_string(index, key, value);
+            }
+        }
+        set_output_target!(container, target, set_string, set_bool);
+    }
+
+    fn set_output_target_inline_array(inline_array: &mut InlineArray, target: OutputTarget) {
+        let idx = inline_array.find(&NodeCursor(target.handle)).unwrap();
+        let value = inline_array.get_mut(idx);
+        let table = if let ValueRefMut::Table(table) = value {
+            table
+        } else {
+            panic!("Invalid operation");
+        };
+        Manifest::set_output_target_inline_table(table, target);
+    }
+
+    fn set_output_target_inline_table(table: &mut InlineTable, target: OutputTarget) {
+        fn set_bool(table: &mut InlineTable, key: &'static str, value: Option<bool>) {
+            if let Some(value) = value {
+                Manifest::remove_child_inline(table, key);
+                let index = table.len();
+                table.insert_boolean(index, key, value);
+            }
+        }
+        fn set_string<'a>(table: &mut InlineTable, key: &'static str, value: Option<&'a str>) {
+            if let Some(value) = value {
+                Manifest::remove_child_inline(table, key);
+                let index = table.len();
+                table.insert_string(index, key, value);
+            }
+        }
+        set_output_target!(table, target, set_string, set_bool);
+    }
+
+    fn remove_output_target(&mut self, handle: usize, kind: &str) {
+        fn remove_child(doc: &mut Document, key: &str) {
+            if let Some(idx) = doc.iter_children().position(|c| key == c.key().get()) {
+                doc.remove(idx)
+            }
+        }
+        if handle == 0 {
+            remove_child(&mut self.doc, kind);
+            Manifest::remove_containers(&mut self.doc, iter::once(kind));
+        } else {
+            let position = self.doc.find(&NodeCursor(handle)).unwrap();
+            self.doc.remove(position);
+        }
+    }
+
+    fn remove_child(cnt: &mut Container, key: &str) {
+        if let Some(idx) = cnt.iter_children().position(|c| key == c.key().get()) {
+            cnt.remove(idx)
+        }
+    }
+
+    fn remove_child_inline(table: &mut InlineTable, key: &str) {
+        if let Some(idx) = table.iter().position(|c| key == c.key().get()) {
+            table.remove(idx)
+        }
+    }
+
+    fn remove_containers<'a, I:Iterator<Item=&'a str>+Clone>(doc: &mut Document, keys: I) {
+        fn find_container<'a, I>(doc: &mut Document, keys: I)
+                                -> Option<usize> where I:Iterator<Item=&'a str>+Clone {
+            doc.iter_containers().position(|c| {
+                c.keys().markup().iter().zip(keys.clone()).all(|(m, k)| m.get() == k)
+            })
+        }
+        loop {
+            let position = find_container(doc, keys.clone());
+            match position {
+                Some(position) => {
+                    let len_children = doc.len_children();
+                    doc.remove(position + len_children);
+                }
+                None => break
+            }
+        }
+    }
 }
 impl std::panic::RefUnwindSafe for Manifest { }
+
+struct NodeCursor(usize);
+impl InternalNode for NodeCursor {
+    fn ptr(&self) -> usize {
+        self.0
+    }
+}
+
+
 
 pub enum QueryError {
     Vacant{ depth: usize },
@@ -376,71 +573,52 @@ pub struct PathError {
 }
 
 pub struct OutputTarget<'a> {
-    kind: &'static str,
+    handle: usize,
+    kind: &'a str,
     name: Option<&'a str>,
     path: Option<&'a str>,
-    test: bool,
-    doctest: bool,
-    bench: bool,
-    doc: bool,
-    plugin: bool,
-    harness: bool
+    test: Option<bool>,
+    doctest: Option<bool>,
+    bench: Option<bool>,
+    doc: Option<bool>,
+    plugin: Option<bool>,
+    harness: Option<bool>
 }
 
 impl<'a> OutputTarget<'a> {
-    fn default() -> OutputTarget<'a> {
+    fn new(handle: usize, kind: &'static str) -> OutputTarget<'a> {
         OutputTarget {
-            kind: "",
+            handle: handle,
+            kind: kind,
             name: None,
             path: None,
-            test: true,
-            doctest: false,
-            bench: true,
-            doc: false,
-            plugin: false,
-            harness: true
+            test: None,
+            doctest: None,
+            bench: None,
+            doc: None,
+            plugin: None,
+            harness: None
         }
     }
 
-    fn bin() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "bin",
-            doc: true,
-            ..OutputTarget::default()
-        }
+    fn bin(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "bin")
     }
 
-    fn lib() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "lib",
-            doctest: true,
-            doc: true,
-            ..OutputTarget::default()
-        }
+    fn lib(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "lib")
     }
 
-    fn bench() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "bench",
-            test: false,
-            ..OutputTarget::default()
-        }
+    fn bench(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "bench")
     }
 
-    fn test() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "test",
-            bench: false,
-            ..OutputTarget::default()
-        }
+    fn test(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "test")
     }
 
-    fn example() -> OutputTarget<'a> {
-        OutputTarget {
-            kind: "example",
-            bench: false,
-            ..OutputTarget::default()
-        }
+    fn example(handle: usize) -> OutputTarget<'a> {
+        OutputTarget::new(handle, "example")
     }
 }
 
@@ -504,8 +682,15 @@ impl<T> OwnedSlice<T> {
 }
 
 impl OwnedSlice<u8> {
-    fn from_str(src: &str) -> OwnedSlice<u8> {
-        let mut text = src.to_string().into_bytes().into_boxed_slice();
+    fn from_str_opt(src: Option<&str>) -> OwnedSlice<u8> {
+        match src {
+            Some(s) => OwnedSlice::from_string(s),
+            None => OwnedSlice::empty()
+        }
+    }
+
+    fn from_string<S:Into<String>>(src: S) -> OwnedSlice<u8> {
+        let mut text = src.into().into_bytes().into_boxed_slice();
         let inner = RawSlice {
             arr: text.as_mut_ptr(),
             len: text.len() as INT32
@@ -513,13 +698,6 @@ impl OwnedSlice<u8> {
         let result = OwnedSlice{ data: inner };
         mem::forget(text);
         result
-    }
-
-    fn from_str_opt(src: Option<&str>) -> OwnedSlice<u8> {
-        match src {
-            Some(s) => OwnedSlice::from_str(s),
-            None => OwnedSlice::empty()
-        }
     }
 }
 
@@ -534,6 +712,14 @@ impl<'a> BorrowedSlice<'a, u8> {
         unsafe {
             let slice = slice::from_raw_parts(self.data.arr, self.data.len as usize);
             str::from_utf8_unchecked(slice)
+        }
+    }
+
+    fn as_str_opt(&'a self) -> Option<&'a str> {
+        if self.data.arr == ptr::null_mut() {
+            None
+        } else {
+            Some(self.as_str())
         }
     }
 }
@@ -581,7 +767,7 @@ pub struct RawDependency {
 impl RawDependency {
     fn from(d: &Dependency) -> RawDependency {
         RawDependency {
-            name: OwnedSlice::from_str(d.name),
+            name: OwnedSlice::from_string(d.name),
             version: OwnedSlice::from_str_opt(d.version),
             git: OwnedSlice::from_str_opt(d.git),
             path: OwnedSlice::from_str_opt(d.path),

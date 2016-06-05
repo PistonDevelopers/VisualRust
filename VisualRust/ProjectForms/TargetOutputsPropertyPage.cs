@@ -21,7 +21,7 @@ namespace VisualRust.Project.Forms
 
         protected override IPropertyPageContext CreateDataContext()
         {
-            return new OutputTargetSectionViewModel(this.Config.Manifest);
+            return new OutputTargetSectionViewModel(this.Config.Manifest, PickTargetOutputTypeWindow.Start);
         }
     }
 }

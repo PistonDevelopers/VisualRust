@@ -52,14 +52,15 @@ namespace VisualRust.Cargo
             }
             throw new ArgumentException(null, "type");
         }
+
         public static string DefaultPath(this OutputTargetType type, string name)
         {
             switch(type)
             {
                 case OutputTargetType.Library:
-                    return @"src\lib.rs";
+                    return String.Format(@"src\{0}.rs", name);
                 case OutputTargetType.Binary:
-                    return @"src\main.rs";
+                    return String.Format(@"src\{0}.rs", name);
                 case OutputTargetType.Benchmark:
                     return String.Format(@"benches\{0}.rs", name);
                 case OutputTargetType.Test:
@@ -68,6 +69,62 @@ namespace VisualRust.Cargo
                     return String.Format(@"examples\{0}.rs", name);
             }
             throw new ArgumentException(null, "type");
+        }
+
+        public static bool DefaultTest(this OutputTargetType type)
+        {
+            switch(type)
+            {
+                default:
+                    return true;
+                case OutputTargetType.Benchmark:
+                    return false;
+            }
+        }
+
+        public static bool DefaultDoctest(this OutputTargetType type)
+        {
+            switch(type)
+            {
+                default:
+                    return false;
+                case OutputTargetType.Library:
+                    return true;
+            }
+        }
+
+        public static bool DefaultBench(this OutputTargetType type)
+        {
+            switch(type)
+            {
+                default:
+                    return true;
+                case OutputTargetType.Test:
+                case OutputTargetType.Example:
+                    return false;
+            }
+        }
+
+        public static bool DefaultDoc(this OutputTargetType type)
+        {
+            switch(type)
+            {
+                default:
+                    return false;
+                case OutputTargetType.Binary:
+                case OutputTargetType.Library:
+                    return true;
+            }
+        }
+
+        public static bool DefaultPlugin(this OutputTargetType _)
+        {
+            return false;
+        }
+
+        public static bool DefaultHarness(this OutputTargetType _)
+        {
+            return true;
         }
     }
 }

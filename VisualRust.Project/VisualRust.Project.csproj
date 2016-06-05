@@ -133,6 +133,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Abstractions, Version=2.0.0.124, Culture=neutral, PublicKeyToken=d480b5b72fb413da, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Abstractions.2.0.0.124\lib\net40\System.IO.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
@@ -165,22 +169,32 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Build.tt</DependentUpon>
     </Compile>
+    <Compile Include="Controls\AlwaysEnabledButton.cs" />
     <Compile Include="Controls\AutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\BenchmarkAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\BinaryAutoOutputTargetViewModel.cs" />
+    <Compile Include="Controls\ChildWindow.cs" />
+    <Compile Include="Controls\CommandTargetOutput.cs" />
     <Compile Include="Controls\ExampleAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\IOutputTargetViewModel.cs" />
+    <Compile Include="Controls\IPanelLayout.cs" />
     <Compile Include="Controls\IPropertyPageContext.cs" />
     <Compile Include="Controls\LibraryAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\NegateConverter.cs" />
+    <Compile Include="Controls\PickTargetOutputTypeWindow.xaml.cs">
+      <DependentUpon>PickTargetOutputTypeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\OpenManifestErrorWindow.xaml.cs">
       <DependentUpon>OpenManifestErrorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\OutputPage.xaml.cs">
       <DependentUpon>OutputPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\OutputTargetChange.cs" />
     <Compile Include="Controls\OutputTargetSectionViewModel.cs" />
     <Compile Include="Controls\OutputTargetViewModel.cs" />
+    <Compile Include="Controls\RelayCommand.cs" />
+    <Compile Include="Controls\SideContentGrid.cs" />
     <Compile Include="Controls\TestAutoOutputTargetViewModel.cs" />
     <Compile Include="Controls\ViewModelBase.cs" />
     <Compile Include="Launcher\GnuDebugLauncher.cs" />
@@ -188,6 +202,7 @@
     <Compile Include="Launcher\MsvcDebugLauncher.cs" />
     <Compile Include="Launcher\ReleaseLauncher.cs" />
     <Compile Include="Launcher\LauncherEnviroment.cs" />
+    <Compile Include="ManifestFile.cs" />
     <Compile Include="ManifestLoadResult.cs" />
     <Compile Include="RustProjectLauncher.cs" />
     <Compile Include="EnvironmentPath.cs" />
@@ -299,11 +314,19 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\PickTargetOutputTypeWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\OpenManifestErrorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\OutputPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Shared.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

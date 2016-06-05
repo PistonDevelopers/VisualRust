@@ -63,6 +63,16 @@ namespace VisualRust.Cargo
             Invoke(() => a(t));
         }
 
+        public static void Invoke<T1, T2>(Action<T1, T2> f, T1 t1, T2 t2)
+        {
+            Invoke(() => f(t1, t2));
+        }
+
+        public static void Invoke<T1, T2, T3>(Action<T1, T2, T3> f, T1 t1, T2 t2, T3 t3)
+        {
+            Invoke(() => f(t1, t2, t3));
+        }
+
         public static T Call<T>(Func<T> f)
         {
             try

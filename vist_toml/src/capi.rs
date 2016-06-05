@@ -27,7 +27,7 @@ impl ParseResult {
     fn error(err: ParserError) -> ParseResult {
         ParseResult {
             manifest: ptr::null_mut(),
-            error: OwnedSlice::from_str(&err.desc)
+            error: OwnedSlice::from_string(err.desc)
         }
     }
 }
@@ -42,7 +42,7 @@ impl QueryResult<OwnedSlice<u8>> {
     fn from_string_result(r: Result<&str, QueryError>) -> QueryResult<OwnedSlice<u8>> {
         match r {
             Ok(string) => QueryResult {
-                result: OwnedSlice::from_str(string),
+                result: OwnedSlice::from_string(string),
                 error: QueryErrorFFI::empty()
             },
             Err(QueryError::Vacant{ depth }) => QueryResult {
@@ -62,7 +62,7 @@ impl QueryResult<OwnedSlice<OwnedSlice<u8>>> {
                                 -> QueryResult<OwnedSlice<OwnedSlice<u8>>> {
         match r {
             Ok(vec) => QueryResult {
-                result: OwnedSlice::from_slice(&vec, |s| OwnedSlice::from_str(s)),
+                result: OwnedSlice::from_slice(&vec, |s| OwnedSlice::from_string(*s)),
                 error: QueryErrorFFI::empty()
             },
             Err(QueryError::Vacant{ depth }) => QueryResult {
@@ -116,7 +116,7 @@ pub struct PathErrorFFI {
 impl PathErrorFFI {
     fn new(e: &PathError) -> PathErrorFFI {
         PathErrorFFI {
-            path: OwnedSlice::from_str(&e.path),
+            path: OwnedSlice::from_string(&*e.path),
             expected: BorrowedSlice::from_static(e.expected),
             got: BorrowedSlice::from_static(e.got)
         }
@@ -145,12 +145,12 @@ impl MultiQueryResult<OwnedSlice<RawDependency>> {
     }
 }
 
-impl MultiQueryResult<OwnedSlice<OutputTargetFFI>> {
+impl MultiQueryResult<OwnedSlice<OwnedOutputTarget>> {
     fn from_output_targets(r: Result<Vec<OutputTarget>, Vec<PathError>>)
-                         -> MultiQueryResult<OwnedSlice<OutputTargetFFI>> {
+                         -> MultiQueryResult<OwnedSlice<OwnedOutputTarget>> {
         match r {
             Ok(targets) => MultiQueryResult {
-                result: OwnedSlice::from_slice(&targets, OutputTargetFFI::from),
+                result: OwnedSlice::from_slice(&targets, OwnedOutputTarget::from),
                 errors: OwnedSlice::empty(),
             },
             Err(errors) => MultiQueryResult {
@@ -161,31 +161,90 @@ impl MultiQueryResult<OwnedSlice<OutputTargetFFI>> {
     }
 }
 
+#[repr(u8)]
+#[derive(Copy, Clone)]
+pub enum Trilean {
+    False = 0,
+    True = 1,
+    Unknown = 2,
+}
+
+impl Trilean {
+    fn new(maybe: Option<bool>) -> Trilean {
+        match maybe {
+            Some(false) => Trilean::False,
+            Some(true) => Trilean::True,
+            None => Trilean::Unknown,
+        }
+    }
+
+    fn to_bool(self) -> Option<bool> {
+        match self {
+            Trilean::False => Some(false),
+            Trilean::True => Some(true),
+            Trilean::Unknown => None,
+        }
+    }
+}
+
 #[repr(C)]
-pub struct OutputTargetFFI {
+pub struct OwnedOutputTarget {
+    handle: usize,
     kind: OwnedSlice<u8>,
     name: OwnedSlice<u8>,
     path: OwnedSlice<u8>,
-    test: Boolean,
-    doctest: Boolean,
-    bench: Boolean,
-    doc: Boolean,
-    plugin: Boolean,
-    harness: Boolean
+    test: Trilean,
+    doctest: Trilean,
+    bench: Trilean,
+    doc: Trilean,
+    plugin: Trilean,
+    harness: Trilean
 }
 
-impl OutputTargetFFI {
-    fn from(t: &OutputTarget) -> OutputTargetFFI {
-        OutputTargetFFI {
-            kind: OwnedSlice::from_str(t.kind),
+impl OwnedOutputTarget {
+    fn from(t: &OutputTarget) -> OwnedOutputTarget {
+        OwnedOutputTarget {
+            handle: t.handle,
+            kind: OwnedSlice::from_string(t.kind),
             name: OwnedSlice::from_str_opt(t.name),
             path: OwnedSlice::from_str_opt(t.path),
-            test: t.test as Boolean,
-            doctest: t.doctest as Boolean,
-            bench: t.bench as Boolean,
-            doc: t.doc as Boolean,
-            plugin: t.plugin as Boolean,
-            harness: t.harness as Boolean,
+            test: Trilean::new(t.test),
+            doctest: Trilean::new(t.doctest),
+            bench: Trilean::new(t.bench),
+            doc: Trilean::new(t.doc),
+            plugin: Trilean::new(t.plugin),
+            harness: Trilean::new(t.harness),
+        }
+    }
+}
+
+#[repr(C)]
+pub struct BorrowedOutputTarget<'a> {
+    handle: usize,
+    kind: BorrowedSlice<'a, u8>,
+    name: BorrowedSlice<'a, u8>,
+    path: BorrowedSlice<'a, u8>,
+    test: Trilean,
+    doctest: Trilean,
+    bench: Trilean,
+    doc: Trilean,
+    plugin: Trilean,
+    harness: Trilean
+}
+
+impl<'a> BorrowedOutputTarget<'a> {
+    fn to_target(&'a self) -> OutputTarget<'a> {
+        OutputTarget {
+            handle: self.handle,
+            kind: self.kind.as_str(),
+            name: self.name.as_str_opt(),
+            path: self.path.as_str_opt(),
+            test: self.test.to_bool(),
+            doctest: self.doctest.to_bool(),
+            bench: self.bench.to_bool(),
+            doc: self.doc.to_bool(),
+            plugin: self.plugin.to_bool(),
+            harness: self.harness.to_bool(),
         }
     }
 }
@@ -231,7 +290,7 @@ pub extern "C" fn free_dependencies_result(r: MultiQueryResult<OwnedSlice<RawDep
 }
 
 #[no_mangle]
-pub extern "C" fn free_output_targets_result(r: MultiQueryResult<OwnedSlice<OutputTargetFFI>>) {
+pub extern "C" fn free_output_targets_result(r: MultiQueryResult<OwnedSlice<OwnedOutputTarget>>) {
     drop(r)
 }
 
@@ -270,9 +329,52 @@ pub extern "C" fn get_dependencies(manifest: *mut Manifest)
 
 #[no_mangle]
 pub extern "C" fn get_output_targets(manifest: *mut Manifest)
-                                     -> MultiQueryResult<OwnedSlice<OutputTargetFFI>> {
+                                     -> MultiQueryResult<OwnedSlice<OwnedOutputTarget>> {
     unwindable_call(move || {
         let targets = unsafe { &*manifest }.get_output_targets();
         MultiQueryResult::from_output_targets(targets)
+    })
+}
+
+#[no_mangle]
+#[allow(no_mangle_generic_items)]
+pub extern "C" fn add_output_target<'a>(manifest: *mut Manifest,
+                                        raw_target: BorrowedOutputTarget<'a>)
+                                        -> usize {
+    unwindable_call(move || {
+        let manifest = unsafe { &mut*manifest };
+        let target = raw_target.to_target();
+        manifest.add_output_target(target)
+    })
+}
+
+#[no_mangle]
+#[allow(no_mangle_generic_items)]
+pub extern "C" fn set_output_target<'a>(manifest: *mut Manifest,
+                                        raw_target: BorrowedOutputTarget<'a>)
+                                        -> usize {
+    unwindable_call(move || {
+        let manifest = unsafe { &mut*manifest };
+        let target = raw_target.to_target();
+        manifest.set_output_target(target).unwrap_or(0)
+    })
+}
+
+#[no_mangle]
+#[allow(no_mangle_generic_items)]
+pub extern "C" fn remove_output_target<'a>(manifest: *mut Manifest,
+                                           handle: usize,
+                                           kind: BorrowedSlice<'a, u8>) {
+    unwindable_call(move || {
+        let manifest = unsafe { &mut*manifest };
+        manifest.remove_output_target(handle, kind.as_str())
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn manifest_to_string(manifest: *mut Manifest) -> OwnedSlice<u8> {
+    unwindable_call(move || {
+        let manifest = unsafe { &*manifest };
+        OwnedSlice::from_string(manifest.to_string())
     })
 }

@@ -20,20 +20,20 @@ namespace VisualRust.Project.Controls
 
     public class OutputTargetChanges
     {
-        public IReadOnlyList<OutputTarget> TargetsAdded { get; private set; }
+        public IReadOnlyList<TargetPair> TargetsAdded { get; private set; }
         public IReadOnlyList<OutputTargetRemoval> TargetsRemoved { get; private set; }
         public IReadOnlyList<TargetPair> TargetsChanged { get; private set; }
 
         public OutputTargetChanges(Manifest manifest, IEnumerable<OutputTargetViewModel> models)
         {
-            List<OutputTarget> added = new List<OutputTarget>();
+            List<TargetPair> added = new List<TargetPair>();
             List<TargetPair> changed = new List<TargetPair>();
             Dictionary<UIntPtr, OutputTarget> existingTargets = manifest.OutputTargets.ToDictionary(t => t.Handle.Value);
             foreach (var vm in models)
             {
                 if (!vm.Handle.HasValue)
                 {
-                    added.Add(vm.ToOutputTarget());
+                    added.Add(new TargetPair(vm, vm.ToOutputTarget()));
                 }
                 else
                 {

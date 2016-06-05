@@ -1,10 +1,12 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VisualRust.Cargo;
+using VisualRust.Project;
 using VisualRust.Project.Controls;
 
 namespace VisualRust.Test.Project.Controls
@@ -12,23 +14,13 @@ namespace VisualRust.Test.Project.Controls
     class OutputTargetSectionViewModelTests
     {
         [Test]
-        public void ShouldExposeDefaultTargets()
-        {
-            var manifest = Manifest.CreateFake("foo", null);
-            var vm = new OutputTargetSectionViewModel(manifest, null);
-            Assert.AreEqual(6, vm.Targets.Count);
-        }
-
-        [Test]
         public void EmptyLib()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 @"[package]
                   name=""foo""
                   version=""0.1""
-                  [lib]",
-                out temp);
+                  [lib]");
             var vm = new OutputTargetSectionViewModel(m, null);
             OutputTargetViewModel lib = (OutputTargetViewModel)GetOutputTarget(vm.Targets, OutputTargetType.Library);
             Assert.AreEqual("foo", lib.Name);
@@ -39,14 +31,12 @@ namespace VisualRust.Test.Project.Controls
         [Test]
         public void NameOnlyLib()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 @"[package]
                   name=""foo""
                   version=""0.1""
                   [lib]
-                  name=""bar""",
-                out temp);
+                  name=""bar""");
             var vm = new OutputTargetSectionViewModel(m, null);
             OutputTargetViewModel lib = (OutputTargetViewModel)GetOutputTarget(vm.Targets, OutputTargetType.Library);
             Assert.AreEqual("bar", lib.Name);
@@ -57,14 +47,12 @@ namespace VisualRust.Test.Project.Controls
         [Test]
         public void PathOnlyLib()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 @"[package]
                   name=""foo""
                   version=""0.1""
                   [lib]
-                  path=""src\\bar.rs""",
-                out temp);
+                  path=""src\\bar.rs""");
             var vm = new OutputTargetSectionViewModel(m, null);
             OutputTargetViewModel lib = (OutputTargetViewModel)GetOutputTarget(vm.Targets, OutputTargetType.Library);
             Assert.AreEqual("foo", lib.Name);
@@ -80,30 +68,27 @@ namespace VisualRust.Test.Project.Controls
         [Test]
         public void DuplicateTarget()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 @"[package]
                   name=""foo""
                   version=""0.1""
                   [[bin]]
-                  name=""foo""",
-                out temp);
-            var vm = new OutputTargetSectionViewModel(m, () => OutputTargetType.Binary);
+                  name=""foo""");
+            var vm = new OutputTargetSectionViewModel(m, _ => OutputTargetType.Binary);
             vm.Add();
             ((OutputTargetViewModel)vm.Targets[vm.Targets.Count - 1]).Name = "foo";
             ((OutputTargetViewModel)vm.Targets[vm.Targets.Count - 1]).Path = @"src\bar.rs";
             Assert.True(vm.IsDirty);
             var changes = vm.PendingChanges();
             Assert.AreEqual(1, changes.TargetsAdded.Count);
-            Assert.AreEqual("foo", changes.TargetsAdded[0].Name);
-            Assert.AreEqual(@"src\bar.rs", changes.TargetsAdded[0].Path);
+            Assert.AreEqual("foo", changes.TargetsAdded[0].Value.Name);
+            Assert.AreEqual(@"src\bar.rs", changes.TargetsAdded[0].Value.Path);
         }
 
         [Test]
         public void RemoveFirstDuplicate()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 @"[package]
                   name=""foo""
                   version=""0.1""
@@ -111,8 +96,7 @@ namespace VisualRust.Test.Project.Controls
                   name=""foo""
                   path=""src\foo1.rs""
                   [[bin]]
-                  name=""src\foo2.rs""",
-                out temp);
+                  name=""src\foo2.rs""");
             var vm = new OutputTargetSectionViewModel(m, null);
             var first = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
             var second = (OutputTargetViewModel)Second(vm.Targets, t => t.Type == OutputTargetType.Binary);
@@ -127,8 +111,7 @@ namespace VisualRust.Test.Project.Controls
         [Test]
         public void RemoveSecondDuplicate()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 @"[package]
                   name=""foo""
                   version=""0.1""
@@ -136,8 +119,7 @@ namespace VisualRust.Test.Project.Controls
                   name=""foo""
                   path=""src\foo1.rs""
                   [[bin]]
-                  name=""src\foo2.rs""",
-                out temp);
+                  name=""src\foo2.rs""");
             var vm = new OutputTargetSectionViewModel(m, null);
             var first = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
             var second = (OutputTargetViewModel)Second(vm.Targets, t => t.Type == OutputTargetType.Binary);
@@ -157,8 +139,7 @@ namespace VisualRust.Test.Project.Controls
         [Test]
         public void ExposeChanges()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 @"[package]
                   name=""foo""
                   version=""0.1""
@@ -166,8 +147,7 @@ namespace VisualRust.Test.Project.Controls
                   name=""foo""
                   path=""src\foo1.rs""
                   [[bin]]
-                  name=""src\foo2.rs""",
-                out temp);
+                  name=""src\foo2.rs""");
             var vm = new OutputTargetSectionViewModel(m, null);
             var first = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
             var second = (OutputTargetViewModel)Second(vm.Targets, t => t.Type == OutputTargetType.Binary);
@@ -191,8 +171,7 @@ namespace VisualRust.Test.Project.Controls
         [Test]
         public void RemoveTarget()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 "[package]\n"
                +"name=\"foo\"\n"
                +"version=\"0.1\"\n"
@@ -200,8 +179,7 @@ namespace VisualRust.Test.Project.Controls
                +"name=\"foo\"\n"
                +"path=\"src\\foo1.rs\"\n"
                +"[[bin]]\n"
-               +"name=\"src\\foo2.rs\"\n",
-                out temp);
+               +"name=\"src\\foo2.rs\"\n");
             var vm = new OutputTargetSectionViewModel(m, null);
             var first = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
             vm.Remove(first);
@@ -212,22 +190,21 @@ namespace VisualRust.Test.Project.Controls
                +"version=\"0.1\"\n"
                +"[[bin]]\n"
                +"name=\"src\\foo2.rs\"\n",
-                m.ToString());
+                m.Manifest.ToString());
             Assert.False(vm.IsDirty);
+            Assert.True(m.Manifest.OutputTargets.All(t => t.Handle != first.Handle));
         }
 
         [Test]
         public void AddTarget()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 "[package]\n"
                +"name=\"foo\"\n"
                +"version=\"0.1\"\n"
                +"[[bin]]\n"
-               +"name=\"asdf\"",
-                out temp);
-            var vm = new OutputTargetSectionViewModel(m, () => OutputTargetType.Test);
+               +"name=\"asdf\"");
+            var vm = new OutputTargetSectionViewModel(m, _ => OutputTargetType.Test);
             vm.Add();
             ((OutputTargetViewModel)vm.Targets[vm.Targets.Count - 1]).Name = "bar";
             ((OutputTargetViewModel)vm.Targets[vm.Targets.Count - 1]).Path = "src\\baz.rs";
@@ -243,15 +220,18 @@ namespace VisualRust.Test.Project.Controls
                +"name = \"bar\"\n"
                +"path = \"src\\\\baz.rs\"\n"
                +"plugin = false\n",
-                m.ToString());
+                m.Manifest.ToString());
             Assert.False(vm.IsDirty);
+            var test = vm.Targets.OfType<OutputTargetViewModel>().First(t => t.Type == OutputTargetType.Test);
+            Assert.AreNotEqual(UIntPtr.Zero, test.Handle);
+            Assert.NotNull(test.Handle);
+            Assert.True(m.Manifest.OutputTargets.Any(t => t.Handle == test.Handle));
         }
 
         [Test]
         public void SetTarget()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 "[package]\n"
                +"name=\"foo\"\n"
                +"version=\"0.1\"\n"
@@ -260,8 +240,7 @@ namespace VisualRust.Test.Project.Controls
                +"[[test]]\n"
                +"name = \"bar\"\n"
                +"path = \"src\\\\baz.rs\"\n"
-               +"plugin = false\n",
-                out temp);
+               +"plugin = false\n");
             var vm = new OutputTargetSectionViewModel(m, null);
             var test = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Test);
             test.Plugin = true;
@@ -279,20 +258,21 @@ namespace VisualRust.Test.Project.Controls
                +"path = \"src\\\\baz.rs\"\n"
                +"doctest = true\n"
                +"plugin = true\n",
-                m.ToString());
+                m.Manifest.ToString());
+            var rawTest = m.Manifest.OutputTargets.First(t => t.Type == OutputTargetType.Test);
+            Assert.AreEqual(true, rawTest.Plugin);
+            Assert.AreEqual(true, rawTest.Doctest);
         }
 
         [Test]
         public void SetInlineTarget()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 "bin = [ { name = \"asdf\" } ]\n"
                +"[package]\n"
                +"name=\"foo\"\n"
-               +"version=\"0.1\"\n",
-                out temp);
-            var vm = new OutputTargetSectionViewModel(m, null);
+               +"version=\"0.1\"\n");
+            var vm = new OutputTargetSectionViewModel(m,null);
             var binary = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Binary);
             binary.Name = "qwer";
             binary.Plugin = true;
@@ -304,19 +284,17 @@ namespace VisualRust.Test.Project.Controls
                +"[package]\n"
                +"name=\"foo\"\n"
                +"version=\"0.1\"\n",
-                m.ToString());
+                m.Manifest.ToString());
         }
 
         [Test]
         public void SetInlineTargetLib()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 "lib = { name = \"asdf\" }\n"
                +"[package]\n"
                +"name=\"foo\"\n"
-               +"version=\"0.1\"",
-                out temp);
+               +"version=\"0.1\"");
             var vm = new OutputTargetSectionViewModel(m, null);
             var library = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Library);
             library.Name = "qwer";
@@ -329,20 +307,18 @@ namespace VisualRust.Test.Project.Controls
                +"[package]\n"
                +"name=\"foo\"\n"
                +"version=\"0.1\"",
-                m.ToString());
+                m.Manifest.ToString());
         }
 
         [Test]
-        public void SetTargetLibExotic()
+        public void SetTargetLibImplicit()
         {
-            ManifestErrors temp;
-            var m = Manifest.TryCreate(
+            var m = CreateManifest(
                 "[lib.asdf]\n"
                +"name = \"foo\"\n"
                +"[package]\n"
                +"name=\"foo\"\n"
-               +"version=\"0.1\"",
-                out temp);
+               +"version=\"0.1\"");
             var vm = new OutputTargetSectionViewModel(m, null);
             var library = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Library);
             Assert.AreEqual(UIntPtr.Zero, library.Handle);
@@ -361,9 +337,38 @@ namespace VisualRust.Test.Project.Controls
                +"name = \"qwer\"\n"
                +"doctest = true\n"
                +"plugin = true\n",
-                m.ToString());
+                m.Manifest.ToString());
             var libraryAfter = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Library);
             Assert.AreNotEqual(UIntPtr.Zero, libraryAfter.Handle);
+            Assert.NotNull(libraryAfter.Handle);
+        }
+
+        [Test]
+        public void RemoveTargetLibImplicit()
+        {
+            var m = CreateManifest(
+                "[lib.asdf]\n"
+               +"name = \"foo\"\n"
+               +"[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n");
+            var vm = new OutputTargetSectionViewModel(m, null);
+            var library = (OutputTargetViewModel)vm.Targets.First(t => t.Type == OutputTargetType.Library);
+            vm.Remove(library);
+            Assert.True(vm.IsDirty);
+            vm.Apply();
+            Assert.AreEqual(
+                "[package]\n"
+               +"name=\"foo\"\n"
+               +"version=\"0.1\"\n",
+                m.Manifest.ToString());
+            Assert.AreEqual(0, m.Manifest.OutputTargets.Count);
+        }
+
+        static ManifestFile CreateManifest(string text)
+        {
+            ManifestErrors temp;
+            return ManifestFile.Create(new MockFileSystem(), "Cargo.toml", _ => ManifestLoadResult.CreateSuccess("Cargo.toml", Manifest.TryCreate(text, out temp)));
         }
     }
 }

@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 
 namespace VisualRust.Project.Controls
 {
-    public partial class OpenManifestErrorWindow : Window
+    partial class OpenManifestErrorWindow : ChildWindow
     {
         public OpenManifestErrorWindow()
         {
@@ -28,9 +28,9 @@ namespace VisualRust.Project.Controls
         public string NewManifest { get; private set; }
         public bool Reload { get; private set; }
 
-        public OpenManifestErrorWindow(Window owner, string fileName, string[] errors) : this()
+        public OpenManifestErrorWindow(Window owner, string fileName, string[] errors) : base(owner)
         {
-            Owner = owner;
+            InitializeComponent();
             FileName = fileName;
             Errors = String.Join(Environment.NewLine, errors);
             DataContext = this;

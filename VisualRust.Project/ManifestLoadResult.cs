@@ -7,25 +7,28 @@ using VisualRust.Cargo;
 
 namespace VisualRust.Project
 {
-    class ManifestLoadResult
+    public class ManifestLoadResult
     {
         public bool Cancel { get; private set; }
+        public string Path { get; private set; }
         public Manifest Manifest { get; private set; }
 
         private ManifestLoadResult() { }
 
-        public static ManifestLoadResult CreateCancel()
+        public static ManifestLoadResult CreateCancel(string path)
         {
             return new ManifestLoadResult
             {
+                Path = path,
                 Cancel = true
             };
         }
 
-        public static ManifestLoadResult CreateSuccess(Manifest m)
+        public static ManifestLoadResult CreateSuccess(string path, Manifest m)
         {
             return new ManifestLoadResult
             {
+                Path = path,
                 Manifest = m
             };
         }

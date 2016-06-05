@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -93,17 +94,17 @@ namespace VisualRust.Cargo
         public IntPtr Buffer;
         public int Length;
 
-        public OutputTarget[] ToArray()
+        public List<OutputTarget> ToList()
         {
             if (Buffer == IntPtr.Zero)
-                return new OutputTarget[0];
-            var buffer = new OutputTarget[Length];
+                return new List<OutputTarget>();
+            var buffer = new List<OutputTarget>(Length);
             for (int i = 0; i < Length; i++)
             {
                 unsafe
                 {
                     RawOutputTarget* current = ((RawOutputTarget*)Buffer) + i;
-                    buffer[i] = new OutputTarget(*current);
+                    buffer.Add(new OutputTarget(*current));
                 }
             }
             return buffer;

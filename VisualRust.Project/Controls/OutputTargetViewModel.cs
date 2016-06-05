@@ -28,7 +28,20 @@ namespace VisualRust.Project.Controls
             }
         }
         public string RawName { get { return name; } }
-        public bool IsNameOverriden { get { return name != null; } } 
+        public bool IsNameOverriden
+        {
+            get
+            {
+                return name != null;
+            }
+            set
+            {
+                if(value)
+                    Name = DefaultName;
+                else
+                    Name = null;
+            }
+        }
 
 
         public string DefaultPath { get { return Type.DefaultPath(Name ?? DefaultName); } }
@@ -43,7 +56,20 @@ namespace VisualRust.Project.Controls
             }
         }
         public string RawPath { get { return path; } }
-        public bool IsPathOverriden { get { return path != null; } } 
+        public bool IsPathOverriden
+        {
+            get
+            {
+                return path != null;
+            }
+            set
+            {
+                if(value)
+                    Path = DefaultPath;
+                else
+                    Path = null;
+            }
+        }
         
         private bool? test;
         public bool Test

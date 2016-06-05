@@ -1,0 +1,45 @@
+﻿<local:ChildWindow
+    x:Class="VisualRust.Project.Controls.PickTargetOutputTypeWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:VisualRust.Project.Controls">
+    <local:ChildWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Shared.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="Button">
+                <Setter Property="Width" Value="103"/>
+                <Setter Property="Height" Value="24"/>
+                <Setter Property="Margin" Value="9,9,0,-3"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="DockPanel.Dock" Value="Right"/>
+            </Style>
+            <DataTemplate x:Key="ItemTemplate">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" Height="16">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding ., Converter={StaticResource TargetIconConverter}}"/>
+                        </Image.Source>
+                    </Image>
+                    <TextBlock Text="{Binding ., StringFormat={} {0}, Mode=OneTime}"/>
+                </StackPanel>
+            </DataTemplate>
+        </ResourceDictionary>
+    </local:ChildWindow.Resources>
+    <local:ChildWindow.Content>
+        <DockPanel Margin="12">
+            <DockPanel DockPanel.Dock="Bottom">
+                <Button IsCancel="True"  Click="OnCancel">_Cancel</Button>
+                <Button Margin="0,9,-3,-3" IsDefault="True" Click="OnOk">_OK</Button>
+            </DockPanel>
+            <ComboBox
+                HorizontalAlignment="Stretch"
+                ItemTemplate="{StaticResource ItemTemplate}"
+                ItemsSource="{Binding Targets}"
+                SelectedItem="{Binding SelectedTarget}"/>
+        </DockPanel>
+    </local:ChildWindow.Content>
+</local:ChildWindow>

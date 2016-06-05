@@ -1,19 +1,13 @@
-﻿<Window
+﻿<local:ChildWindow
     x:Class="VisualRust.Project.Controls.OpenManifestErrorWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:VisualRust.Project.Controls"
-    SizeToContent="WidthAndHeight"
-    ResizeMode="NoResize"
-    ShowInTaskbar="False"
-    WindowStartupLocation="CenterOwner"
     Title="Visual Rust"
-    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-    TextOptions.TextFormattingMode="Display"
-    UseLayoutRounding="True" Height="160" Width="435">
-    <Window.Resources>
+    SizeToContent="WidthAndHeight">
+    <local:ChildWindow.Resources>
         <ResourceDictionary>
             <Style TargetType="Button">
                 <Setter Property="Width" Value="103"/>
@@ -23,11 +17,11 @@
                 <Setter Property="DockPanel.Dock" Value="Right"/>
             </Style>
         </ResourceDictionary>
-    </Window.Resources>
-    <Window.Content>
+    </local:ChildWindow.Resources>
+    <local:ChildWindow.Content>
         <DockPanel Margin="12">
             <DockPanel DockPanel.Dock="Bottom">
-                <Button Click="OnCancel">_Cancel</Button>
+                <Button Click="OnCancel" IsCancel="True">_Cancel</Button>
                 <Button Click="OnReload">_Retry</Button>
                 <Button Click="OnBrowse">_Browse...</Button>
             </DockPanel>
@@ -50,5 +44,5 @@
                 Do you want to pick a different path or reload from the existing one?
             </TextBlock>
         </DockPanel>
-    </Window.Content>
-</Window>
+    </local:ChildWindow.Content>
+</local:ChildWindow>

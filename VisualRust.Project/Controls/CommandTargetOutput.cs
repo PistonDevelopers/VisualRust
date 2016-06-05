@@ -53,7 +53,7 @@ namespace VisualRust.Project.Controls
         {
             get
             {
-                throw new InvalidOperationException();
+                return false;
             }
         }
 
@@ -97,11 +97,12 @@ namespace VisualRust.Project.Controls
             }
         }
 
-        OutputTargetType IOutputTargetViewModel.Type
+        public OutputTargetType Type
         {
             get
             {
-                throw new InvalidOperationException();
+                // Dirty hack to force this to be at the end of the list in the UI
+                return (OutputTargetType)255;
             }
         }
 

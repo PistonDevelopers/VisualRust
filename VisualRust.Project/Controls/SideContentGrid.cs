@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -47,25 +48,27 @@ namespace VisualRust.Project.Controls
             base.OnInitialized(e);
             InitializeProxyLayout();
         }
-
+        
         private void InitializeProxyLayout()
         {
             foreach (UIElement uie in sideContents)
                 this.RemoveVisualChild(uie);
             innerGrid = new Grid();
             sideContents = new FrameworkElement[InternalChildren.Count];
-            innerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            innerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            for (int i = 0; i < InternalChildren.Count; i++)
+            innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            innerGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            int i = 0;
+            foreach (UIElement uie in InternalChildren.Cast<UIElement>().Where(uie => uie != null))
             {
-                OnVisualChildAdded(i);
+                OnVisualChildAdded(i, uie);
+                i++;
             }
         }
-
-        private void OnVisualChildAdded(int i)
+        
+        private void OnVisualChildAdded(int i, UIElement elm)
         {
             innerGrid.RowDefinitions.Add(new RowDefinition());
-            FrameworkElement sideChild = AddChild(InternalChildren[i], i);
+            FrameworkElement sideChild = AddChild(elm, i);
             sideContents[i] = sideChild;
         }
 
@@ -94,6 +97,7 @@ namespace VisualRust.Project.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            innerGrid.InvalidateMeasure();
             innerGrid.Measure(availableSize);
             this.measuredOnce = true;
             return innerGrid.DesiredSize;
@@ -101,6 +105,7 @@ namespace VisualRust.Project.Controls
 
         protected override Size ArrangeOverride(Size finalSize)
         {
+            innerGrid.InvalidateArrange();
             innerGrid.Arrange(new Rect(finalSize));
             return finalSize;
         }

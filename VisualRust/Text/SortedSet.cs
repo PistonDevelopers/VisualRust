@@ -518,7 +518,7 @@ namespace VisualRust.Text
               // update sibling, this is necessary for following processing
               sibling = (parent.Left == current) ? parent.Right : parent.Left;
             }
-            Debug.Assert(sibling != null || sibling.IsRed == false, "sibling must not be null and it must be black!");
+            Debug.Assert(sibling != null && sibling.IsRed == false, "sibling must not be null and it must be black!");
 
             if (Is2Node(sibling))
             {
@@ -850,7 +850,7 @@ namespace VisualRust.Text
       {
         Debug.Assert(parentOfSuccesor != null, "parent of successor cannot be null!");
         Debug.Assert(succesor.Left == null, "Left child of succesor must be null!");
-        Debug.Assert((succesor.Right == null && succesor.IsRed) || (succesor.Right.IsRed && !succesor.IsRed), "Succesor must be in valid state");
+        Debug.Assert((succesor.Right == null && succesor.IsRed) || (succesor.Right != null && succesor.Right.IsRed && !succesor.IsRed), "Succesor must be in valid state");
         if (succesor.Right != null)
         {
           succesor.Right.IsRed = false;

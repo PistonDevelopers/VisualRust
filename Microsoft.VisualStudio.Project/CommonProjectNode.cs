@@ -1590,27 +1590,25 @@ namespace Microsoft.VisualStudioTools.Project {
 
             for (HierarchyNode n = parent.FirstChild; n != null; n = n.NextSibling) {
                 // TODO: Distinguish between real Urls and fake ones (eg. "References")
-                if (windows != null) {
-                    var absUrl = CommonUtils.GetAbsoluteFilePath(parent.ProjectMgr.ProjectHome, n.Url);
-                    if (CommonUtils.IsSamePath(oldFile, absUrl)) {
-                        windows.SetItemAttribute(
-                            this,
-                            n.ID,
-                            (uint)__VSHIERITEMATTRIBUTE.VSHIERITEMATTRIBUTE_Bold,
-                            false
-                        );
-                        ReDrawNode(n, UIHierarchyElement.Icon);
-                    } else if (CommonUtils.IsSamePath(newFile, absUrl)) {
-                        windows.SetItemAttribute(
-                            this,
-                            n.ID,
-                            (uint)__VSHIERITEMATTRIBUTE.VSHIERITEMATTRIBUTE_Bold,
-                            true
-                        );
-                        ReDrawNode(n, UIHierarchyElement.Icon);
-                    }
+                var absUrl = CommonUtils.GetAbsoluteFilePath(parent.ProjectMgr.ProjectHome, n.Url);
+                if (CommonUtils.IsSamePath(oldFile, absUrl)) {
+                    windows.SetItemAttribute(
+                        this,
+                        n.ID,
+                        (uint)__VSHIERITEMATTRIBUTE.VSHIERITEMATTRIBUTE_Bold,
+                        false
+                    );
+                    ReDrawNode(n, UIHierarchyElement.Icon);
+                } else if (CommonUtils.IsSamePath(newFile, absUrl)) {
+                    windows.SetItemAttribute(
+                        this,
+                        n.ID,
+                        (uint)__VSHIERITEMATTRIBUTE.VSHIERITEMATTRIBUTE_Bold,
+                        true
+                    );
+                    ReDrawNode(n, UIHierarchyElement.Icon);
                 }
-
+                
                 RefreshStartupFile(n, oldFile, newFile);
             }
         }

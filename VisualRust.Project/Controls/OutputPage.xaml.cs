@@ -135,7 +135,7 @@ namespace VisualRust.Project.Controls
         public override Style SelectStyle(object item, DependencyObject container)
         {
             IOutputTargetViewModel vm = item as IOutputTargetViewModel;
-            if (item == null)
+            if (vm == null)
                 return base.SelectStyle(item, container);
             if (item is CommandOutputTargetViewModel)
                 return Button;

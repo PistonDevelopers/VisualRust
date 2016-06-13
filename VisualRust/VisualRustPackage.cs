@@ -196,7 +196,7 @@ namespace VisualRust
             if (results.Length > 0)
             {
                 // Make sure that we are printing whole lines
-                if (!results.EndsWith("\n") && !results.EndsWith("\r\n"))
+                if (!results.EndsWith("\n"))
                 {
                     results = results + "\n";
                 }

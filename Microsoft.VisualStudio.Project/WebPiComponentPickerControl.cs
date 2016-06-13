@@ -238,7 +238,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     for (int i = 0; i < items.Length; i++) {
                         items[i] = (PackageInfo)_productsList.SelectedItems[0].Tag;
                     }
-                    int count = items != null ? items.Length : 0;
+                    int count = items.Length;
                     Marshal.WriteByte(m.WParam, Convert.ToByte(count));
                     if (count > 0) {
                         IntPtr ppItems = Marshal.AllocCoTaskMem(

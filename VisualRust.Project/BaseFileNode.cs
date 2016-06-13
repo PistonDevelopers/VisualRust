@@ -109,7 +109,8 @@ namespace VisualRust.Project
                 {
                     try
                     {
-                        File.Create(this.Url);
+                        var file = File.Create(this.Url);
+                        file.Dispose();
                         return true;
                     }
                     catch(IOException)

@@ -7,16 +7,15 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.Build.Framework;
 using System.IO;
+using VisualRust.Build.Message;
+using VisualRust.Build.Message.Human;
+using VisualRust.Build.Message.Json;
 using VisualRust.Shared;
 
 namespace VisualRust.Build
 {
     public class Rustc : Microsoft.Build.Utilities.Task
     {
-        private static readonly Regex defectRegex = new Regex(@"^([^\n:]+):(\d+):(\d+):\s+(\d+):(\d+)\s+(.*)$", RegexOptions.Multiline | RegexOptions.CultureInvariant);
-
-        private static readonly Regex errorCodeRegex = new Regex(@"\[([A-Z]\d\d\d\d)\]$", RegexOptions.CultureInvariant);
-
         private string[] configFlags = new string[0];
         /// <summary>
         /// Sets --cfg option.
@@ -154,6 +153,7 @@ namespace VisualRust.Build
         public string CodegenOptions { get; set; }
 
         private bool? lto;
+
         /// <summary>
         /// Sets -C lto option. Default value is false.
         /// </summary>
@@ -162,6 +162,8 @@ namespace VisualRust.Build
             get { return lto.HasValue ? lto.Value : false; }
             set { lto = value; }
         }
+
+        public Boolean UseJsonErrorFormat { get; set; }
 
         [Required]
         public string WorkingDirectory { get; set; }
@@ -219,6 +221,8 @@ namespace VisualRust.Build
                 sb.AppendFormat(" -C lto");
             if (CodegenOptions != null)
                 sb.AppendFormat(" -C {0}", CodegenOptions);
+            if (UseJsonErrorFormat)
+                sb.Append(" -Z unstable-options --error-format=json");
             sb.AppendFormat(" {0}", Input);
             string target = TargetTriple ?? Shared.Environment.DefaultTarget;
             string installPath = Shared.Environment.FindInstallPath(target);
@@ -268,15 +272,32 @@ namespace VisualRust.Build
 
                 string errorOutput = error.ToString();
                 // We found some warning or errors in the output, print them out
-                IEnumerable<RustcParsedMessage> messages = ParseOutput(errorOutput);
-                // We found some warning or errors in the output, print them out
-                foreach (RustcParsedMessage msg in messages)
+                IEnumerable<RustcMessageHuman> messagesHuman = null;
+                IEnumerable<RustcMessageJson> messageJson = null;
+                bool haveAnyMessages = false;
+
+                if (UseJsonErrorFormat)
                 {
-                    LogRustcMessage(msg);
+                    messageJson = RustcMessageJsonParser.Parse(errorOutput);
+                    foreach (var msg in messageJson)
+                    {
+                        LogRustcMessage(msg);
+                        haveAnyMessages = true;
+                    }
                 }
+                else
+                {
+                    messagesHuman = RustcMessageHumanParser.Parse(errorOutput);
+                    foreach (var msg in messagesHuman)
+                    {
+                        LogRustcMessage(msg);
+                        haveAnyMessages = true;
+                    }
+                }
+
                 // rustc failed but we couldn't sniff anything from stderr
                 // this could be an internal compiler error or a missing main() function (there are probably more errors without spans)
-                if (process.ExitCode != 0 && !messages.Any())
+                if (process.ExitCode != 0 && !haveAnyMessages)
                 {
                     // FIXME: This automatically sets the file to VisualRust.Rust.targets. Is there a way to set no file instead?
                     this.Log.LogError(errorOutput);
@@ -291,76 +312,14 @@ namespace VisualRust.Build
             }
         }
         
-        private IEnumerable<RustcParsedMessage> ParseOutput(string output)
+        
+        private void LogRustcMessage(RustcMessageHuman msg)
         {
-            MatchCollection errorMatches = defectRegex.Matches(output);
-
-            RustcParsedMessage previous = null;
-            foreach (Match match in errorMatches)
-            {
-                string remainingMsg = match.Groups[6].Value.Trim();
-                Match errorMatch = errorCodeRegex.Match(remainingMsg);
-                string errorCode = errorMatch.Success ? errorMatch.Groups[1].Value : null;
-                int line = Int32.Parse(match.Groups[2].Value, System.Globalization.NumberStyles.None);
-                int col = Int32.Parse(match.Groups[3].Value, System.Globalization.NumberStyles.None);
-                int endLine = Int32.Parse(match.Groups[4].Value, System.Globalization.NumberStyles.None);
-                int endCol = Int32.Parse(match.Groups[5].Value, System.Globalization.NumberStyles.None);
-
-                if (remainingMsg.StartsWith("warning: "))
-                {
-                    string msg = match.Groups[6].Value.Substring(9, match.Groups[6].Value.Length - 9 - (errorCode != null ? 8 : 0));
-                    if (previous != null) yield return previous;
-                    previous = new RustcParsedMessage(RustcParsedMessageType.Warning, msg, errorCode, match.Groups[1].Value,
-                        line, col, endLine, endCol);
-                }
-                else if (remainingMsg.StartsWith("note: ") || remainingMsg.StartsWith("help: "))
-                {
-                    if (remainingMsg.StartsWith("help: pass `--explain ") && previous != null)
-                    {
-                        previous.CanExplain = true;
-                        continue;
-                    }
-
-                    // NOTE: "note: " and "help: " are both 6 characters long (though hardcoding this is probably still not a very good idea)
-                    string msg = remainingMsg.Substring(6, remainingMsg.Length - 6 - (errorCode != null ? 8 : 0));
-                    var type = remainingMsg.StartsWith("note: ") ? RustcParsedMessageType.Note : RustcParsedMessageType.Help;
-                    RustcParsedMessage note = new RustcParsedMessage(type, msg, errorCode, match.Groups[1].Value,
-                        line, col, endLine, endCol);
-
-                    if (previous != null)
-                    {
-                        // try to merge notes and help messages with a previous message (warning or error where it belongs to), if the span is the same
-                        if (previous.TryMergeWithFollowing(note))
-                        {
-                            continue; // skip setting new previous, because we successfully merged the new note into the previous message
-                        }
-                        else
-                        {
-                            yield return previous;
-                        }
-                    }
-                    previous = note;
-                }
-                else
-                {
-                    bool startsWithError = remainingMsg.StartsWith("error: ");
-                    string msg = remainingMsg.Substring((startsWithError ? 7 : 0), remainingMsg.Length - (startsWithError ? 7 : 0) - (errorCode != null ? 8 : 0));
-                    if (previous != null) yield return previous;
-                    previous = new RustcParsedMessage(RustcParsedMessageType.Error, msg, errorCode, match.Groups[1].Value,
-                        line, col, endLine, endCol);
-                }
-            }
-
-            if (previous != null) yield return previous;
-        }
-
-        private void LogRustcMessage(RustcParsedMessage msg)
-        {
-            if (msg.Type == RustcParsedMessageType.Warning)
+            if (msg.Type == RustcMessageType.Warning)
             {
                 this.Log.LogWarning(null, msg.ErrorCode, null, msg.File, msg.LineNumber, msg.ColumnNumber, msg.EndLineNumber, msg.EndColumnNumber, msg.Message);
             }
-            else if (msg.Type == RustcParsedMessageType.Note)
+            else if (msg.Type == RustcMessageType.Note)
             {
                 this.Log.LogWarning(null, msg.ErrorCode, null, msg.File, msg.LineNumber, msg.ColumnNumber, msg.EndLineNumber, msg.EndColumnNumber, "note: " + msg.Message);
             }
@@ -368,6 +327,33 @@ namespace VisualRust.Build
             {
                 this.Log.LogError(null, msg.ErrorCode, null, msg.File, msg.LineNumber, msg.ColumnNumber, msg.EndLineNumber, msg.EndColumnNumber, msg.Message);
             }
+        }
+
+        private void LogRustcMessage(RustcMessageJson msg)
+        {
+            // todo multi span
+            // todo all other fields
+            // todo mb help key word is code.explanation
+
+            var type = msg.GetLevelAsEnum();
+            var primarySpan = msg.GetPrimarySpan();
+            var code = msg.GetErrorCodeAsString();
+
+            if (type == RustcMessageType.Error)
+            {
+                if (primarySpan == null)
+                    Log.LogError(msg.message);
+                else
+                    Log.LogError(null, code, null, primarySpan.file_name, primarySpan.line_start, primarySpan.byte_start, primarySpan.line_end, primarySpan.byte_end, msg.message);
+            }
+            else
+            {
+                if (primarySpan == null)
+                    Log.LogWarning(msg.message);
+                else
+                    Log.LogWarning(null, code, null, primarySpan.file_name, primarySpan.line_start, primarySpan.byte_start, primarySpan.line_end, primarySpan.byte_end, msg.message);
+            }
+
         }
     }
 }

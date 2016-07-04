@@ -64,6 +64,7 @@
     <EmbeddedResource Include="Internal\Circular\foo.rs" />
     <EmbeddedResource Include="Internal\CircularNested\in\foo.rs" />
     <EmbeddedResource Include="Internal\CircularNested\main.rs" />
+    <Compile Include="Build\RustcMessageJsonParserTest.cs" />
     <Compile Include="Cargo\ManifestTests.cs" />
     <Compile Include="Project\Controls\OutputTargetSectionViewModelTests.cs" />
     <Compile Include="Project\ModuleImportTests.cs" />
@@ -104,10 +105,16 @@
     <EmbeddedResource Include="Internal\ClosedCircle\foo.rs" />
     <EmbeddedResource Include="Internal\ClosedCircle\main.rs" />
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <EmbeddedResource Include="External\servo\components\layout\lib.rs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\VisualRust.Build\VisualRust.Build.csproj">
+      <Project>{9cf556ab-76fe-4c3d-ad0a-b64b3b9989b4}</Project>
+      <Name>VisualRust.Build</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VisualRust.Cargo\VisualRust.Cargo.csproj">
       <Project>{2594db0d-03ff-40ea-8d27-9930e5d3ff83}</Project>
       <Name>VisualRust.Cargo</Name>
@@ -117,7 +124,9 @@
       <Name>VisualRust.Project</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

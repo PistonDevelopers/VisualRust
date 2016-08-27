@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Message\Human\RustcMessageHuman.cs" />
+    <Compile Include="Version.cs" />
     <None Include="packages.config" />
     <None Include="VisualRust.Rust.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

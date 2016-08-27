@@ -163,18 +163,26 @@ namespace VisualRust.Build
             set { lto = value; }
         }
 
-        public Boolean UseJsonErrorFormat { get; set; }
-
         [Required]
         public string WorkingDirectory { get; set; }
 
         [Required]
         public string Input { get; set; }
 
+        private String installPath;
+        private Version rustcVersion;
+
         public override bool Execute()
         {
             try
             {
+                if (!FindRustc())
+                    return false;
+
+                rustcVersion = GetVersion();
+                if (rustcVersion == null)
+                    return false;
+
                 return ExecuteInner();
             }
             catch (Exception ex)
@@ -184,8 +192,53 @@ namespace VisualRust.Build
             }
         }
 
+        private bool FindRustc()
+        {
+            string target = TargetTriple ?? Shared.Environment.DefaultTarget;
+            installPath = Shared.Environment.FindInstallPath(target);
+            if (installPath == null)
+            {
+                if (String.Equals(target, Shared.Environment.DefaultTarget, StringComparison.OrdinalIgnoreCase))
+                    Log.LogError("No Rust installation detected. You can download official Rust installer from https://www.rust-lang.org/downloads.html");
+                else
+                    Log.LogError("Could not find a Rust installation that can compile target {0}.", target);
+                return false;
+            }
+
+            return true;
+        }
+
+        private Process CreateProcess(String argumets)
+        {
+            var psi = new ProcessStartInfo()
+            {
+                CreateNoWindow = true,
+                FileName = Path.Combine(installPath, "rustc.exe"),
+                UseShellExecute = false,
+                WorkingDirectory = WorkingDirectory,
+                Arguments = argumets,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
+
+            var process = new Process();
+            process.StartInfo = psi;
+
+            return process;
+        }
+
+        private Version GetVersion()
+        {
+            var process = CreateProcess(" --version");
+            process.Start();
+            process.WaitForExit();
+            return Version.ParseRustcOutput(process.StandardOutput.ReadToEnd());
+        }
+
         private bool ExecuteInner()
         {
+            var useJsonErrorFormat = rustcVersion.VersionMinor >= 11;
+
             StringBuilder sb = new StringBuilder();
             if (ConfigFlags.Length > 0)
                 sb.AppendFormat(" --cfg {0}", String.Join(",", ConfigFlags));
@@ -221,33 +274,15 @@ namespace VisualRust.Build
                 sb.AppendFormat(" -C lto");
             if (CodegenOptions != null)
                 sb.AppendFormat(" -C {0}", CodegenOptions);
-            if (UseJsonErrorFormat)
-                sb.Append(" -Z unstable-options --error-format=json");
+            if (useJsonErrorFormat)
+                sb.Append(" --error-format=json");
             sb.AppendFormat(" {0}", Input);
-            string target = TargetTriple ?? Shared.Environment.DefaultTarget;
-            string installPath = Shared.Environment.FindInstallPath(target);
-            if(installPath == null)
-            {
-                if(String.Equals(target, Shared.Environment.DefaultTarget, StringComparison.OrdinalIgnoreCase))
-                    Log.LogError("No Rust installation detected. You can download official Rust installer from https://www.rust-lang.org/downloads.html");
-                else
-                    Log.LogError("Could not find a Rust installation that can compile target {0}.", target);
-                return false;
-            }
-            var psi = new ProcessStartInfo()
-            {
-                CreateNoWindow = true,
-                FileName =  Path.Combine(installPath, "rustc.exe"),
-                UseShellExecute = false,
-                WorkingDirectory = WorkingDirectory,
-                Arguments = sb.ToString(),
-                RedirectStandardError = true
-            };
-            Log.LogCommandLine(String.Join(" ", psi.FileName, psi.Arguments));
+
+            var process = CreateProcess(sb.ToString());
+            Log.LogCommandLine(String.Join(" ", process.StartInfo.FileName, process.StartInfo.Arguments));
             try
             {
-                Process process = new Process();
-                process.StartInfo = psi;
+
                 StringBuilder error = new StringBuilder();
 
                 using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
@@ -276,7 +311,7 @@ namespace VisualRust.Build
                 IEnumerable<RustcMessageJson> messageJson = null;
                 bool haveAnyMessages = false;
 
-                if (UseJsonErrorFormat)
+                if (useJsonErrorFormat)
                 {
                     messageJson = RustcMessageJsonParser.Parse(errorOutput);
                     foreach (var msg in messageJson)

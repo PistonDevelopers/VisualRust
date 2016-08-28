@@ -19,8 +19,8 @@ namespace VisualRust.Test.Build
         [Test]
         public void FileNotFound()
         {
-            const string output = "{\"message\":\"couldn't read \\\"main2.rs\\\": Не удается" +
-                                  " найти указанный файл. (os error 2)\",\"code\":null,\"level\":\"error" +
+            const string output = "{\"message\":\"couldn't read \\\"main2.rs\\\": file" +
+                                  " not found. (os error 2)\",\"code\":null,\"level\":\"error" +
                                   "\",\"spans\":[],\"children\":[],\"rendered\":null}\n";
             var messages = RustcMessageJsonParser.Parse(output).ToList();
 

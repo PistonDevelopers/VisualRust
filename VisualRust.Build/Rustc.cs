@@ -237,7 +237,7 @@ namespace VisualRust.Build
 
         private bool ExecuteInner()
         {
-            var useJsonErrorFormat = rustcVersion.VersionMinor >= 11;
+            var useJsonErrorFormat = rustcVersion.VersionMajor >= 1 && rustcVersion.VersionMinor >= 11;
 
             StringBuilder sb = new StringBuilder();
             if (ConfigFlags.Length > 0)

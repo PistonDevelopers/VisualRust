@@ -85,7 +85,7 @@ namespace VisualRust.Shared
             {
                 return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry64)
                     .Union(GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32))
-                    .Union(new string[] { GetMultirustInstallRoot() })
+                    .Union(new string[] { GetMultirustInstallRoot(), GetRustupInstallRoot() })
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry64))
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32))
                     .Union(GetInnoInstallRoot());
@@ -93,7 +93,7 @@ namespace VisualRust.Shared
             else
             {
                 return GetInstallRoots(RegistryHive.CurrentUser, RegistryView.Registry32)
-                    .Union(new string[] { GetMultirustInstallRoot() })
+                    .Union(new string[] { GetMultirustInstallRoot(), GetRustupInstallRoot() })
                     .Union(GetInstallRoots(RegistryHive.LocalMachine, RegistryView.Registry32))
                     .Union(GetInnoInstallRoot());
             }
@@ -108,6 +108,18 @@ namespace VisualRust.Shared
                 return Path.Combine(localAppData, ".multirust");
             }
             return multirustHome;
+        }
+
+        static string GetRustupInstallRoot()
+        {
+            // rustup.rs installs into %CARGO_HOME%\bin\ and %CARGO_HOME% defaults to %USERPROFILE%\.cargo\
+            string cargoHome = System.Environment.GetEnvironmentVariable("CARGO_HOME");
+            if (String.IsNullOrEmpty(cargoHome))
+            {
+                string userprofile = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+                return Path.Combine(userprofile, ".cargo");
+            }
+            return cargoHome;
         }
 
         private static string[] GetInnoInstallRoot()

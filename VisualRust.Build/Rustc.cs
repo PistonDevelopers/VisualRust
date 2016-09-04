@@ -374,19 +374,23 @@ namespace VisualRust.Build
             var primarySpan = msg.GetPrimarySpan();
             var code = msg.GetErrorCodeAsString();
 
+            // supress messages like "aborting due to previous error"
+            if (String.IsNullOrEmpty(code) && primarySpan == null)
+                return;
+
             if (type == RustcMessageType.Error)
             {
                 if (primarySpan == null)
                     Log.LogError(msg.message);
                 else
-                    Log.LogError(null, code, null, primarySpan.file_name, primarySpan.line_start, primarySpan.byte_start, primarySpan.line_end, primarySpan.byte_end, msg.message);
+                    Log.LogError(null, code, null, primarySpan.file_name, primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
             }
             else
             {
                 if (primarySpan == null)
                     Log.LogWarning(msg.message);
                 else
-                    Log.LogWarning(null, code, null, primarySpan.file_name, primarySpan.line_start, primarySpan.byte_start, primarySpan.line_end, primarySpan.byte_end, msg.message);
+                    Log.LogWarning(null, code, null, primarySpan.file_name, primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
             }
 
         }

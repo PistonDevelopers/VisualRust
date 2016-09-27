@@ -1,18 +1,8 @@
-﻿using System;
-
-namespace VisualRust.Build
+﻿namespace VisualRust.Build.Message.Human
 {
-    enum RustcParsedMessageType
+    class RustcMessageHuman
     {
-        Error,
-        Warning,
-        Note,
-        Help
-    }
-
-    class RustcParsedMessage
-    {
-        public RustcParsedMessageType Type;
+        public RustcMessageType Type;
         public string Message;
         public string ErrorCode;
         public string File;
@@ -22,7 +12,7 @@ namespace VisualRust.Build
         public int EndColumnNumber;
         public bool CanExplain; // TODO: currently we don't do anything with this
 
-        public RustcParsedMessage(RustcParsedMessageType type, string message, string errorCode, string file,
+        public RustcMessageHuman(RustcMessageType type, string message, string errorCode, string file,
             int lineNumber, int columnNumber, int endLineNumber, int endColumnNumber)
         {
             Type = type;
@@ -36,13 +26,13 @@ namespace VisualRust.Build
             CanExplain = false;
         }
 
-        public bool TryMergeWithFollowing(RustcParsedMessage other)
+        public bool TryMergeWithFollowing(RustcMessageHuman other)
         {
-            if ((other.Type == RustcParsedMessageType.Note || other.Type == RustcParsedMessageType.Help)
+            if ((other.Type == RustcMessageType.Note || other.Type == RustcMessageType.Help)
                 && other.File == this.File && other.LineNumber == this.LineNumber && other.ColumnNumber == this.ColumnNumber &&
                 other.EndLineNumber == this.EndLineNumber && other.EndColumnNumber == this.EndColumnNumber)
             {
-                var prefix = other.Type == RustcParsedMessageType.Note ? "\nnote: " : "\nhelp: ";
+                var prefix = other.Type == RustcMessageType.Note ? "\nnote: " : "\nhelp: ";
                 this.Message += prefix + other.Message;
                 return true;
             }

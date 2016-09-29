@@ -37,6 +37,8 @@
       </Component>
       <!-- Racer files -->
       <ComponentGroupRef Id="CmpGroup_Racer_2013"/>
+      <!-- GPG files -->
+      <ComponentGroupRef Id="CmpGroup_gpg_2013"/>
       <!-- Open .rsproj with vs launcher -->
       <Component Id="Cmp_RsprojRegistration_$(var.VsVersion)" Guid="{15CB1600-9413-4770-9BDC-39C8593B8FC4}">
         <CreateFolder/>

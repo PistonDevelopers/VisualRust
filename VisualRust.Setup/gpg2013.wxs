@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define VsVersion  = "2013"?>
+  <Fragment>
+    <DirectoryRef Id="Dir_vsx_$(var.VsVersion)">
+      <Directory Id="Dir_gpg_$(var.VsVersion)" Name="gpg"/>
+    </DirectoryRef>
+    <ComponentGroup Id="CmpGroup_gpg_$(var.VsVersion)" Directory="Dir_gpg_$(var.VsVersion)">
+      <Component Id="Cmp_gpg2_exe_$(var.VsVersion)" Guid="{0E7D8C96-2B04-418B-807D-151B0CFDC5B8}">
+        <File Id="File_gpg2_exe_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\gpg\gpg2.exe" />
+      </Component>
+      <Component Id="Cmp_gpgconf_exe_$(var.VsVersion)" Guid="{DC9B0D68-F3C0-4705-AEF8-5E4A35C12F52}">
+        <File Id="File_gpgconf_exe_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\gpg\gpgconf.exe" />
+      </Component>
+      <Component Id="Cmp_libadns_1_dll_$(var.VsVersion)" Guid="{C9430CDF-2EA8-43B7-81E4-4250465AC83D}">
+        <File Id="File_libadns_1_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\gpg\libadns-1.dll" />
+      </Component>
+      <Component Id="Cmp_libassuan_0_dll_$(var.VsVersion)" Guid="{0EE3029A-94C7-4272-B6E4-EC10BA3B6841}">
+        <File Id="File_libassuan_0_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\gpg\libassuan-0.dll" />
+      </Component>
+      <Component Id="Cmp_libgcrypt_20_dll_$(var.VsVersion)" Guid="{16983C76-7A7C-4AEE-84AB-B45C3FECBC82}">
+        <File Id="File_libgcrypt_20_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\gpg\libgcrypt-20.dll" />
+      </Component>
+      <Component Id="Cmp_libgpg_error_0_dll_$(var.VsVersion)" Guid="{2ED73457-0617-4D5F-A77E-61280BDCB46A}">
+        <File Id="File_libgpg_error_0_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\gpg\libgpg-error-0.dll" />
+      </Component>
+      <Component Id="Cmp_libiconv_2_dll_$(var.VsVersion)" Guid="{215FBBA9-BBD5-4DAA-B380-99F6F79C9075}">
+        <File Id="File_libiconv_2_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\gpg\libiconv-2.dll" />
+      </Component>
+      <Component Id="Cmp_zlib1_dll_$(var.VsVersion)" Guid="{11231EF6-57F8-48CB-9224-5E3878D6A988}">
+        <File Id="File_zlib1_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)\gpg\zlib1.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

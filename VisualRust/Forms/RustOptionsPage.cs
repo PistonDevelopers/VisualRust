@@ -15,6 +15,12 @@ namespace VisualRust.Options
         public bool UseCustomSources { get; set; }
         public string CustomSourcesPath { get; set; }
 
+        public bool UseCustomGpg { get; set; }
+        public string CustomGpgPath { get; set; }
+
+        public bool UseCustomGpgHomedir { get; set; }
+        public string CustomGpgHomedir { get; set; }
+
         private RustOptionsPageControl _page;
 
         protected override IWin32Window Window

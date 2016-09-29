@@ -107,6 +107,7 @@ namespace VisualRust
             docEventsListener = new RunningDocTableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
 
             Racer.RacerSingleton.Init();
+            GPG.Gpg.Init();
         }
 
         int IOleCommandTarget.Exec(ref Guid cmdGroup, uint nCmdID, uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)

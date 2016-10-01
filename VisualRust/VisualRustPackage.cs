@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using System.ComponentModel.Composition;
-using Microsoft.MIDebugEngine;
+//using Microsoft.MIDebugEngine;
 using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -12,11 +12,11 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
-using VisualRust.Project;
-using Microsoft.VisualStudioTools.Project;
-using Microsoft.VisualStudioTools.Project.Automation;
+//using VisualRust.Project;
+//using Microsoft.VisualStudioTools.Project;
+//using Microsoft.VisualStudioTools.Project.Automation;
 using VisualRust.Options;
-using MICore;
+//using MICore;
 using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Package.Registration;
 using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Shell;
 using System.Collections.Generic;
@@ -64,20 +64,20 @@ namespace VisualRust
         LanguageVsTemplate="Rust")]*/
     [ProvideLanguageExtension(typeof(RustLanguage), ".rs")]
     [Guid(GuidList.guidVisualRustPkgString)]
-    [ProvideObject(typeof(Project.Forms.ApplicationPropertyPage))]
-    [ProvideObject(typeof(Project.Forms.BuildPropertyPage))]
-    [ProvideObject(typeof(Project.Forms.DebugPropertyPage))]
-    [ProvideObject(typeof(Project.Forms.TargetOutputsPropertyPage))]
+    //[ProvideObject(typeof(Project.Forms.ApplicationPropertyPage))]
+    //[ProvideObject(typeof(Project.Forms.BuildPropertyPage))]
+    //[ProvideObject(typeof(Project.Forms.DebugPropertyPage))]
+    //[ProvideObject(typeof(Project.Forms.TargetOutputsPropertyPage))]
     [ProvideOptionPage(typeof(RustOptionsPage), "Visual Rust", "General", 110, 113, true)]
     [ProvideOptionPage(typeof(DebuggingOptionsPage), "Visual Rust", "Debugging", 110, 114, true)]
     [ProvideProfile(typeof(RustOptionsPage), "Visual Rust", "General", 110, 113, true)]
-    [ProvideDebugEngine("Rust GDB", typeof(AD7ProgramProvider), typeof(AD7Engine), EngineConstants.EngineId)]
+    //[ProvideDebugEngine("Rust GDB", typeof(AD7ProgramProvider), typeof(AD7Engine), EngineConstants.EngineId)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideCpsProjectFactory(GuidList.CpsProjectFactoryGuidString, "Rust")]
     [ProvideProjectFileGenerator(typeof(RustProjectFileGenerator), GuidList.CpsProjectFactoryGuidString, FileExtensions = "toml", DisplayGeneratorFilter = 300)]
     public class VisualRustPackage : Package, IOleCommandTarget
     {
-        private RunningDocTableEventsListener docEventsListener;
+        //private RunningDocTableEventsListener docEventsListener;
         private IOleCommandTarget packageCommandTarget;
         private Dictionary<IVsProjectGenerator, uint> _projectFileGenerators;
 
@@ -95,7 +95,7 @@ namespace VisualRust
         public VisualRustPackage()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
-            Microsoft.VisualStudioTools.UIThread.InitializeAndAlwaysInvokeToCurrentThread();
+            //Microsoft.VisualStudioTools.UIThread.InitializeAndAlwaysInvokeToCurrentThread();
         }
 
         /////////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ namespace VisualRust
             packageCommandTarget = GetService(typeof(IOleCommandTarget)) as IOleCommandTarget;
             Instance = this;
 
-            docEventsListener = new RunningDocTableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
+            //docEventsListener = new RunningDoc2TableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
 
             Racer.RacerSingleton.Init();
         }
@@ -146,8 +146,8 @@ namespace VisualRust
             {
                 switch (nCmdID)
                 {
-                    case 1:
-                        return VRDebugExec(nCmdExecOpt, pvaIn, pvaOut);
+                    //case 1:
+                    //    return VRDebugExec(nCmdExecOpt, pvaIn, pvaOut);
 
                     default:
                         return VSConstants.E_NOTIMPL;
@@ -175,66 +175,66 @@ namespace VisualRust
             return packageCommandTarget.QueryStatus(ref cmdGroup, cCmds, prgCmds, pCmdText);
         }
 
-        private int VRDebugExec(uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
-        {
-            int hr;
+        //private int VRDebugExec(uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
+        //{
+        //    int hr;
 
-            if (IsQueryParameterList(pvaIn, pvaOut, nCmdExecOpt))
-            {
-                Marshal.GetNativeVariantForObject("$", pvaOut);
-                return VSConstants.S_OK;
-            }
+        //    if (IsQueryParameterList(pvaIn, pvaOut, nCmdExecOpt))
+        //    {
+        //        Marshal.GetNativeVariantForObject("$", pvaOut);
+        //        return VSConstants.S_OK;
+        //    }
 
-            string arguments;
-            hr = EnsureString(pvaIn, out arguments);
-            if (hr != VSConstants.S_OK)
-                return hr;
+        //    string arguments;
+        //    hr = EnsureString(pvaIn, out arguments);
+        //    if (hr != VSConstants.S_OK)
+        //        return hr;
 
-            if (string.IsNullOrWhiteSpace(arguments))
-                throw new ArgumentException("Expected an MI command to execute (ex: Debug.VRDebugExec info sharedlibrary)");
+        //    if (string.IsNullOrWhiteSpace(arguments))
+        //        throw new ArgumentException("Expected an MI command to execute (ex: Debug.VRDebugExec info sharedlibrary)");
 
-            VRDebugExecAsync(arguments);
+        //    VRDebugExecAsync(arguments);
 
-            return VSConstants.S_OK;
-        }
+        //    return VSConstants.S_OK;
+        //}
 
-        private async void VRDebugExecAsync(string command)
-        {
-            var commandWindow = (IVsCommandWindow)GetService(typeof(SVsCommandWindow));
+        //private async void VRDebugExecAsync(string command)
+        //{
+        //    var commandWindow = (IVsCommandWindow)GetService(typeof(SVsCommandWindow));
 
-            string results = null;
+        //    string results = null;
 
-            try
-            {
-                results = await MIDebugCommandDispatcher.ExecuteCommand(command);
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException != null)
-                    e = e.InnerException;
+        //    try
+        //    {
+        //        results = await MIDebugCommandDispatcher.ExecuteCommand(command);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        if (e.InnerException != null)
+        //            e = e.InnerException;
 
-                UnexpectedMIResultException miException = e as UnexpectedMIResultException;
-                string message;
-                if (miException != null && miException.MIError != null)
-                    message = miException.MIError;
-                else
-                    message = e.Message;
+        //        UnexpectedMIResultException miException = e as UnexpectedMIResultException;
+        //        string message;
+        //        if (miException != null && miException.MIError != null)
+        //            message = miException.MIError;
+        //        else
+        //            message = e.Message;
 
-                commandWindow.Print(string.Format("Error: {0}\r\n", message));
-                return;
-            }
+        //        commandWindow.Print(string.Format("Error: {0}\r\n", message));
+        //        return;
+        //    }
 
-            if (results.Length > 0)
-            {
-                // Make sure that we are printing whole lines
-                if (!results.EndsWith("\n") && !results.EndsWith("\r\n"))
-                {
-                    results = results + "\n";
-                }
+        //    if (results.Length > 0)
+        //    {
+        //        // Make sure that we are printing whole lines
+        //        if (!results.EndsWith("\n") && !results.EndsWith("\r\n"))
+        //        {
+        //            results = results + "\n";
+        //        }
 
-                commandWindow.Print(results);
-            }
-        }
+        //        commandWindow.Print(results);
+        //    }
+        //}
 
         static private bool IsQueryParameterList(System.IntPtr pvaIn, System.IntPtr pvaOut, uint nCmdexecopt)
         {
@@ -275,7 +275,7 @@ namespace VisualRust
 
         protected override void Dispose(bool disposing)
         {
-            docEventsListener.Dispose();
+            //docEventsListener.Dispose();
             base.Dispose(disposing);
         }
 

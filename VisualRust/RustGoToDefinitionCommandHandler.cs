@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.Text;
 using VisualRust.Racer;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudioTools.Project;
 
 namespace VisualRust
 {
@@ -85,7 +84,8 @@ namespace VisualRust
                     }
                     else
                     {
-                        VsUtilities.NavigateTo(ServiceProvider, fname, Guid.Empty, targetLine, targetColumn);
+                        //VsUtilities.NavigateTo(ServiceProvider, fname, Guid.Empty, targetLine, targetColumn);
+                        throw new NotImplementedException("currently disabled");
                     }
                     return true;
                 }

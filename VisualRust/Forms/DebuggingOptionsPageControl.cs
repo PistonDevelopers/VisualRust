@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using VisualRust.Project;
 
 namespace VisualRust.Options
 {

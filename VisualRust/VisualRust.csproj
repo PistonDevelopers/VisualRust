@@ -4,6 +4,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <MinimumVisualStudioVersion>$(VisualStudioVersion)</MinimumVisualStudioVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <Import Project="VisualRust.Gdb.msbuild" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -19,7 +20,7 @@
     <AssemblyName>VisualRust</AssemblyName>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <CopyVsixManifestToOutput>true</CopyVsixManifestToOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-CI|AnyCPU'">
@@ -215,6 +216,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoadHooks.cs" />
     <Compile Include="ProjectForms\BasePropertyPage.cs" />
     <Compile Include="ProjectForms\BuildPropertyPage.cs" />
     <Compile Include="ProjectForms\DebugPropertyPage.cs" />
@@ -245,6 +247,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="RunningDocTableEventsListener.cs" />
     <Compile Include="RustBraceMatcher.cs" />
+    <Compile Include="RustProjectFileGenerator.cs" />
     <Compile Include="Text\JoinedTextChange.cs" />
     <Compile Include="Text\RustClassifier.cs" />
     <Compile Include="Text\RustClassifierProvider.cs" />
@@ -321,6 +324,14 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Common.Core\Microsoft.Common.Core.csproj">
+      <Project>{5da4c00b-9f16-4ef9-894d-20329544265e}</Project>
+      <Name>Microsoft.Common.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring\Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.csproj">
+      <Project>{b8696d0c-8adb-4c11-8cee-5c81aa8c6ebd}</Project>
+      <Name>Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">
       <Project>{cacb60a9-1e76-4f92-8831-b134a658c695}</Project>
       <Name>Microsoft.VisualStudio.Project</Name>

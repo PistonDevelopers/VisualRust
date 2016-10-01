@@ -17,6 +17,9 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using VisualRust.Options;
 using MICore;
+using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Package.Registration;
+using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Shell;
+using System.Collections.Generic;
 
 namespace VisualRust
 {
@@ -51,14 +54,14 @@ namespace VisualRust
         EnableFormatSelection = true,
         SupportCopyPasteOfHTML = false
     )]
-    [ProvideProjectFactory(
+    /*[ProvideProjectFactory(
         typeof(RustProjectFactory),
         "Rust",
         "Rust Project Files (*.rsproj);*.rsproj",
         "rsproj",
         "rsproj",
         ".\\NullPath",
-        LanguageVsTemplate="Rust")]
+        LanguageVsTemplate="Rust")]*/
     [ProvideLanguageExtension(typeof(RustLanguage), ".rs")]
     [Guid(GuidList.guidVisualRustPkgString)]
     [ProvideObject(typeof(Project.Forms.ApplicationPropertyPage))]
@@ -70,12 +73,17 @@ namespace VisualRust
     [ProvideProfile(typeof(RustOptionsPage), "Visual Rust", "General", 110, 113, true)]
     [ProvideDebugEngine("Rust GDB", typeof(AD7ProgramProvider), typeof(AD7Engine), EngineConstants.EngineId)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    public class VisualRustPackage : CommonProjectPackage, IOleCommandTarget
+    [ProvideCpsProjectFactory(GuidList.CpsProjectFactoryGuidString, "Rust")]
+    [ProvideProjectFileGenerator(typeof(RustProjectFileGenerator), GuidList.CpsProjectFactoryGuidString, FileExtensions = "toml", DisplayGeneratorFilter = 300)]
+    public class VisualRustPackage : Package, IOleCommandTarget
     {
         private RunningDocTableEventsListener docEventsListener;
         private IOleCommandTarget packageCommandTarget;
+        private Dictionary<IVsProjectGenerator, uint> _projectFileGenerators;
 
         internal static VisualRustPackage Instance { get; private set; }
+
+        public const string UniqueCapability = "VisualRust";
 
         /// <summary>
         /// Default constructor of the package.
@@ -101,12 +109,35 @@ namespace VisualRust
         protected override void Initialize()
         {
             base.Initialize();
+
+            RegisterProjectFileGenerator(new RustProjectFileGenerator());
+
             packageCommandTarget = GetService(typeof(IOleCommandTarget)) as IOleCommandTarget;
             Instance = this;
 
             docEventsListener = new RunningDocTableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
 
             Racer.RacerSingleton.Init();
+        }
+
+        private void RegisterProjectFileGenerator(IVsProjectGenerator projectFileGenerator)
+        {
+            var registerProjectGenerators = GetService(typeof(SVsRegisterProjectTypes)) as IVsRegisterProjectGenerators;
+            if (registerProjectGenerators == null)
+            {
+                throw new InvalidOperationException(typeof(SVsRegisterProjectTypes).FullName);
+            }
+
+            uint cookie;
+            Guid riid = projectFileGenerator.GetType().GUID;
+            registerProjectGenerators.RegisterProjectGenerator(ref riid, projectFileGenerator, out cookie);
+
+            if (_projectFileGenerators == null)
+            {
+                _projectFileGenerators = new Dictionary<IVsProjectGenerator, uint>();
+            }
+
+            _projectFileGenerators[projectFileGenerator] = cookie;
         }
 
         int IOleCommandTarget.Exec(ref Guid cmdGroup, uint nCmdID, uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
@@ -250,39 +281,39 @@ namespace VisualRust
 
         #endregion
 
-        public override ProjectFactory CreateProjectFactory()
-        {
-            return new RustProjectFactory(this);
-        }
+        //public override ProjectFactory CreateProjectFactory()
+        //{
+        //    return new RustProjectFactory(this);
+        //}
 
-        public override CommonEditorFactory CreateEditorFactory()
-        {
-            return null;
-        }
+        //public override CommonEditorFactory CreateEditorFactory()
+        //{
+        //    return null;
+        //}
 
-        public override uint GetIconIdForAboutBox()
-        {
-            throw new NotImplementedException();
-        }
+        //public override uint GetIconIdForAboutBox()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public override uint GetIconIdForSplashScreen()
-        {
-            throw new NotImplementedException();
-        }
+        //public override uint GetIconIdForSplashScreen()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public override string GetProductName()
-        {
-            return "Visual Rust";
-        }
+        //public override string GetProductName()
+        //{
+        //    return "Visual Rust";
+        //}
 
-        public override string GetProductDescription()
-        {
-            return "Visual Studio integration for the Rust programming language (http://www.rust-lang.org/)";
-        }
+        //public override string GetProductDescription()
+        //{
+        //    return "Visual Studio integration for the Rust programming language (http://www.rust-lang.org/)";
+        //}
 
-        public override string GetProductVersion()
-        {
-            return "0.1.2";
-        }
+        //public override string GetProductVersion()
+        //{
+        //    return "0.1.2";
+        //}
     }
 }

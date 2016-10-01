@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5DA4C00B-9F16-4EF9-894D-20329544265E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.Common.Core</RootNamespace>
+    <AssemblyName>Microsoft.Common.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;VS14</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;VS14</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Collections\DictionaryExtension.cs" />
+    <Compile Include="Collections\EnumerableExtensions.cs" />
+    <Compile Include="Collections\ListExtensions.cs" />
+    <Compile Include="Composition\INamedExport.cs" />
+    <Compile Include="Composition\NamedExportLocator.cs" />
+    <Compile Include="Diagnostics\Check.cs" />
+    <Compile Include="Diagnostics\RestartManager.cs" />
+    <Compile Include="Disposables\CountdownDisposable.cs" />
+    <Compile Include="Disposables\DefaultDisposable.cs" />
+    <Compile Include="Disposables\Disposable.cs" />
+    <Compile Include="Disposables\DisposableBag.cs" />
+    <Compile Include="Disposables\DisposeToken.cs" />
+    <Compile Include="Enums\YesNoAsk.cs" />
+    <Compile Include="Extensions\ArraySegmentExtensions.cs" />
+    <Compile Include="Extensions\AssemblyExtensions.cs" />
+    <Compile Include="Extensions\CharExtensions.cs" />
+    <Compile Include="Extensions\ClipboardExtensions.cs" />
+    <Compile Include="Extensions\CompositionBatchExtensions.cs" />
+    <Compile Include="Extensions\CompositionBatchExtensions.FactoryReflectionComposablePart.cs" />
+    <Compile Include="Extensions\ExceptionExtensions.cs" />
+    <Compile Include="Extensions\IOExtensions.cs" />
+    <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="Extensions\StringBuilderExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="IO\DirectoryInfoProxy.cs" />
+    <Compile Include="IO\FileInfoProxy.cs" />
+    <Compile Include="IO\FileSystem.cs" />
+    <Compile Include="IO\FileSystemWatcherProxy.cs" />
+    <Compile Include="IO\FileVersionInfo.cs" />
+    <Compile Include="IO\IDirectoryInfo.cs" />
+    <Compile Include="IO\IFileInfo.cs" />
+    <Compile Include="IO\IFileSystem.cs" />
+    <Compile Include="IO\IFileSystemInfo.cs" />
+    <Compile Include="IO\IFileSystemWatcher.cs" />
+    <Compile Include="IO\IFileVersionInfo.cs" />
+    <Compile Include="IO\KnownFolderGuids.cs" />
+    <Compile Include="Lazy.cs" />
+    <Compile Include="Logging\FileLogWriter.cs" />
+    <Compile Include="Logging\GeneralLog.cs" />
+    <Compile Include="Logging\IActionLinesLog.cs" />
+    <Compile Include="Logging\IActionLog.cs" />
+    <Compile Include="Logging\IActionLogWriter.cs" />
+    <Compile Include="Logging\LinesLog.cs" />
+    <Compile Include="Logging\MessageCategory.cs" />
+    <Compile Include="Logging\NullLog.cs" />
+    <Compile Include="Logging\NullLogWriter.cs" />
+    <Compile Include="Logging\StringLog.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Net\FileDownloader.cs" />
+    <Compile Include="Net\IFileDownloader.cs" />
+    <Compile Include="Net\WebSocketHelper.cs" />
+    <Compile Include="OS\ErrorCodeConverter.cs" />
+    <Compile Include="OS\IProcessServices.cs" />
+    <Compile Include="OS\IRegistry.cs" />
+    <Compile Include="OS\IRegistryKey.cs" />
+    <Compile Include="OS\ProcessServices.cs" />
+    <Compile Include="OS\RegistryImpl.cs" />
+    <Compile Include="OS\RegistryKeyImpl.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shell\CoreShell.cs" />
+    <Compile Include="Shell\ICompositionCatalog.cs" />
+    <Compile Include="Shell\ICoreShell.cs" />
+    <Compile Include="Shell\IIdleTimeService.cs" />
+    <Compile Include="Shell\MessageButtons.cs" />
+    <Compile Include="Shell\ProgressBarSession.cs" />
+    <Compile Include="Tasks\EventTaskSource.cs" />
+    <Compile Include="Tasks\TaskCompletionSourceEx.cs" />
+    <Compile Include="TaskUtilities.cs" />
+    <Compile Include="Telemetry\ITelemetryRecorder.cs" />
+    <Compile Include="Telemetry\ITelemetryService.cs" />
+    <Compile Include="Telemetry\PropertyNames.cs" />
+    <Compile Include="Telemetry\TelemetryArea.cs" />
+    <Compile Include="Telemetry\TelemetryServiceBase.cs" />
+    <Compile Include="Threading\AsyncCountdownEvent.cs" />
+    <Compile Include="Threading\AsyncManualResetEvent.cs" />
+    <Compile Include="Threading\BackgroundThreadAwaitable.cs" />
+    <Compile Include="Threading\BackgroundThreadAwaiter.cs" />
+    <Compile Include="Threading\BinaryAsyncLock.cs" />
+    <Compile Include="Threading\DelayedAsyncAction.cs" />
+    <Compile Include="Versions\Toolset.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Key.snk" />
+    <None Include="project.json" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

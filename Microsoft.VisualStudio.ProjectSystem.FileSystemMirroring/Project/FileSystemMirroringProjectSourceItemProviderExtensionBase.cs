@@ -22,9 +22,9 @@ namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Project {
         private readonly UnconfiguredProject _unconfiguredProject;
         private readonly ConfiguredProject _configuredProject;
         private readonly IProjectLockService _projectLockService;
-        private readonly IFileSystemMirroringProjectTemporaryItems _temporaryItems;
+        private readonly IFileSystemMirroringProjectTemporaryItems2 _temporaryItems;
 
-        protected FileSystemMirroringProjectSourceItemProviderExtensionBase(UnconfiguredProject unconfiguredProject, ConfiguredProject configuredProject, IProjectLockService projectLockService, IFileSystemMirroringProjectTemporaryItems temporaryItems) {
+        protected FileSystemMirroringProjectSourceItemProviderExtensionBase(UnconfiguredProject unconfiguredProject, ConfiguredProject configuredProject, IProjectLockService projectLockService, IFileSystemMirroringProjectTemporaryItems2 temporaryItems) {
             _unconfiguredProject = unconfiguredProject;
             _configuredProject = configuredProject;
             _projectLockService = projectLockService;

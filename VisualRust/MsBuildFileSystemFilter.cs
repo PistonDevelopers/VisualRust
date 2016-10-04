@@ -16,7 +16,7 @@ namespace VisualRust
 
 		public bool IsDirectoryAllowed(string relativePath, FileAttributes attributes)
 		{
-			return !attributes.HasFlag(FileAttributes.Hidden);
+			return !attributes.HasFlag(FileAttributes.Hidden) && !relativePath.StartsWith("target\\");
 		}
 
 		public void Seal() { }

@@ -114,6 +114,8 @@ namespace VisualRust
 
             RegisterProjectFileGenerator(new RustProjectFileGenerator());
 
+            ProjectIconProvider.LoadProjectImages();
+
             packageCommandTarget = GetService(typeof(IOleCommandTarget)) as IOleCommandTarget;
             Instance = this;
 
@@ -278,7 +280,9 @@ namespace VisualRust
 
         protected override void Dispose(bool disposing)
         {
+            ProjectIconProvider.Close();
             //docEventsListener.Dispose();
+
             base.Dispose(disposing);
         }
 

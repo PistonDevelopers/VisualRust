@@ -44,7 +44,8 @@ namespace VisualRust
 		//private const string DefaultRDataName = ".RData";
 		//private const string DefaultRHistoryName = ".RHistory";
 
-		[Export(typeof(IFileSystemMirroringProjectTemporaryItems))]
+		[Export(typeof(IFileSystemMirroringProjectTemporaryItems2))]
+		//[AppliesTo(VisualRustPackage.UniqueCapability)]
 		private FileSystemMirroringProject Project { get; }
 
 		private readonly MsBuildFileSystemWatcher _fileWatcher;

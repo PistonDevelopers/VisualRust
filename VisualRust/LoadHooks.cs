@@ -29,6 +29,7 @@ using Microsoft.Common.Core.Logging;
 //#if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
 using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IThreadHandling;
+using Microsoft.VisualStudio;
 //#endif
 #if VS15
 using Microsoft.VisualStudio.ProjectSystem.VS;
@@ -95,6 +96,21 @@ namespace VisualRust
 			Project = new FileSystemMirroringProject(unconfiguredProject, projectLockService, _fileWatcher, _dependencyProvider);
 		}
 
+		public static IVsPackage EnsurePackageLoaded(Guid guidPackage)
+		{
+			var shell = (IVsShell)VisualRustPackage.GetGlobalService(typeof(IVsShell));
+			var guid = guidPackage;
+			IVsPackage package;
+			int hr = ErrorHandler.ThrowOnFailure(shell.IsPackageLoaded(ref guid, out package), VSConstants.E_FAIL);
+			guid = guidPackage;
+			if (hr != VSConstants.S_OK)
+			{
+				ErrorHandler.ThrowOnFailure(shell.LoadPackage(ref guid, out package), VSConstants.E_FAIL);
+			}
+
+			return package;
+		}
+
 		[AppliesTo(VisualRustPackage.UniqueCapability)]
 //#if VS14
 		[UnconfiguredProjectAutoLoad2(completeBy: UnconfiguredProjectLoadCheckpoint.CapabilitiesEstablished)]
@@ -109,8 +125,8 @@ namespace VisualRust
 			_fileWatcher.Start();
 
 			await _threadHandling.SwitchToUIThread();
-			// Make sure R package is loaded
-			//VsAppShell.EnsurePackageLoaded(RGuidList.RPackageGuid);
+			// Make sure package is loaded
+			EnsurePackageLoaded(GuidList.VisualRustPkgGuid);
 
 			// Verify project is not on a network share and give warning if it is
 			//CheckRemoteDrive(_projectDirectory);

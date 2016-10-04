@@ -74,7 +74,9 @@ namespace VisualRust
     //[ProvideDebugEngine("Rust GDB", typeof(AD7ProgramProvider), typeof(AD7Engine), EngineConstants.EngineId)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideCpsProjectFactory(GuidList.CpsProjectFactoryGuidString, "Rust")]
-    [ProvideProjectFileGenerator(typeof(RustProjectFileGenerator), GuidList.CpsProjectFactoryGuidString, FileExtensions = "toml", DisplayGeneratorFilter = 300)]
+    [ProvideProjectFileGenerator(typeof(RustProjectFileGenerator), GuidList.CpsProjectFactoryGuidString, FileNames = "Cargo.toml", DisplayGeneratorFilter = 300)]
+    // TODO: not sure what DeveloperActivity actually does
+    [DeveloperActivity("Rust", GuidList.guidVisualRustPkgString, sortPriority: 40)]
     public class VisualRustPackage : Package, IOleCommandTarget
     {
         //private RunningDocTableEventsListener docEventsListener;
@@ -120,6 +122,7 @@ namespace VisualRust
             Racer.RacerSingleton.Init();
         }
 
+        // TODO: add UnregisterProjectFileGenerators
         private void RegisterProjectFileGenerator(IVsProjectGenerator projectFileGenerator)
         {
             var registerProjectGenerators = GetService(typeof(SVsRegisterProjectTypes)) as IVsRegisterProjectGenerators;

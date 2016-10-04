@@ -10,5 +10,6 @@ namespace VisualRust
         public const string CpsProjectFactoryGuidString = "c7cbdbed-50ca-46fc-be3b-1d7809d42a0a";
         public static readonly Guid CpsProjectFactoryGuid = new Guid(CpsProjectFactoryGuidString);
         public const string ProjectFileGenerationGuidString = "04486994-cf85-4394-b3cd-53ddc27698f5";
+        public static readonly Guid VisualRustPkgGuid = new Guid(guidVisualRustPkgString);
     };
 }

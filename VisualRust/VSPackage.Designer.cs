@@ -97,6 +97,15 @@ namespace VisualRust {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cargo Manifest Files;Cargo.toml.
+        /// </summary>
+        internal static string _300 {
+            get {
+                return ResourceManager.GetString("300", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon _400 {

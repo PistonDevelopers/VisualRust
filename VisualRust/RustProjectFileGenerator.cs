@@ -3,13 +3,12 @@
 
 using System.IO;
 using System.Runtime.InteropServices;
-//using Microsoft.R.Components.ContentTypes;
 using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.MsBuild;
 using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Project;
-//using Microsoft.VisualStudio.R.Packages.R;
 
 namespace VisualRust
 {
+	// TODO: build a correct project file generator, probably not based on FileSystemMirroringProjectFileGenerator
 	[Guid(GuidList.ProjectFileGenerationGuidString)]
 	internal sealed class RustProjectFileGenerator : FileSystemMirroringProjectFileGenerator
 	{
@@ -25,12 +24,12 @@ namespace VisualRust
 
 		protected override XPropertyGroup CreateProjectSpecificPropertyGroup(string cpsProjFileName)
 		{
-			var scripts = Directory.GetFiles(Path.GetDirectoryName(cpsProjFileName), "*.rs");
-			if (scripts.Length > 0)
-			{
-				var startupFile = Path.GetFileName(scripts[0]);
-				return new XPropertyGroup(new XProperty("StartupFile", startupFile));
-			}
+			//var scripts = Directory.GetFiles(Path.GetDirectoryName(cpsProjFileName), "*.rs");
+			//if (scripts.Length > 0)
+			//{
+			//	var startupFile = Path.GetFileName(scripts[0]);
+			//	return new XPropertyGroup(new XProperty("StartupFile", startupFile));
+			//}
 			return null;
 		}
 	}

@@ -8,7 +8,7 @@
     "Microsoft.VisualStudio.SDK.EmbedInteropTypes": "14.1.2",
     "Microsoft.VisualStudio.Shell.Immutable.10.0": "10.0.30319",
     "Microsoft.VisualStudio.Shell.Interop.11.0": "11.0.61030",
-    "System.Collections.Immutable": "1.2.0"
+    "System.Collections.Immutable": "1.1.37"
   },
   "frameworks": {
     "net46": {}

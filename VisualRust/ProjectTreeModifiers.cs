@@ -22,10 +22,10 @@ namespace VisualRust {
                     {
                         tree = tree.SetIcon(ProjectIconProvider.RustFileNodeImage.ToProjectSystemType());
                     }
-                    /*else if (ext == ".md")
+                    else if (ext == ".md")
                     {
                         tree = tree.SetIcon(KnownMonikers.MarkdownFile.ToProjectSystemType());
-                    }*/
+                    }
                 }
             }
             return tree;

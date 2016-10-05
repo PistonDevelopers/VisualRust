@@ -17,15 +17,23 @@ namespace VisualRust {
                 if (tree.Capabilities.Contains(ProjectTreeCapabilities.ProjectRoot)) {
                     tree = tree.SetIcon(ProjectIconProvider.ProjectNodeImage.ToProjectSystemType());
                 } else if (tree.Capabilities.Contains(ProjectTreeCapabilities.FileOnDisk)) {
-                    string ext = Path.GetExtension(tree.FilePath).ToLowerInvariant();
-                    if (ext == ".rs")
-                    {
-                        tree = tree.SetIcon(ProjectIconProvider.RustFileNodeImage.ToProjectSystemType());
-                    }
-                    else if (ext == ".md")
-                    {
-                        tree = tree.SetIcon(KnownMonikers.MarkdownFile.ToProjectSystemType());
-                    }
+					string name = Path.GetFileName(tree.FilePath).ToLowerInvariant();
+					if (name == "cargo.toml")
+					{
+						tree = tree.SetIcon(ProjectIconProvider.CargoManifestNodeImage.ToProjectSystemType());
+					}
+					else
+					{
+						string ext = Path.GetExtension(tree.FilePath).ToLowerInvariant();
+						if (ext == ".rs")
+						{
+							tree = tree.SetIcon(ProjectIconProvider.RustFileNodeImage.ToProjectSystemType());
+						}
+						else if (ext == ".md")
+						{
+							tree = tree.SetIcon(KnownMonikers.MarkdownFile.ToProjectSystemType());
+						}
+					}
                 }
             }
             return tree;

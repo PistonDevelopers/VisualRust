@@ -14,6 +14,7 @@ namespace VisualRust
 
 		public static ImageMoniker ProjectNodeImage { get; private set; }
 		public static ImageMoniker RustFileNodeImage { get; private set; }
+		public static ImageMoniker CargoManifestNodeImage { get; private set; }
 
 		/// <summary>
 		/// Creates image list and image monikers for project icons.
@@ -32,15 +33,17 @@ namespace VisualRust
 
 				_imageList.Images.Add(Resources.RustProjectNode);
 				_imageList.Images.Add(Resources.RustFileNode);
+				_imageList.Images.Add(Resources.CargoManifestNode);
 
 				_monikerImageList = imageService.CreateMonikerImageListFromHIMAGELIST(_imageList.Handle);
 				imageService.AddCustomImageList(_monikerImageList);
 
-				ImageMoniker[] monikers = new ImageMoniker[2];
-				_monikerImageList.GetImageMonikers(0, 2, monikers);
+				ImageMoniker[] monikers = new ImageMoniker[3];
+				_monikerImageList.GetImageMonikers(0, 3, monikers);
 
 				ProjectNodeImage = monikers[0];
 				RustFileNodeImage = monikers[1];
+				CargoManifestNodeImage = monikers[2];
 			}
 		}
 

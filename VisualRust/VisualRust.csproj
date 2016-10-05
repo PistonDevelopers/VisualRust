@@ -406,6 +406,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <None Include="Resources\CargoManifestNode.png" />
     <None Include="Resources\RustProjectNode.png" />
     <None Include="Resources\RustFileNode.png" />
     <Resource Include="Resources\Package.ico" />

@@ -63,6 +63,16 @@ namespace VisualRust {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CargoManifestNode {
+            get {
+                object obj = ResourceManager.GetObject("CargoManifestNode", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap RustFileNode {
             get {
                 object obj = ResourceManager.GetObject("RustFileNode", resourceCulture);

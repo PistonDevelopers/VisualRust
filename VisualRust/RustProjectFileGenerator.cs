@@ -1,36 +1,63 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
-
+﻿using Microsoft.Common.Core;
+using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.MsBuild;
+using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Shell;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.MsBuild;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Project;
+using System.Xml.Linq;
 
 namespace VisualRust
 {
-	// TODO: build a correct project file generator, probably not based on FileSystemMirroringProjectFileGenerator
 	[Guid(GuidList.ProjectFileGenerationGuidString)]
-	internal sealed class RustProjectFileGenerator : FileSystemMirroringProjectFileGenerator
+	internal sealed class RustProjectFileGenerator : IVsProjectGenerator
 	{
-		private static readonly string[] _imports = {
-			 //ProjectConstants.RtvsRulesPropsRelativePath,
-			 //ProjectConstants.RtvsTargetsRelativePath,
-		};
-
-		public RustProjectFileGenerator()
-			: base(GuidList.CpsProjectFactoryGuid, null, ".rsproj", _imports)
+		public void RunGenerator(string szSourceFileMoniker, out bool pfProjectIsGenerated, out string pbstrGeneratedFile, out Guid pGuidProjType)
 		{
+			pfProjectIsGenerated = true;
+			pbstrGeneratedFile = GetCpsProjFileName(szSourceFileMoniker);
+			pGuidProjType = GuidList.CpsProjectFactoryGuid;
+
+			EnsureCpsProjFile(pbstrGeneratedFile);
 		}
 
-		protected override XPropertyGroup CreateProjectSpecificPropertyGroup(string cpsProjFileName)
+		private string GetCpsProjFileName(string fileName)
 		{
-			//var scripts = Directory.GetFiles(Path.GetDirectoryName(cpsProjFileName), "*.rs");
-			//if (scripts.Length > 0)
-			//{
-			//	var startupFile = Path.GetFileName(scripts[0]);
-			//	return new XPropertyGroup(new XProperty("StartupFile", startupFile));
-			//}
-			return null;
+			var directory = new DirectoryInfo(Path.GetDirectoryName(fileName));
+			return directory.FullName
+				+ Path.DirectorySeparatorChar
+				+ directory.Name
+				+ ".rsproj";
+		}
+
+		private void EnsureCpsProjFile(string cpsProjFileName)
+		{
+			var fileInfo = new FileInfo(cpsProjFileName);
+			if (fileInfo.Exists)
+			{
+				return;
+			}
+
+			//var inMemoryTargetsFile = FileSystemMirroringProjectUtilities.GetInMemoryTargetsFileName(cpsProjFileName);
+
+			var xProjDocument = new XProjDocument(
+				new XProject(Toolset.Version, "Build",
+					new XPropertyGroup("Globals", null,
+						new XProperty("ProjectGuid", Guid.NewGuid().ToString("D")),
+						new XProperty("ManifestPath", "Cargo.toml")
+					),
+					new XProjElement("Target", new XAttribute("Name", "Build")),
+					new XProjElement("Import", new XAttribute("Project", @"$(MSBuildExtensionsPath)\VisualRust\VisualRust.Rust.targets")),
+					new XProjElement("Import",
+						new XAttribute("Project", @"$(MSBuildThisFileName).InMemory.Targets"),
+						new XAttribute("Condition", "Exists('$(MSBuildThisFileName).InMemory.Targets')")
+					)
+				)
+			);
+
+			using (var writer = fileInfo.CreateText())
+			{
+				xProjDocument.Save(writer);
+			}
 		}
 	}
 }

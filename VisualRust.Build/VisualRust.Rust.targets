@@ -1,12 +1,59 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <RulesDirectory>$(MSBuildThisFileDirectory)\Rules</RulesDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefaultContentType Condition="$(DefaultContentType) == ''">Default</DefaultContentType>
+    <!-- We don't target any framework, so clear what the Microsoft.Common.targets sets. -->
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectCapability Include="OutputGroups"/>
+    <ProjectCapability Include="AllTargetOutputGroups"/>
+    <ProjectCapability Include="VisualStudioWellKnownOutputGroups"/>
+    <ProjectCapability Include="SourceItemsFromImports"/>
+    <ProjectCapability Include="ProjectConfigurationsInferredFromUsage"/>
+    <ProjectCapability Include="SharedImports"/>
+    <ProjectCapability Include="VisualRust"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PropertyPageSchema Include="$(RulesDirectory)\ProjectItemsSchema.xaml;"/>
+    <PropertyPageSchema Include="$(RulesDirectory)\Scc.xaml">
+      <Context>Invisible</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(RulesDirectory)\Run.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(RulesDirectory)\Settings.xaml">
+      <Context>Settings</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(RulesDirectory)\General.BrowseObject.xaml;">
+      <Context>BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(RulesDirectory)\Content.xaml;
+                                 $(RulesDirectory)\Folder.xaml;
+                                 $(RulesDirectory)\None.xaml;">
+      <Context>File;BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <!--<PropertyPageSchema Include="$(RulesDirectory)\Debugger.xaml;"/>-->
+  </ItemGroup>
+
   <UsingTask AssemblyFile="$(VisualRustTasksPath)\VisualRust.Build.dll"
              TaskFactory="RustcFactory"
              TaskName="Rustc"/>
 
   <PropertyGroup>
     <ManifestPath Condition="'$(ManifestPath)' == ''">Cargo.toml</ManifestPath>
-    <VisualRustTasksPath>$(MSBuildExtensionsPath)\VisualRust</VisualRustTasksPath>
+    <VisualRustTasksPath>$(MSBuildThisFileDirectory)</VisualRustTasksPath>
     <OutputType Condition="'$(OutputType)' != 'library'">exe</OutputType>
     <_EntryPoint Condition="'$(OutputType)'=='exe'">src\main.rs</_EntryPoint>
     <_EntryPoint Condition="'$(OutputType)'=='library'">src\lib.rs</_EntryPoint>

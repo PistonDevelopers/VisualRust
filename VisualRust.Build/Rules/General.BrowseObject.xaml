@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT License. See LICENSE in the project root for license information.
+-->
+<Rule Name="ConfigurationGeneral" DisplayName="General" PageTemplate="generic" Description="General" xmlns="http://schemas.microsoft.com/build/2009/properties">
+  <Rule.Categories>
+    <Category Name="General" DisplayName="General" />
+  </Rule.Categories>
+  <Rule.DataSource>
+    <DataSource Persistence="ProjectFile" />
+  </Rule.DataSource>
+
+  <BoolProperty Name="ShowAllFiles" Visible="false">
+    <BoolProperty.DataSource>
+      <DataSource Persistence="UserFile" HasConfigurationCondition="false" />
+    </BoolProperty.DataSource>
+  </BoolProperty>
+</Rule>

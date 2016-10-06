@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(NuGetPackageRoot)' == ''">
+    <NuGetPackageRoot>$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+  </PropertyGroup>
+  <ImportGroup>
+    <Import Project="$(NuGetPackageRoot)\Microsoft.VisualStudio.SDK.EmbedInteropTypes\14.1.3\build\Microsoft.VisualStudio.SDK.EmbedInteropTypes.targets" Condition="Exists('$(NuGetPackageRoot)\Microsoft.VisualStudio.SDK.EmbedInteropTypes\14.1.3\build\Microsoft.VisualStudio.SDK.EmbedInteropTypes.targets')" />
+    <Import Project="$(NuGetPackageRoot)\Microsoft.VisualStudio.SDK.VsixSuppression\14.1.29\build\Microsoft.VisualStudio.SDK.VsixSuppression.targets" Condition="Exists('$(NuGetPackageRoot)\Microsoft.VisualStudio.SDK.VsixSuppression\14.1.29\build\Microsoft.VisualStudio.SDK.VsixSuppression.targets')" />
+  </ImportGroup>
+</Project>

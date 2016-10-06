@@ -374,8 +374,8 @@ namespace VisualRust.Build
             var primarySpan = msg.GetPrimarySpan();
             var code = msg.GetErrorCodeAsString();
 
-            // supress messages like "aborting due to previous error"
-            if (String.IsNullOrEmpty(code) && primarySpan == null)
+            // suppress message "aborting due to previous error"
+            if (String.IsNullOrEmpty(code) && primarySpan == null && msg.message.Contains("aborting due to previous error"))
                 return;
 
             if (type == RustcMessageType.Error)

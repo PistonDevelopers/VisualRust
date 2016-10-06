@@ -27,7 +27,7 @@ using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IProjectThreadingSe
 #endif
 
 
-namespace VisualRust
+namespace VisualRust.ProjectSystem
 {
 	internal sealed class LoadHooks
 	{

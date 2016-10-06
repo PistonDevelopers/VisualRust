@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.ProjectSystem.Items;
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
 //#endif
 
-namespace VisualRust
+namespace VisualRust.ProjectSystem
 {
 	[Export(typeof(IProjectSourceItemProviderExtension))]
 	[Export(typeof(IProjectFolderItemProviderExtension))]

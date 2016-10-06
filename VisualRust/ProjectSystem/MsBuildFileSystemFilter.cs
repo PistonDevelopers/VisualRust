@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using System.Linq;
 using Microsoft.Common.Core;
-//using Microsoft.R.Components.ContentTypes;
 using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.IO;
 
-namespace VisualRust
+namespace VisualRust.ProjectSystem
 {
 	internal sealed class MsBuildFileSystemFilter : IMsBuildFileSystemFilter
 	{

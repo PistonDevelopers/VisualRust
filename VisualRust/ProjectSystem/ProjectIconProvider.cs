@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace VisualRust
+namespace VisualRust.ProjectSystem
 {
 	internal static class ProjectIconProvider
 	{

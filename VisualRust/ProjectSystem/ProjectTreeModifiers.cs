@@ -8,15 +8,22 @@ using Microsoft.VisualStudio.ProjectSystem.Designers;
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
 using Microsoft.VisualStudio.ProjectSystem.Utilities.Designers;
 
-namespace VisualRust {
-    [Export(typeof(IProjectTreeModifier))]
-    [AppliesTo(VisualRustPackage.UniqueCapability)]
-    internal sealed class ProjectTreeModifier : IProjectTreeModifier {
-        public IProjectTree ApplyModifications(IProjectTree tree, IProjectTreeProvider projectTreeProvider) {
-            if (tree != null) {
-                if (tree.Capabilities.Contains(ProjectTreeCapabilities.ProjectRoot)) {
-                    tree = tree.SetIcon(ProjectIconProvider.ProjectNodeImage.ToProjectSystemType());
-                } else if (tree.Capabilities.Contains(ProjectTreeCapabilities.FileOnDisk)) {
+namespace VisualRust.ProjectSystem
+{
+	[Export(typeof(IProjectTreeModifier))]
+	[AppliesTo(VisualRustPackage.UniqueCapability)]
+	internal sealed class ProjectTreeModifier : IProjectTreeModifier
+	{
+		public IProjectTree ApplyModifications(IProjectTree tree, IProjectTreeProvider projectTreeProvider)
+		{
+			if (tree != null)
+			{
+				if (tree.Capabilities.Contains(ProjectTreeCapabilities.ProjectRoot))
+				{
+					tree = tree.SetIcon(ProjectIconProvider.ProjectNodeImage.ToProjectSystemType());
+				}
+				else if (tree.Capabilities.Contains(ProjectTreeCapabilities.FileOnDisk))
+				{
 					string name = Path.GetFileName(tree.FilePath).ToLowerInvariant();
 					if (name == "cargo.toml")
 					{
@@ -34,10 +41,10 @@ namespace VisualRust {
 							tree = tree.SetIcon(KnownMonikers.MarkdownFile.ToProjectSystemType());
 						}
 					}
-                }
-            }
-            return tree;
-        }
-    }
+				}
+			}
+			return tree;
+		}
+	}
 }
 //#endif

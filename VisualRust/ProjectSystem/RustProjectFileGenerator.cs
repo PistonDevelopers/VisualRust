@@ -6,7 +6,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
 
-namespace VisualRust
+namespace VisualRust.ProjectSystem
 {
 	[Guid(GuidList.ProjectFileGenerationGuidString)]
 	internal sealed class RustProjectFileGenerator : IVsProjectGenerator

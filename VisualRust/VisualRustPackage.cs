@@ -20,6 +20,7 @@ using VisualRust.Options;
 using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Package.Registration;
 using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Shell;
 using System.Collections.Generic;
+using VisualRust.ProjectSystem;
 
 namespace VisualRust
 {

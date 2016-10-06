@@ -291,8 +291,8 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LoadHooks.cs" />
-    <Compile Include="MsBuildFileSystemFilter.cs" />
+    <Compile Include="ProjectSystem\LoadHooks.cs" />
+    <Compile Include="ProjectSystem\MsBuildFileSystemFilter.cs" />
     <Compile Include="ProjectForms\BasePropertyPage.cs" />
     <Compile Include="ProjectForms\BuildPropertyPage.cs" />
     <Compile Include="ProjectForms\DebugPropertyPage.cs" />
@@ -318,8 +318,8 @@
     <Compile Include="Forms\RustOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ProjectIconProvider.cs" />
-    <Compile Include="ProjectTreeModifiers.cs" />
+    <Compile Include="ProjectSystem\ProjectIconProvider.cs" />
+    <Compile Include="ProjectSystem\ProjectTreeModifiers.cs" />
     <Compile Include="ProvideDebugEngineAttribute.cs" />
     <Compile Include="Racer\RacerSingleton.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -328,10 +328,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="RunningDocTableEventsListener.cs" />
     <Compile Include="RustBraceMatcher.cs" />
-    <Compile Include="RustProjectFileGenerator.cs" />
-    <Compile Include="RustProjectSourceItemProviderExtensions.cs" />
+    <Compile Include="ProjectSystem\RustProjectFileGenerator.cs" />
+    <Compile Include="ProjectSystem\RustProjectSourceItemProviderExtensions.cs" />
     <Compile Include="Text\JoinedTextChange.cs" />
     <Compile Include="Text\RustClassifier.cs" />
     <Compile Include="Text\RustClassifierProvider.cs" />

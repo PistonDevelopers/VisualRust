@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Package.Regis
     public sealed class ProvideCpsProjectFactoryAttribute : RegistrationAttribute {
         public string ProjectTypeGuid { get; }
         public string LanguageVsTemplate { get; }
+        public string PossibleProjectExtensions { get; }
 
         private bool? _disableAsynchronousSolutionLoadValue;
         public bool DisableAsynchronousSolutionLoad {
@@ -14,9 +15,10 @@ namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Package.Regis
             set { _disableAsynchronousSolutionLoadValue = value; }
         }
 
-        public ProvideCpsProjectFactoryAttribute(string projectTypeGuid, string languageVsTemplate) {
+        public ProvideCpsProjectFactoryAttribute(string projectTypeGuid, string languageVsTemplate, string possibleProjectExtensions) {
             ProjectTypeGuid = projectTypeGuid;
             LanguageVsTemplate = languageVsTemplate;
+            PossibleProjectExtensions = possibleProjectExtensions;
         }
 
         public override void Register(RegistrationContext context) {
@@ -34,7 +36,8 @@ namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Package.Regis
                     .PackageGuidValue("Package")
                     .StringValue("Language(VsTemplate)", LanguageVsTemplate)
                     .GuidValue("ProjectFactoryPackage", "3347BEE8-D7A1-4082-95E4-38A439553CC2")
-                    .BoolValue("DisableAsynchronousSolutionLoad", DisableAsynchronousSolutionLoad);
+                    .BoolValue("DisableAsynchronousSolutionLoad", DisableAsynchronousSolutionLoad)
+                    .StringValue("PossibleProjectExtensions", PossibleProjectExtensions);
             return builder;
         }
     }

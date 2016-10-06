@@ -1,0 +1,6 @@
+﻿[package]
+name = "$safeprojectname$"
+version = "0.1.0"
+authors = ["$username$"]
+
+[dependencies]

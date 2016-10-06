@@ -74,7 +74,7 @@ namespace VisualRust
     [ProvideProfile(typeof(RustOptionsPage), "Visual Rust", "General", 110, 113, true)]
     //[ProvideDebugEngine("Rust GDB", typeof(AD7ProgramProvider), typeof(AD7Engine), EngineConstants.EngineId)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideCpsProjectFactory(GuidList.CpsProjectFactoryGuidString, "Rust")]
+    [ProvideCpsProjectFactory(GuidList.CpsProjectFactoryGuidString, "Rust", "rsproj")]
     [ProvideProjectFileGenerator(typeof(RustProjectFileGenerator), GuidList.CpsProjectFactoryGuidString, FileNames = "Cargo.toml", DisplayGeneratorFilter = 300)]
     // TODO: not sure what DeveloperActivity actually does
     [DeveloperActivity("Rust", GuidList.guidVisualRustPkgString, sortPriority: 40)]
@@ -125,7 +125,6 @@ namespace VisualRust
             Racer.RacerSingleton.Init();
         }
 
-        // TODO: add UnregisterProjectFileGenerators
         private void RegisterProjectFileGenerator(IVsProjectGenerator projectFileGenerator)
         {
             var registerProjectGenerators = GetService(typeof(SVsRegisterProjectTypes)) as IVsRegisterProjectGenerators;
@@ -144,6 +143,32 @@ namespace VisualRust
             }
 
             _projectFileGenerators[projectFileGenerator] = cookie;
+        }
+
+        private void UnregisterProjectFileGenerators(Dictionary<IVsProjectGenerator, uint> projectFileGenerators)
+        {
+            try
+            {
+                IVsRegisterProjectGenerators registerProjectGenerators = GetService(typeof(SVsRegisterProjectTypes)) as IVsRegisterProjectGenerators;
+                if (registerProjectGenerators != null)
+                {
+                    foreach (var projectFileGenerator in projectFileGenerators)
+                    {
+                        try
+                        {
+                            registerProjectGenerators.UnregisterProjectGenerator(projectFileGenerator.Value);
+                        }
+                        finally
+                        {
+                            (projectFileGenerator.Key as IDisposable)?.Dispose();
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Fail(String.Format(CultureInfo.InvariantCulture, "Failed to dispose project file generator for package {0}\n{1}", GetType().FullName, e.Message));
+            }
         }
 
         int IOleCommandTarget.Exec(ref Guid cmdGroup, uint nCmdID, uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
@@ -284,7 +309,20 @@ namespace VisualRust
             ProjectIconProvider.Close();
             //docEventsListener.Dispose();
 
-            base.Dispose(disposing);
+            if (!disposing)
+            {
+                base.Dispose(false);
+                return;
+            }
+
+            if (_projectFileGenerators != null)
+            {
+                var projectFileGenerators = _projectFileGenerators;
+                _projectFileGenerators = null;
+                UnregisterProjectFileGenerators(projectFileGenerators);
+            }
+
+            base.Dispose(true);
         }
 
         #endregion

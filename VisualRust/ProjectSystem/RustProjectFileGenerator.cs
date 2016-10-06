@@ -37,22 +37,21 @@ namespace VisualRust.ProjectSystem
 				return;
 			}
 
-			//var inMemoryTargetsFile = FileSystemMirroringProjectUtilities.GetInMemoryTargetsFileName(cpsProjFileName);
+			var xProj = new XProject();
 
-			var xProjDocument = new XProjDocument(
-				new XProject(Toolset.Version, "Build",
-					new XPropertyGroup("Globals", null,
-						new XProperty("ProjectGuid", Guid.NewGuid().ToString("D")),
-						new XProperty("ManifestPath", "Cargo.toml")
-					),
-					new XProjElement("Target", new XAttribute("Name", "Build")),
-					new XProjElement("Import", new XAttribute("Project", @"$(MSBuildExtensionsPath)\VisualRust\VisualRust.Rust.targets")),
-					new XProjElement("Import",
-						new XAttribute("Project", @"$(MSBuildThisFileName).InMemory.Targets"),
-						new XAttribute("Condition", "Exists('$(MSBuildThisFileName).InMemory.Targets')")
-					)
+			xProj.Add(
+				new XPropertyGroup("Globals", null,
+					new XProperty("ProjectGuid", Guid.NewGuid().ToString("D")),
+					new XProperty("ManifestPath", "Cargo.toml")
+				),
+				new XProjElement("Import", new XAttribute("Project", @"$(MSBuildExtensionsPath)\VisualRust\VisualRust.Rust.targets")),
+				new XProjElement("Import",
+					new XAttribute("Project", @"$(MSBuildThisFileName).InMemory.Targets"),
+					new XAttribute("Condition", "Exists('$(MSBuildThisFileName).InMemory.Targets')")
 				)
 			);
+
+			var xProjDocument = new XProjDocument(xProj);
 
 			using (var writer = fileInfo.CreateText())
 			{

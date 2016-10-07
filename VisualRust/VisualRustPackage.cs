@@ -55,14 +55,6 @@ namespace VisualRust
         EnableFormatSelection = true,
         SupportCopyPasteOfHTML = false
     )]
-    /*[ProvideProjectFactory(
-        typeof(RustProjectFactory),
-        "Rust",
-        "Rust Project Files (*.rsproj);*.rsproj",
-        "rsproj",
-        "rsproj",
-        ".\\NullPath",
-        LanguageVsTemplate="Rust")]*/
     [ProvideLanguageExtension(typeof(RustLanguage), ".rs")]
     [Guid(GuidList.guidVisualRustPkgString)]
     //[ProvideObject(typeof(Project.Forms.ApplicationPropertyPage))]
@@ -80,7 +72,6 @@ namespace VisualRust
     [DeveloperActivity("Rust", GuidList.guidVisualRustPkgString, sortPriority: 40)]
     public class VisualRustPackage : Package, IOleCommandTarget
     {
-        //private RunningDocTableEventsListener docEventsListener;
         private IOleCommandTarget packageCommandTarget;
         private Dictionary<IVsProjectGenerator, uint> _projectFileGenerators;
 
@@ -119,8 +110,6 @@ namespace VisualRust
 
             packageCommandTarget = GetService(typeof(IOleCommandTarget)) as IOleCommandTarget;
             Instance = this;
-
-            //docEventsListener = new RunningDoc2TableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
 
             Racer.RacerSingleton.Init();
         }
@@ -307,7 +296,6 @@ namespace VisualRust
         protected override void Dispose(bool disposing)
         {
             ProjectIconProvider.Close();
-            //docEventsListener.Dispose();
 
             if (!disposing)
             {
@@ -326,40 +314,5 @@ namespace VisualRust
         }
 
         #endregion
-
-        //public override ProjectFactory CreateProjectFactory()
-        //{
-        //    return new RustProjectFactory(this);
-        //}
-
-        //public override CommonEditorFactory CreateEditorFactory()
-        //{
-        //    return null;
-        //}
-
-        //public override uint GetIconIdForAboutBox()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public override uint GetIconIdForSplashScreen()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public override string GetProductName()
-        //{
-        //    return "Visual Rust";
-        //}
-
-        //public override string GetProductDescription()
-        //{
-        //    return "Visual Studio integration for the Rust programming language (http://www.rust-lang.org/)";
-        //}
-
-        //public override string GetProductVersion()
-        //{
-        //    return "0.1.2";
-        //}
     }
 }

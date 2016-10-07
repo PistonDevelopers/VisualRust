@@ -26,16 +26,12 @@
       <Context>Invisible</Context>
     </PropertyPageSchema>
 
-    <PropertyPageSchema Include="$(RulesDirectory)\Run.xaml">
-      <Context>Project</Context>
-    </PropertyPageSchema>
-
     <PropertyPageSchema Include="$(RulesDirectory)\Settings.xaml">
       <Context>Settings</Context>
     </PropertyPageSchema>
 
-    <PropertyPageSchema Include="$(RulesDirectory)\General.BrowseObject.xaml;">
-      <Context>BrowseObject</Context>
+    <PropertyPageSchema Include="$(RulesDirectory)\General.xaml;">
+      <Context>Project;BrowseObject</Context>
     </PropertyPageSchema>
 
     <PropertyPageSchema Include="$(RulesDirectory)\Content.xaml;
@@ -44,8 +40,12 @@
       <Context>File;BrowseObject</Context>
     </PropertyPageSchema>
 
-    <!--<PropertyPageSchema Include="$(RulesDirectory)\Debugger.xaml;"/>-->
+    <PropertyPageSchema Include="$(RulesDirectory)\Debugger.xaml;"/>
   </ItemGroup>
+  
+  <PropertyGroup>
+    <DebuggerFlavor>RustDebugger</DebuggerFlavor>
+  </PropertyGroup>
 
   <UsingTask AssemblyFile="$(VisualRustTasksPath)\VisualRust.Build.dll"
              TaskFactory="RustcFactory"

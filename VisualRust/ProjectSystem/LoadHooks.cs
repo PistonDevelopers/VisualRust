@@ -43,7 +43,6 @@ namespace VisualRust.ProjectSystem
 		private readonly IEnumerable<Lazy<IVsProject>> _cpsIVsProjects;
 		private readonly IProjectItemDependencyProvider _dependencyProvider;
 
-
 		/// <summary>
 		/// Backing field for the similarly named property.
 		/// </summary>
@@ -99,6 +98,8 @@ namespace VisualRust.ProjectSystem
 			await _threadHandling.SwitchToUIThread();
 			// Make sure package is loaded
 			EnsurePackageLoaded(GuidList.VisualRustPkgGuid);
+
+			// TODO: start watching the Cargo manifest
 		}
 
 		private void FileWatcherError(object sender, EventArgs args)

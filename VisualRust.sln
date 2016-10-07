@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust", "VisualRust\VisualRust.csproj", "{8B7B30F7-17C1-4CE8-BAF4-88B086AF7B25}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9CF556AB-76FE-4C3D-AD0A-B64B3B9989B4} = {9CF556AB-76FE-4C3D-AD0A-B64B3B9989B4}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RustLexer", "RustLexer\RustLexer.csproj", "{E983E989-F83A-4643-896A-AD496BF647D0}"
 EndProject

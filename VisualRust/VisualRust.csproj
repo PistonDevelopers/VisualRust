@@ -104,6 +104,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProjectSystem\CargoManifestData.cs" />
+    <Compile Include="ProjectSystem\DebugLaunchProvider.cs" />
+    <Compile Include="ProjectSystem\ICargoManifestData.cs" />
     <Compile Include="ProjectSystem\LoadHooks.cs" />
     <Compile Include="ProjectSystem\MsBuildFileSystemFilter.cs" />
     <Compile Include="ProjectForms\BasePropertyPage.cs" />
@@ -127,11 +130,12 @@
     <Compile Include="Forms\RustOptionsPageControl.designer.cs">
       <DependentUpon>RustOptionsPageControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Guids.cs" />
+    <Compile Include="GuidList.cs" />
     <Compile Include="Forms\RustOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ProjectSystem\ProjectIconProvider.cs" />
+    <Compile Include="ProjectSystem\ProjectProperties.cs" />
     <Compile Include="ProjectSystem\ProjectTreeModifiers.cs" />
     <Compile Include="ProvideDebugEngineAttribute.cs" />
     <Compile Include="Racer\RacerSingleton.cs" />

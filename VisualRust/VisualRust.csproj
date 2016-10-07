@@ -87,6 +87,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UIAutomationTypes" />
@@ -105,7 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProjectSystem\CargoManifestData.cs" />
-    <Compile Include="ProjectSystem\DebugLaunchProvider.cs" />
+    <Compile Include="ProjectSystem\RustDebuggerProvider.cs" />
     <Compile Include="ProjectSystem\ICargoManifestData.cs" />
     <Compile Include="ProjectSystem\LoadHooks.cs" />
     <Compile Include="ProjectSystem\MsBuildFileSystemFilter.cs" />
@@ -135,7 +136,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ProjectSystem\ProjectIconProvider.cs" />
-    <Compile Include="ProjectSystem\ProjectProperties.cs" />
+    <Compile Include="ProjectProperties.cs" />
     <Compile Include="ProjectSystem\ProjectTreeModifiers.cs" />
     <Compile Include="ProvideDebugEngineAttribute.cs" />
     <Compile Include="Racer\RacerSingleton.cs" />
@@ -248,6 +249,34 @@
       <Name>VisualRust.Templates</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <XamlPropertyRule Include="Rules\Content.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="Rules\Debugger.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="Rules\Folder.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="Rules\General.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="Rules\None.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <Content Include="Rules\ProjectItemsSchema.xaml">
+      <SubType>Designer</SubType>
+    </Content>
+    <XamlPropertyRule Include="Rules\Scc.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+  </ItemGroup>
+  <ItemGroup>
+    <XamlPropertyRule Include="Rules\RustDebugger.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

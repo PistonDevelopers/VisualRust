@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.ProjectSystem.Properties;
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
 
-namespace VisualRust.ProjectSystem
+namespace VisualRust
 {
     [Export]
     internal partial class ProjectProperties : StronglyTypedPropertyAccess

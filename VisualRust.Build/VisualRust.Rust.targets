@@ -40,7 +40,8 @@
       <Context>File;BrowseObject</Context>
     </PropertyPageSchema>
 
-    <PropertyPageSchema Include="$(RulesDirectory)\Debugger.xaml;"/>
+    <PropertyPageSchema Include="$(RulesDirectory)\Debugger.xaml;
+                                 $(RulesDirectory)\RustDebugger.xaml;"/>
   </ItemGroup>
   
   <PropertyGroup>

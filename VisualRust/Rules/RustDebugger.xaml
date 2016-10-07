@@ -1,0 +1,20 @@
+﻿<Rule Name="RustDebugger"
+      DisplayName="Rust Debugger"
+      PageTemplate="debugger"
+      Description="Debugging options"
+      xmlns="http://schemas.microsoft.com/build/2009/properties"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Rule.DataSource>
+        <DataSource Persistence="UserFile" HasConfigurationCondition="False"/>
+    </Rule.DataSource>
+
+    <StringProperty Name="StartWorkingDirectory" DisplayName="Working Directory" IncludeInCommandLine="false"
+                  Description="The application's working directory. By default, the directory containing the project file."
+                  Subtype="folder"
+                  F1Keyword="VC.Project.IVCLocalDebugPageObject.WorkingDirectory"/>
+
+    <StringProperty Name="StartArguments" DisplayName="Command Arguments" IncludeInCommandLine="false"
+                  Description="The command line arguments to pass to the application."
+                  Subtype="folder"
+                  F1Keyword="VC.Project.IVCLocalDebugPageObject.CommandArguments"/>
+</Rule>

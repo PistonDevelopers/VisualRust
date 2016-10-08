@@ -19,16 +19,16 @@ namespace VisualRust
     [Name("Auto indent controller")]
     [ContentType("rust")]
     [TextViewRole(PredefinedTextViewRoles.Editable)]
-    public class VisaulRustAutoindentProvider : IVsTextViewCreationListener
+    public class VisualRustAutoIndentProvider : IVsTextViewCreationListener
     {
         [Import]
-        internal IVsEditorAdaptersFactoryService AdaptersService;
+        internal IVsEditorAdaptersFactoryService AdaptersService { get; set; }
 
         [Import]
-        internal IEditorOperationsFactoryService OperationsService;
+        internal IEditorOperationsFactoryService OperationsService { get; set; }
 
         [Import]
-        internal ITextUndoHistoryRegistry UndoHistoryRegistry;
+        internal ITextUndoHistoryRegistry UndoHistoryRegistry { get; set; }
 
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {

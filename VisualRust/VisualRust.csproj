@@ -310,6 +310,6 @@
   <Target Name="AddToVsixSources" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
       <VSIXSourceItem Include="$(OutputPath)\Newtonsoft.Json.dll" />
-	</ItemGroup>
+    </ItemGroup>
   </Target>
 </Project>

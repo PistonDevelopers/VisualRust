@@ -11,14 +11,7 @@ namespace VisualRust.Shared.Message
     {
         public string reason { get; set; }
         public string package_id { get; set; }
-        public CargoMessageTarget target { get; set; }
+        public CargoTarget target { get; set; }
         public RustcMessageJson message { get; set; }
-    }
-
-    public class CargoMessageTarget
-    {
-        public string text { get; set; }
-        public int highlight_start { get; set; }
-        public int highlight_end { get; set; }
     }
 }

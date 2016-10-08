@@ -28,7 +28,7 @@ namespace VisualRust.Shared
         }
 
         /// <summary>
-        /// Returns a wrapper for an installed cargo.exe that understands --message-format
+        /// Returns a wrapper for an installed cargo.exe that understands --message-format,
         /// or null if none was found.
         /// </summary>
         public static Cargo FindSupportedInstallation()
@@ -59,9 +59,20 @@ namespace VisualRust.Shared
             return CommandHelper.RunAsync(Executable, arguments, WorkingDirectory, cancellationToken);
         }
 
-        public async Task<Message.CargoMetadata> ReadMetadataAsync()
+        public async Task<Message.CargoMetadata> ReadMetadataAsync(bool includeDependencies)
         {
-            var result = await RunAsync("metadata");
+            string[] args;
+            if (includeDependencies)
+            {
+                args = new string[] { "metadata" };
+            }
+            else
+            {
+                args = new string[] { "metadata", "--no-deps" };
+            }
+            
+
+            var result = await RunAsync(args);
             return JsonSerializer.Deserialize<Message.CargoMetadata>(new JsonTextReader(new StringReader(result.Output)));
         }
 

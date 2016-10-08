@@ -105,9 +105,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ProjectSystem\CargoManifestData.cs" />
     <Compile Include="ProjectSystem\RustDebuggerProvider.cs" />
-    <Compile Include="ProjectSystem\ICargoManifestData.cs" />
     <Compile Include="ProjectSystem\LoadHooks.cs" />
     <Compile Include="ProjectSystem\MsBuildFileSystemFilter.cs" />
     <Compile Include="ProjectForms\BasePropertyPage.cs" />
@@ -308,5 +306,10 @@
   <Target Name="DownloadGdb" BeforeTargets="BeforeBuild">
     <MsBuild Projects="VisualRust.Gdb.msbuild" Targets="DownloadGdb" Properties="MingwVersion=i686-5.1.0-release-posix-dwarf-rt_v4-rev0;MingwRootDir=mingw32;MingwArch=i686;MingwPath=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/5.1.0/threads-posix/dwarf/i686-5.1.0-release-posix-dwarf-rt_v4-rev0.7z" />
     <MsBuild Projects="VisualRust.Gdb.msbuild" Targets="DownloadGdb" Properties="MingwVersion=x86_64-5.1.0-release-win32-seh-rt_v4-rev0;MingwRootDir=mingw64;MingwArch=x86_64;MingwPath=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/5.1.0/threads-win32/seh/x86_64-5.1.0-release-win32-seh-rt_v4-rev0.7z" />
+  </Target>
+  <Target Name="AddToVsixSources" AfterTargets="GetVsixSourceItems">
+    <ItemGroup>
+      <VSIXSourceItem Include="$(OutputPath)\Newtonsoft.Json.dll" />
+	</ItemGroup>
   </Target>
 </Project>

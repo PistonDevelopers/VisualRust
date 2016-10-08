@@ -18,6 +18,14 @@ namespace VisualRust.Shared.Message
         public string version { get; set; } // TODO: use better type
         public string id { get; set; }
         public string manifest_path { get; set; }
+        public List<CargoTarget> targets { get; set; }
         // ... more fields omitted, can be added as necessary
+    }
+
+    public class CargoTarget
+    {
+        public List<string> kind { get; set; }
+        public string name { get; set; }
+        public string src_path { get; set; }
     }
 }

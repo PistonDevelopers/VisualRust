@@ -22,7 +22,8 @@
     "Microsoft.VisualStudio.Text.Data": "14.1.24720",
     "Microsoft.VisualStudio.TextManager.Interop": "7.10.6070",
     "Microsoft.VisualStudio.Threading": "14.1.131",
-    "Microsoft.VisualStudio.Validation": "14.1.111"
+    "Microsoft.VisualStudio.Validation": "14.1.111",
+    "Newtonsoft.Json": "9.0.1"
   },
   "frameworks": {
     "net46": {}

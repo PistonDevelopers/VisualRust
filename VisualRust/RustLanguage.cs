@@ -32,6 +32,7 @@ namespace VisualRust
                 preferences.AutoListMembers = false;
                 preferences.EnableQuickInfo = false;
                 preferences.ParameterInformation = false;
+                preferences.InsertTabs = false;
             }
             return preferences;
         }

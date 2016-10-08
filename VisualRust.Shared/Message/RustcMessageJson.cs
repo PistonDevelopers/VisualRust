@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace VisualRust.Build.Message.Json
+namespace VisualRust.Shared.Message
 {
     public class RustcMessageJson
     {

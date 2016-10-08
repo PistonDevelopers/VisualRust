@@ -1,4 +1,4 @@
-﻿namespace VisualRust.Build.Message
+﻿namespace VisualRust.Shared.Message
 {
     public enum RustcMessageType
     {

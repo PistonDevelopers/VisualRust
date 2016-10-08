@@ -7,13 +7,13 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.Build.Framework;
 using System.IO;
-using VisualRust.Build.Message;
-using VisualRust.Build.Message.Human;
-using VisualRust.Build.Message.Json;
+using VisualRust.Shared.Message;
 using VisualRust.Shared;
+using Microsoft.Build.Utilities;
 
 namespace VisualRust.Build
 {
+    // TODO: It is unclear whether we should continue to support/provide this task
     public class Rustc : Microsoft.Build.Utilities.Task
     {
         private string[] configFlags = new string[0];
@@ -170,7 +170,7 @@ namespace VisualRust.Build
         public string Input { get; set; }
 
         private String installPath;
-        private Version rustcVersion;
+        private ToolVersion rustcVersion;
 
         public override bool Execute()
         {
@@ -179,9 +179,10 @@ namespace VisualRust.Build
                 if (!FindRustc())
                     return false;
 
-                rustcVersion = GetVersion();
-                if (rustcVersion == null)
+                var version = GetVersion();
+                if (!version.HasValue)
                     return false;
+                rustcVersion = version.Value;
 
                 return ExecuteInner();
             }
@@ -227,17 +228,17 @@ namespace VisualRust.Build
             return process;
         }
 
-        private Version GetVersion()
+        private ToolVersion? GetVersion()
         {
             var process = CreateProcess(" --version");
             process.Start();
             process.WaitForExit();
-            return Version.ParseRustcOutput(process.StandardOutput.ReadToEnd());
+            return ToolVersion.Parse(process.StandardOutput.ReadToEnd());
         }
 
         private bool ExecuteInner()
         {
-            var useJsonErrorFormat = rustcVersion.VersionMajor >= 1 && rustcVersion.VersionMinor >= 12;
+            var useJsonErrorFormat = rustcVersion.Major >= 1 && rustcVersion.Minor >= 12;
 
             StringBuilder sb = new StringBuilder();
             if (ConfigFlags.Length > 0)
@@ -316,7 +317,7 @@ namespace VisualRust.Build
                     messageJson = RustcMessageJsonParser.Parse(errorOutput);
                     foreach (var msg in messageJson)
                     {
-                        LogRustcMessage(msg);
+                        LogRustcMessage(msg, WorkingDirectory, Log);
                         haveAnyMessages = true;
                     }
                 }
@@ -364,7 +365,7 @@ namespace VisualRust.Build
             }
         }
 
-        private void LogRustcMessage(RustcMessageJson msg)
+        public static void LogRustcMessage(RustcMessageJson msg, string rootPath, TaskLoggingHelper log)
         {
             // todo multi span
             // todo all other fields
@@ -375,22 +376,22 @@ namespace VisualRust.Build
             var code = msg.GetErrorCodeAsString();
 
             // suppress message "aborting due to previous error"
-            if (String.IsNullOrEmpty(code) && primarySpan == null && msg.message.Contains("aborting due to previous error"))
+            if (String.IsNullOrEmpty(code) && primarySpan == null && msg.message.Contains("aborting due to"))
                 return;
 
             if (type == RustcMessageType.Error)
             {
                 if (primarySpan == null)
-                    Log.LogError(msg.message);
+                    log.LogError(msg.message);
                 else
-                    Log.LogError(null, code, null, primarySpan.file_name, primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
+                    log.LogError(null, code, null, Path.Combine(rootPath, primarySpan.file_name), primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
             }
             else
             {
                 if (primarySpan == null)
-                    Log.LogWarning(msg.message);
+                    log.LogWarning(msg.message);
                 else
-                    Log.LogWarning(null, code, null, primarySpan.file_name, primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
+                    log.LogWarning(null, code, null, Path.Combine(rootPath, primarySpan.file_name), primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
             }
 
         }

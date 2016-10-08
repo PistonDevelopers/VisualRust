@@ -48,19 +48,19 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Message\Human\RustcMessageHuman.cs" />
-    <Compile Include="Version.cs" />
+    <Compile Include="CargoTask.cs" />
+    <Compile Include="CargoClean.cs" />
+    <Compile Include="CargoBuild.cs" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="VisualRust.Core.targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="VisualRust.Rust.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
-    <Compile Include="Message\Human\RustcMessageHumanParser.cs" />
-    <Compile Include="Message\Json\RustcMessageJson.cs" />
-    <Compile Include="Message\Json\RustcMessageJsonParser.cs" />
-    <Compile Include="Message\RustcMessageType.cs" />
     <Compile Include="Rustc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RustcFactory.cs" />

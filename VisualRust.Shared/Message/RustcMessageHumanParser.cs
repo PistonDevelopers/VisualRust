@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace VisualRust.Build.Message.Human
+namespace VisualRust.Shared.Message
 {
-    static class RustcMessageHumanParser
+    // TODO: probably we should just get rid of this
+    public static class RustcMessageHumanParser
     {
         private static readonly Regex defectRegex = new Regex(@"^([^\n:]+):(\d+):(\d+):\s+(\d+):(\d+)\s+(.*)$", RegexOptions.Multiline | RegexOptions.CultureInvariant);
 

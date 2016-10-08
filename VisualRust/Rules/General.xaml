@@ -7,6 +7,13 @@
         <DataSource Persistence="UserFile" HasConfigurationCondition="False" />
     </Rule.DataSource>
 
+    <!-- This is used for the "Show All Files" functionality in Solution Explorer -->
+    <BoolProperty Name="ShowAllFiles" Visible="false">
+        <BoolProperty.DataSource>
+            <DataSource Persistence="UserFile" HasConfigurationCondition="false" />
+        </BoolProperty.DataSource>
+    </BoolProperty>
+
     <!-- Currently marked as read-only, because we can't reload on the fly when the manifest path changes -->
     <StringProperty Name="ManifestPath" DisplayName="Cargo Manifest"
                     Description="Relative path to the Cargo manifest file (Cargo.toml)." Visible="True"

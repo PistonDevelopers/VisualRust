@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace VisualRust.Build.Message.Json
+namespace VisualRust.Shared.Message
 {
     public static class RustcMessageJsonParser
     {

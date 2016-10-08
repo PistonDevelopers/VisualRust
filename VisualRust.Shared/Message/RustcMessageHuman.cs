@@ -1,6 +1,6 @@
-﻿namespace VisualRust.Build.Message.Human
+﻿namespace VisualRust.Shared.Message
 {
-    class RustcMessageHuman
+    public class RustcMessageHuman
     {
         public RustcMessageType Type;
         public string Message;

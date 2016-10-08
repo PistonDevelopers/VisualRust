@@ -244,6 +244,10 @@
       <Project>{e983e989-f83a-4643-896a-ad496bf647d0}</Project>
       <Name>RustLexer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Shared\VisualRust.Shared.csproj">
+      <Project>{B99CC9EB-90F2-4040-9E66-418CC7042153}</Project>
+      <Name>VisualRust.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VisualRust.Templates\VisualRust.Templates.csproj">
       <Project>{59D94B96-1AF7-46F2-8790-AAB6DFAE8D9A}</Project>
       <Name>VisualRust.Templates</Name>

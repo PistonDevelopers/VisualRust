@@ -84,8 +84,7 @@ namespace VisualRust
                     }
                     else
                     {
-                        //VsUtilities.NavigateTo(ServiceProvider, fname, Guid.Empty, targetLine, targetColumn);
-                        throw new NotImplementedException("currently disabled");
+                        VsUtilities.NavigateTo(ServiceProvider, fname, Guid.Empty, targetLine, targetColumn);
                     }
                     return true;
                 }

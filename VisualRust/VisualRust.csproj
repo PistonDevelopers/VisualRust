@@ -183,6 +183,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>VSPackage.resx</DependentUpon>
     </Compile>
+    <Compile Include="VsUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\DebuggingOptionsPageControl.resx">

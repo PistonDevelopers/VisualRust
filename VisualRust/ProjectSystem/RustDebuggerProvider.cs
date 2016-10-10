@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.ProjectSystem.Utilities.DebuggerProviders;
 using Microsoft.VisualStudio.ProjectSystem.VS.Debuggers;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -43,8 +44,13 @@ namespace VisualRust.ProjectSystem
                 return targets;
             }
 
-            // TODO: use correct ManifestPath
-            cargo.WorkingDirectory = Path.GetDirectoryName(ConfiguredProject.UnconfiguredProject.FullPath);
+            var props = await Properties.GetConfigurationGeneralPropertiesAsync();
+            var manifestPath = await props.ManifestPath.GetEvaluatedValueAsync();
+            if (String.IsNullOrWhiteSpace(manifestPath))
+            {
+                manifestPath = "Cargo.toml";
+            }
+            cargo.WorkingDirectory = Path.GetDirectoryName(Path.Combine(Path.GetDirectoryName(ConfiguredProject.UnconfiguredProject.FullPath), manifestPath));
             // TODO: this should initialized once when the project is loaded and then be updated using a file watcher on Cargo.toml
             // can't use `cargo rustc -- --print file-names`, because it would build all dependencies first
             var metadata = await cargo.ReadMetadataAsync(false);

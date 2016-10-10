@@ -62,6 +62,11 @@ namespace VisualRust.Shared
             return arguments.ToString();
         }
 
+        public static Task<CommandResult> RunAsync(string command, params string[] arguments)
+        {
+            return RunAsync(command, arguments, null, default(CancellationToken));
+        }
+
         public static Task<CommandResult> RunAsync(string command, string[] arguments, string workingDirectory = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             ProcessStartInfo psi = new ProcessStartInfo

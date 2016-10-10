@@ -18,12 +18,14 @@ namespace VisualRust.Shared
     {
         public static readonly JsonSerializer JsonSerializer = new JsonSerializer { MissingMemberHandling = MissingMemberHandling.Ignore };
         public string Executable { get; }
+        public string RustcExecutable { get; }
 
         public string WorkingDirectory { get; set; }
 
         private Cargo(string exe)
         {
             Executable = exe;
+            RustcExecutable = Path.Combine(Path.GetDirectoryName(exe), "rustc.exe");
             WorkingDirectory = null;
         }
 
@@ -57,6 +59,21 @@ namespace VisualRust.Shared
         public Task<CommandResult> RunAsync(string[] arguments, CancellationToken cancellationToken = default(CancellationToken))
         {
             return CommandHelper.RunAsync(Executable, arguments, WorkingDirectory, cancellationToken);
+        }
+
+        public async Task<string> GetSysrootAsync()
+        {
+            var result = await CommandHelper.RunAsync(RustcExecutable, "--print=sysroot");
+            return result.Output.Trim();
+        }
+
+        public async Task<TargetTriple> GetHostTargetTripleAsync()
+        {
+            var result = await CommandHelper.RunAsync(RustcExecutable, "-vV");
+            Match hostMatch = Regex.Match(result.Output, "^host:\\s*(.+)$", RegexOptions.Multiline);
+            if (hostMatch.Groups.Count < 2)
+                return null;
+            return TargetTriple.Create(hostMatch.Groups[1].Value.TrimEnd());
         }
 
         public async Task<Message.CargoMetadata> ReadMetadataAsync(bool includeDependencies)

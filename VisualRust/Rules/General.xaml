@@ -10,7 +10,7 @@
     <!-- This is used for the "Show All Files" functionality in Solution Explorer -->
     <BoolProperty Name="ShowAllFiles" Visible="false">
         <BoolProperty.DataSource>
-            <DataSource Persistence="UserFile" HasConfigurationCondition="false" />
+            <DataSource Persistence="ProjectFile" HasConfigurationCondition="false" />
         </BoolProperty.DataSource>
     </BoolProperty>
 

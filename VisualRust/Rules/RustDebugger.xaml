@@ -5,7 +5,8 @@
       xmlns="http://schemas.microsoft.com/build/2009/properties"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Rule.DataSource>
-        <DataSource Persistence="UserFile" HasConfigurationCondition="False"/>
+        <!-- We have to store everything in the ProjectFile, because UserFile does not work (settings are stored, but never loaded) -->
+        <DataSource Persistence="ProjectFile" HasConfigurationCondition="False"/>
     </Rule.DataSource>
 
     <StringProperty Name="StartWorkingDirectory" DisplayName="Working Directory" IncludeInCommandLine="false"
@@ -17,4 +18,16 @@
                   Description="The command line arguments to pass to the application."
                   Subtype="folder"
                   F1Keyword="VC.Project.IVCLocalDebugPageObject.CommandArguments"/>
+    
+    <BoolProperty Name="UseCustomGdbPath" DisplayName="Use a custom path to GDB" Default="false"
+                  Description="Set this to true to use a custom GDB for debugging." />
+
+    <StringProperty Name="CustomGdbPath" DisplayName="Set custom path to GDB"
+                    Description="Path to the GDB installation (gdb.exe) used if custom GDB is enabled."
+                    Subtype="file" />
+
+    <StringProperty Name="GdbExtraArguments" DisplayName="Additional GDB Arguments"
+                    Description="Set additional arguments here that will be passed to GDB when debugging."
+                    Subtype="file" />
+
 </Rule>

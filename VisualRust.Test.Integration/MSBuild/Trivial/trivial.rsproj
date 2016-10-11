@@ -1,7 +1,0 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <Folder Include="src\" />
-    <Code Include="src\main.rs" />
-  </ItemGroup>
-  <Import Project="..\..\VisualRust.Rust.targets"/>
-</Project>

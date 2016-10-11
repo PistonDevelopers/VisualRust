@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VisualRust.Test</RootNamespace>
     <AssemblyName>VisualRust.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,77 +39,18 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr4.Runtime.net45">
-      <HintPath>..\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.IO.Abstractions, Version=2.0.0.124, Culture=neutral, PublicKeyToken=d480b5b72fb413da, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IO.Abstractions.2.0.0.124\lib\net40\System.IO.Abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.IO.Abstractions.TestingHelpers, Version=2.0.0.124, Culture=neutral, PublicKeyToken=d480b5b72fb413da, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IO.Abstractions.TestingHelpers.2.0.0.124\lib\net40\System.IO.Abstractions.TestingHelpers.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Internal\Circular\baz.rs" />
-    <EmbeddedResource Include="Internal\Circular\bar.rs" />
-    <EmbeddedResource Include="Internal\Circular\foo.rs" />
-    <EmbeddedResource Include="Internal\CircularNested\in\foo.rs" />
-    <EmbeddedResource Include="Internal\CircularNested\main.rs" />
-    <Compile Include="Build\RustcMessageJsonParserTest.cs" />
+    <Compile Include="Shared\RustcMessageJsonParserTest.cs" />
     <Compile Include="Cargo\ManifestTests.cs" />
-    <Compile Include="Project\Controls\OutputTargetSectionViewModelTests.cs" />
-    <Compile Include="Project\ModuleImportTests.cs" />
-    <Compile Include="Project\ModuleParserTests.cs" />
-    <Compile Include="Project\ModuleTrackerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TemporaryDirectory.cs" />
-    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="External\image\src\lib.rs" />
-    <EmbeddedResource Include="Internal\mod_paths.rs" />
-    <EmbeddedResource Include="Internal\SimpleChain\baz.rs" />
-    <EmbeddedResource Include="Internal\SimpleChain\foo.rs" />
-    <EmbeddedResource Include="Internal\SimpleChain\main.rs" />
-    <EmbeddedResource Include="Internal\CircularAdd\main.rs" />
-    <EmbeddedResource Include="Internal\CircularAdd\foo.rs" />
-    <EmbeddedResource Include="Internal\CircularAdd\bar.rs" />
-    <EmbeddedResource Include="Internal\CircularDowngrade\bar.rs" />
-    <EmbeddedResource Include="Internal\CircularDowngrade\foo.rs" />
-    <EmbeddedResource Include="Internal\CircularDowngrade\main.rs" />
-    <EmbeddedResource Include="Internal\CircularAddClosed\bar.rs" />
-    <EmbeddedResource Include="Internal\CircularAddClosed\foo.rs" />
-    <EmbeddedResource Include="Internal\CircularAddClosed\main.rs" />
-    <EmbeddedResource Include="Internal\CircularMultiRoot\bar.rs" />
-    <EmbeddedResource Include="Internal\CircularMultiRoot\foo.rs" />
-    <EmbeddedResource Include="Internal\CircularMultiRoot\lib.rs" />
-    <EmbeddedResource Include="Internal\CircularConnected\bar.rs" />
-    <EmbeddedResource Include="Internal\CircularConnected\baz.rs" />
-    <EmbeddedResource Include="Internal\CircularConnected\foo.rs" />
-    <EmbeddedResource Include="Internal\CircularConnected\main.rs" />
-    <EmbeddedResource Include="Internal\Circular\main.rs" />
-    <EmbeddedResource Include="Internal\ResolveNonAuthImport\main.rs" />
-    <EmbeddedResource Include="Internal\ResolveNonAuthImport\bar\mod.rs" />
-    <EmbeddedResource Include="Internal\ResolveNonAuthImport\baz.rs" />
-    <EmbeddedResource Include="Internal\ClosedCircle\bar.rs" />
-    <EmbeddedResource Include="Internal\ClosedCircle\baz.rs" />
-    <EmbeddedResource Include="Internal\ClosedCircle\foo.rs" />
-    <EmbeddedResource Include="Internal\ClosedCircle\main.rs" />
     <None Include="app.config" />
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-    <EmbeddedResource Include="External\servo\components\layout\lib.rs" />
+    <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VisualRust.Build\VisualRust.Build.csproj">
@@ -119,9 +61,9 @@
       <Project>{2594db0d-03ff-40ea-8d27-9930e5d3ff83}</Project>
       <Name>VisualRust.Cargo</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VisualRust.Project\VisualRust.Project.csproj">
-      <Project>{475c4df2-4d4b-4f2c-9f27-414148dd6f11}</Project>
-      <Name>VisualRust.Project</Name>
+    <ProjectReference Include="..\VisualRust.Shared\VisualRust.Shared.csproj">
+      <Project>{b99cc9eb-90f2-4040-9e66-418cc7042153}</Project>
+      <Name>VisualRust.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

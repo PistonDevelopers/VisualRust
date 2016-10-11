@@ -34,17 +34,17 @@ namespace VisualRust.Options
 
         public void LoadSettings(DebuggingOptionsPage optionsPage)
         {
-            defaultGdb.Checked = !optionsPage.UseCustomGdbPath;
-            customGdb.Checked = optionsPage.UseCustomGdbPath;
-            customGdbPath.Text = optionsPage.DebuggerLocation;
-            extraArgs.Text = optionsPage.ExtraArgs;
+            defaultGdb.Checked = !optionsPage.UseCustomGdb;
+            customGdb.Checked = optionsPage.UseCustomGdb;
+            customGdbPath.Text = optionsPage.CustomGdbPath;
+            extraArgs.Text = optionsPage.GdbExtraArguments;
         }
 
         public void ApplySettings(DebuggingOptionsPage optionsPage)
         {
-            optionsPage.UseCustomGdbPath = customGdb.Checked;
-            optionsPage.DebuggerLocation = customGdbPath.Text;
-            optionsPage.ExtraArgs = extraArgs.Text;
+            optionsPage.UseCustomGdb = customGdb.Checked;
+            optionsPage.CustomGdbPath = customGdbPath.Text;
+            optionsPage.GdbExtraArguments = extraArgs.Text;
         }
 
         private void OnCustomGdbButton_Click(object sender, EventArgs e)

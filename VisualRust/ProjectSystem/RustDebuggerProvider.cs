@@ -76,7 +76,7 @@ namespace VisualRust.ProjectSystem
                     provider = new MsvcDebugLaunchSettingsProvider();
                 
                 var target = await provider.GetLaunchSettingsAsync(executablePath, arguments, workingDirectory,
-                    launchOptions, await Properties.GetRustDebuggerPropertiesAsync(), cargo, targetTriple);
+                    launchOptions, cargo, targetTriple);
 
                 targets.Add(target);
             }

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using VisualRust.Options;
 using VisualRust.Shared;
 
 namespace VisualRust.ProjectSystem
@@ -19,8 +20,9 @@ namespace VisualRust.ProjectSystem
         protected readonly static Guid MIDebugEngineGuid = new Guid(Microsoft.MIDebugEngine.EngineConstants.EngineId);
 
         public async Task<DebugLaunchSettings> GetLaunchSettingsAsync(string executable, string arguments, string workingDirectory,
-           DebugLaunchOptions options, RustDebugger debuggerProperties, Cargo cargo, TargetTriple triple)
+           DebugLaunchOptions options, Cargo cargo, TargetTriple triple)
         {
+            EnvDTE.DTE env = (EnvDTE.DTE)VisualRustPackage.GetGlobalService(typeof(EnvDTE.DTE));
             var target = new DebugLaunchSettings(options)
             {
                 LaunchOperation = DebugLaunchOperation.CreateProcess,
@@ -28,18 +30,18 @@ namespace VisualRust.ProjectSystem
                 Executable = executable,
                 Arguments = arguments,
                 CurrentDirectory = workingDirectory,
-                Options = ToXmlString(await BuildLaunchOptionsAsync(executable, arguments, workingDirectory, debuggerProperties, cargo, triple))
+                Options = ToXmlString(await BuildLaunchOptionsAsync(executable, arguments, workingDirectory, env, cargo, triple))
             };
             return target;
         }
 
         private async Task<PipeLaunchOptions> BuildLaunchOptionsAsync(string path, string args, string workingDir,
-            RustDebugger debuggerProperties, Cargo cargo, TargetTriple triple)
+            EnvDTE.DTE dte, Cargo cargo, TargetTriple triple)
         {
             // We could go through LocalLaunchOptions, but this way we can pass additional args
             PipeLaunchOptions options = new PipeLaunchOptions();
-            options.PipePath = await GetGdbPathAsync(debuggerProperties, triple);
-            options.PipeArguments = String.Format("-q -interpreter=mi {0}", await debuggerProperties.GdbExtraArguments.GetEvaluatedValueAsync());
+            options.PipePath = GetGdbPath(dte, triple);
+            options.PipeArguments = String.Format("-q -interpreter=mi {0}", GetDebuggingConfigProperty<string>(dte, nameof(DebuggingOptionsPage.GdbExtraArguments)));
             options.ExePath = EscapePath(path);
             options.ExeArguments = args;
             options.SetupCommands = GetSetupCommands();
@@ -67,14 +69,15 @@ namespace VisualRust.ProjectSystem
             options.AdditionalSOLibSearchPath = additionalPath;
         }
 
-        async Task<string> GetGdbPathAsync(RustDebugger debuggerProperties, TargetTriple triple)
+        string GetGdbPath(EnvDTE.DTE dte, TargetTriple triple)
         {
             string gdbPath = null;
-            bool useCustomPath = false;
-            bool.TryParse(await debuggerProperties.UseCustomGdbPath.GetEvaluatedValueAsync(), out useCustomPath);
+            //bool useCustomPath = false;
+            //bool.TryParse(GetDebuggingConfigProperty<bool>(dte, ""));
+            bool useCustomPath = GetDebuggingConfigProperty<bool>(dte, nameof(DebuggingOptionsPage.UseCustomGdb));
             if (useCustomPath)
             {
-                gdbPath = await debuggerProperties.CustomGdbPath.GetEvaluatedValueAsync();
+                gdbPath = GetDebuggingConfigProperty<string>(dte, nameof(DebuggingOptionsPage.CustomGdbPath));
             }
 
             if (gdbPath != null)
@@ -133,5 +136,10 @@ namespace VisualRust.ProjectSystem
         //        return new string[0];
         //    return debuggerScript.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
         //}
+
+        private T GetDebuggingConfigProperty<T>(EnvDTE.DTE env, string key)
+        {
+            return (T)env.get_Properties("Visual Rust", "Debugging").Item(key).Value;
+        }
     }
 }

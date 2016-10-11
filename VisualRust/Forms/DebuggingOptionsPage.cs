@@ -9,9 +9,9 @@ namespace VisualRust.Options
     [Guid("93F42A39-0AF6-40EE-AE2C-1C44AB5F8B15")]
     public partial class DebuggingOptionsPage : DialogPage
     {
-        public bool UseCustomGdbPath { get; set; }
-        public string DebuggerLocation { get; set; }
-        public string ExtraArgs { get; set; }
+        public bool UseCustomGdb { get; set; }
+        public string CustomGdbPath { get; set; }
+        public string GdbExtraArguments { get; set; }
 
         private IWin32Window page;
 

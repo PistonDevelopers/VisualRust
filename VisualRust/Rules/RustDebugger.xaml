@@ -18,16 +18,5 @@
                   Description="The command line arguments to pass to the application."
                   Subtype="folder"
                   F1Keyword="VC.Project.IVCLocalDebugPageObject.CommandArguments"/>
-    
-    <BoolProperty Name="UseCustomGdbPath" DisplayName="Use a custom path to GDB" Default="false"
-                  Description="Set this to true to use a custom GDB for debugging." />
-
-    <StringProperty Name="CustomGdbPath" DisplayName="Set custom path to GDB"
-                    Description="Path to the GDB installation (gdb.exe) used if custom GDB is enabled."
-                    Subtype="file" />
-
-    <StringProperty Name="GdbExtraArguments" DisplayName="Additional GDB Arguments"
-                    Description="Set additional arguments here that will be passed to GDB when debugging."
-                    Subtype="file" />
 
 </Rule>

@@ -13,7 +13,9 @@
     <StringProperty Name="DebuggerFlavor" Visible="false" IncludeInCommandLine="false"
                     Description="The debug rule selected as the active debugger.">
         <StringProperty.DataSource>
-            <DataSource Persistence="ProjectFile" HasConfigurationCondition="False"/>
+            <!-- Settings from UserFile can't be loaded, but it doesn't matter in this case,
+                 because the only possible value is "RustDebugger", which is automatically enabled. -->
+            <DataSource Persistence="UserFile" HasConfigurationCondition="False"/>
         </StringProperty.DataSource>
     </StringProperty>
 </Rule>

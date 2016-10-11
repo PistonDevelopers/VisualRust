@@ -9,6 +9,6 @@ namespace VisualRust.ProjectSystem
     internal interface IDebugLaunchSettingsProvider
     {
         Task<DebugLaunchSettings> GetLaunchSettingsAsync(string executable, string arguments, string workingDirectory,
-            DebugLaunchOptions options, RustDebugger debuggerProperties, Cargo cargo, TargetTriple triple);
+            DebugLaunchOptions options, Cargo cargo, TargetTriple triple);
     }
 }

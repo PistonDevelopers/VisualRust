@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using VisualRust.Options;
 using Process = System.Diagnostics.Process;
 
 namespace VisualRust.Racer
@@ -61,13 +62,13 @@ namespace VisualRust.Racer
         {
             DTE env = (DTE)VisualRustPackage.GetGlobalService(typeof(DTE));
             // If path to racer.exe is specifed, use it
-            if(GetVisualRustProperty<bool>(env, "UseCustomRacer"))
-                racerPathForExecution = GetVisualRustProperty<string>(env, "CustomRacerPath");
+            if(GetVisualRustProperty<bool>(env, nameof(RustOptionsPage.UseCustomRacer)))
+                racerPathForExecution = GetVisualRustProperty<string>(env, nameof(RustOptionsPage.CustomRacerPath));
             else
                 racerPathForExecution = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Racer", BundledRacerExecutable);
             // Same for custom RUST_SRC_PATH
-            if(GetVisualRustProperty<bool>(env, "UseCustomSources"))
-                racerSourcesLocation = GetVisualRustProperty<string>(env, "CustomSourcesPath");
+            if(GetVisualRustProperty<bool>(env, nameof(RustOptionsPage.UseCustomSources)))
+                racerSourcesLocation = GetVisualRustProperty<string>(env, nameof(RustOptionsPage.CustomSourcesPath));
             else
                 racerSourcesLocation = null;
         }

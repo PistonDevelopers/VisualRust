@@ -100,9 +100,6 @@
     <Compile Include="ProjectSystem\RustDebuggerProvider.cs" />
     <Compile Include="ProjectSystem\LoadHooks.cs" />
     <Compile Include="ProjectSystem\MsBuildFileSystemFilter.cs" />
-    <Compile Include="ProjectForms\BasePropertyPage.cs" />
-    <Compile Include="ProjectForms\BuildPropertyPage.cs" />
-    <Compile Include="ProjectForms\DebugPropertyPage.cs" />
     <Compile Include="Forms\DebuggingOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -112,9 +109,6 @@
     <Compile Include="Forms\DebuggingOptionsPageControl.Designer.cs">
       <DependentUpon>DebuggingOptionsPageControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProjectForms\TargetOutputsPropertyPage.cs" />
-    <Compile Include="ProjectForms\WpfPropertyPage.cs" />
-    <Compile Include="ProjectForms\GeneralPropertyPage.cs" />
     <Compile Include="Forms\RustOptionsPageControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

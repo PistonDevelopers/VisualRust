@@ -25,17 +25,6 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <CopyVsixManifestToOutput>true</CopyVsixManifestToOutput>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-CI|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug-CI\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <DeployExtension>false</DeployExtension>
-    <CreateVsixContainer>true</CreateVsixContainer>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -59,7 +48,7 @@
     <CreateVsixContainer>false</CreateVsixContainer>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Debug-CI'">
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\ApplicationProject.zip">
       <Link>ProjectTemplates\ApplicationProject.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -306,11 +295,7 @@
     <Delete Files="$(TargetDir)source.extension.vsixmanifest" />
   </Target>
   <Target Name="BeforeBuild">
-    <PropertyGroup>
-      <_VsixmanifestConfiguration Condition=" '$(Configuration)' == 'Debug-CI' ">Debug</_VsixmanifestConfiguration>
-      <_VsixmanifestConfiguration Condition=" '$(_VsixmanifestConfiguration)' == '' ">$(Configuration)</_VsixmanifestConfiguration>
-    </PropertyGroup>
-    <Copy SourceFiles="source.extension.$(_VsixmanifestConfiguration).vsixmanifest" DestinationFiles="$(TargetDir)source.extension.vsixmanifest" />
+    <Copy SourceFiles="source.extension.$(Configuration).vsixmanifest" DestinationFiles="$(TargetDir)source.extension.vsixmanifest" />
     <ItemGroup>
       <None Include="$(TargetDir)source.extension.vsixmanifest" />
     </ItemGroup>

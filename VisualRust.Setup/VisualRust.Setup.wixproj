@@ -25,17 +25,12 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="gdb\gdb.2013.x86_64.wxs" />
     <Compile Include="gdb\gdb.2015.x86_64.wxs" />
     <Compile Include="gdb\gdb.2015.i686.wxs" />
-    <Compile Include="gdb\gdb.2013.i686.wxs" />
     <Compile Include="racer2015.wxs" />
     <Compile Include="templates2015.wxs" />
     <Compile Include="vsx2015.wxs" />
-    <Compile Include="racer2013.wxs" />
-    <Compile Include="templates2013.wxs" />
     <Compile Include="VisualRust.wxs" />
-    <Compile Include="vsx2013.wxs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VisualRust.Build\VisualRust.Build.csproj">

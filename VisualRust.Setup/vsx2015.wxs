@@ -10,8 +10,11 @@
       <Component Id="Cmp_extension_vsixmanifest_$(var.VsVersion)" Guid="{C54951E2-13EC-4F0A-A01D-C16DE809ECF0}">
         <File Id="File_extension_vsixmanifest_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)extension.vsixmanifest" />
       </Component>
-      <Component Id="Cmp_Microsoft_VisualStudio_Project_dll_$(var.VsVersion)" Guid="{58A3CE52-BEDE-451A-BB0E-B573E3AE59B3}">
-        <File Id="File_Microsoft_VisualStudio_Project_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Microsoft.VisualStudio.Project.dll" />
+      <Component Id="Cmp_Microsoft_Common_Core_dll_$(var.VsVersion)" Guid="{ECC51E4D-B8A1-49E6-8C52-6C2B863BAA47}">
+        <File Id="File_Microsoft_Common_Core_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Microsoft.Common.Core.dll" />
+      </Component>
+      <Component Id="Cmp_Microsoft_VisualStudio_ProjectSystem_FileMirroring_dll_$(var.VsVersion)" Guid="{790A5517-33AB-45C2-BA84-F8B1DC31EE79}">
+        <File Id="File_Microsoft_VisualStudio_ProjectSystem_FileMirroring_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.dll" />
       </Component>
       <Component Id="Cmp_RustLexer_dll_$(var.VsVersion)" Guid="{8F935DDE-4C7B-4BA9-9910-C4EA3CDB2422}">
         <File Id="File_RustLexer_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)RustLexer.dll" />
@@ -23,9 +26,6 @@
         <File Id="File_VisualRust_pkgdef_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.pkgdef" />
         <util:RestartResource Path="[VS14DEVENV]"/>
       </Component>
-      <Component Id="Cmp_VisualRust_Project_dll_$(var.VsVersion)" Guid="{338964DA-B89F-46FB-94F7-E22AAEDA019C}">
-        <File Id="File_VisualRust_Project_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Project.dll" />
-      </Component>
       <Component Id="Cmp_VisualRust_Shared_dll_$(var.VsVersion)" Guid="{41B6B354-136C-4D28-AAFB-0F56881E1533}">
         <File Id="File_VisualRust_Shared_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Shared.dll" />
       </Component>
@@ -35,9 +35,21 @@
       <Component Id="Cmp_PistonDevelopers_MIDebugEngine_dll_dll_$(var.VsVersion)" Guid="{FB9BBC7F-DEAA-4DE5-A80A-93FEC1317FBD}">
         <File Id="File_PistonDevelopers_MIDebugEngine_dll_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)PistonDevelopers.MIDebugEngine.dll" />
       </Component>
+      <Component Id="Cmp_Cmp_Newtonsoft_Json_dll_$(var.VsVersion)" Guid="{9852F0B4-C5F4-4122-803B-9B4769C7EE76}">
+        <File Id="File_Newtonsoft_Json_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Newtonsoft.Json.dll" />
+      </Component>
+      <Component Id="Cmp_Additional_Asemblies_$(var.VsVersion)" Guid="{9208FB5B-4D30-4996-82A7-778B6BDB8201}">
+        <File Id="File_System_Collections_Immutable_dll_$(var.VsVersion)" Source="$(var.VisualRust.TargetDir)System.Collections.Immutable.dll" />
+        <File Id="File_System_Composition_AttributedModel_dll_$(var.VsVersion)" Source="$(var.VisualRust.TargetDir)System.Composition.AttributedModel.dll" />
+        <File Id="File_System_Composition_Convention_dll_$(var.VsVersion)" Source="$(var.VisualRust.TargetDir)System.Composition.Convention.dll" />
+        <File Id="File_System_Composition_Hosting_dll_$(var.VsVersion)" Source="$(var.VisualRust.TargetDir)System.Composition.Hosting.dll" />
+        <File Id="File_System_Composition_Runtime_dll_$(var.VsVersion)" Source="$(var.VisualRust.TargetDir)System.Composition.Runtime.dll" />
+        <File Id="File_System_Composition_TypedParts_dll_$(var.VsVersion)" Source="$(var.VisualRust.TargetDir)System.Composition.TypedParts.dll" />
+        <File Id="File_System_Threading_Tasks_Dataflow_dll_$(var.VsVersion)" Source="$(var.VisualRust.TargetDir)System.Threading.Tasks.Dataflow.dll" />
+      </Component>
       <!-- Racer files -->
       <ComponentGroupRef Id="CmpGroup_Racer_2015"/>
-      <!-- Open .rsproj with vs launcher -->
+      <!-- Open .rsproj with VS launcher -->
       <Component Id="Cmp_RsprojRegistration_$(var.VsVersion)" Guid="{D78325B7-966F-44C1-A8ED-2074C4EDC106}">
         <CreateFolder/>
         <ProgId Id="VisualRust.Launcher" Description="Rust Project">
@@ -46,6 +58,7 @@
           </Extension>
         </ProgId>
       </Component>
+      <!-- TODO: Is there a way to also associate Cargo.toml with VS launcher? -->
       <!-- Open .rs with context menu  -->
       <Component Id="Cmp_RsRegistration_$(var.VsVersion)" Guid="{56E579B9-6657-4900-B0F8-979152643F6A}">
         <CreateFolder/>

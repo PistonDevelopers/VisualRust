@@ -3,6 +3,7 @@
     "Antlr4.Runtime": "4.3.0",
     "Microsoft.Composition": "1.0.27",
     "Microsoft.Tpl.Dataflow": "4.5.24",
+    "Microsoft.Build": "14.3.0",
     "Microsoft.VisualStudio.Editor": "14.1.24720",
     "Microsoft.VisualStudio.ImageCatalog": "14.1.24720",
     "Microsoft.VisualStudio.Imaging": "14.1.24720",

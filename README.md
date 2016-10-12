@@ -15,11 +15,11 @@ Release" and "Artifacts").
 
 ## Features
 
-* Project support
+* Project support based on Cargo
 * Syntax highlighting
 * Autocomplete
 * Go to definition
-* MIEngine-powered debugging featuring
+* Debugging for both MSVC and GNU toolchains
   * Conditional breakpoints
   * Watch window (with the ability to change the runtime state)
   * Immediate window (with the ability to change the runtime state)
@@ -58,12 +58,11 @@ the time to spend coding.
 
 ## Prerequisites
 
-To build this, you'll need the Visual Studio (2013 or 2015) and matching
+To build this, you'll need Visual Studio 2015 and matching
 [Visual Studio SDK](http://msdn.microsoft.com/en-us/vstudio/vextend.aspx) for
-the VS plugin, [WiX Toolset 3.9 or higher](http://wixtoolset.org/) (if you are
-developing from VS 2015, you will need version 3.10 or higher) for the setup
+the VS plugin, [WiX Toolset 3.10 or higher](http://wixtoolset.org/) for the setup
 project and [Java RE] (https://www.java.com/en/download/manual.jsp).
-Nuget will take care of the rest.
+NuGet will take care of the rest.
 
 ## Build configuration
 

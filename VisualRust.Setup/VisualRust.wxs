@@ -3,7 +3,7 @@
   <Product Id="*"
            Name="Visual Rust"
            Language="1033"
-           Version="0.1.2.0"
+           Version="0.2.0.0"
            Manufacturer="The Piston Project"
            UpgradeCode="{B5CC88F7-BC23-4400-95D8-9EE3FA95CC3F}">
     <Package InstallerVersion="400"

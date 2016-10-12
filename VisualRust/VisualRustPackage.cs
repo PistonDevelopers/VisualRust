@@ -36,7 +36,7 @@ namespace VisualRust
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", "0.1.2", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "0.2.0", IconResourceID = 400)]
     [ProvideLanguageService(typeof(RustLanguage), "Rust", 100, 
         CodeSense = true, 
         DefaultToInsertSpaces = true,

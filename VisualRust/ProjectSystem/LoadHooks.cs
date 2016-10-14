@@ -29,118 +29,118 @@ using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IProjectThreadingSe
 
 namespace VisualRust.ProjectSystem
 {
-	internal sealed class LoadHooks
-	{
-		[Export(typeof(IFileSystemMirroringProjectTemporaryItems2))]
-		[AppliesTo(VisualRustPackage.UniqueCapability)]
-		private FileSystemMirroringProject Project { get; }
+    internal sealed class LoadHooks
+    {
+        [Export(typeof(IFileSystemMirroringProjectTemporaryItems2))]
+        [AppliesTo(VisualRustPackage.UniqueCapability)]
+        private FileSystemMirroringProject Project { get; }
 
-		private readonly MsBuildFileSystemWatcher _fileWatcher;
-		private readonly string _projectDirectory;
-		private readonly IFileSystem _fileSystem = new FileSystem();
-		private readonly IThreadHandling _threadHandling;
-		private readonly UnconfiguredProject _unconfiguredProject;
-		private readonly IEnumerable<Lazy<IVsProject>> _cpsIVsProjects;
-		private readonly IProjectItemDependencyProvider _dependencyProvider;
+        private readonly MsBuildFileSystemWatcher _fileWatcher;
+        private readonly string _projectDirectory;
+        private readonly IFileSystem _fileSystem = new FileSystem();
+        private readonly IThreadHandling _threadHandling;
+        private readonly UnconfiguredProject _unconfiguredProject;
+        private readonly IEnumerable<Lazy<IVsProject>> _cpsIVsProjects;
+        private readonly IProjectItemDependencyProvider _dependencyProvider;
 
-		/// <summary>
-		/// Backing field for the similarly named property.
-		/// </summary>
-		[ImportingConstructor]
-		public LoadHooks(UnconfiguredProject unconfiguredProject
-			, [ImportMany("Microsoft.VisualStudio.ProjectSystem.Microsoft.VisualStudio.Shell.Interop.IVsProject")] IEnumerable<Lazy<IVsProject>> cpsIVsProjects
-			, IProjectLockService projectLockService
-			, IThreadHandling threadHandling
-			, [Import(AllowDefault = true)] IProjectItemDependencyProvider dependencyProvider)
-		{
+        /// <summary>
+        /// Backing field for the similarly named property.
+        /// </summary>
+        [ImportingConstructor]
+        public LoadHooks(UnconfiguredProject unconfiguredProject
+            , [ImportMany("Microsoft.VisualStudio.ProjectSystem.Microsoft.VisualStudio.Shell.Interop.IVsProject")] IEnumerable<Lazy<IVsProject>> cpsIVsProjects
+            , IProjectLockService projectLockService
+            , IThreadHandling threadHandling
+            , [Import(AllowDefault = true)] IProjectItemDependencyProvider dependencyProvider)
+        {
 
-			_unconfiguredProject = unconfiguredProject;
-			_cpsIVsProjects = cpsIVsProjects;
-			_threadHandling = threadHandling;
-			_dependencyProvider = dependencyProvider;
+            _unconfiguredProject = unconfiguredProject;
+            _cpsIVsProjects = cpsIVsProjects;
+            _threadHandling = threadHandling;
+            _dependencyProvider = dependencyProvider;
 
-			_projectDirectory = unconfiguredProject.GetProjectDirectory();
+            _projectDirectory = unconfiguredProject.GetProjectDirectory();
 
-			unconfiguredProject.ProjectUnloading += ProjectUnloading;
-			_fileWatcher = new MsBuildFileSystemWatcher(_projectDirectory, "*", 25, 1000, _fileSystem, new MsBuildFileSystemFilter());
-			_fileWatcher.Error += FileWatcherError;
-			Project = new FileSystemMirroringProject(unconfiguredProject, projectLockService, _fileWatcher, _dependencyProvider);
-		}
+            unconfiguredProject.ProjectUnloading += ProjectUnloading;
+            _fileWatcher = new MsBuildFileSystemWatcher(_projectDirectory, "*", 25, 1000, _fileSystem, new MsBuildFileSystemFilter());
+            _fileWatcher.Error += FileWatcherError;
+            Project = new FileSystemMirroringProject(unconfiguredProject, projectLockService, _fileWatcher, _dependencyProvider);
+        }
 
-		public static IVsPackage EnsurePackageLoaded(Guid guidPackage)
-		{
-			var shell = (IVsShell)VisualRustPackage.GetGlobalService(typeof(IVsShell));
-			var guid = guidPackage;
-			IVsPackage package;
-			int hr = ErrorHandler.ThrowOnFailure(shell.IsPackageLoaded(ref guid, out package), VSConstants.E_FAIL);
-			guid = guidPackage;
-			if (hr != VSConstants.S_OK)
-			{
-				ErrorHandler.ThrowOnFailure(shell.LoadPackage(ref guid, out package), VSConstants.E_FAIL);
-			}
+        public static IVsPackage EnsurePackageLoaded(Guid guidPackage)
+        {
+            var shell = (IVsShell)VisualRustPackage.GetGlobalService(typeof(IVsShell));
+            var guid = guidPackage;
+            IVsPackage package;
+            int hr = ErrorHandler.ThrowOnFailure(shell.IsPackageLoaded(ref guid, out package), VSConstants.E_FAIL);
+            guid = guidPackage;
+            if (hr != VSConstants.S_OK)
+            {
+                ErrorHandler.ThrowOnFailure(shell.LoadPackage(ref guid, out package), VSConstants.E_FAIL);
+            }
 
-			return package;
-		}
+            return package;
+        }
 
-		[AppliesTo(VisualRustPackage.UniqueCapability)]
+        [AppliesTo(VisualRustPackage.UniqueCapability)]
 //#if VS14
-		[UnconfiguredProjectAutoLoad2(completeBy: UnconfiguredProjectLoadCheckpoint.CapabilitiesEstablished)]
+        [UnconfiguredProjectAutoLoad2(completeBy: UnconfiguredProjectLoadCheckpoint.CapabilitiesEstablished)]
 //#else
 //		[ProjectAutoLoad(startAfter: ProjectLoadCheckpoint.UnconfiguredProjectLocalCapabilitiesEstablished,
 //						 completeBy: ProjectLoadCheckpoint.BeforeLoadInitialConfiguration,
 //						 RequiresUIThread = false)]
 //#endif
-		public async Task InitializeProjectFromDiskAsync()
-		{
-			await Project.CreateInMemoryImport();
-			_fileWatcher.Start();
+        public async Task InitializeProjectFromDiskAsync()
+        {
+            await Project.CreateInMemoryImport();
+            _fileWatcher.Start();
 
-			await _threadHandling.SwitchToUIThread();
-			// Make sure package is loaded
-			EnsurePackageLoaded(GuidList.VisualRustPkgGuid);
+            await _threadHandling.SwitchToUIThread();
+            // Make sure package is loaded
+            EnsurePackageLoaded(GuidList.VisualRustPkgGuid);
 
-			// TODO: start watching the Cargo manifest
-		}
+            // TODO: start watching the Cargo manifest
+        }
 
-		private void FileWatcherError(object sender, EventArgs args)
-		{
-			_fileWatcher.Error -= FileWatcherError;
-			//VsAppShell.Current.DispatchOnUIThread(() => {
-			//	foreach (var iVsProjectLazy in _cpsIVsProjects)
-			//	{
-			//		IVsProject iVsProject;
-			//		try
-			//		{
-			//			iVsProject = iVsProjectLazy.Value;
-			//		}
-			//		catch (Exception)
-			//		{
-			//			continue;
-			//		}
+        private void FileWatcherError(object sender, EventArgs args)
+        {
+            _fileWatcher.Error -= FileWatcherError;
+            //VsAppShell.Current.DispatchOnUIThread(() => {
+            //	foreach (var iVsProjectLazy in _cpsIVsProjects)
+            //	{
+            //		IVsProject iVsProject;
+            //		try
+            //		{
+            //			iVsProject = iVsProjectLazy.Value;
+            //		}
+            //		catch (Exception)
+            //		{
+            //			continue;
+            //		}
 
-			//		if (iVsProject.AsUnconfiguredProject() != _unconfiguredProject)
-			//		{
-			//			continue;
-			//		}
+            //		if (iVsProject.AsUnconfiguredProject() != _unconfiguredProject)
+            //		{
+            //			continue;
+            //		}
 
-			//		var solution = VsAppShell.Current.GetGlobalService<IVsSolution>(typeof(SVsSolution));
-			//		solution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, (IVsHierarchy)iVsProject, 0);
-			//		return;
-			//	}
-			//});
-		}
+            //		var solution = VsAppShell.Current.GetGlobalService<IVsSolution>(typeof(SVsSolution));
+            //		solution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, (IVsHierarchy)iVsProject, 0);
+            //		return;
+            //	}
+            //});
+        }
 
-		private async Task ProjectUnloading(object sender, EventArgs args)
-		{
-			//VsAppShell.Current.AssertIsOnMainThread();
+        private async Task ProjectUnloading(object sender, EventArgs args)
+        {
+            //VsAppShell.Current.AssertIsOnMainThread();
 
-			_unconfiguredProject.ProjectUnloading -= ProjectUnloading;
-			_fileWatcher.Dispose();
+            _unconfiguredProject.ProjectUnloading -= ProjectUnloading;
+            _fileWatcher.Dispose();
 
-			if (!_fileSystem.DirectoryExists(_projectDirectory))
-			{
-				return;
-			}
-		}
-	}
+            if (!_fileSystem.DirectoryExists(_projectDirectory))
+            {
+                return;
+            }
+        }
+    }
 }

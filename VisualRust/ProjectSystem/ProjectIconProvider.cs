@@ -7,54 +7,54 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace VisualRust.ProjectSystem
 {
-	internal static class ProjectIconProvider
-	{
-		private static IVsImageMonikerImageList _monikerImageList;
-		private static ImageList _imageList;
+    internal static class ProjectIconProvider
+    {
+        private static IVsImageMonikerImageList _monikerImageList;
+        private static ImageList _imageList;
 
-		public static ImageMoniker ProjectNodeImage { get; private set; }
-		public static ImageMoniker RustFileNodeImage { get; private set; }
-		public static ImageMoniker CargoManifestNodeImage { get; private set; }
+        public static ImageMoniker ProjectNodeImage { get; private set; }
+        public static ImageMoniker RustFileNodeImage { get; private set; }
+        public static ImageMoniker CargoManifestNodeImage { get; private set; }
 
-		/// <summary>
-		/// Creates image list and image monikers for project icons.
-		/// Must be called on UI thread.
-		/// </summary>
-		public static void LoadProjectImages()
-		{
-			if (_monikerImageList == null)
-			{
-				IVsImageService2 imageService = VisualRustPackage.GetGlobalService(typeof(SVsImageService)) as IVsImageService2;
+        /// <summary>
+        /// Creates image list and image monikers for project icons.
+        /// Must be called on UI thread.
+        /// </summary>
+        public static void LoadProjectImages()
+        {
+            if (_monikerImageList == null)
+            {
+                IVsImageService2 imageService = VisualRustPackage.GetGlobalService(typeof(SVsImageService)) as IVsImageService2;
 
-				if (_imageList == null)
-				{
-					_imageList = new ImageList();
-				}
+                if (_imageList == null)
+                {
+                    _imageList = new ImageList();
+                }
 
-				_imageList.Images.Add(Resources.RustProjectNode);
-				_imageList.Images.Add(Resources.RustFileNode);
-				_imageList.Images.Add(Resources.CargoManifestNode);
+                _imageList.Images.Add(Resources.RustProjectNode);
+                _imageList.Images.Add(Resources.RustFileNode);
+                _imageList.Images.Add(Resources.CargoManifestNode);
 
-				_monikerImageList = imageService.CreateMonikerImageListFromHIMAGELIST(_imageList.Handle);
-				imageService.AddCustomImageList(_monikerImageList);
+                _monikerImageList = imageService.CreateMonikerImageListFromHIMAGELIST(_imageList.Handle);
+                imageService.AddCustomImageList(_monikerImageList);
 
-				ImageMoniker[] monikers = new ImageMoniker[3];
-				_monikerImageList.GetImageMonikers(0, 3, monikers);
+                ImageMoniker[] monikers = new ImageMoniker[3];
+                _monikerImageList.GetImageMonikers(0, 3, monikers);
 
-				ProjectNodeImage = monikers[0];
-				RustFileNodeImage = monikers[1];
-				CargoManifestNodeImage = monikers[2];
-			}
-		}
+                ProjectNodeImage = monikers[0];
+                RustFileNodeImage = monikers[1];
+                CargoManifestNodeImage = monikers[2];
+            }
+        }
 
-		public static void Close()
-		{
-			if (_imageList != null)
-			{
-				_imageList.Dispose();
-				_imageList = null;
-				_monikerImageList = null;
-			}
-		}
-	}
+        public static void Close()
+        {
+            if (_imageList != null)
+            {
+                _imageList.Dispose();
+                _imageList = null;
+                _monikerImageList = null;
+            }
+        }
+    }
 }

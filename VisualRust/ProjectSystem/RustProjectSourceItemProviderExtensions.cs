@@ -11,15 +11,15 @@ using Microsoft.VisualStudio.ProjectSystem.Utilities;
 
 namespace VisualRust.ProjectSystem
 {
-	[Export(typeof(IProjectSourceItemProviderExtension))]
-	[Export(typeof(IProjectFolderItemProviderExtension))]
-	[AppliesTo(VisualRustPackage.UniqueCapability)]
-	internal sealed class RustProjectSourceItemProviderExtension : FileSystemMirroringProjectSourceItemProviderExtensionBase
-	{
-		[ImportingConstructor]
-		public RustProjectSourceItemProviderExtension(UnconfiguredProject unconfiguredProject, ConfiguredProject configuredProject, IProjectLockService projectLockService, IFileSystemMirroringProjectTemporaryItems2 temporaryItems)
-			: base(unconfiguredProject, configuredProject, projectLockService, temporaryItems)
-		{
-		}
-	}
+    [Export(typeof(IProjectSourceItemProviderExtension))]
+    [Export(typeof(IProjectFolderItemProviderExtension))]
+    [AppliesTo(VisualRustPackage.UniqueCapability)]
+    internal sealed class RustProjectSourceItemProviderExtension : FileSystemMirroringProjectSourceItemProviderExtensionBase
+    {
+        [ImportingConstructor]
+        public RustProjectSourceItemProviderExtension(UnconfiguredProject unconfiguredProject, ConfiguredProject configuredProject, IProjectLockService projectLockService, IFileSystemMirroringProjectTemporaryItems2 temporaryItems)
+            : base(unconfiguredProject, configuredProject, projectLockService, temporaryItems)
+        {
+        }
+    }
 }

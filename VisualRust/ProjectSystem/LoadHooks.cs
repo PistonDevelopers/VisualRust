@@ -31,7 +31,7 @@ namespace VisualRust.ProjectSystem
 {
     internal sealed class LoadHooks
     {
-        [Export(typeof(IFileSystemMirroringProjectTemporaryItems2))]
+        [Export(typeof(IFileSystemMirroringProjectTemporaryItems))]
         [AppliesTo(VisualRustPackage.UniqueCapability)]
         private FileSystemMirroringProject Project { get; }
 
@@ -41,7 +41,6 @@ namespace VisualRust.ProjectSystem
         private readonly IThreadHandling _threadHandling;
         private readonly UnconfiguredProject _unconfiguredProject;
         private readonly IEnumerable<Lazy<IVsProject>> _cpsIVsProjects;
-        private readonly IProjectItemDependencyProvider _dependencyProvider;
 
         /// <summary>
         /// Backing field for the similarly named property.
@@ -50,21 +49,19 @@ namespace VisualRust.ProjectSystem
         public LoadHooks(UnconfiguredProject unconfiguredProject
             , [ImportMany("Microsoft.VisualStudio.ProjectSystem.Microsoft.VisualStudio.Shell.Interop.IVsProject")] IEnumerable<Lazy<IVsProject>> cpsIVsProjects
             , IProjectLockService projectLockService
-            , IThreadHandling threadHandling
-            , [Import(AllowDefault = true)] IProjectItemDependencyProvider dependencyProvider)
+            , IThreadHandling threadHandling)
         {
 
             _unconfiguredProject = unconfiguredProject;
             _cpsIVsProjects = cpsIVsProjects;
             _threadHandling = threadHandling;
-            _dependencyProvider = dependencyProvider;
 
             _projectDirectory = unconfiguredProject.GetProjectDirectory();
 
             unconfiguredProject.ProjectUnloading += ProjectUnloading;
             _fileWatcher = new MsBuildFileSystemWatcher(_projectDirectory, "*", 25, 1000, _fileSystem, new MsBuildFileSystemFilter());
             _fileWatcher.Error += FileWatcherError;
-            Project = new FileSystemMirroringProject(unconfiguredProject, projectLockService, _fileWatcher, _dependencyProvider);
+            Project = new FileSystemMirroringProject(unconfiguredProject, projectLockService, _fileWatcher, null);
         }
 
         public static IVsPackage EnsurePackageLoaded(Guid guidPackage)

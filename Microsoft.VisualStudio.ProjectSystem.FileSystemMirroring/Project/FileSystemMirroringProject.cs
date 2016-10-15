@@ -21,7 +21,7 @@ using Microsoft.VisualStudio.ProjectSystem.Utilities;
 #endif
 
 namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Project {
-    public class FileSystemMirroringProject : IFileSystemMirroringProjectTemporaryItems2 {
+    public class FileSystemMirroringProject : IFileSystemMirroringProjectTemporaryItems {
         private readonly static XProjDocument EmptyProject;
 
         private readonly UnconfiguredProject _unconfiguredProject;
@@ -297,7 +297,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Project {
     /// But since for the FSMP the only source of truth is file system, these items removed from project during next update
     /// (which may restore them as added from file system)
     /// </summary>
-    public interface IFileSystemMirroringProjectTemporaryItems2 {
+    public interface IFileSystemMirroringProjectTemporaryItems {
         Task<IReadOnlyCollection<string>> AddTemporaryFiles(ConfiguredProject configuredProject, IEnumerable<string> filesToAdd);
         Task<IReadOnlyCollection<string>> AddTemporaryDirectories(ConfiguredProject configuredProject, IEnumerable<string> directoriesToAdd);
     }

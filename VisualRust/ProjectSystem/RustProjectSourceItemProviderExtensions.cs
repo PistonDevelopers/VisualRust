@@ -17,7 +17,7 @@ namespace VisualRust.ProjectSystem
     internal sealed class RustProjectSourceItemProviderExtension : FileSystemMirroringProjectSourceItemProviderExtensionBase
     {
         [ImportingConstructor]
-        public RustProjectSourceItemProviderExtension(UnconfiguredProject unconfiguredProject, ConfiguredProject configuredProject, IProjectLockService projectLockService, IFileSystemMirroringProjectTemporaryItems2 temporaryItems)
+        public RustProjectSourceItemProviderExtension(UnconfiguredProject unconfiguredProject, ConfiguredProject configuredProject, IProjectLockService projectLockService, IFileSystemMirroringProjectTemporaryItems temporaryItems)
             : base(unconfiguredProject, configuredProject, projectLockService, temporaryItems)
         {
         }

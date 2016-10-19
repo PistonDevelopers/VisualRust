@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.IO {
         public IReceivableSourceBlock<Changeset> SourceBlock { get; }
         public event EventHandler<EventArgs> Error;
 
-        public MsBuildFileSystemWatcher(string directory, string filter, int delayMilliseconds, int recoveryDelayMilliseconds, IFileSystem fileSystem, IMsBuildFileSystemFilter fileSystemFilter, TaskScheduler taskScheduler = null, IActionLog log = null) {
+        public MsBuildFileSystemWatcher(string directory, string filter, int delayMilliseconds, int recoveryDelayMilliseconds, IFileSystem fileSystem, IMsBuildFileSystemFilter fileSystemFilter, IActionLog log, TaskScheduler taskScheduler = null) {
             Requires.NotNullOrWhiteSpace(directory, nameof(directory));
             Requires.NotNullOrWhiteSpace(filter, nameof(filter));
             Requires.Range(delayMilliseconds >= 0, nameof(delayMilliseconds));
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.IO {
             _fileSystem = fileSystem;
             _fileSystemFilter = fileSystemFilter;
             _taskScheduler = taskScheduler ?? TaskScheduler.Default;
-            _log = log ?? ProjectSystemActionLog.Default;
+            _log = log;
 
             _entries = new MsBuildFileSystemWatcherEntries();
             _queue = new ConcurrentQueue<IFileSystemChange>();

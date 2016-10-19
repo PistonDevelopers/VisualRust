@@ -5,6 +5,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.FormattableString;
 
 namespace Microsoft.Common.Core.Tasks {
     public class TaskCompletionSourceEx<TResult> {
@@ -53,7 +54,7 @@ namespace Microsoft.Common.Core.Tasks {
             }
 
             if (exception is OperationCanceledException) {
-                throw new ArgumentOutOfRangeException(nameof(exception), string.Format(System.Globalization.CultureInfo.InvariantCulture, "Use {0} to cancel task", nameof(TrySetCanceled)));
+                throw new ArgumentOutOfRangeException(nameof(exception), Invariant($"Use {nameof(TrySetCanceled)} to cancel task"));
             }
 
             if (Task.IsCompleted) {

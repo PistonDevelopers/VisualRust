@@ -57,7 +57,6 @@
     <Compile Include="IO\MsBuildFileSystemWatcherEntries.cs" />
     <Compile Include="Logging\FileSystemMirroringProjectLoggingExtensions.cs" />
     <Compile Include="Logging\MsBuildFileSystemWatcherLoggingExtensions.cs" />
-    <Compile Include="Logging\ProjectSystemActionLog.cs" />
     <Compile Include="MsBuild\XDefaultValueProperty.cs" />
     <Compile Include="MsBuild\XImport.cs" />
     <Compile Include="MsBuild\XImportExisting.cs" />

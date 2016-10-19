@@ -53,12 +53,7 @@ namespace Microsoft.Common.Core {
             }
         }
 
-        public static Task WhenAllCancelOnFailure(params Func<CancellationToken, Task>[]  functions) {
-            var cts = new CancellationTokenSource();
-            var tasks = functions.Select(f => f(cts.Token)
-                .ContinueWith(WhenAllCancelOnFailureContinuation, cts, default(CancellationToken), TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default));
-            return Task.WhenAll(tasks);
-        }
+        public static Task WhenAllCancelOnFailure(params Func<CancellationToken, Task>[]  functions) => WhenAllCancelOnFailure(functions, default(CancellationToken));
 
         public static Task WhenAllCancelOnFailure<TSource>(IEnumerable<TSource> source, Func<TSource, CancellationToken, Task> taskFactory, CancellationToken cancellationToken) {
             var functions = source.Select(s => SourceToFunctionConverter(s, taskFactory));
@@ -69,24 +64,53 @@ namespace Microsoft.Common.Core {
             => ct => taskFactory(source, ct);
 
         public static Task WhenAllCancelOnFailure(IEnumerable<Func<CancellationToken, Task>> functions, CancellationToken cancellationToken) {
+            var functionsList = functions.ToList();
             var cts = new CancellationTokenSource();
-            var tasks = functions.Select(f => f(CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken).Token)
-                .ContinueWith(WhenAllCancelOnFailureContinuation, cts, default(CancellationToken), TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default));
-            return Task.WhenAll(tasks);
+            var tcs = new TaskCompletionSourceEx<bool>();
+            var state = new WhenAllCancelOnFailureContinuationState(functionsList.Count, tcs, cts);
+
+            foreach (var function in functionsList) {
+                var task = function(CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken).Token);
+                task.ContinueWith(WhenAllCancelOnFailureContinuation, state, default(CancellationToken), TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+            }
+            
+            return tcs.Task;
         }
 
         private static void WhenAllCancelOnFailureContinuation(Task task, object state) {
-            var cts = (CancellationTokenSource) state;
-            try {
-                task.GetAwaiter().GetResult();
-            } catch (OperationCanceledException ex) {
-                if (!cts.IsCancellationRequested && ex.CancellationToken != cts.Token) {
-                    cts.Cancel();
-                    throw;
-                }
-            } catch (Exception) {
-                cts.Cancel();
-                throw;
+            var continuationState = (WhenAllCancelOnFailureContinuationState) state;
+            switch (task.Status) {
+                case TaskStatus.RanToCompletion:
+                    if (Interlocked.Decrement(ref continuationState.Count) == 0) {
+                        continuationState.TaskCompletionSource.TrySetResult(true);
+                    }
+                    break;
+                case TaskStatus.Canceled:
+                    try {
+                        task.GetAwaiter().GetResult();
+                    } catch (OperationCanceledException ex) {
+                        if (continuationState.TaskCompletionSource.TrySetCanceled(ex)) {
+                            continuationState.CancellationTokenSource.Cancel();
+                        }
+                    }
+                    break;
+                case TaskStatus.Faulted:
+                    if (continuationState.TaskCompletionSource.TrySetException(task.Exception)) {
+                        continuationState.CancellationTokenSource.Cancel();
+                    }
+                    break;
+            }
+        }
+
+        private class WhenAllCancelOnFailureContinuationState {
+            public int Count;
+            public readonly TaskCompletionSourceEx<bool> TaskCompletionSource;
+            public readonly CancellationTokenSource CancellationTokenSource;
+
+            public WhenAllCancelOnFailureContinuationState(int count, TaskCompletionSourceEx<bool> taskCompletionSource, CancellationTokenSource cancellationTokenSource) {
+                Count = count;
+                TaskCompletionSource = taskCompletionSource;
+                CancellationTokenSource = cancellationTokenSource;
             }
         }
     }

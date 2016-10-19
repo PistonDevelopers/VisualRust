@@ -1,19 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Common.Core.Disposables;
 
 namespace Microsoft.Common.Core.Threading {
     /// <summary>
     /// BinaryAsyncLock is a helper primitive that can be used instead of SemaphoreSlim.WaitAsync + double-checked locking
     /// </summary>
     /// <remarks>
-    /// After BinaryAsyncLock is created or reset, the first caller of <see cref="WaitAsync"/> will immediately get <see cref="BinaryAsyncLockToken" />
-    /// that is not set. All other callers will either wait until <see cref="BinaryAsyncLockToken.Release"/> is called and then will get <see langword="true" />,
-    /// or until previous token is skipped.
+    /// After BinaryAsyncLock is created or reset, the first caller of <see cref="WaitAsync"/> will immediately get <see cref="IBinaryAsyncLockToken" />
+    /// that is not set. All other callers will either wait until <see cref="IBinaryAsyncLockToken.Set"/> is called and then will get <see langword="true" />,
+    /// or until until <see cref="IBinaryAsyncLockToken.Reset"/> is called and next awaiting caller will get <see langword="false" />,
     /// </remarks>
     public class BinaryAsyncLock {
         private static readonly Task<IBinaryAsyncLockToken> CompletedTask = Task.FromResult<IBinaryAsyncLockToken>(new Token());
@@ -57,6 +55,18 @@ namespace Microsoft.Common.Core.Threading {
             }
         }
 
+        /// <summary>
+        /// Creates a task that is completed when lock is in Unset state and no reset waiters are in front of current one
+        /// and all tokens that were issued prior this one are released
+        /// </summary>
+        /// <remarks>
+        /// Method tries to replace current tail with the new Reset TokenSource (when its task is completed, lock will be in Unset state),
+        /// and if it fails, it means that another thread has updated the tail, so method tries again with that new tail.
+        /// If there is no tail, it is considered that lock is in the Unset state already, but no one has requested a token yet
+        /// If there is a tail, method tries to set its <see cref="TokenSource.Next"/> to the new TokenSource,
+        /// and if it fails, it means that another thread has updated the property or the tail, so method tries again with that new tail.
+        /// If replacing tail succeeded, method stops adding Set tokens. If there are no unreleased set tokens, new tail task is set to completed.
+        /// </remarks>
         public Task<IBinaryAsyncLockToken> ResetAsync(CancellationToken cancellationToken = default(CancellationToken)) {
             while (true) {
                 if (cancellationToken.IsCancellationRequested) {
@@ -81,21 +91,12 @@ namespace Microsoft.Common.Core.Threading {
             }
         }
 
-        public bool TryReset() {
-            while (true) {
-                var tail = _tail;
-                if (tail == null || tail.IsUnset) {
-                    return true;
+        public void EnqueueReset() {
+            ResetAsync().ContinueWith(t => {
+                if (t.Status == TaskStatus.RanToCompletion) {
+                    t.Result.Reset();
                 }
-
-                if (tail.IsWaiting) {
-                    return false;
-                }
-
-                if (Interlocked.CompareExchange(ref _tail, null, tail) == tail) {
-                    return true;
-                }
-            }
+            });
         }
 
         private void TokenSet(TokenSource tokenSource) {
@@ -107,8 +108,7 @@ namespace Microsoft.Common.Core.Threading {
                     return;
                 }
 
-                if (tokenSource.ResetOnSet) {
-                    tokenSource.Tcs.TrySetResult(new Token(this, tokenSource));
+                if (tokenSource.ResetOnSet && tokenSource.Tcs.TrySetResult(new Token(this, tokenSource))) {
                     return;
                 }
 
@@ -116,9 +116,10 @@ namespace Microsoft.Common.Core.Threading {
             }
         }
 
-        private void TokenReset(TokenSource tokenSource) {
+        private void TokenReset(TokenSource tokenSource, bool setIfLast) {
             while (tokenSource != null) {
-                Interlocked.CompareExchange(ref _tail, null, tokenSource);
+                var newTail = setIfLast ? new TokenSource(CompletedTask) : null;
+                Interlocked.CompareExchange(ref _tail, newTail, tokenSource);
 
                 tokenSource = tokenSource.Next;
                 if (tokenSource?.Tcs == null) {
@@ -147,8 +148,9 @@ namespace Microsoft.Common.Core.Threading {
             }
 
             public bool IsSet { get; }
-            public void Reset() => _binaryAsyncLock?.TokenReset(_tokenSource);
+            public void Reset() => _binaryAsyncLock?.TokenReset(_tokenSource, false);
             public void Set() => _binaryAsyncLock?.TokenSet(_tokenSource);
+            public void SetIfLast() => _binaryAsyncLock?.TokenReset(_tokenSource, true);
         }
 
         private class TokenSource {
@@ -159,8 +161,6 @@ namespace Microsoft.Common.Core.Threading {
             public TokenSource Next => _next;
             public bool ResetOnSet { get; }
             public bool IsSet => Task.Status == TaskStatus.RanToCompletion && Task.Result.IsSet;
-            public bool IsUnset => Task.Status == TaskStatus.RanToCompletion && !Task.Result.IsSet;
-            public bool IsWaiting => !Task.IsCompleted;
 
             public TokenSource(BinaryAsyncLock binaryAsyncLock) {
                 Task = System.Threading.Tasks.Task.FromResult<IBinaryAsyncLockToken>(new Token(binaryAsyncLock, this));
@@ -194,5 +194,6 @@ namespace Microsoft.Common.Core.Threading {
         bool IsSet { get; }
         void Reset();
         void Set();
+        void SetIfLast();
     }
 }

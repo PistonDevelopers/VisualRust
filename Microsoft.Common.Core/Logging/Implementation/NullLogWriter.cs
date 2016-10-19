@@ -4,17 +4,11 @@
 using System.Threading.Tasks;
 
 namespace Microsoft.Common.Core.Logging {
-    public sealed class NullLogWriter : IActionLogWriter {
+    internal sealed class NullLogWriter : IActionLogWriter {
         public static IActionLogWriter Instance { get; } = new NullLogWriter();
 
-        private NullLogWriter() {
-
-        }
-
-        public Task WriteAsync(MessageCategory category, string message) {
-            return Task.CompletedTask;
-        }
-
+        private NullLogWriter() { }
+        public Task WriteAsync(MessageCategory category, string message) => Task.CompletedTask;
         public void Flush() { }
     }
 }

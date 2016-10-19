@@ -5,24 +5,12 @@ using System.Diagnostics;
 
 namespace Microsoft.Common.Core.OS {
     public sealed class ProcessServices : IProcessServices {
-        private static IProcessServices _instance;
-
-        public static IProcessServices Current {
-            get {
-                if (_instance == null) {
-                    _instance = new ProcessServices();
-                }
-                return _instance;
-            }
-            internal set { _instance = value; }
+        public Process Start(ProcessStartInfo psi) {
+            return Process.Start(psi);
         }
 
-        public void Start(ProcessStartInfo psi) {
-            Process.Start(psi);
-        }
-
-        public void Start(string path) {
-            Process.Start(path);
+        public Process Start(string path) {
+            return Process.Start(path);
         }
     }
 }

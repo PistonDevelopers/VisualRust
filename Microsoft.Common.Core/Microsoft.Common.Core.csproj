@@ -40,10 +40,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +68,7 @@
     <Compile Include="Extensions\CompositionBatchExtensions.FactoryReflectionComposablePart.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\IOExtensions.cs" />
+    <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Extensions\StringBuilderExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -85,19 +86,21 @@
     <Compile Include="IO\IFileVersionInfo.cs" />
     <Compile Include="IO\KnownFolderGuids.cs" />
     <Compile Include="Lazy.cs" />
-    <Compile Include="Logging\FileLogWriter.cs" />
-    <Compile Include="Logging\GeneralLog.cs" />
-    <Compile Include="Logging\IActionLinesLog.cs" />
     <Compile Include="Logging\IActionLog.cs" />
     <Compile Include="Logging\IActionLogWriter.cs" />
-    <Compile Include="Logging\LinesLog.cs" />
+    <Compile Include="Logging\ILoggerProvider.cs" />
+    <Compile Include="Logging\ILoggingPermissions.cs" />
+    <Compile Include="Logging\Implementation\FileLogWriter.cs" />
+    <Compile Include="Logging\Implementation\LoggingPermissions.cs" />
+    <Compile Include="Logging\Implementation\LoggingServices.cs" />
+    <Compile Include="Logging\Implementation\NullLogWriter.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\LogVerbosity.cs" />
     <Compile Include="Logging\MessageCategory.cs" />
-    <Compile Include="Logging\NullLog.cs" />
-    <Compile Include="Logging\NullLogWriter.cs" />
-    <Compile Include="Logging\StringLog.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Net\FileDownloader.cs" />
     <Compile Include="Net\IFileDownloader.cs" />
+    <Compile Include="Net\Network.cs" />
     <Compile Include="Net\WebSocketHelper.cs" />
     <Compile Include="OS\ErrorCodeConverter.cs" />
     <Compile Include="OS\IProcessServices.cs" />
@@ -106,14 +109,28 @@
     <Compile Include="OS\ProcessServices.cs" />
     <Compile Include="OS\RegistryImpl.cs" />
     <Compile Include="OS\RegistryKeyImpl.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\Credentials.cs" />
+    <Compile Include="Security\ISecurityService.cs" />
+    <Compile Include="Security\SecurityService.cs" />
+    <Compile Include="Security\SecurityUtilities.cs" />
+    <Compile Include="Services\CoreServices.cs" />
+    <Compile Include="Services\ICoreServices.cs" />
+    <Compile Include="Settings\ISettingsStorage.cs" />
     <Compile Include="Shell\CoreShell.cs" />
+    <Compile Include="Shell\CoreShellExtensions.cs" />
+    <Compile Include="Shell\IApplicationConstants.cs" />
     <Compile Include="Shell\ICompositionCatalog.cs" />
     <Compile Include="Shell\ICoreShell.cs" />
+    <Compile Include="Shell\IFileDialog.cs" />
     <Compile Include="Shell\IIdleTimeService.cs" />
+    <Compile Include="Shell\IProgressDialog.cs" />
     <Compile Include="Shell\MessageButtons.cs" />
+    <Compile Include="Shell\MessageType.cs" />
     <Compile Include="Shell\ProgressBarSession.cs" />
+    <Compile Include="Shell\ProgressDialogData.cs" />
+    <Compile Include="Shell\UIColorTheme.cs" />
     <Compile Include="Tasks\EventTaskSource.cs" />
+    <Compile Include="Tasks\ITaskService.cs" />
     <Compile Include="Tasks\TaskCompletionSourceEx.cs" />
     <Compile Include="TaskUtilities.cs" />
     <Compile Include="Telemetry\ITelemetryRecorder.cs" />
@@ -123,15 +140,25 @@
     <Compile Include="Telemetry\TelemetryServiceBase.cs" />
     <Compile Include="Threading\AsyncCountdownEvent.cs" />
     <Compile Include="Threading\AsyncManualResetEvent.cs" />
+    <Compile Include="Threading\AsyncReaderWriterLock.cs" />
     <Compile Include="Threading\BackgroundThreadAwaitable.cs" />
     <Compile Include="Threading\BackgroundThreadAwaiter.cs" />
     <Compile Include="Threading\BinaryAsyncLock.cs" />
     <Compile Include="Threading\DelayedAsyncAction.cs" />
+    <Compile Include="Threading\IAsyncReaderWriterLockToken.cs" />
+    <Compile Include="Threading\IMainThread.cs" />
+    <Compile Include="Threading\IReentrancyTokenFactory.cs" />
+    <Compile Include="Threading\MainThreadAwaitable.cs" />
+    <Compile Include="Threading\MainThreadAwaiter.cs" />
+    <Compile Include="Threading\ReentrancyToken.cs" />
     <Compile Include="Versions\Toolset.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
     <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

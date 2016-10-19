@@ -13,7 +13,7 @@ using System.Threading.Tasks.Dataflow;
 using static System.FormattableString;
 
 namespace Microsoft.Common.Core.Logging {
-    public sealed class FileLogWriter : IActionLogWriter {
+    internal sealed class FileLogWriter : IActionLogWriter {
         private const int _maxTimeout = 5000;
         private const int _maxBufferSize = 1024;
         private static readonly ConcurrentDictionary<string, FileLogWriter> _writers = new ConcurrentDictionary<string, FileLogWriter>();

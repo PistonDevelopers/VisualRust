@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Common.Core.OS {
     public interface IProcessServices {
-        void Start(ProcessStartInfo psi);
-        void Start(string path);
+        Process Start(ProcessStartInfo psi);
+        Process Start(string path);
     }
 }

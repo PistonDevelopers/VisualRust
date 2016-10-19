@@ -11,39 +11,39 @@ using static System.FormattableString;
 namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Logging {
     internal static class MsBuildFileSystemWatcherLoggingExtensions {
         public static void WatcherStarting(this IActionLog log) {
-            log.WriteLineAsync(MessageCategory.General, "MsBuildFileSystemWatcher starting");
+            log.WriteLineAsync(LogVerbosity.Normal, MessageCategory.General, "MsBuildFileSystemWatcher starting");
         }
 
         public static void WatcherStarted(this IActionLog log) {
-            log.WriteLineAsync(MessageCategory.General, "MsBuildFileSystemWatcher started");
+            log.WriteLineAsync(LogVerbosity.Normal, MessageCategory.General, "MsBuildFileSystemWatcher started");
         }
 
         public static void WatcherConsumeChangesScheduled(this IActionLog log) {
-            log.WriteLineAsync(MessageCategory.General, "Consume file system changes scheduled");
+            log.WriteLineAsync(LogVerbosity.Normal, MessageCategory.General, "Consume file system changes scheduled");
         }
 
         public static void WatcherConsumeChangesStarted(this IActionLog log) {
-            log.WriteLineAsync(MessageCategory.General, "File system changes consumer started");
+            log.WriteLineAsync(LogVerbosity.Normal, MessageCategory.General, "File system changes consumer started");
         }
 
         public static void WatcherConsumeChangesFinished(this IActionLog log) {
-            log.WriteLineAsync(MessageCategory.General, "File system changes consumer finished");
+            log.WriteLineAsync(LogVerbosity.Normal, MessageCategory.General, "File system changes consumer finished");
         }
 
         public static void WatcherApplyChange(this IActionLog log, string change) {
-            log.WriteLineAsync(MessageCategory.General, Invariant($"Apply change: {change}"));
+            log.WriteLineAsync(LogVerbosity.Normal, MessageCategory.General, Invariant($"Apply change: {change}"));
         }
 
         public static void WatcherApplyChangeFailed(this IActionLog log, string change, Exception exception) {
-            log.WriteLineAsync(MessageCategory.Error, Invariant($"Failed to apply change '{change}':{exception}"));
+            log.WriteLineAsync(LogVerbosity.Normal, MessageCategory.Error, Invariant($"Failed to apply change '{change}':{exception}"));
         }
 
         public static void WatcherApplyRecoveryChange(this IActionLog log, string change) {
-            log.WriteLineAsync(MessageCategory.General, Invariant($"Apply recovery change: {change}"));
+            log.WriteLineAsync(LogVerbosity.Normal, MessageCategory.General, Invariant($"Apply recovery change: {change}"));
         }
 
         public static void WatcherApplyRecoveryChangeFailed(this IActionLog log, string change, Exception exception) {
-            log.WriteLineAsync(MessageCategory.Error, Invariant($"Failed to apply recovery change '{change}', closing watcher:{exception}"));
+            log.WriteLineAsync(LogVerbosity.Normal, MessageCategory.Error, Invariant($"Failed to apply recovery change '{change}', closing watcher:{exception}"));
         }
 
         public static void WatcherChangesetSent(this IActionLog log, MsBuildFileSystemWatcher.Changeset changeset) {
@@ -56,11 +56,11 @@ namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Logging {
                 .AppendWatcherChangesetPart(changeset.RenamedDirectories, "Renamed Directories:")
                 .AppendWatcherChangesetPart(changeset.RemovedDirectories, "Removed Directories:");
 
-            log.WriteAsync(MessageCategory.General, sb.ToString());
+            log.WriteAsync(LogVerbosity.Normal, MessageCategory.General, sb.ToString());
         }
 
         public static void ErrorInFileSystemWatcher(this IActionLog log, string watcherName, Exception e) {
-            log.WriteAsync(MessageCategory.Error, Invariant($"{watcherName} failed with exception:{e}"));
+            log.WriteAsync(LogVerbosity.Minimal, MessageCategory.Error, Invariant($"{watcherName} failed with exception:{e}"));
         }
 
         private static StringBuilder AppendWatcherChangesetPart(this StringBuilder sb, ISet<string> changesetPart, string name) {

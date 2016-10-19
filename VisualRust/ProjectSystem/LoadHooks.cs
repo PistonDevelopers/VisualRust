@@ -58,10 +58,12 @@ namespace VisualRust.ProjectSystem
 
             _projectDirectory = unconfiguredProject.GetProjectDirectory();
 
+            var log = new DummyLogger();
+
             unconfiguredProject.ProjectUnloading += ProjectUnloading;
-            _fileWatcher = new MsBuildFileSystemWatcher(_projectDirectory, "*", 25, 1000, _fileSystem, new MsBuildFileSystemFilter());
+            _fileWatcher = new MsBuildFileSystemWatcher(_projectDirectory, "*", 25, 1000, _fileSystem, new MsBuildFileSystemFilter(), log);
             _fileWatcher.Error += FileWatcherError;
-            Project = new FileSystemMirroringProject(unconfiguredProject, projectLockService, _fileWatcher, null);
+            Project = new FileSystemMirroringProject(unconfiguredProject, projectLockService, _fileWatcher, null, log);
         }
 
         public static IVsPackage EnsurePackageLoaded(Guid guidPackage)

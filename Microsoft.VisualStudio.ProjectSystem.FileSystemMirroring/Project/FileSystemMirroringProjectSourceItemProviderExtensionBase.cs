@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Build.Evaluation;
 using Microsoft.Common.Core;
+using Microsoft.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.Threading;
 #if VS14
 using Microsoft.VisualStudio.ProjectSystem.Items;

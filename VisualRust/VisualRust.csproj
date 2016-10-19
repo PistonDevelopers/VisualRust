@@ -94,6 +94,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProjectSystem\DummyLogger.cs" />
     <Compile Include="ProjectSystem\GnuDebugLaunchSettingsProvider.cs" />
     <Compile Include="ProjectSystem\IDebugLaunchSettingsProvider.cs" />
     <Compile Include="ProjectSystem\MsvcDebugLaunchSettingsProvider.cs" />

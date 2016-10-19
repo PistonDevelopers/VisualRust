@@ -63,6 +63,18 @@ namespace Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring {
             return Enumerable.Empty<string>();
         }
 
+        public static IEnumerable<string> GetAllFilePaths(this IEnumerable<IProjectTree> nodes) {
+            List<string> paths = new List<string>();
+            foreach (IProjectTree node in nodes) {
+                if (node.IsFolder || node.Children.Count > 0) {
+                    paths.AddRange(node.Children.GetAllFilePaths());
+                } else if (!string.IsNullOrWhiteSpace(node.FilePath)) {
+                    paths.Add(node.FilePath);
+                }
+            }
+            return paths.Distinct();
+        }
+
         public static string GetSelectedFolderPath(this IImmutableSet<IProjectTree> nodes, UnconfiguredProject unconfiguredProject) {
             if (nodes.Count == 1) {
                 var n = nodes.First();

@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Common.Core.Disposables {
     /// <summary>
@@ -27,6 +28,8 @@ namespace Microsoft.Common.Core.Disposables {
         /// Gets the disposable that does nothing when disposed.
         /// </summary>
         public static IDisposable Empty => DefaultDisposable.Instance;
+
+        public static Task<IDisposable> EmptyTask { get; } = Task.FromResult<IDisposable>(DefaultDisposable.Instance);
 
         /// <summary>
         /// Represents an Action-based disposable.

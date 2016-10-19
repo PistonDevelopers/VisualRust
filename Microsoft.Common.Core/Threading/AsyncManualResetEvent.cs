@@ -10,6 +10,8 @@ namespace Microsoft.Common.Core.Threading {
     /// </summary>
     public class AsyncManualResetEvent {
         private TaskCompletionSource<bool> _tcs;
+        public bool IsSet => _tcs.Task.IsCompleted;
+
         public Task WaitAsync() => _tcs.Task;
         public void Set() => _tcs.TrySetResult(true);
 
@@ -39,8 +41,11 @@ namespace Microsoft.Common.Core.Threading {
             }
         }
 
-        public AsyncManualResetEvent() {
+        public AsyncManualResetEvent(bool isSet = false) {
             _tcs = new TaskCompletionSource<bool>();
+            if (isSet) {
+                _tcs.SetResult(true);
+            }
         }
 
         public void Reset() {

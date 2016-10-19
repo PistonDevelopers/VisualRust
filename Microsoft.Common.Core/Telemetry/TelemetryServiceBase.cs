@@ -9,7 +9,9 @@ namespace Microsoft.Common.Core.Telemetry {
     /// <summary>
     /// Base telemetry service implementation, common to production code and test cases.
     /// </summary>
-    public abstract class TelemetryServiceBase : ITelemetryService, IDisposable {
+    public abstract class TelemetryServiceBase<TRecorder> : ITelemetryService, IDisposable
+        where TRecorder: class, ITelemetryRecorder {
+
         public string EventNamePrefix { get; private set; }
         public string PropertyNamePrefix { get; private set; }
 
@@ -18,12 +20,12 @@ namespace Microsoft.Common.Core.Telemetry {
         /// uses IVsTelemetryService, in unit or component tests
         /// recorder is a simple string container or a disk file.
         /// </summary>
-        public ITelemetryRecorder TelemetryRecorder { get; internal set; }
+        public TRecorder TelemetryRecorder { get; private set; }
 
-        protected TelemetryServiceBase(string eventNamePrefix, string propertyNamePrefix, ITelemetryRecorder telemetryRecorder) {
-            this.TelemetryRecorder = telemetryRecorder;
-            this.EventNamePrefix = eventNamePrefix;
-            this.PropertyNamePrefix = propertyNamePrefix;
+        protected TelemetryServiceBase(string eventNamePrefix, string propertyNamePrefix, TRecorder telemetryRecorder) {
+            TelemetryRecorder = telemetryRecorder;
+            EventNamePrefix = eventNamePrefix;
+            PropertyNamePrefix = propertyNamePrefix;
         }
 
         #region ITelemetryService

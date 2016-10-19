@@ -14,10 +14,15 @@ using Microsoft.Extensions.FileSystemGlobbing;
 namespace Microsoft.Common.Core.IO {
     public sealed class FileSystem : IFileSystem {
         public IFileSystemWatcher CreateFileSystemWatcher(string path, string filter) => new FileSystemWatcherProxy(path, filter);
-        
+
         public IDirectoryInfo GetDirectoryInfo(string directoryPath) => new DirectoryInfoProxy(directoryPath);
-        
+
         public bool FileExists(string path) => File.Exists(path);
+
+        public long FileSize(string path) {
+            var fileInfo = new FileInfo(path);
+            return fileInfo.Length;
+        }
 
         public string ReadAllText(string path) => File.ReadAllText(path);
         
@@ -63,16 +68,35 @@ namespace Microsoft.Common.Core.IO {
         
         public void CreateDirectory(string path) => Directory.CreateDirectory(path);
 
-        public string CompressFile(string path) {
-            string compressedFilePath = Path.GetTempFileName();
-            using (FileStream sourceFileStream = File.OpenRead(path))
-            using (FileStream compressedFileStream = File.Create(compressedFilePath))
-            using (GZipStream stream = new GZipStream(compressedFileStream, CompressionLevel.Optimal)) {
-                // 81920 is the default compression buffer size
-                sourceFileStream.CopyTo(compressedFileStream, 81920);
+        public string CompressFile(string path, string relativeTodir) {
+            string zipFilePath = Path.GetTempFileName();
+            using (FileStream zipStream = new FileStream(zipFilePath, FileMode.Create))
+            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create)) {
+                string entryName = Path.GetFileName(path);
+                if (!string.IsNullOrWhiteSpace(relativeTodir)) {
+                    entryName = path.MakeRelativePath(relativeTodir).Replace('\\', '/');
+                }
+                archive.CreateEntryFromFile(path, entryName);
             }
+            return zipFilePath;
+        }
 
-            return compressedFilePath;
+        public string CompressFiles(IEnumerable<string> paths, string relativeTodir, IProgress<string> progress, CancellationToken ct) {
+            string zipFilePath = Path.GetTempFileName();
+            using (FileStream zipStream = new FileStream(zipFilePath, FileMode.Create))
+            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create)) {
+                foreach(string path in paths) {
+                    string entryName = null;
+                    if (!string.IsNullOrWhiteSpace(relativeTodir)) {
+                        entryName = path.MakeRelativePath(relativeTodir).Replace('\\', '/');
+                    } else {
+                        entryName = path.MakeRelativePath(Path.GetDirectoryName(path)).Replace('\\', '/');
+                    }
+                    progress?.Report(path);
+                    archive.CreateEntryFromFile(path, entryName);
+                }
+            }
+            return zipFilePath;
         }
 
         public string CompressDirectory(string path) {

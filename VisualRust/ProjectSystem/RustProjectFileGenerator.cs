@@ -1,6 +1,6 @@
 ﻿using Microsoft.Common.Core;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.MsBuild;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Shell;
+using VisualRust.ProjectSystem.FileSystemMirroring.MsBuild;
+using VisualRust.ProjectSystem.FileSystemMirroring.Shell;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;

@@ -33,7 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.Cargo", "VisualR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Common.Core", "Microsoft.Common.Core\Microsoft.Common.Core.csproj", "{5DA4C00B-9F16-4EF9-894D-20329544265E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring", "Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring\Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.csproj", "{B8696D0C-8ADB-4C11-8CEE-5C81AA8C6EBD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.ProjectSystem.FileSystemMirroring", "VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.csproj", "{B8696D0C-8ADB-4C11-8CEE-5C81AA8C6EBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

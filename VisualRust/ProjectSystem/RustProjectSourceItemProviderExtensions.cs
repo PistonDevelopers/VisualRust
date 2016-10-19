@@ -3,7 +3,7 @@
 
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.ProjectSystem;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Project;
+using VisualRust.ProjectSystem.FileSystemMirroring.Project;
 //#if VS14
 using Microsoft.VisualStudio.ProjectSystem.Items;
 using Microsoft.VisualStudio.ProjectSystem.Utilities;

@@ -222,9 +222,9 @@
       <Project>{5da4c00b-9f16-4ef9-894d-20329544265e}</Project>
       <Name>Microsoft.Common.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring\Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.csproj">
+    <ProjectReference Include="..\VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.csproj">
       <Project>{b8696d0c-8adb-4c11-8cee-5c81aa8c6ebd}</Project>
-      <Name>Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring</Name>
+      <Name>VisualRust.ProjectSystem.FileSystemMirroring</Name>
     </ProjectReference>
     <ProjectReference Include="..\MIEngine\src\MICore\MICore.csproj">
       <Project>{12cc862d-95b7-4224-8e16-b928c6333677}</Project>

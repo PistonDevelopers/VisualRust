@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using Microsoft.Common.Core;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.IO;
+using VisualRust.ProjectSystem.FileSystemMirroring.IO;
 
 namespace VisualRust.ProjectSystem
 {

@@ -14,8 +14,8 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 using VisualRust.Options;
 using MICore;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Package.Registration;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Shell;
+using VisualRust.ProjectSystem.FileSystemMirroring.Package.Registration;
+using VisualRust.ProjectSystem.FileSystemMirroring.Shell;
 using System.Collections.Generic;
 using VisualRust.ProjectSystem;
 

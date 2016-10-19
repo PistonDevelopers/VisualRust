@@ -12,8 +12,8 @@ using Microsoft.Common.Core.Enums;
 using Microsoft.Common.Core.IO;
 using Microsoft.Common.Core.Shell;
 using Microsoft.VisualStudio.ProjectSystem;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.IO;
-using Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.Project;
+using VisualRust.ProjectSystem.FileSystemMirroring.IO;
+using VisualRust.ProjectSystem.FileSystemMirroring.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Common.Core.Logging;
 //#if VS14

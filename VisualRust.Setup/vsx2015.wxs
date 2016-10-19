@@ -13,8 +13,8 @@
       <Component Id="Cmp_Microsoft_Common_Core_dll_$(var.VsVersion)" Guid="{ECC51E4D-B8A1-49E6-8C52-6C2B863BAA47}">
         <File Id="File_Microsoft_Common_Core_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Microsoft.Common.Core.dll" />
       </Component>
-      <Component Id="Cmp_Microsoft_VisualStudio_ProjectSystem_FileMirroring_dll_$(var.VsVersion)" Guid="{790A5517-33AB-45C2-BA84-F8B1DC31EE79}">
-        <File Id="File_Microsoft_VisualStudio_ProjectSystem_FileMirroring_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Microsoft.VisualStudio.ProjectSystem.FileSystemMirroring.dll" />
+      <Component Id="Cmp_VisualRust_ProjectSystem_FileMirroring_dll_$(var.VsVersion)" Guid="{790A5517-33AB-45C2-BA84-F8B1DC31EE79}">
+        <File Id="File_VisualRust_ProjectSystem_FileMirroring_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.ProjectSystem.FileSystemMirroring.dll" />
       </Component>
       <Component Id="Cmp_RustLexer_dll_$(var.VsVersion)" Guid="{8F935DDE-4C7B-4BA9-9910-C4EA3CDB2422}">
         <File Id="File_RustLexer_dll_$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)RustLexer.dll" />

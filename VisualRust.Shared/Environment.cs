@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace VisualRust.Shared
 {
-    public class Environment
+    public static class Environment
     {
         private const string InnoPath = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\Rust_is1";
         private static readonly string[] MozillaPaths = { @"Software\Mozilla Foundation", @"Software\The Rust Project Developers" };
@@ -47,6 +47,7 @@ namespace VisualRust.Shared
             }
         }
 
+        // TODO: this is wrong, because we're checking the host triple, not the availability of a target
         public static TargetTriple GetTarget(string exePath)
         {
             if (!File.Exists(exePath))
@@ -79,7 +80,7 @@ namespace VisualRust.Shared
             return TargetTriple.Create(hostMatch.Groups[1].Value);
         }
 
-        private static IEnumerable<string> GetAllInstallPaths()
+        public static IEnumerable<string> GetAllInstallPaths()
         {
             if (System.Environment.Is64BitOperatingSystem)
             {

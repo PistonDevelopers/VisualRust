@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rule Name="DebuggerGeneralProperties"
+      DisplayName="Debugger General Properties"
+      Description="General Debugger options"
+      Order="18"
+      xmlns="http://schemas.microsoft.com/build/2009/properties"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Rule.DataSource>
+        <DataSource Persistence="ProjectFile" />
+    </Rule.DataSource>
+
+    <StringProperty Name="DebuggerFlavor" Visible="false" IncludeInCommandLine="false"
+                    Description="The debug rule selected as the active debugger.">
+        <StringProperty.DataSource>
+            <!-- Settings from UserFile can't be loaded, but it doesn't matter in this case,
+                 because the only possible value is "RustDebugger", which is automatically enabled. -->
+            <DataSource Persistence="UserFile" HasConfigurationCondition="False"/>
+        </StringProperty.DataSource>
+    </StringProperty>
+</Rule>

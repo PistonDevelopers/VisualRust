@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the MIT License. See LICENSE in the project root for license information.
+-->
+<Rule
+  Name="SourceControl"
+  DisplayName="Source control"
+  PageTemplate="generic"
+  Description="General"
+  xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+  <Rule.DataSource>
+    <DataSource Persistence="ProjectFile" Label="Globals" HasConfigurationCondition="false" />
+  </Rule.DataSource>
+
+  <StringProperty Name="SccProjectName" />
+  <StringProperty Name="SccProvider" />
+  <StringProperty Name="SccAuxPath" />
+  <StringProperty Name="SccLocalPath" />
+</Rule>

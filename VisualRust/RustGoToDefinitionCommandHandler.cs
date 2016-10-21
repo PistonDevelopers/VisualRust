@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.Text;
 using VisualRust.Racer;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudioTools.Project;
 
 namespace VisualRust
 {

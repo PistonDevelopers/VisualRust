@@ -1,84 +1,70 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <UsingTask AssemblyFile="$(VisualRustTasksPath)\VisualRust.Build.dll"
-             TaskFactory="RustcFactory"
-             TaskName="Rustc"/>
+  <PropertyGroup Label="Globals">
+    <RulesDirectory>$(MSBuildThisFileDirectory)\Rules</RulesDirectory>
+  </PropertyGroup>
 
   <PropertyGroup>
+    <DefaultContentType Condition="$(DefaultContentType) == ''">Default</DefaultContentType>
+    <!-- We don't target any framework, so clear what the Microsoft.Common.targets sets. -->
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectCapability Include="OutputGroups"/>
+    <ProjectCapability Include="AllTargetOutputGroups"/>
+    <ProjectCapability Include="VisualStudioWellKnownOutputGroups"/>
+    <ProjectCapability Include="SourceItemsFromImports"/>
+    <ProjectCapability Include="ProjectConfigurationsInferredFromUsage"/>
+    <ProjectCapability Include="SharedImports"/>
+    <ProjectCapability Include="VisualRust"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PropertyPageSchema Include="$(RulesDirectory)\ProjectItemsSchema.xaml;"/>
+    <PropertyPageSchema Include="$(RulesDirectory)\Scc.xaml">
+      <Context>Invisible</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(RulesDirectory)\Settings.xaml">
+      <Context>Settings</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(RulesDirectory)\General.xaml;">
+      <Context>Project;BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(RulesDirectory)\Content.xaml;
+                                 $(RulesDirectory)\Folder.xaml;
+                                 $(RulesDirectory)\None.xaml;">
+      <Context>File;BrowseObject</Context>
+    </PropertyPageSchema>
+
+    <PropertyPageSchema Include="$(RulesDirectory)\Debugger.xaml;
+                                 $(RulesDirectory)\RustDebugger.xaml;"/>
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <DebuggerFlavor>RustDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  
+  <PropertyGroup>
     <ManifestPath Condition="'$(ManifestPath)' == ''">Cargo.toml</ManifestPath>
-    <VisualRustTasksPath>$(MSBuildExtensionsPath)\VisualRust</VisualRustTasksPath>
-    <OutputType Condition="'$(OutputType)' != 'library'">exe</OutputType>
-    <_EntryPoint Condition="'$(OutputType)'=='exe'">src\main.rs</_EntryPoint>
-    <_EntryPoint Condition="'$(OutputType)'=='library'">src\lib.rs</_EntryPoint>
-    <CrateType Condition="'$(OutputType)' == 'exe'">bin</CrateType>
-    <CrateType Condition="'$(OutputType)' == 'library'">lib</CrateType>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
-    <PlatformTarget Condition="'$(PlatformTarget)' == ''" >default</PlatformTarget>
-    <OutputPath Condition="'$(PlatformTarget)' == 'default'" >target\$(Configuration)\</OutputPath>
-    <OutputPath Condition="'$(PlatformTarget)' != 'default'" >target\$(PlatformTarget)\$(Configuration)\</OutputPath>
-    <LinkTimeOptimization Condition="'$(LinkTimeOptimization)' == ''">false</LinkTimeOptimization>
-    <CrateName Condition="'$(CrateName)' ==''">$(MSBuildProjectName)</CrateName>
-    <AssemblyName>$(CrateName)</AssemblyName>
+    <_CargoBuildRelease Condition="'$(Configuration)' == 'Debug'">false</_CargoBuildRelease>
+    <_CargoBuildRelease Condition="'$(Configuration)' == 'Release'">true</_CargoBuildRelease>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(OutputType)'!='library'">
-    <BuildStaticlib>false</BuildStaticlib>
-    <BuildDylib>false</BuildDylib>
-    <BuildRlib>false</BuildRlib>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BuildStaticlib)'=='true'">
-    <TargetFileName>lib$(CrateName).a</TargetFileName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BuildDylib)'=='true'">
-    <TargetFileName>$(CrateName).dll</TargetFileName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BuildRlib)'=='true'">
-    <TargetFileName>lib$(CrateName).rlib</TargetFileName>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(BuildRlib)' == 'true'">
-    <FileWrites Include="$(IntermediateOutputPath)lib$(CrateName).rlib"/>
-    <AddModules Include="$(IntermediateOutputPath)lib$(CrateName).rlib"/>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(BuildDylib)' == 'true'">
-    <FileWrites Include="$(IntermediateOutputPath)$(CrateName).dll"/>
-    <AddModules Include="$(IntermediateOutputPath)$(CrateName).dll"/>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(BuildStaticlib)' == 'true'">
-    <FileWrites Include="$(IntermediateOutputPath)lib$(CrateName).a"/>
-    <AddModules Include="$(IntermediateOutputPath)lib$(CrateName).a"/>
-  </ItemGroup>
-
+  <Import Project="$(MSBuildThisFileDirectory)\VisualRust.Core.targets" />
+  
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\VisualRust.Build.dll" TaskName="CargoBuild" />
   <Target Name="CoreCompile">
-    <Rustc Input="$(_EntryPoint)"
-           OutputDirectory="$(IntermediateOutputPath)"
-           WorkingDirectory="$(ProjectDir)"
-           CrateName="$(CrateName)"
-           CrateType="$(CrateType)"
-           LTO="$(LinkTimeOptimization)"
-           DebugInfo="$(DebugSymbols)"
-           OptimizationLevel="$(OptimizationLevel)"
-           TargetTriple="$(PlatformTarget)"/>
+    <CargoBuild ManifestPath="$(ManifestPath)"
+                Release="$(_CargoBuildRelease)" />
   </Target>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
-  <PropertyGroup Condition="'$(BuildStaticlib)'=='true'">
-    <TargetExt>.a</TargetExt>
-    <CrateType>$(CrateType);staticlib</CrateType>
-    <TargetName>lib$(CrateName)</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BuildDylib)'=='true'">
-    <TargetExt>.dll</TargetExt>
-    <CrateType>$(CrateType);dylib</CrateType>
-    <TargetName>$(CrateName)</TargetName>
-    <TargetFileName>$(TargetName)$(TargetExt)</TargetFileName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BuildRlib)'=='true'">
-    <TargetExt>.rlib</TargetExt>
-    <CrateType>$(CrateType);rlib</CrateType>
-    <TargetName>lib$(CrateName)</TargetName>
-    <TargetFileName>$(TargetName)$(TargetExt)</TargetFileName>
-  </PropertyGroup>
-  <Target Name="GetFrameworkPaths"/>
-  <Target Name="CreateManifestResourceNames"/>
+
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)\VisualRust.Build.dll" TaskName="CargoClean" />
+  <Target Name="CoreClean">
+    <CargoClean ManifestPath="$(ManifestPath)" />
+  </Target>
 </Project>

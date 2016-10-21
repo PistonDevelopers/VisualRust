@@ -4,6 +4,9 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <MinimumVisualStudioVersion>$(VisualStudioVersion)</MinimumVisualStudioVersion>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="VisualRust.Gdb.msbuild" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -19,19 +22,8 @@
     <AssemblyName>VisualRust</AssemblyName>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <CopyVsixManifestToOutput>true</CopyVsixManifestToOutput>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-CI|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug-CI\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <DeployExtension>false</DeployExtension>
-    <CreateVsixContainer>true</CreateVsixContainer>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,7 +48,7 @@
     <CreateVsixContainer>false</CreateVsixContainer>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Debug-CI'">
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <Content Include="..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\ApplicationProject.zip">
       <Link>ProjectTemplates\ApplicationProject.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -71,126 +63,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Antlr4.Runtime.net45">
-      <HintPath>..\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.MSXML, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>false</EmbedInteropTypes>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.CoreUtility.12.0.4\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Debugger.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Debugger.Interop.10.10.0.4\lib\net40\Microsoft.VisualStudio.Debugger.Interop.10.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Debugger.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Debugger.Interop.11.11.0.4\lib\net20\Microsoft.VisualStudio.Debugger.Interop.11.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\VSSDK.Debugger.Interop.9.9.0.4\lib\net20\Microsoft.VisualStudio.Debugger.InteropA.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Editor, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Editor.12.0.4\lib\net45\Microsoft.VisualStudio.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.GraphModel, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.GraphModel.11.0.4\lib\net45\Microsoft.VisualStudio.GraphModel.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Language.12.0.4\lib\net45\Microsoft.VisualStudio.Language.Intellisense.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Language.StandardClassification, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Language.12.0.4\lib\net45\Microsoft.VisualStudio.Language.StandardClassification.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\VSSDK.OLE.Interop.7.0.4\lib\net20\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Package.LanguageService.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.LanguageService.12.12.0.4\lib\net45\Microsoft.VisualStudio.Package.LanguageService.12.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Shell.12.12.0.4\lib\net45\Microsoft.VisualStudio.Shell.12.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Shell.Immutable.10.10.0.4\lib\net40\Microsoft.VisualStudio.Shell.Immutable.10.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Shell.Immutable.11.11.0.4\lib\net45\Microsoft.VisualStudio.Shell.Immutable.11.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Shell.Immutable.12.12.0.4\lib\net45\Microsoft.VisualStudio.Shell.Immutable.12.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\VSSDK.Shell.Interop.7.0.4\lib\net20\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\packages\VSSDK.Shell.Interop.10.10.0.4\lib\net20\Microsoft.VisualStudio.Shell.Interop.10.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\packages\VSSDK.Shell.Interop.11.11.0.4\lib\net20\Microsoft.VisualStudio.Shell.Interop.11.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\VSSDK.Shell.Interop.8.8.0.4\lib\net20\Microsoft.VisualStudio.Shell.Interop.8.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\VSSDK.Shell.Interop.9.9.0.4\lib\net20\Microsoft.VisualStudio.Shell.Interop.9.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Text.Data, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Text.12.0.4\lib\net45\Microsoft.VisualStudio.Text.Data.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Text.Logic, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Text.12.0.4\lib\net45\Microsoft.VisualStudio.Text.Logic.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Text.UI, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Text.12.0.4\lib\net45\Microsoft.VisualStudio.Text.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Text.UI.Wpf, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Text.12.0.4\lib\net45\Microsoft.VisualStudio.Text.UI.Wpf.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\VSSDK.TextManager.Interop.7.0.4\lib\net20\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\VSSDK.TextManager.Interop.8.8.0.4\lib\net20\Microsoft.VisualStudio.TextManager.Interop.8.0.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Threading, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\VSSDK.Threading.12.0.4\lib\net45\Microsoft.VisualStudio.Threading.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\packages\VSSDK.DTE.7.0.4\lib\net20\stdole.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -198,6 +76,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UIAutomationTypes" />
@@ -215,9 +94,13 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ProjectForms\BasePropertyPage.cs" />
-    <Compile Include="ProjectForms\BuildPropertyPage.cs" />
-    <Compile Include="ProjectForms\DebugPropertyPage.cs" />
+    <Compile Include="ProjectSystem\DummyLogger.cs" />
+    <Compile Include="ProjectSystem\GnuDebugLaunchSettingsProvider.cs" />
+    <Compile Include="ProjectSystem\IDebugLaunchSettingsProvider.cs" />
+    <Compile Include="ProjectSystem\MsvcDebugLaunchSettingsProvider.cs" />
+    <Compile Include="ProjectSystem\RustDebuggerProvider.cs" />
+    <Compile Include="ProjectSystem\LoadHooks.cs" />
+    <Compile Include="ProjectSystem\MsBuildFileSystemFilter.cs" />
     <Compile Include="Forms\DebuggingOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -227,24 +110,30 @@
     <Compile Include="Forms\DebuggingOptionsPageControl.Designer.cs">
       <DependentUpon>DebuggingOptionsPageControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProjectForms\TargetOutputsPropertyPage.cs" />
-    <Compile Include="ProjectForms\WpfPropertyPage.cs" />
-    <Compile Include="ProjectForms\GeneralPropertyPage.cs" />
     <Compile Include="Forms\RustOptionsPageControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Forms\RustOptionsPageControl.designer.cs">
       <DependentUpon>RustOptionsPageControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Guids.cs" />
+    <Compile Include="GuidList.cs" />
     <Compile Include="Forms\RustOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ProjectSystem\ProjectIconProvider.cs" />
+    <Compile Include="ProjectProperties.cs" />
+    <Compile Include="ProjectSystem\ProjectTreeModifiers.cs" />
     <Compile Include="ProvideDebugEngineAttribute.cs" />
     <Compile Include="Racer\RacerSingleton.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="RunningDocTableEventsListener.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RustBraceMatcher.cs" />
+    <Compile Include="ProjectSystem\RustProjectFileGenerator.cs" />
+    <Compile Include="ProjectSystem\RustProjectSourceItemProviderExtensions.cs" />
     <Compile Include="Text\JoinedTextChange.cs" />
     <Compile Include="Text\RustClassifier.cs" />
     <Compile Include="Text\RustClassifierProvider.cs" />
@@ -278,6 +167,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>VSPackage.resx</DependentUpon>
     </Compile>
+    <Compile Include="VsUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\DebuggingOptionsPageControl.resx">
@@ -285,6 +175,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\RustOptionsPageControl.resx">
       <DependentUpon>RustOptionsPageControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
@@ -295,7 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="project.json" />
     <None Include="source.extension.debug.vsixmanifest" />
     <None Include="source.extension.release.vsixmanifest" />
   </ItemGroup>
@@ -315,41 +209,72 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <None Include="Resources\CargoManifestNode.png" />
+    <None Include="Resources\RustProjectNode.png" />
+    <None Include="Resources\RustFileNode.png" />
     <Resource Include="Resources\Package.ico" />
     <VSCTCompile Include="VisualRust.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.VisualStudio.Project\Microsoft.VisualStudio.Project.csproj">
-      <Project>{cacb60a9-1e76-4f92-8831-b134a658c695}</Project>
-      <Name>Microsoft.VisualStudio.Project</Name>
+    <ProjectReference Include="..\Microsoft.Common.Core\Microsoft.Common.Core.csproj">
+      <Project>{5da4c00b-9f16-4ef9-894d-20329544265e}</Project>
+      <Name>Microsoft.Common.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.csproj">
+      <Project>{b8696d0c-8adb-4c11-8cee-5c81aa8c6ebd}</Project>
+      <Name>VisualRust.ProjectSystem.FileSystemMirroring</Name>
     </ProjectReference>
     <ProjectReference Include="..\MIEngine\src\MICore\MICore.csproj">
       <Project>{12cc862d-95b7-4224-8e16-b928c6333677}</Project>
       <Name>MICore</Name>
     </ProjectReference>
     <ProjectReference Include="..\MIEngine\src\MIDebugEngine\MIDebugEngine.csproj">
-      <Project>{6D2688FE-6FD8-44A8-B96A-6037457F72A7}</Project>
+      <Project>{6d2688fe-6fd8-44a8-b96a-6037457f72a7}</Project>
       <Name>MIDebugEngine</Name>
     </ProjectReference>
     <ProjectReference Include="..\RustLexer\RustLexer.csproj">
       <Project>{e983e989-f83a-4643-896a-ad496bf647d0}</Project>
       <Name>RustLexer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VisualRust.Cargo\VisualRust.Cargo.csproj">
-      <Project>{2594DB0D-03FF-40EA-8D27-9930E5D3FF83}</Project>
-      <Name>VisualRust.Cargo</Name>
+    <ProjectReference Include="..\VisualRust.Shared\VisualRust.Shared.csproj">
+      <Project>{B99CC9EB-90F2-4040-9E66-418CC7042153}</Project>
+      <Name>VisualRust.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\VisualRust.Templates\VisualRust.Templates.csproj">
       <Project>{59D94B96-1AF7-46F2-8790-AAB6DFAE8D9A}</Project>
       <Name>VisualRust.Templates</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\VisualRust.Project\VisualRust.Project.csproj">
-      <Project>{475c4df2-4d4b-4f2c-9f27-414148dd6f11}</Project>
-      <Name>VisualRust.Project</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <XamlPropertyRule Include="Rules\Content.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="Rules\Debugger.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="Rules\Folder.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="Rules\General.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="Rules\None.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <Content Include="Rules\ProjectItemsSchema.xaml">
+      <SubType>Designer</SubType>
+    </Content>
+    <XamlPropertyRule Include="Rules\Scc.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+  </ItemGroup>
+  <ItemGroup>
+    <XamlPropertyRule Include="Rules\RustDebugger.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
@@ -365,11 +290,7 @@
     <Delete Files="$(TargetDir)source.extension.vsixmanifest" />
   </Target>
   <Target Name="BeforeBuild">
-    <PropertyGroup>
-      <_VsixmanifestConfiguration Condition=" '$(Configuration)' == 'Debug-CI' ">Debug</_VsixmanifestConfiguration>
-      <_VsixmanifestConfiguration Condition=" '$(_VsixmanifestConfiguration)' == '' ">$(Configuration)</_VsixmanifestConfiguration>
-    </PropertyGroup>
-    <Copy SourceFiles="source.extension.$(_VsixmanifestConfiguration).vsixmanifest" DestinationFiles="$(TargetDir)source.extension.vsixmanifest" />
+    <Copy SourceFiles="source.extension.$(Configuration).vsixmanifest" DestinationFiles="$(TargetDir)source.extension.vsixmanifest" />
     <ItemGroup>
       <None Include="$(TargetDir)source.extension.vsixmanifest" />
     </ItemGroup>
@@ -378,10 +299,9 @@
     <MsBuild Projects="VisualRust.Gdb.msbuild" Targets="DownloadGdb" Properties="MingwVersion=i686-5.1.0-release-posix-dwarf-rt_v4-rev0;MingwRootDir=mingw32;MingwArch=i686;MingwPath=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/5.1.0/threads-posix/dwarf/i686-5.1.0-release-posix-dwarf-rt_v4-rev0.7z" />
     <MsBuild Projects="VisualRust.Gdb.msbuild" Targets="DownloadGdb" Properties="MingwVersion=x86_64-5.1.0-release-win32-seh-rt_v4-rev0;MingwRootDir=mingw64;MingwArch=x86_64;MingwPath=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/5.1.0/threads-win32/seh/x86_64-5.1.0-release-win32-seh-rt_v4-rev0.7z" />
   </Target>
-  <!-- Sometimes various Visual Studio files get copied into resulting .vsix. This target removes them just before .vsix generation -->
-  <Target Name="RemoveVSSDKAssemblies" BeforeTargets="CreateVsixContainer">
+  <Target Name="AddToVsixSources" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
-      <VSIXSourceItem Remove="@(VSIXSourceItem)" Condition="$([System.String]::new('%(VSIXSourceItem.FusionName)').StartsWith('Microsoft.VisualStudio'))" />
+      <VSIXSourceItem Include="$(OutputPath)\Newtonsoft.Json.dll" />
     </ItemGroup>
   </Target>
 </Project>

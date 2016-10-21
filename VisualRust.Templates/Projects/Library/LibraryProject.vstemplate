@@ -3,15 +3,19 @@
   <TemplateData>
     <Name>Rust Library</Name>
     <Description>A project for creating a Rust library</Description>
-     <Icon>LibraryProject.ico</Icon>
-     <ProjectType>Rust</ProjectType>
-     <CreateNewFolder>true</CreateNewFolder>
-     <DefaultName>rust_library</DefaultName>
-     <ProvideDefaultName>true</ProvideDefaultName>
+    <Icon>LibraryProject.ico</Icon>
+    <ProjectType>Rust</ProjectType>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>rust_library</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <CreateInPlace>true</CreateInPlace>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
   </TemplateData>
   <TemplateContent>
-    <Project File="LibraryProject.rsproj" ReplaceParameters="true">
-      <ProjectItem TargetFileName="src\lib.rs" ReplaceParameters="true" OpenInEditor="true">lib.rs</ProjectItem>
+    <!-- Unfortunately we can not use Cargo.toml as the Project File, because VS automatically renames it to <projectname>.toml, regardless of setting `TargetFileName` -->
+    <Project File="LibraryProject.rsproj">
+      <ProjectItem TargetFileName="Cargo.toml" ReplaceParameters="true" OpenInEditor="true" OpenOrder="200">Cargo.toml</ProjectItem>
+      <ProjectItem TargetFileName="src\lib.rs" ReplaceParameters="true" OpenInEditor="true" OpenOrder="100">lib.rs</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>

@@ -5,6 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
+.vs
 
 # Build results
 
@@ -97,6 +98,9 @@ publish/
 
 # NuGet Packages Directory
 packages/
+
+# NuGet lock files
+project.lock.json
 
 # Windows Azure Build Output
 csx

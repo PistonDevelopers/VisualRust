@@ -12,11 +12,12 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
-using VisualRust.Project;
-using Microsoft.VisualStudioTools.Project;
-using Microsoft.VisualStudioTools.Project.Automation;
 using VisualRust.Options;
 using MICore;
+using VisualRust.ProjectSystem.FileSystemMirroring.Package.Registration;
+using VisualRust.ProjectSystem.FileSystemMirroring.Shell;
+using System.Collections.Generic;
+using VisualRust.ProjectSystem;
 
 namespace VisualRust
 {
@@ -35,7 +36,7 @@ namespace VisualRust
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", "0.1.2", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "0.2.0", IconResourceID = 400)]
     [ProvideLanguageService(typeof(RustLanguage), "Rust", 100, 
         CodeSense = true, 
         DefaultToInsertSpaces = true,
@@ -51,31 +52,25 @@ namespace VisualRust
         EnableFormatSelection = true,
         SupportCopyPasteOfHTML = false
     )]
-    [ProvideProjectFactory(
-        typeof(RustProjectFactory),
-        "Rust",
-        "Rust Project Files (*.rsproj);*.rsproj",
-        "rsproj",
-        "rsproj",
-        ".\\NullPath",
-        LanguageVsTemplate="Rust")]
     [ProvideLanguageExtension(typeof(RustLanguage), ".rs")]
     [Guid(GuidList.guidVisualRustPkgString)]
-    [ProvideObject(typeof(Project.Forms.ApplicationPropertyPage))]
-    [ProvideObject(typeof(Project.Forms.BuildPropertyPage))]
-    [ProvideObject(typeof(Project.Forms.DebugPropertyPage))]
-    [ProvideObject(typeof(Project.Forms.TargetOutputsPropertyPage))]
     [ProvideOptionPage(typeof(RustOptionsPage), "Visual Rust", "General", 110, 113, true)]
     [ProvideOptionPage(typeof(DebuggingOptionsPage), "Visual Rust", "Debugging", 110, 114, true)]
     [ProvideProfile(typeof(RustOptionsPage), "Visual Rust", "General", 110, 113, true)]
     [ProvideDebugEngine("Rust GDB", typeof(AD7ProgramProvider), typeof(AD7Engine), EngineConstants.EngineId)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    public class VisualRustPackage : CommonProjectPackage, IOleCommandTarget
+    [ProvideCpsProjectFactory(GuidList.CpsProjectFactoryGuidString, "Rust", "rsproj")]
+    [ProvideProjectFileGenerator(typeof(RustProjectFileGenerator), GuidList.CpsProjectFactoryGuidString, FileNames = "Cargo.toml", DisplayGeneratorFilter = 300)]
+    // TODO: not sure what DeveloperActivity actually does
+    [DeveloperActivity("Rust", GuidList.guidVisualRustPkgString, sortPriority: 40)]
+    public class VisualRustPackage : Package, IOleCommandTarget
     {
-        private RunningDocTableEventsListener docEventsListener;
         private IOleCommandTarget packageCommandTarget;
+        private Dictionary<IVsProjectGenerator, uint> _projectFileGenerators;
 
         internal static VisualRustPackage Instance { get; private set; }
+
+        public const string UniqueCapability = "VisualRust";
 
         /// <summary>
         /// Default constructor of the package.
@@ -87,7 +82,7 @@ namespace VisualRust
         public VisualRustPackage()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
-            Microsoft.VisualStudioTools.UIThread.InitializeAndAlwaysInvokeToCurrentThread();
+            //Microsoft.VisualStudioTools.UIThread.InitializeAndAlwaysInvokeToCurrentThread();
         }
 
         /////////////////////////////////////////////////////////////////////////////
@@ -101,12 +96,61 @@ namespace VisualRust
         protected override void Initialize()
         {
             base.Initialize();
+
+            RegisterProjectFileGenerator(new RustProjectFileGenerator());
+
+            ProjectIconProvider.LoadProjectImages();
+
             packageCommandTarget = GetService(typeof(IOleCommandTarget)) as IOleCommandTarget;
             Instance = this;
 
-            docEventsListener = new RunningDocTableEventsListener((IVsRunningDocumentTable)GetService(typeof(SVsRunningDocumentTable)));
-
             Racer.RacerSingleton.Init();
+        }
+
+        private void RegisterProjectFileGenerator(IVsProjectGenerator projectFileGenerator)
+        {
+            var registerProjectGenerators = GetService(typeof(SVsRegisterProjectTypes)) as IVsRegisterProjectGenerators;
+            if (registerProjectGenerators == null)
+            {
+                throw new InvalidOperationException(typeof(SVsRegisterProjectTypes).FullName);
+            }
+
+            uint cookie;
+            Guid riid = projectFileGenerator.GetType().GUID;
+            registerProjectGenerators.RegisterProjectGenerator(ref riid, projectFileGenerator, out cookie);
+
+            if (_projectFileGenerators == null)
+            {
+                _projectFileGenerators = new Dictionary<IVsProjectGenerator, uint>();
+            }
+
+            _projectFileGenerators[projectFileGenerator] = cookie;
+        }
+
+        private void UnregisterProjectFileGenerators(Dictionary<IVsProjectGenerator, uint> projectFileGenerators)
+        {
+            try
+            {
+                IVsRegisterProjectGenerators registerProjectGenerators = GetService(typeof(SVsRegisterProjectTypes)) as IVsRegisterProjectGenerators;
+                if (registerProjectGenerators != null)
+                {
+                    foreach (var projectFileGenerator in projectFileGenerators)
+                    {
+                        try
+                        {
+                            registerProjectGenerators.UnregisterProjectGenerator(projectFileGenerator.Value);
+                        }
+                        finally
+                        {
+                            (projectFileGenerator.Key as IDisposable)?.Dispose();
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Fail(String.Format(CultureInfo.InvariantCulture, "Failed to dispose project file generator for package {0}\n{1}", GetType().FullName, e.Message));
+            }
         }
 
         int IOleCommandTarget.Exec(ref Guid cmdGroup, uint nCmdID, uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
@@ -244,45 +288,24 @@ namespace VisualRust
 
         protected override void Dispose(bool disposing)
         {
-            docEventsListener.Dispose();
-            base.Dispose(disposing);
+            ProjectIconProvider.Close();
+
+            if (!disposing)
+            {
+                base.Dispose(false);
+                return;
+            }
+
+            if (_projectFileGenerators != null)
+            {
+                var projectFileGenerators = _projectFileGenerators;
+                _projectFileGenerators = null;
+                UnregisterProjectFileGenerators(projectFileGenerators);
+            }
+
+            base.Dispose(true);
         }
 
         #endregion
-
-        public override ProjectFactory CreateProjectFactory()
-        {
-            return new RustProjectFactory(this);
-        }
-
-        public override CommonEditorFactory CreateEditorFactory()
-        {
-            return null;
-        }
-
-        public override uint GetIconIdForAboutBox()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override uint GetIconIdForSplashScreen()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string GetProductName()
-        {
-            return "Visual Rust";
-        }
-
-        public override string GetProductDescription()
-        {
-            return "Visual Studio integration for the Rust programming language (http://www.rust-lang.org/)";
-        }
-
-        public override string GetProductVersion()
-        {
-            return "0.1.2";
-        }
     }
 }

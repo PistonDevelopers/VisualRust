@@ -1,16 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="40c1d2b5-528b-4966-a7b1-1974e3568abe" Version="0.1.2" Language="en-US" Publisher="The Piston Project" />
+    <Identity Id="40c1d2b5-528b-4966-a7b1-1974e3568abe" Version="0.2.0" Language="en-US" Publisher="The Piston Project" />
     <DisplayName>Visual Rust</DisplayName>
     <Description>Visual Studio integration for the Rust programming language (http://www.rust-lang.org/)</Description>
     <License>LICENSE.txt</License>
   </Metadata>
   <Installation InstalledByMsi="false">
-    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0,]" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0, ]" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[14.0, ]" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[14.0, ]" />
   </Installation>
   <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,]" />
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.6,]" />
     <Dependency Id="Microsoft.VisualStudio.MPF.12.0" DisplayName="Visual Studio MPF 12.0" d:Source="Installed" Version="[12.0,]" />
   </Dependencies>
   <Assets>
@@ -18,5 +20,6 @@
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
     <Asset Type="Microsoft.VisualStudio.ProjectTemplate" Path="ProjectTemplates" />
     <Asset Type="Microsoft.VisualStudio.ItemTemplate" Path="ItemTemplates" />
+    <Asset Type="Microsoft.VisualStudio.Assembly" Path="Newtonsoft.Json.dll" />
   </Assets>
 </PackageManifest>

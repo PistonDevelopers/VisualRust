@@ -1,0 +1,177 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+    ============================================================
+                                        Build
+
+    The main build entry point.
+    ============================================================
+    -->
+  <PropertyGroup>
+    <BuildDependsOn>
+      BeforeBuild;
+      CoreBuild;
+      AfterBuild
+    </BuildDependsOn>
+  </PropertyGroup>
+  <Target
+      Name="Build"
+      Condition=" '$(_InvalidConfigurationWarning)' != 'true' "
+      DependsOnTargets="$(BuildDependsOn)"
+      Returns="$(TargetPath)" />
+
+  <!--
+    ============================================================
+                                        BeforeBuild
+
+    Redefine this target in your project in order to run tasks just before Build
+    ============================================================
+    -->
+  <Target Name="BeforeBuild"/>
+
+  <!--
+    ============================================================
+                                        AfterBuild
+
+    Redefine this target in your project in order to run tasks just after Build
+    ============================================================
+    -->
+  <Target Name="AfterBuild"/>
+
+  <!--
+    ============================================================
+                                        CoreBuild
+
+    The core build step calls each of the build targets.
+    ============================================================
+    -->
+  <PropertyGroup>
+    <CoreBuildDependsOn>
+      Compile
+    </CoreBuildDependsOn>
+  </PropertyGroup>
+  <Target
+      Name="CoreBuild"
+      DependsOnTargets="$(CoreBuildDependsOn)" />
+
+  <!--
+    ============================================================
+                                        Rebuild
+
+    Delete all intermediate and final build outputs, and then build the project from scratch.
+    ============================================================
+    -->
+  <PropertyGroup>
+
+    <_ProjectDefaultTargets Condition="'$(MSBuildProjectDefaultTargets)' != ''">$(MSBuildProjectDefaultTargets)</_ProjectDefaultTargets>
+    <_ProjectDefaultTargets Condition="'$(MSBuildProjectDefaultTargets)' == ''">Build</_ProjectDefaultTargets>
+
+    <RebuildDependsOn>
+      BeforeRebuild;
+      Clean;
+      $(_ProjectDefaultTargets);
+      AfterRebuild;
+    </RebuildDependsOn>
+
+    <RebuildDependsOn Condition=" '$(MSBuildProjectDefaultTargets)' == 'Rebuild' " >
+      BeforeRebuild;
+      Clean;
+      Build;
+      AfterRebuild;
+    </RebuildDependsOn>
+  </PropertyGroup>
+
+  <Target
+      Name="Rebuild"
+      Condition=" '$(_InvalidConfigurationWarning)' != 'true' "
+      DependsOnTargets="$(RebuildDependsOn)"
+      Returns="$(TargetPath)"/>
+
+  <!--
+    ============================================================
+                                        BeforeRebuild
+
+    Redefine this target in your project in order to run tasks just before Rebuild
+    ============================================================
+    -->
+  <Target Name="BeforeRebuild"/>
+
+  <!--
+    ============================================================
+                                        AfterRebuild
+
+    Redefine this target in your project in order to run tasks just after Rebuild
+    ============================================================
+    -->
+  <Target Name="AfterRebuild"/>
+
+  <!--
+    ============================================================
+                                        Compile
+    ============================================================
+    -->
+  <PropertyGroup>
+    <CompileDependsOn>
+      BeforeCompile;
+      CoreCompile;
+      AfterCompile;
+    </CompileDependsOn>
+  </PropertyGroup>
+  <Target
+      Name="Compile"
+      DependsOnTargets="$(CompileDependsOn)"/>
+
+  <!--
+    ============================================================
+                                        BeforeCompile
+
+    Redefine this target in your project in order to run tasks just before Compile.
+    ============================================================
+    -->
+  <Target Name="BeforeCompile"/>
+
+  <!--
+    ============================================================
+                                        AfterCompile
+
+    Redefine this target in your project in order to run tasks just after Compile.
+    ============================================================
+    -->
+  <Target Name="AfterCompile"/>
+
+  <!--
+    ============================================================
+                                        Clean
+
+    Delete all intermediate and final build outputs.
+    ============================================================
+    -->
+  <PropertyGroup>
+    <CleanDependsOn>
+      BeforeClean;
+      CoreClean;
+      AfterClean
+    </CleanDependsOn>
+  </PropertyGroup>
+  <Target
+      Name="Clean"
+      Condition=" '$(_InvalidConfigurationWarning)' != 'true' "
+      DependsOnTargets="$(CleanDependsOn)" />
+
+  <!--
+    ============================================================
+                                        BeforeClean
+
+    Redefine this target in your project in order to run tasks just before Clean.
+    ============================================================
+    -->
+  <Target Name="BeforeClean"/>
+
+  <!--
+    ============================================================
+                                        AfterClean
+
+    Redefine this target in your project in order to run tasks just after Clean.
+    ============================================================
+    -->
+  <Target Name="AfterClean"/>
+</Project>

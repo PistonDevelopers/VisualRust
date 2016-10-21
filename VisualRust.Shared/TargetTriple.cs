@@ -26,14 +26,24 @@ namespace VisualRust.Shared
             if(text == null)
                 return null;
             string[] parts = text.ToLowerInvariant().Split('-');
-            if(parts.Length != 4)
+            string abi;
+            if (parts.Length < 3)
                 return null;
-            return new TargetTriple(parts[0], parts[1], parts[2], parts[3]);
+            else if (parts.Length < 4)
+                abi = "";
+            else if (parts.Length == 4)
+                abi = parts[3];
+            else
+                return null;
+            return new TargetTriple(parts[0], parts[1], parts[2], abi);
         }
 
         public override string ToString()
         {
-            return String.Format("{0}-{1}-{2}-{3}", Arch, Vendor, System, Abi);
+            if (String.IsNullOrEmpty(Abi))
+                return String.Format("{0}-{1}-{2}", Arch, Vendor, System);
+            else
+                return String.Format("{0}-{1}-{2}-{3}", Arch, Vendor, System, Abi);
         }
     }
 }

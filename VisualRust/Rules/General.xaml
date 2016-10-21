@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Rule Name="ConfigurationGeneral" DisplayName="General" PageTemplate="generic" Description="General" xmlns="http://schemas.microsoft.com/build/2009/properties">
+    <Rule.Categories>
+        <Category Name="General" DisplayName="General" />
+    </Rule.Categories>
+    <Rule.DataSource>
+        <DataSource Persistence="UserFile" HasConfigurationCondition="False" />
+    </Rule.DataSource>
+
+    <!-- This is used for the "Show All Files" functionality in Solution Explorer -->
+    <BoolProperty Name="ShowAllFiles" Visible="false">
+        <BoolProperty.DataSource>
+            <DataSource Persistence="ProjectFile" HasConfigurationCondition="false" />
+        </BoolProperty.DataSource>
+    </BoolProperty>
+
+    <!-- Currently marked as read-only, because we can't reload on the fly when the manifest path changes -->
+    <StringProperty Name="ManifestPath" DisplayName="Cargo Manifest"
+                    Description="Relative path to the Cargo manifest file (Cargo.toml)." Visible="True"
+                    Subtype="file" Default="Cargo.toml" ReadOnly="true">
+        <StringProperty.DataSource>
+            <DataSource Persistence="ProjectFile" HasConfigurationCondition="False"/>
+        </StringProperty.DataSource>
+    </StringProperty>
+</Rule>

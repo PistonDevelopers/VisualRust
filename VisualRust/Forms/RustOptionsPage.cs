@@ -9,10 +9,17 @@ namespace VisualRust.Options
     [Guid("189B1BF9-0D6D-4325-A2BB-6BFE9DA3A92E")]
     public class RustOptionsPage : DialogPage
     {
+        public enum RustSource
+        {
+            EnvVariable,
+            Sysroot,
+            Custom
+        }
+
         public bool UseCustomRacer { get; set; }
         public string CustomRacerPath { get; set; }
 
-        public bool UseCustomSources { get; set; }
+        public RustSource SourceType { get; set; }
         public string CustomSourcesPath { get; set; }
 
         private RustOptionsPageControl _page;

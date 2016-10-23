@@ -15,8 +15,19 @@ namespace VisualRust.Options
         {
             bundledRacer.Checked = !optionsPage.UseCustomRacer;
             customRacer.Checked = optionsPage.UseCustomRacer;
-            envSource.Checked = !optionsPage.UseCustomSources;
-            customSource.Checked = optionsPage.UseCustomSources;
+
+            switch (optionsPage.SourceType) {
+                case RustOptionsPage.RustSource.EnvVariable:
+                    envSource.Checked = true;
+                    break;
+                case RustOptionsPage.RustSource.Custom:
+                    customSource.Checked = true;
+                    break;
+                default:
+                    sysrootSource.Checked = true;
+                    break;
+            };
+
             customRacerPath.Text = optionsPage.CustomRacerPath;
             customSourcePath.Text = optionsPage.CustomSourcesPath;
             customRacer_CheckedChanged(null, null);
@@ -31,7 +42,13 @@ namespace VisualRust.Options
             optionsPage.UseCustomRacer = !bundledRacer.Checked;
             optionsPage.CustomRacerPath = customRacerPath.Text;
 
-            optionsPage.UseCustomSources = !envSource.Checked;
+            if (envSource.Checked)
+                optionsPage.SourceType = RustOptionsPage.RustSource.EnvVariable;
+            else if (customSource.Checked)
+                optionsPage.SourceType = RustOptionsPage.RustSource.Custom;
+            else
+                optionsPage.SourceType = RustOptionsPage.RustSource.Sysroot;
+
             optionsPage.CustomSourcesPath = customSourcePath.Text;
         }
 

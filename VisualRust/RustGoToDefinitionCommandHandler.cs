@@ -90,7 +90,7 @@ namespace VisualRust
                 }
                 else
                 {
-                    Utils.PrintToOutput(findOutput);
+                    Utils.PrintToOutput(findOutput + "\n");
                 }
 
             }

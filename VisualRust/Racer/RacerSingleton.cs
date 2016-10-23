@@ -1,8 +1,11 @@
 ﻿using EnvDTE;
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using VisualRust.Options;
 using Process = System.Diagnostics.Process;
 
@@ -67,10 +70,48 @@ namespace VisualRust.Racer
             else
                 racerPathForExecution = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Racer", BundledRacerExecutable);
             // Same for custom RUST_SRC_PATH
-            if(GetVisualRustProperty<bool>(env, nameof(RustOptionsPage.UseCustomSources)))
-                racerSourcesLocation = GetVisualRustProperty<string>(env, nameof(RustOptionsPage.CustomSourcesPath));
-            else
-                racerSourcesLocation = null;
+            var type = GetVisualRustProperty<RustOptionsPage.RustSource>(env, nameof(RustOptionsPage.SourceType));
+            switch (type) {
+                case RustOptionsPage.RustSource.EnvVariable:
+                    racerSourcesLocation = null;
+                    break;
+                case RustOptionsPage.RustSource.Custom:
+                    racerSourcesLocation = GetVisualRustProperty<string>(env, nameof(RustOptionsPage.CustomSourcesPath));
+                    break;
+                default:
+                    racerSourcesLocation = GetRustcSysroot();
+                    if (racerSourcesLocation != null && !Directory.Exists(racerSourcesLocation))
+                        racerSourcesLocation = null;
+                    break;
+            }
+
+        }
+
+        private static String GetRustcSysroot()
+        {
+            string exePath = "rustc"; // TODO wich rustc ???
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                FileName = exePath,
+                RedirectStandardOutput = true,
+                Arguments = "--print sysroot",
+            };
+            try
+            {
+                Process proc = Process.Start(psi);
+                string sysroot = proc.StandardOutput.ReadToEnd();
+                return Path.Combine(sysroot.TrimEnd(), @"lib\rustlib\src\rust\src");
+            }
+            catch (Win32Exception)
+            {
+                return null;
+            }
+            catch (IOException)
+            {
+                return null;
+            }
         }
 
         public static string Run(string args)

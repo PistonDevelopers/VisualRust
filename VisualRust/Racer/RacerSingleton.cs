@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using VisualRust.Options;
 using Process = System.Diagnostics.Process;
 
@@ -114,7 +115,8 @@ namespace VisualRust.Racer
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.RedirectStandardOutput = true;
                     process.StartInfo.CreateNoWindow = true;
-                    if(this.racerSourcesLocation != null)
+                    process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+                    if (this.racerSourcesLocation != null)
                         process.StartInfo.EnvironmentVariables[RacerSourceEnviromentVariable] = racerSourcesLocation;
 
                     process.Start();

@@ -41,7 +41,8 @@ namespace VisualRust.Build
                 WorkingDirectory = cargo.WorkingDirectory,
                 Arguments = argString,
                 RedirectStandardError = true,
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                StandardOutputEncoding = Encoding.UTF8
             };
 
             var process = new Process();

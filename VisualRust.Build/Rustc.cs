@@ -219,7 +219,8 @@ namespace VisualRust.Build
                 WorkingDirectory = WorkingDirectory,
                 Arguments = argumets,
                 RedirectStandardError = true,
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                StandardOutputEncoding = Encoding.UTF8
             };
 
             var process = new Process();

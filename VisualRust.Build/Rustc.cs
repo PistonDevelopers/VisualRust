@@ -220,7 +220,8 @@ namespace VisualRust.Build
                 Arguments = argumets,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
-                StandardOutputEncoding = Encoding.UTF8
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8
             };
 
             var process = new Process();

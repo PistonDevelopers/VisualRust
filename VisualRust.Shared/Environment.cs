@@ -59,7 +59,8 @@ namespace VisualRust.Shared
                 FileName = exePath,
                 RedirectStandardOutput = true,
                 Arguments = "-Vv",
-                StandardOutputEncoding = Encoding.UTF8
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8
             };
             string verboseVersion;
             try

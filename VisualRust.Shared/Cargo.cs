@@ -102,7 +102,8 @@ namespace VisualRust.Shared
                 FileName = exePath,
                 RedirectStandardOutput = true,
                 Arguments = "-V",
-                StandardOutputEncoding = Encoding.UTF8
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8
             };
             try
             {

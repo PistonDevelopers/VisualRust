@@ -101,7 +101,9 @@ namespace VisualRust.Shared
                 CreateNoWindow = true,
                 FileName = exePath,
                 RedirectStandardOutput = true,
-                Arguments = "-V"
+                Arguments = "-V",
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8
             };
             try
             {

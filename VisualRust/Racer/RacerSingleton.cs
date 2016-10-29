@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using VisualRust.Options;
+using VisualRust.Shared;
 using Process = System.Diagnostics.Process;
 
 namespace VisualRust.Racer
@@ -89,7 +90,11 @@ namespace VisualRust.Racer
 
         private static String GetRustcSysroot()
         {
-            string exePath = "rustc"; // TODO wich rustc ???
+            var cargo = Cargo.FindSupportedInstallation();
+            if (cargo == null)
+                return null;
+
+            string exePath = cargo.RustcExecutable;
             ProcessStartInfo psi = new ProcessStartInfo
             {
                 UseShellExecute = false,
@@ -97,6 +102,7 @@ namespace VisualRust.Racer
                 FileName = exePath,
                 RedirectStandardOutput = true,
                 Arguments = "--print sysroot",
+                StandardOutputEncoding = Encoding.UTF8
             };
             try
             {

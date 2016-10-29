@@ -75,6 +75,7 @@ namespace VisualRust.Shared
                 CreateNoWindow = true,
                 FileName = command,
                 RedirectStandardOutput = true,
+                StandardOutputEncoding = Encoding.UTF8,
                 Arguments = CommandHelper.EscapeArguments(arguments)
             };
 

@@ -60,7 +60,6 @@ namespace VisualRust.Shared
                 RedirectStandardOutput = true,
                 Arguments = "-Vv",
                 StandardOutputEncoding = Encoding.UTF8,
-                StandardErrorEncoding = Encoding.UTF8
             };
             string verboseVersion;
             try

@@ -116,7 +116,6 @@ namespace VisualRust.Racer
                     process.StartInfo.RedirectStandardOutput = true;
                     process.StartInfo.CreateNoWindow = true;
                     process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-                    process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
 
                     if (this.racerSourcesLocation != null)
                         process.StartInfo.EnvironmentVariables[RacerSourceEnviromentVariable] = racerSourcesLocation;

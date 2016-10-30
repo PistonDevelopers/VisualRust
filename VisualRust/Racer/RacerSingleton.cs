@@ -94,6 +94,7 @@ namespace VisualRust.Racer
             if (cargo == null)
                 return null;
 
+            // TODO: Repalce with Cargo.GetSysrootAsync()
             string exePath = cargo.RustcExecutable;
             ProcessStartInfo psi = new ProcessStartInfo
             {

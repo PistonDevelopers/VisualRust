@@ -378,22 +378,22 @@ namespace VisualRust.Build
             var code = msg.GetErrorCodeAsString();
 
             // suppress message "aborting due to previous error"
-            if (String.IsNullOrEmpty(code) && primarySpan == null && msg.message.Contains("aborting due to"))
+            if (String.IsNullOrEmpty(code) && primarySpan == null && msg.GetMessage().Contains("aborting due to"))
                 return;
 
             if (type == RustcMessageType.Error)
             {
                 if (primarySpan == null)
-                    log.LogError(msg.message);
+                    log.LogError(msg.GetMessage());
                 else
-                    log.LogError(null, code, null, Path.Combine(rootPath, primarySpan.file_name), primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
+                    log.LogError(null, code, null, Path.Combine(rootPath, primarySpan.file_name), primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.GetMessage());
             }
             else
             {
                 if (primarySpan == null)
-                    log.LogWarning(msg.message);
+                    log.LogWarning(msg.GetMessage());
                 else
-                    log.LogWarning(null, code, null, Path.Combine(rootPath, primarySpan.file_name), primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
+                    log.LogWarning(null, code, null, Path.Combine(rootPath, primarySpan.file_name), primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.GetMessage());
             }
 
         }

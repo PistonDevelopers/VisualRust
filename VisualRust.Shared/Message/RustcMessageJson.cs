@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace VisualRust.Shared.Message
 {
@@ -91,7 +92,7 @@ namespace VisualRust.Shared.Message
         /// <summary>
         /// Associated diagnostic messages.
         /// </summary>
-        public List<object> children { get; set; }
+        public List<RustcMessageJson> children { get; set; }
         /// <summary>
         /// The message as rustc would render it. Currently this is only
         /// `Some` for "suggestions", but eventually it will include all
@@ -126,6 +127,36 @@ namespace VisualRust.Shared.Message
             if (code == null)
                 return string.Empty;
             return code.code;
+        }
+
+        public String GetMessage()
+        {
+            var hasMeaningfulMessage = !String.IsNullOrWhiteSpace(message);
+
+            if (children != null && children.Count > 0)
+            {
+                var stackedMessages = hasMeaningfulMessage ? new StringBuilder(message) : new StringBuilder();
+                if (hasMeaningfulMessage) stackedMessages.Append(" (");
+
+                foreach (var child in children)
+                {
+                    if (child.GetLevelAsEnum() == RustcMessageType.Note)
+                    {
+
+                        // i don't know, maybe the notes can have their own notes,
+                        // so lets append them also
+                        var innerMessage = child.GetMessage();
+                        if (!String.IsNullOrWhiteSpace(innerMessage))
+                        {
+                            stackedMessages.Append(innerMessage);
+                        }
+                    }
+                }
+                if (hasMeaningfulMessage) stackedMessages.Append(')');
+
+                return stackedMessages.ToString();
+            }
+            else return hasMeaningfulMessage ? message : String.Empty;
         }
     }
 }

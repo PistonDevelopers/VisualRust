@@ -138,6 +138,7 @@ namespace VisualRust.Shared.Message
                 var stackedMessages = hasMeaningfulMessage ? new StringBuilder(message) : new StringBuilder();
                 if (hasMeaningfulMessage) stackedMessages.Append(" (");
 
+                var firstToBeAppended = true;
                 foreach (var child in children)
                 {
                     if (child.GetLevelAsEnum() == RustcMessageType.Note)
@@ -148,7 +149,9 @@ namespace VisualRust.Shared.Message
                         var innerMessage = child.GetMessage();
                         if (!String.IsNullOrWhiteSpace(innerMessage))
                         {
+                            if(!firstToBeAppended) stackedMessages.Append(' ');
                             stackedMessages.Append(innerMessage);
+                            firstToBeAppended = false;
                         }
                     }
                 }

@@ -18,6 +18,7 @@ using VisualRust.ProjectSystem.FileSystemMirroring.Package.Registration;
 using VisualRust.ProjectSystem.FileSystemMirroring.Shell;
 using System.Collections.Generic;
 using VisualRust.ProjectSystem;
+using Microsoft.VisualStudio.ProjectSystem.Utilities;
 
 namespace VisualRust
 {
@@ -60,6 +61,7 @@ namespace VisualRust
     [ProvideDebugEngine("Rust GDB", typeof(AD7ProgramProvider), typeof(AD7Engine), EngineConstants.EngineId)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideCpsProjectFactory(GuidList.CpsProjectFactoryGuidString, "Rust", "rsproj")]
+    [ProjectTypeRegistration(GuidList.CpsProjectFactoryGuidString, "Rust", "Rust Project Files (*.rsproj);*.rsproj", "rsproj", "Rust", PossibleProjectExtensions = "rsproj")]
     [ProvideProjectFileGenerator(typeof(RustProjectFileGenerator), GuidList.CpsProjectFactoryGuidString, FileNames = "Cargo.toml", DisplayGeneratorFilter = 300)]
     // TODO: not sure what DeveloperActivity actually does
     [DeveloperActivity("Rust", GuidList.guidVisualRustPkgString, sortPriority: 40)]

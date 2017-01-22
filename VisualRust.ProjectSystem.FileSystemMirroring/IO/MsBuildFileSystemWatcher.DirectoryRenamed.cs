@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.Common.Core;
-using Microsoft.Common.Core.IO;
+using System.IO.Abstractions;
 using VisualRust.ProjectSystem.FileSystemMirroring.Utilities;
 #if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.ProjectSystem.Utilities;
 using static System.FormattableString;
 
 namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
+    using VisualRust.Core;
+
     public sealed partial class MsBuildFileSystemWatcher {
         private class DirectoryRenamed : IFileSystemChange {
             private readonly MsBuildFileSystemWatcherEntries _entries;
@@ -34,7 +36,7 @@ namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
                     return;
                 }
 
-                var newDirectoryInfo = _fileSystem.GetDirectoryInfo(_fullPath);
+                var newDirectoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(_fullPath);
                 var newRelativePath = PathHelper.EnsureTrailingSlash(PathHelper.MakeRelative(_rootDirectory, _fullPath));
                 if (!newDirectoryInfo.Exists || !_fileSystemFilter.IsDirectoryAllowed(newRelativePath, newDirectoryInfo.Attributes)) {
                     DeleteInsteadOfRename();

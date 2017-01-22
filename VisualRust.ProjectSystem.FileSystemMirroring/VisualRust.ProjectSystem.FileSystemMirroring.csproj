@@ -23,6 +23,7 @@
     <DefineConstants>TRACE;DEBUG;VS14</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,7 @@
     <DefineConstants>TRACE;VS14</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -132,6 +134,10 @@
       <HintPath>..\packages\Microsoft.Composition.1.0.27\lib\portable-net45+win8+wp8+wpa81\System.Composition.TypedParts.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.IO.Abstractions, Version=2.0.0.140, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Abstractions.2.0.0.140\lib\net40\System.IO.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Threading.Tasks.Dataflow, Version=4.5.24.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
       <Private>True</Private>
@@ -154,6 +160,8 @@
     <Compile Include="IO\MsBuildFileSystemWatcherEntries.cs" />
     <Compile Include="Logging\FileSystemMirroringProjectLoggingExtensions.cs" />
     <Compile Include="Logging\MsBuildFileSystemWatcherLoggingExtensions.cs" />
+    <Compile Include="Microsoft.Common.Core\Extensions\StringExtensions.cs" />
+    <Compile Include="Microsoft.Common.Core\Versions\Toolset.cs" />
     <Compile Include="MsBuild\XDefaultValueProperty.cs" />
     <Compile Include="MsBuild\XImport.cs" />
     <Compile Include="MsBuild\XImportExisting.cs" />
@@ -184,12 +192,14 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Key.snk" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Common.Core\Microsoft.Common.Core.csproj">
-      <Project>{5da4c00b-9f16-4ef9-894d-20329544265e}</Project>
-      <Name>Microsoft.Common.Core</Name>
+    <ProjectReference Include="..\VisualRust.Core\VisualRust.Core.csproj">
+      <Project>{403d6de5-6c9e-4836-90ca-cb803a2d3599}</Project>
+      <Name>VisualRust.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

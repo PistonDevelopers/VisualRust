@@ -4,14 +4,15 @@
 using System.IO;
 using System.Collections.Generic;
 using Microsoft.Common.Core;
-using Microsoft.Common.Core.IO;
 using VisualRust.ProjectSystem.FileSystemMirroring.Utilities;
+using System.IO.Abstractions;
 #if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
 #endif
 using static System.FormattableString;
 
 namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
+    using VisualRust.Core;
     public sealed partial class MsBuildFileSystemWatcher {
         private class DirectoryCreated : IFileSystemChange {
             private readonly MsBuildFileSystemWatcherEntries _entries;
@@ -38,7 +39,7 @@ namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
 
                 while (directories.Count > 0) {
                     var directoryPath = directories.Dequeue();
-                    var directory = _fileSystem.GetDirectoryInfo(directoryPath);
+                    var directory = _fileSystem.DirectoryInfo.FromDirectoryName(directoryPath);
                     var relativeDirectoryPath = PathHelper.MakeRelative(_rootDirectory, directoryPath);
 
                     if (!directory.Exists) {
@@ -62,7 +63,7 @@ namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
                     }
 
                     foreach (var entry in directory.EnumerateFileSystemInfos()) {
-                        if (entry is IDirectoryInfo) {
+                        if (entry is DirectoryInfoBase) {
                             directories.Enqueue(entry.FullName);
                         } else {
                             var relativeFilePath = PathHelper.MakeRelative(_rootDirectory, entry.FullName);

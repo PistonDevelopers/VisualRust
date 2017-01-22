@@ -4,16 +4,16 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Microsoft.Common.Core;
-using Microsoft.Common.Core.IO;
-using Microsoft.Common.Core.Logging;
 using Microsoft;
 using VisualRust.ProjectSystem.FileSystemMirroring.Logging;
 using VisualRust.ProjectSystem.FileSystemMirroring.Utilities;
+using System.IO.Abstractions;
+using NotifyFilters = System.IO.NotifyFilters;
+using IOException = System.IO.IOException;
+using ErrorEventArgs = System.IO.ErrorEventArgs;
 
 #if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
@@ -21,6 +21,9 @@ using Microsoft.VisualStudio.ProjectSystem.Utilities;
 using static System.FormattableString;
 
 namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
+    using Microsoft.Common.Core;
+    using VisualRust.Core;
+
     public sealed partial class MsBuildFileSystemWatcher : IDisposable {
         private readonly string _directory;
         private readonly string _filter;
@@ -33,9 +36,9 @@ namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
         private readonly TaskScheduler _taskScheduler;
         private readonly BroadcastBlock<Changeset> _broadcastBlock;
         private readonly IActionLog _log;
-        private IFileSystemWatcher _fileWatcher;
-        private IFileSystemWatcher _directoryWatcher;
-        private IFileSystemWatcher _attributesWatcher;
+        private FileSystemWatcherBase _fileWatcher;
+        private FileSystemWatcherBase _directoryWatcher;
+        private FileSystemWatcherBase _attributesWatcher;
         private int _consumerIsWorking;
         private int _hasErrors;
 
@@ -201,8 +204,8 @@ namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
             while (_queue.TryDequeue(out change)) { }
         }
 
-        private IFileSystemWatcher CreateFileSystemWatcher(NotifyFilters notifyFilter) {
-            var watcher = _fileSystem.CreateFileSystemWatcher(_directory, _filter);
+        private FileSystemWatcherBase CreateFileSystemWatcher(NotifyFilters notifyFilter) {
+            var watcher = _fileSystem.FileSystemWatcher.Create(_directory, _filter);
             watcher.EnableRaisingEvents = true;
             watcher.IncludeSubdirectories = true;
             watcher.InternalBufferSize = 65536;
@@ -219,7 +222,7 @@ namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
                 relativePath = PathHelper.MakeRelative(rootDirectory, fullPath);
                  try {
                     shortRelativePath = fileSystem.ToShortRelativePath(fullPath, rootDirectory);
-                    return !string.IsNullOrEmpty(shortRelativePath) && filter.IsFileAllowed(relativePath, fileSystem.GetFileAttributes(fullPath));
+                    return !string.IsNullOrEmpty(shortRelativePath) && filter.IsFileAllowed(relativePath, fileSystem.FileInfo.FromFileName(fullPath).Attributes);
                 } catch (IOException) { } catch (UnauthorizedAccessException) { } // File isn't allowed if it isn't accessible
             }
             return false;

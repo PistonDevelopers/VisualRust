@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.Common.Core;
-using Microsoft.Common.Core.IO;
+using System.IO.Abstractions;
 using VisualRust.ProjectSystem.FileSystemMirroring.Utilities;
 #if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.ProjectSystem.Utilities;
 using static System.FormattableString;
 
 namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
+    using VisualRust.Core;
+
     public sealed partial class MsBuildFileSystemWatcher {
         private class FileRenamed : IFileSystemChange {
             private readonly MsBuildFileSystemWatcherEntries _entries;

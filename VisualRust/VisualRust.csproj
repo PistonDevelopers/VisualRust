@@ -402,10 +402,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Common.Core\Microsoft.Common.Core.csproj">
-      <Project>{5da4c00b-9f16-4ef9-894d-20329544265e}</Project>
-      <Name>Microsoft.Common.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.csproj">
       <Project>{b8696d0c-8adb-4c11-8cee-5c81aa8c6ebd}</Project>
       <Name>VisualRust.ProjectSystem.FileSystemMirroring</Name>

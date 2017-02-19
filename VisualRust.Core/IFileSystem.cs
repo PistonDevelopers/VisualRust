@@ -11,6 +11,5 @@ namespace VisualRust.Core
     {
         IFileSystemWatcherFactory FileSystemWatcher { get; }
         string ToShortPath(string path);
-        string ToShortRelativePath(string path);
     }
 }

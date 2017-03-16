@@ -12,14 +12,13 @@ using Microsoft.VisualStudio.ProjectSystem;
 using VisualRust.ProjectSystem.FileSystemMirroring.IO;
 using VisualRust.ProjectSystem.FileSystemMirroring.Project;
 using Microsoft.VisualStudio.Shell.Interop;
-//#if VS14
+#if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
 using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IThreadHandling;
 using Microsoft.VisualStudio;
 using VisualRust.Core;
 using Microsoft.VisualStudio.Shell;
-//#endif
-#if VS15
+#else
 using Microsoft.VisualStudio.ProjectSystem.VS;
 using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IProjectThreadingService;
 #endif
@@ -31,8 +30,8 @@ namespace VisualRust.ProjectSystem
 
     internal sealed class LoadHooks
     {
-        [Export(typeof(IFileSystemMirroringProjectTemporaryItems))]
         [AppliesTo(VisualRustPackage.UniqueCapability)]
+        [Export(typeof(IFileSystemMirroringProjectTemporaryItems))]
         private FileSystemMirroringProject Project { get; }
 
         private readonly MsBuildFileSystemWatcher _fileWatcher;
@@ -47,7 +46,7 @@ namespace VisualRust.ProjectSystem
         /// </summary>
         [ImportingConstructor]
         public LoadHooks(UnconfiguredProject unconfiguredProject,
-            [Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider,
+            //[Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider,
             [ImportMany("Microsoft.VisualStudio.ProjectSystem.Microsoft.VisualStudio.Shell.Interop.IVsProject")] IEnumerable<Lazy<IVsProject>> cpsIVsProjects,
             IProjectLockService projectLockService,
             IThreadHandling threadHandling)
@@ -59,7 +58,7 @@ namespace VisualRust.ProjectSystem
 
             _projectDirectory = unconfiguredProject.GetProjectDirectory();
 
-            var log = new OutputPaneLogger(serviceProvider);
+            var log = new OutputPaneLogger(null);
 
             unconfiguredProject.ProjectUnloading += ProjectUnloading;
             _fileWatcher = new MsBuildFileSystemWatcher(_projectDirectory, "*", 25, 1000, _fileSystem, new MsBuildFileSystemFilter(), log);
@@ -83,14 +82,14 @@ namespace VisualRust.ProjectSystem
         }
 
         [AppliesTo(VisualRustPackage.UniqueCapability)]
-//#if VS14
+#if VS14
         [UnconfiguredProjectAutoLoad2(completeBy: UnconfiguredProjectLoadCheckpoint.CapabilitiesEstablished)]
-//#else
-//		[ProjectAutoLoad(startAfter: ProjectLoadCheckpoint.UnconfiguredProjectLocalCapabilitiesEstablished,
-//						 completeBy: ProjectLoadCheckpoint.BeforeLoadInitialConfiguration,
-//						 RequiresUIThread = false)]
-//#endif
-        public async System.Threading.Tasks.Task InitializeProjectFromDiskAsync()
+#else
+        [ProjectAutoLoad(startAfter: ProjectLoadCheckpoint.UnconfiguredProjectLocalCapabilitiesEstablished,
+                         completeBy: ProjectLoadCheckpoint.BeforeLoadInitialConfiguration,
+                         RequiresUIThread = false)]
+#endif
+        public async Task InitializeProjectFromDiskAsync()
         {
             await Project.CreateInMemoryImport();
             _fileWatcher.Start();
@@ -98,6 +97,15 @@ namespace VisualRust.ProjectSystem
             await _threadHandling.SwitchToUIThread();
             // Make sure package is loaded
             EnsurePackageLoaded(GuidList.VisualRustPkgGuid);
+
+            // TODO: start watching the Cargo manifest
+        }
+
+        [AppliesTo(VisualRustPackage.UniqueCapability)]
+        [UnconfiguredProjectAutoLoad()]
+        public void InitializeProjectFromDisk()
+        {
+            InitializeProjectFromDiskAsync().Wait();
 
             // TODO: start watching the Cargo manifest
         }

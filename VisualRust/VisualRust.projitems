@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>e3265c09-2dd6-4ae5-a0fd-a0576fe9d279</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>VisualRust</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <Content Include="$(MSBuildThisFileDirectory)..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\ApplicationProject.zip">
+      <Link>ProjectTemplates\ApplicationProject.zip</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\LibraryProject.zip">
+      <Link>ProjectTemplates\LibraryProject.zip</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)..\VisualRust.Templates\bin\$(Configuration)\ItemTemplates\Rust\127\Module.zip">
+      <Link>ItemTemplates\Module.zip</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\EncodingController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\FileSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\GnuDebugLaunchSettingsProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\IDebugLaunchSettingsProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\MsvcDebugLaunchSettingsProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\OutputPaneLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\RustDebuggerProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\LoadHooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\MsBuildFileSystemFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Forms\DebuggingOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Forms\DebuggingOptionsPageControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Forms\DebuggingOptionsPageControl.Designer.cs">
+      <DependentUpon>DebuggingOptionsPageControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Forms\RustOptionsPageControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Forms\RustOptionsPageControl.designer.cs">
+      <DependentUpon>RustOptionsPageControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)GuidList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Forms\RustOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\ProjectIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\ProjectTreeModifiers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProvideDebugEngineAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Racer\RacerSingleton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)RustBraceMatcher.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\RustProjectFileGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\RustProjectSourceItemProviderExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\JoinedTextChange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\RustClassifier.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\RustClassifierProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RustCommentSelectionCommandHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RustCompletionCommandHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RustCompletionSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RustDocumentListener.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RustF1HelpCommandHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RustGoToDefinitionCommandHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RustTokenTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\Antlr\TextSegmentsCharStream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\Antlr\Lexer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\BitHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\EnumerableHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\IRustLexer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\SortedSet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\SortedSetHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\SpannedToken.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\DocumentState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\TokensChangedEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Text\TrackingToken.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RustLanguage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VisualRustAutoIndent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VisualRustPackage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VisualRustSmartIndent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VSCommandTarget.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VSPackage.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VSPackage.resx</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)VsUtilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Forms\DebuggingOptionsPageControl.resx">
+      <DependentUpon>DebuggingOptionsPageControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Forms\RustOptionsPageControl.resx">
+      <DependentUpon>RustOptionsPageControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <ManifestResourceName>VSPackage</ManifestResourceName>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VSPackage.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <XamlPropertyRule Include="$(MSBuildThisFileDirectory)Rules\Content.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="$(MSBuildThisFileDirectory)Rules\Debugger.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="$(MSBuildThisFileDirectory)Rules\Folder.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="$(MSBuildThisFileDirectory)Rules\General.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="$(MSBuildThisFileDirectory)Rules\None.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <Content Include="$(MSBuildThisFileDirectory)Rules\ProjectItemsSchema.xaml">
+      <SubType>Designer</SubType>
+    </Content>
+    <XamlPropertyRule Include="$(MSBuildThisFileDirectory)Rules\Scc.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+    <XamlPropertyRule Include="$(MSBuildThisFileDirectory)Rules\RustDebugger.xaml">
+      <SubType>Designer</SubType>
+    </XamlPropertyRule>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory).\LICENSE.txt">
+      <Link>LICENSE.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)Racer\libgcc_s_dw2-1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)Racer\racer-120e98b.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="$(MSBuildThisFileDirectory)Resources\CargoManifestNode.png" />
+    <None Include="$(MSBuildThisFileDirectory)Resources\RustProjectNode.png" />
+    <None Include="$(MSBuildThisFileDirectory)Resources\RustFileNode.png" />
+    <Resource Include="$(MSBuildThisFileDirectory)Resources\Package.ico" />
+    <VSCTCompile Include="$(MSBuildThisFileDirectory)VisualRust.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+  </ItemGroup>
+</Project>

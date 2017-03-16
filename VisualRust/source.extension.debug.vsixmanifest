@@ -22,4 +22,7 @@
     <Asset Type="Microsoft.VisualStudio.ItemTemplate" Path="ItemTemplates" />
     <Asset Type="Microsoft.VisualStudio.Assembly" Path="Newtonsoft.Json.dll" />
   </Assets>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0.26208.0,16.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
 </PackageManifest>

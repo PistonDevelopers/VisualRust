@@ -148,7 +148,7 @@
     <None Include="$(MSBuildThisFileDirectory)Key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory).\LICENSE.txt">
+    <Content Include="$(MSBuildThisFileDirectory)..\LICENSE.txt">
       <Link>LICENSE.txt</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

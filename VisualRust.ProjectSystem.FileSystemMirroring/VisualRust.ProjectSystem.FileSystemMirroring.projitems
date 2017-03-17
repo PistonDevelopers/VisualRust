@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>3338f071-d3b5-419c-a69f-fc4a56ca87ee</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>VisualRust.ProjectSystem.FileSystemMirroring</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ProjectTreeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interop\NativeMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\IMsBuildFileSystemFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\MsBuildFileSystemWatcher.AttributesChanged.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\MsBuildFileSystemWatcher.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\MsBuildFileSystemWatcher.DirectoryCreated.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\MsBuildFileSystemWatcher.DirectoryDeleted.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\MsBuildFileSystemWatcher.DirectoryRenamed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\MsBuildFileSystemWatcher.FileCreated.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\MsBuildFileSystemWatcher.FileDeleted.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\MsBuildFileSystemWatcher.FileRenamed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\MsBuildFileSystemWatcherEntries.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\FileSystemMirroringProjectLoggingExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\MsBuildFileSystemWatcherLoggingExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Common.Core\Extensions\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Common.Core\Versions\Toolset.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MsBuild\XDefaultValueProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MsBuild\XImport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MsBuild\XImportExisting.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MsBuild\XProjDocument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MsBuild\XProject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MsBuild\XProjElement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MsBuild\XProjHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MsBuild\XProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MsBuild\XPropertyGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Project\FileSystemMirroringProject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Project\FileSystemMirroringProjectFileGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Project\FileSystemMirroringProjectSourceItemProviderExtensionBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Project\FileSystemMirroringProjectUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Project\IProjectItemDependencyProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shell\IVsProjectGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shell\IVsRegisterProjectGenerators.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\DictionaryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\PathExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\ServiceProviderExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\VsSolutionBuildManagerExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Package\Registration\DeveloperActivityAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Package\Registration\ProvideCpsProjectFactoryAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Package\Registration\ProvideProjectFileGeneratorAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Package\Registration\RegistrationAttributeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Package\Registration\RegistrationAttributeBuilder.RegKey.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Key.snk" />
+  </ItemGroup>
+</Project>

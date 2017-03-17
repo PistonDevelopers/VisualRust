@@ -11,15 +11,13 @@
     <AssemblyName>VisualRust.ProjectSystem.FileSystemMirroring</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <BaseIntermediateOutputPath>obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\$(MSBuildProjectName)\\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;VS14</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\$(MSBuildProjectName)\\Release\</OutputPath>
     <DefineConstants>TRACE;VS14</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -146,53 +144,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\ProjectTreeExtensions.cs" />
-    <Compile Include="Interop\NativeMethods.cs" />
-    <Compile Include="IO\IMsBuildFileSystemFilter.cs" />
-    <Compile Include="IO\MsBuildFileSystemWatcher.AttributesChanged.cs" />
-    <Compile Include="IO\MsBuildFileSystemWatcher.cs" />
-    <Compile Include="IO\MsBuildFileSystemWatcher.DirectoryCreated.cs" />
-    <Compile Include="IO\MsBuildFileSystemWatcher.DirectoryDeleted.cs" />
-    <Compile Include="IO\MsBuildFileSystemWatcher.DirectoryRenamed.cs" />
-    <Compile Include="IO\MsBuildFileSystemWatcher.FileCreated.cs" />
-    <Compile Include="IO\MsBuildFileSystemWatcher.FileDeleted.cs" />
-    <Compile Include="IO\MsBuildFileSystemWatcher.FileRenamed.cs" />
-    <Compile Include="IO\MsBuildFileSystemWatcherEntries.cs" />
-    <Compile Include="Logging\FileSystemMirroringProjectLoggingExtensions.cs" />
-    <Compile Include="Logging\MsBuildFileSystemWatcherLoggingExtensions.cs" />
-    <Compile Include="Microsoft.Common.Core\Extensions\StringExtensions.cs" />
-    <Compile Include="Microsoft.Common.Core\Versions\Toolset.cs" />
-    <Compile Include="MsBuild\XDefaultValueProperty.cs" />
-    <Compile Include="MsBuild\XImport.cs" />
-    <Compile Include="MsBuild\XImportExisting.cs" />
-    <Compile Include="MsBuild\XProjDocument.cs" />
-    <Compile Include="MsBuild\XProject.cs" />
-    <Compile Include="MsBuild\XProjElement.cs" />
-    <Compile Include="MsBuild\XProjHelpers.cs" />
-    <Compile Include="MsBuild\XProperty.cs" />
-    <Compile Include="MsBuild\XPropertyGroup.cs" />
-    <Compile Include="Package\Registration\DeveloperActivityAttribute.cs" />
-    <Compile Include="Package\Registration\ProvideCpsProjectFactoryAttribute.cs" />
-    <Compile Include="Package\Registration\ProvideProjectFileGeneratorAttribute.cs" />
-    <Compile Include="Package\Registration\RegistrationAttributeBuilder.cs" />
-    <Compile Include="Package\Registration\RegistrationAttributeBuilder.RegKey.cs" />
-    <Compile Include="Project\FileSystemMirroringProject.cs" />
-    <Compile Include="Project\FileSystemMirroringProjectFileGenerator.cs" />
-    <Compile Include="Project\FileSystemMirroringProjectSourceItemProviderExtensionBase.cs" />
-    <Compile Include="Project\FileSystemMirroringProjectUtilities.cs" />
-    <Compile Include="Project\IProjectItemDependencyProvider.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Shell\IVsProjectGenerator.cs" />
-    <Compile Include="Shell\IVsRegisterProjectGenerators.cs" />
-    <Compile Include="Utilities\DictionaryExtensions.cs" />
-    <Compile Include="Utilities\PathExtensions.cs" />
-    <Compile Include="Utilities\ServiceProviderExtensions.cs" />
-    <Compile Include="Utilities\VsSolutionBuildManagerExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Key.snk" />
-    <None Include="packages.config">
+    <None Include="packages.VisualRust.ProjectSystem.FileSystemMirroring.2015.config">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
@@ -202,6 +154,7 @@
       <Name>VisualRust.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="VisualRust.ProjectSystem.FileSystemMirroring.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.VisualStudio.SDK.VsixSuppression.14.1.32\build\Microsoft.VisualStudio.SDK.VsixSuppression.targets" Condition="Exists('..\packages\Microsoft.VisualStudio.SDK.VsixSuppression.14.1.32\build\Microsoft.VisualStudio.SDK.VsixSuppression.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

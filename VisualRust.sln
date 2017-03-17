@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.2015", "VisualRust\VisualRust.2015.csproj", "{8B7B30F7-17C1-4CE8-BAF4-88B086AF7B25}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -29,15 +29,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIDebugEngine", "MIEngine\s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MICore", "MIEngine\src\MICore\MICore.csproj", "{12CC862D-95B7-4224-8E16-B928C6333677}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.ProjectSystem.FileSystemMirroring", "VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.csproj", "{B8696D0C-8ADB-4C11-8CEE-5C81AA8C6EBD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.ProjectSystem.FileSystemMirroring.2015", "VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.2015.csproj", "{B8696D0C-8ADB-4C11-8CEE-5C81AA8C6EBD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.Core", "VisualRust.Core\VisualRust.Core.csproj", "{403D6DE5-6C9E-4836-90CA-CB803A2D3599}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "VisualRust", "VisualRust\VisualRust.shproj", "{E3265C09-2DD6-4AE5-A0FD-A0576FE9D279}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.2017", "VisualRust\VisualRust.2017.csproj", "{CE4062FE-D6D2-43FA-AD8C-709F103F4722}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "VisualRust.ProjectSystem.FileSystemMirroring", "VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.shproj", "{3338F071-D3B5-419C-A69F-FC4A56CA87EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualRust.ProjectSystem.FileSystemMirroring.2017", "VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.2017.csproj", "{3893F2BE-BE63-4C53-BF64-85A7CF455B60}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.projitems*{3338f071-d3b5-419c-a69f-fc4a56ca87ee}*SharedItemsImports = 13
+		VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.projitems*{3893f2be-be63-4c53-bf64-85a7cf455b60}*SharedItemsImports = 4
 		VisualRust\VisualRust.projitems*{8b7b30f7-17c1-4ce8-baf4-88b086af7b25}*SharedItemsImports = 4
+		VisualRust.ProjectSystem.FileSystemMirroring\VisualRust.ProjectSystem.FileSystemMirroring.projitems*{b8696d0c-8adb-4c11-8cee-5c81aa8c6ebd}*SharedItemsImports = 4
+		VisualRust\VisualRust.projitems*{ce4062fe-d6d2-43fa-ad8c-709f103f4722}*SharedItemsImports = 4
 		VisualRust\VisualRust.projitems*{e3265c09-2dd6-4ae5-a0fd-a0576fe9d279}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -188,6 +198,38 @@ Global
 		{403D6DE5-6C9E-4836-90CA-CB803A2D3599}.Release|x64.Build.0 = Release|Any CPU
 		{403D6DE5-6C9E-4836-90CA-CB803A2D3599}.Release|x86.ActiveCfg = Release|Any CPU
 		{403D6DE5-6C9E-4836-90CA-CB803A2D3599}.Release|x86.Build.0 = Release|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Debug|x64.Build.0 = Debug|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Debug|x86.Build.0 = Debug|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Release|x64.ActiveCfg = Release|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Release|x64.Build.0 = Release|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Release|x86.ActiveCfg = Release|Any CPU
+		{CE4062FE-D6D2-43FA-AD8C-709F103F4722}.Release|x86.Build.0 = Release|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Debug|x64.Build.0 = Debug|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Debug|x86.Build.0 = Debug|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Release|x64.ActiveCfg = Release|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Release|x64.Build.0 = Release|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Release|x86.ActiveCfg = Release|Any CPU
+		{3893F2BE-BE63-4C53-BF64-85A7CF455B60}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,12 +12,12 @@ using Microsoft.VisualStudio.ProjectSystem;
 using VisualRust.ProjectSystem.FileSystemMirroring.IO;
 using VisualRust.ProjectSystem.FileSystemMirroring.Project;
 using Microsoft.VisualStudio.Shell.Interop;
-#if VS14
-using Microsoft.VisualStudio.ProjectSystem.Utilities;
-using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IThreadHandling;
 using Microsoft.VisualStudio;
 using VisualRust.Core;
 using Microsoft.VisualStudio.Shell;
+#if VS14
+using Microsoft.VisualStudio.ProjectSystem.Utilities;
+using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IThreadHandling;
 #else
 using Microsoft.VisualStudio.ProjectSystem.VS;
 using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IProjectThreadingService;
@@ -26,6 +26,7 @@ using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IProjectThreadingSe
 
 namespace VisualRust.ProjectSystem
 {
+    using Microsoft.VisualStudio;
     using System.Threading.Tasks;
 
     internal sealed class LoadHooks
@@ -45,11 +46,12 @@ namespace VisualRust.ProjectSystem
         /// Backing field for the similarly named property.
         /// </summary>
         [ImportingConstructor]
-        public LoadHooks(UnconfiguredProject unconfiguredProject,
-            //[Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider,
+        public LoadHooks(
+            UnconfiguredProject unconfiguredProject,
             [ImportMany("Microsoft.VisualStudio.ProjectSystem.Microsoft.VisualStudio.Shell.Interop.IVsProject")] IEnumerable<Lazy<IVsProject>> cpsIVsProjects,
             IProjectLockService projectLockService,
-            IThreadHandling threadHandling)
+            IThreadHandling threadHandling,
+            IActionLog log)
         {
 
             _unconfiguredProject = unconfiguredProject;
@@ -57,8 +59,6 @@ namespace VisualRust.ProjectSystem
             _threadHandling = threadHandling;
 
             _projectDirectory = unconfiguredProject.GetProjectDirectory();
-
-            var log = new OutputPaneLogger(null);
 
             unconfiguredProject.ProjectUnloading += ProjectUnloading;
             _fileWatcher = new MsBuildFileSystemWatcher(_projectDirectory, "*", 25, 1000, _fileSystem, new MsBuildFileSystemFilter(), log);
@@ -102,10 +102,14 @@ namespace VisualRust.ProjectSystem
         }
 
         [AppliesTo(VisualRustPackage.UniqueCapability)]
-        [UnconfiguredProjectAutoLoad()]
-        public void InitializeProjectFromDisk()
+#if VS14
+        [UnconfiguredProjectAutoLoad2]
+#else
+        [ProjectAutoLoad]
+#endif
+        public Task InitializeProjectFromDisk()
         {
-            InitializeProjectFromDiskAsync().Wait();
+            return InitializeProjectFromDiskAsync();
 
             // TODO: start watching the Cargo manifest
         }

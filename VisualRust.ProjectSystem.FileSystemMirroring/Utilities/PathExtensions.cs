@@ -4,6 +4,8 @@
 using VisualRust.Core;
 #if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
+#else
+using Microsoft.VisualStudio.ProjectSystem;
 #endif
 
 namespace VisualRust.ProjectSystem.FileSystemMirroring.Utilities {

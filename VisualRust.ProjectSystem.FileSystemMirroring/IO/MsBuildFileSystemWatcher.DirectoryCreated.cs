@@ -8,6 +8,8 @@ using VisualRust.ProjectSystem.FileSystemMirroring.Utilities;
 using System.IO.Abstractions;
 #if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
+#else
+using Microsoft.VisualStudio.ProjectSystem;
 #endif
 using static System.FormattableString;
 

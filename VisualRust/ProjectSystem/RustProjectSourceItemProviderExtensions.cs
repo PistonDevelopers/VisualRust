@@ -4,10 +4,10 @@
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.ProjectSystem;
 using VisualRust.ProjectSystem.FileSystemMirroring.Project;
-//#if VS14
+#if VS14
 using Microsoft.VisualStudio.ProjectSystem.Items;
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
-//#endif
+#endif
 
 namespace VisualRust.ProjectSystem
 {

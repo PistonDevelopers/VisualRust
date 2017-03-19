@@ -1,7 +1,9 @@
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.ProjectSystem.Properties;
+#if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
+#endif
 
 namespace VisualRust
 {

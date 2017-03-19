@@ -8,20 +8,17 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Common.Core;
-using Microsoft.Common.Core.Enums;
-using Microsoft.Common.Core.IO;
-using Microsoft.Common.Core.Shell;
 using Microsoft.VisualStudio.ProjectSystem;
 using VisualRust.ProjectSystem.FileSystemMirroring.IO;
 using VisualRust.ProjectSystem.FileSystemMirroring.Project;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.Common.Core.Logging;
-//#if VS14
+using Microsoft.VisualStudio;
+using VisualRust.Core;
+using Microsoft.VisualStudio.Shell;
+#if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
 using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IThreadHandling;
-using Microsoft.VisualStudio;
-//#endif
-#if VS15
+#else
 using Microsoft.VisualStudio.ProjectSystem.VS;
 using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IProjectThreadingService;
 #endif
@@ -29,10 +26,13 @@ using IThreadHandling = Microsoft.VisualStudio.ProjectSystem.IProjectThreadingSe
 
 namespace VisualRust.ProjectSystem
 {
+    using Microsoft.VisualStudio;
+    using System.Threading.Tasks;
+
     internal sealed class LoadHooks
     {
-        [Export(typeof(IFileSystemMirroringProjectTemporaryItems))]
         [AppliesTo(VisualRustPackage.UniqueCapability)]
+        [Export(typeof(IFileSystemMirroringProjectTemporaryItems))]
         private FileSystemMirroringProject Project { get; }
 
         private readonly MsBuildFileSystemWatcher _fileWatcher;
@@ -46,10 +46,12 @@ namespace VisualRust.ProjectSystem
         /// Backing field for the similarly named property.
         /// </summary>
         [ImportingConstructor]
-        public LoadHooks(UnconfiguredProject unconfiguredProject
-            , [ImportMany("Microsoft.VisualStudio.ProjectSystem.Microsoft.VisualStudio.Shell.Interop.IVsProject")] IEnumerable<Lazy<IVsProject>> cpsIVsProjects
-            , IProjectLockService projectLockService
-            , IThreadHandling threadHandling)
+        public LoadHooks(
+            UnconfiguredProject unconfiguredProject,
+            [ImportMany("Microsoft.VisualStudio.ProjectSystem.Microsoft.VisualStudio.Shell.Interop.IVsProject")] IEnumerable<Lazy<IVsProject>> cpsIVsProjects,
+            IProjectLockService projectLockService,
+            IThreadHandling threadHandling,
+            IActionLog log)
         {
 
             _unconfiguredProject = unconfiguredProject;
@@ -57,8 +59,6 @@ namespace VisualRust.ProjectSystem
             _threadHandling = threadHandling;
 
             _projectDirectory = unconfiguredProject.GetProjectDirectory();
-
-            var log = new DummyLogger();
 
             unconfiguredProject.ProjectUnloading += ProjectUnloading;
             _fileWatcher = new MsBuildFileSystemWatcher(_projectDirectory, "*", 25, 1000, _fileSystem, new MsBuildFileSystemFilter(), log);
@@ -68,7 +68,7 @@ namespace VisualRust.ProjectSystem
 
         public static IVsPackage EnsurePackageLoaded(Guid guidPackage)
         {
-            var shell = (IVsShell)VisualRustPackage.GetGlobalService(typeof(IVsShell));
+            var shell = (IVsShell)Package.GetGlobalService(typeof(IVsShell));
             var guid = guidPackage;
             IVsPackage package;
             int hr = ErrorHandler.ThrowOnFailure(shell.IsPackageLoaded(ref guid, out package), VSConstants.E_FAIL);
@@ -82,13 +82,13 @@ namespace VisualRust.ProjectSystem
         }
 
         [AppliesTo(VisualRustPackage.UniqueCapability)]
-//#if VS14
+#if VS14
         [UnconfiguredProjectAutoLoad2(completeBy: UnconfiguredProjectLoadCheckpoint.CapabilitiesEstablished)]
-//#else
-//		[ProjectAutoLoad(startAfter: ProjectLoadCheckpoint.UnconfiguredProjectLocalCapabilitiesEstablished,
-//						 completeBy: ProjectLoadCheckpoint.BeforeLoadInitialConfiguration,
-//						 RequiresUIThread = false)]
-//#endif
+#else
+        [ProjectAutoLoad(startAfter: ProjectLoadCheckpoint.UnconfiguredProjectLocalCapabilitiesEstablished,
+                         completeBy: ProjectLoadCheckpoint.BeforeLoadInitialConfiguration,
+                         RequiresUIThread = false)]
+#endif
         public async Task InitializeProjectFromDiskAsync()
         {
             await Project.CreateInMemoryImport();
@@ -97,6 +97,19 @@ namespace VisualRust.ProjectSystem
             await _threadHandling.SwitchToUIThread();
             // Make sure package is loaded
             EnsurePackageLoaded(GuidList.VisualRustPkgGuid);
+
+            // TODO: start watching the Cargo manifest
+        }
+
+        [AppliesTo(VisualRustPackage.UniqueCapability)]
+#if VS14
+        [UnconfiguredProjectAutoLoad2]
+#else
+        [ProjectAutoLoad]
+#endif
+        public Task InitializeProjectFromDisk()
+        {
+            return InitializeProjectFromDiskAsync();
 
             // TODO: start watching the Cargo manifest
         }
@@ -129,17 +142,13 @@ namespace VisualRust.ProjectSystem
             //});
         }
 
-        private async Task ProjectUnloading(object sender, EventArgs args)
+        private Task ProjectUnloading(object sender, EventArgs args)
         {
             //VsAppShell.Current.AssertIsOnMainThread();
 
             _unconfiguredProject.ProjectUnloading -= ProjectUnloading;
             _fileWatcher.Dispose();
-
-            if (!_fileSystem.DirectoryExists(_projectDirectory))
-            {
-                return;
-            }
+            return Task.CompletedTask;
         }
     }
 }

@@ -11,12 +11,12 @@ using System.Threading.Tasks.Dataflow;
 using System.Xml;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
-using Microsoft.Common.Core;
-using Microsoft.Common.Core.Logging;
 using Microsoft.VisualStudio.ProjectSystem;
+using VisualRust.Core;
 using VisualRust.ProjectSystem.FileSystemMirroring.IO;
 using VisualRust.ProjectSystem.FileSystemMirroring.Logging;
 using VisualRust.ProjectSystem.FileSystemMirroring.MsBuild;
+using Microsoft.Common.Core;
 #if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
 #endif

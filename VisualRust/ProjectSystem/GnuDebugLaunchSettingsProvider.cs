@@ -1,7 +1,4 @@
 ﻿using MICore.Xml.LaunchOptions;
-using Microsoft.VisualStudio.ProjectSystem.Debuggers;
-using Microsoft.VisualStudio.ProjectSystem.Utilities.DebuggerProviders;
-using Microsoft.VisualStudio.ProjectSystem.VS.Debuggers;
 using System;
 using System.IO;
 using System.Linq;
@@ -12,6 +9,14 @@ using System.Xml;
 using System.Xml.Serialization;
 using VisualRust.Options;
 using VisualRust.Shared;
+#if VS14
+using Microsoft.VisualStudio.ProjectSystem.Debuggers;
+using Microsoft.VisualStudio.ProjectSystem.Utilities.DebuggerProviders;
+using Microsoft.VisualStudio.ProjectSystem.VS.Debuggers;
+#else
+using Microsoft.VisualStudio.ProjectSystem.Debug;
+using Microsoft.VisualStudio.ProjectSystem.VS.Debug;
+#endif
 
 namespace VisualRust.ProjectSystem
 {

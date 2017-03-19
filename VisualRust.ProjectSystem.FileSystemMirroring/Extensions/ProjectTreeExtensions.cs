@@ -10,9 +10,6 @@ using Microsoft.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.ProjectSystem.Designers;
 using Microsoft.VisualStudio.ProjectSystem.Utilities.Designers;
 #endif
-#if VS15
-using Microsoft.VisualStudio.ProjectSystem;
-#endif
 
 namespace VisualRust.ProjectSystem.FileSystemMirroring {
     public static class ProjectTreeExtensions {

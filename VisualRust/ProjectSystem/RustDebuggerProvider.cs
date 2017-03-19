@@ -1,8 +1,4 @@
 ﻿using Microsoft.VisualStudio.ProjectSystem;
-using Microsoft.VisualStudio.ProjectSystem.Debuggers;
-using Microsoft.VisualStudio.ProjectSystem.Utilities;
-using Microsoft.VisualStudio.ProjectSystem.Utilities.DebuggerProviders;
-using Microsoft.VisualStudio.ProjectSystem.VS.Debuggers;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
 using System;
@@ -11,6 +7,15 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 using VisualRust.Shared;
+#if VS14
+using Microsoft.VisualStudio.ProjectSystem.Utilities;
+using Microsoft.VisualStudio.ProjectSystem.Debuggers;
+using Microsoft.VisualStudio.ProjectSystem.Utilities.DebuggerProviders;
+using Microsoft.VisualStudio.ProjectSystem.VS.Debuggers;
+#else
+using Microsoft.VisualStudio.ProjectSystem.Debug;
+using Microsoft.VisualStudio.ProjectSystem.VS.Debug;
+#endif
 
 namespace VisualRust.ProjectSystem
 {

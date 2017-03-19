@@ -8,6 +8,8 @@ using System.Linq;
 using Microsoft.Common.Core;
 #if VS14
 using Microsoft.VisualStudio.ProjectSystem.Utilities;
+#else
+using Microsoft.VisualStudio.ProjectSystem;
 #endif
 using static VisualRust.ProjectSystem.FileSystemMirroring.IO.MsBuildFileSystemWatcherEntries.EntryState;
 using static VisualRust.ProjectSystem.FileSystemMirroring.IO.MsBuildFileSystemWatcherEntries.EntryType;

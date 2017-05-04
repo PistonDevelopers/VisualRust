@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?define VisualRust.TargetDir = $(var.VisualRust.2017.TargetDir) ?>
+  <?define InstallDirId = Dir_vsx.2017 ?>
+  <?define ItemTemplatesDirRefId = VS2017_ITEMTEMPLATES_DIR ?>
+  <?define ItemTemplatesDirSeed = {DB42CD21-39AC-4C64-8324-80710EE17448} ?>
+  <?define ProjectTemplatesDirRefId = VS2017_PROJECTTEMPLATES_DIR ?>
+  <?define ProjectTemplatesDirSeed = {C73A4D6F-29A6-4373-94AF-8B1708AAF62C} ?>
+  <?define VsVersion = 2017 ?>
+  <?define Devenv = VS2017DEVENV ?>
+  <?define VsxDirSeed = {070086AB-A839-4248-98D1-0B7C0DE20139} ?>
+  <?define RsRegistrationGuid = {5B50ED36-02F8-4C05-9ECD-6DD2ED1007BD} ?>
+  <?define RsprojRegistrationGuid = {908B24E1-7CD6-4DAE-B3A3-FBA5BBEAA162} ?>
+</Include>

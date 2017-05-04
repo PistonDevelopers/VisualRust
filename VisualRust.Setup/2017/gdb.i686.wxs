@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?include common.wxi ?>
+  <?define Platform = i686?>
+  <?define libgcc_s = libgcc_s_dw2-1?>
+  <?include ..\shared\gdb.wxi ?>
+</Wix>

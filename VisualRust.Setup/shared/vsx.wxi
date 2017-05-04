@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  <Fragment>
+    <PropertyRef Id="VS$(var.VsVersion)_EXTENSIONS_DIR" />
+    <DirectoryRef Id="TARGETDIR">
+      <Directory Id="VS$(var.VsVersion)_EXTENSIONS_DIR">
+        <Directory Id="Dir_vsx.$(var.VsVersion)" Name="Visual Rust" ComponentGuidGenerationSeed="$(var.VsxDirSeed)"/>
+      </Directory>
+    </DirectoryRef>
+
+    <ComponentGroup Id="CmpGroup_vsx.$(var.VsVersion)" Directory="Dir_vsx.$(var.VsVersion)">
+      <!-- Debugger  -->
+      <Component Id="Cmp_PistonDevelopers_MICore_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_PistonDevelopers_MICore_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)PistonDevelopers.MICore.dll" />
+      </Component>
+      <Component Id="Cmp_PistonDevelopers_MIDebugEngine_dll_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_PistonDevelopers_MIDebugEngine_dll_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)PistonDevelopers.MIDebugEngine.dll" />
+      </Component>
+      <!-- Visual Rust -->
+      <Component Id="Cmp_RustLexer_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_RustLexer_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)RustLexer.dll" />
+      </Component>
+      <Component Id="Cmp_VisualRust_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_VisualRust_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.dll" />
+      </Component>
+      <Component Id="Cmp_VisualRust_Core_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_VisualRust_Core_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Core.dll" />
+      </Component>
+      <Component Id="Cmp_VisualRust_ProjectSystem_FileMirroring_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_VisualRust_ProjectSystem_FileMirroring_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.ProjectSystem.FileSystemMirroring.dll" />
+      </Component>
+      <Component Id="Cmp_VisualRust_Shared_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_VisualRust_Shared_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.Shared.dll" />
+      </Component>
+      <!--  Visual Studio metadata -->
+      <Component Id="Cmp_extension_vsixmanifest.$(var.VsVersion)" Guid="*">
+        <File Id="File_extension_vsixmanifest.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)extension.vsixmanifest" />
+      </Component>
+      <Component Id="Cmp_VisualRust_pkgdef.$(var.VsVersion)" Guid="*">
+        <File Id="File_VisualRust_pkgdef.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)VisualRust.pkgdef" />
+        <util:RestartResource Path="[$(var.Devenv)]"/>
+      </Component>
+      <Component Id="Cmp_LICENSE_txt.$(var.VsVersion)" Guid="*">
+        <File Id="File_LICENSE_txt.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)LICENSE.txt" />
+      </Component>
+      <!-- Third-party -->
+      <Component Id="Cmp_Antlr4_Runtime_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_Antlr4_Runtime_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Antlr4.Runtime.dll" />
+      </Component>
+      <Component Id="Cmp_System_IO_Abstractions_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_System_IO_Abstractions_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)System.IO.Abstractions.dll" />
+      </Component>
+      <Component Id="Cmp_Cmp_Newtonsoft_Json_dll.$(var.VsVersion)" Guid="*">
+        <File Id="File_Newtonsoft_Json_dll.$(var.VsVersion)" KeyPath="yes" Source="$(var.VisualRust.TargetDir)Newtonsoft.Json.dll" />
+      </Component>
+      <!-- Open .rsproj with VS launcher -->
+      <Component Id="Cmp_RsprojRegistration.$(var.VsVersion)" Guid="$(var.RsprojRegistrationGuid)">
+        <CreateFolder/>
+        <ProgId Id="VisualRust.Launcher" Description="Rust Project">
+          <Extension Id="rsproj" ContentType="text/plain">
+            <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
+          </Extension>
+        </ProgId>
+      </Component>
+      <!-- TODO: Is there a way to also associate Cargo.toml with VS launcher? -->
+      <!-- Open .rs with context menu  -->
+      <Component Id="Cmp_RsRegistration.$(var.VsVersion)" Guid="$(var.RsRegistrationGuid)">
+        <CreateFolder/>
+        <RegistryValue Root="HKCR" Key=".rs\OpenWithProgids" Name="VisualRust.Launcher" Type="string" Value="" />
+      </Component>
+    </ComponentGroup>
+    <PropertyRef Id="$(var.Devenv)" />
+    <!--
+      This custom actions is taken pretty much verbatim from the WiX source. One differences is that we check if the vsx2015/2017 feature was selected (or is being uninstalled).
+    -->
+    <CustomAction Id="CA_VSSetup.$(var.VsVersion)" Property="$(var.Devenv)" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
+    <InstallExecuteSequence>
+      <Custom Action="CA_VSSetup.$(var.VsVersion)" Before="InstallFinalize"><![CDATA[($(var.Devenv) AND &Ftr_VisualRust.$(var.VsVersion)=3) OR ((NOT UPGRADINGPRODUCTCODE) AND (&Ftr_VisualRust.$(var.VsVersion)=2) AND (!Ftr_VisualRust.$(var.VsVersion)=3))]]></Custom>
+    </InstallExecuteSequence>
+    <UI>
+      <ProgressText Action="CA_VSSetup.$(var.VsVersion)">Configuring Visual Studio $(var.VsVersion) (this might take a few minutes)</ProgressText>
+    </UI>
+  </Fragment>
+</Include>

@@ -373,6 +373,10 @@ namespace VisualRust.Build
             // todo all other fields
             // todo mb help key word is code.explanation
 
+            // cargo build json messages don't always contain a message component
+            if (msg == null)
+                return;
+
             var type = msg.GetLevelAsEnum();
             var primarySpan = msg.GetPrimarySpan();
             var code = msg.GetErrorCodeAsString();

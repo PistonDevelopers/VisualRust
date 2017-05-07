@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <ComponentGroup Id="CmpGroup_MSBuild" Directory="Dir_MSBuild_InstallLocation">
+      <Component Id="Cmp_VisualRust_Rust_Targets" Guid="*">
+        <File Id="File_VisualRust_Rust_Targets" Source="$(var.VisualRust.Build.TargetDir)VisualRust.Rust.targets" KeyPath="yes" />
+      </Component>
+      <Component Id="Cmp_VisualRust_Core_Targets" Guid="*">
+        <File Id="File_VisualRust_Core_Targets" Source="$(var.VisualRust.Build.TargetDir)VisualRust.Core.targets" KeyPath="yes" />
+      </Component>
+      <Component Id="Cmp_VisualRust_Build_dll" Guid="*">
+        <File Id="File_VisualRust_Build_dll" Source="$(var.VisualRust.Build.TargetDir)VisualRust.Build.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="Cmp_VisualRust_Shared_dll_MSBuild" Guid="*">
+        <File Id="File_VisualRust_Shared_dll_MSBuild" Source="$(var.VisualRust.Build.TargetDir)VisualRust.Shared.dll" KeyPath="yes" />
+      </Component>
+      <Component Id="Cmp_Newtonsoft_Json_dll_MSBuild" Guid="*">
+        <File Id="File_Newtonsoft_Json_dll_MSBuild" Source="$(var.VisualRust.Build.TargetDir)Newtonsoft.Json.dll" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="CmpGroup_MSBuild_Targets_XamlRules" Directory="Dir_MSBuild_InstallLocation_Rules">
+      <Component Id="Cmp_VisualRust_Rules_Content" Guid="*">
+        <File Id="File_VisualRust_Rules_Content" Source="$(var.VisualRust.Build.TargetDir)Rules\Content.xaml" KeyPath="yes"/>
+      </Component>
+      <Component Id="Cmp_VisualRust_Rules_Debugger" Guid="*">
+        <File Id="File_VisualRust_Rules_Debugger" Source="$(var.VisualRust.Build.TargetDir)Rules\Debugger.xaml" KeyPath="yes"/>
+      </Component>
+      <Component Id="Cmp_VisualRust_Rules_Folder" Guid="*">
+        <File Id="File_VisualRust_Rules_Folder" Source="$(var.VisualRust.Build.TargetDir)Rules\Folder.xaml" KeyPath="yes"/>
+      </Component>
+      <Component Id="Cmp_VisualRust_Rules_General" Guid="*">
+        <File Id="File_VisualRust_Rules_General" Source="$(var.VisualRust.Build.TargetDir)Rules\General.xaml" KeyPath="yes"/>
+      </Component>
+      <Component Id="Cmp_VisualRust_Rules_None" Guid="*">
+        <File Id="File_VisualRust_Rules_None" Source="$(var.VisualRust.Build.TargetDir)Rules\None.xaml" KeyPath="yes"/>
+      </Component>
+      <Component Id="Cmp_VisualRust_Rules_ProjectItemsSchema" Guid="*">
+        <File Id="File_VisualRust_Rules_ProjectItemsSchema" Source="$(var.VisualRust.Build.TargetDir)Rules\ProjectItemsSchema.xaml" KeyPath="yes"/>
+      </Component>
+      <Component Id="Cmp_VisualRust_Rules_RustDebugger" Guid="*">
+        <File Id="File_VisualRust_Rules_RustDebugger" Source="$(var.VisualRust.Build.TargetDir)Rules\RustDebugger.xaml" KeyPath="yes"/>
+      </Component>
+      <Component Id="Cmp_VisualRust_Rules_Scc" Guid="*">
+        <File Id="File_VisualRust_Rules_Scc" Source="$(var.VisualRust.Build.TargetDir)Rules\Scc.xaml" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

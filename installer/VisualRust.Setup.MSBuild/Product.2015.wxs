@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define ProductId = {F5188C89-A880-4B7B-AF08-1D961D23EDEE} ?>
+  <?define UpgradeCode = {B5CC88F7-BC23-4400-95D8-9EE3FA95CC3F} ?>
+  <?define VsVersion = 2015 ?>
+  <?include Product.wxi ?>
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="Dir_MSBuild" Name="MSBuild" >
+          <Directory Id="Dir_MSBuild_InstallLocation" Name="VisualRust">
+            <Directory Id="Dir_MSBuild_InstallLocation_Rules" Name="Rules" />
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+</Wix>

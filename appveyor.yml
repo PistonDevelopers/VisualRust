@@ -26,5 +26,4 @@ build:
   parallel: true
   verbosity: normal
 artifacts:
-- path: VisualRust.Setup\bin\Release\*.msi
-  name: VisualRust.msi
+- path: installer\VisualRust.Setup\bin\Release\*.exe

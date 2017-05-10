@@ -22,12 +22,12 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <CopyVsixManifestToOutput>true</CopyVsixManifestToOutput>
     <BaseIntermediateOutputPath>obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <OutputPath>bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\$(MSBuildProjectName)\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;VS14;CONTRACTS_FULL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -38,12 +38,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\$(MSBuildProjectName)\Release\</OutputPath>
     <DefineConstants>TRACE;VS14</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DeployExtension>false</DeployExtension>
-    <CreateVsixContainer>false</CreateVsixContainer>
+    <CreateVsixContainer>true</CreateVsixContainer>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
@@ -268,7 +267,10 @@
   <ItemGroup>
     <None Include="packages.VisualRust.2015.config" />
     <None Include="source.extension.debug.vsixmanifest" />
-    <None Include="source.extension.release.vsixmanifest" />
+    <None Include="source.extension.release.2015.vsixmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(IntermediateOutputPath)source.extension.vsixmanifest" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VisualRust.Core\VisualRust.Core.csproj">
@@ -315,13 +317,11 @@
   </Target>
   -->
   <Target Name="BeforeClean">
-    <Delete Files="$(TargetDir)source.extension.vsixmanifest" />
+    <Delete Files="$(IntermediateOutputPath)source.extension.vsixmanifest" />
   </Target>
-  <Target Name="BeforeBuild">
-    <Copy SourceFiles="source.extension.$(Configuration).vsixmanifest" DestinationFiles="$(TargetDir)source.extension.vsixmanifest" />
-    <ItemGroup>
-      <None Include="$(TargetDir)source.extension.vsixmanifest" />
-    </ItemGroup>
+  <Target Name="BeforeBuild" >
+    <Copy Condition="'$(Configuration)' == 'Release'" SourceFiles="source.extension.$(Configuration).2015.vsixmanifest" DestinationFiles="$(IntermediateOutputPath)source.extension.vsixmanifest" />
+    <Copy Condition="'$(Configuration)' != 'Release'" SourceFiles="source.extension.$(Configuration).vsixmanifest" DestinationFiles="$(IntermediateOutputPath)source.extension.vsixmanifest" />
   </Target>
   <Target Name="DownloadGdb" BeforeTargets="BeforeBuild">
     <MsBuild Projects="VisualRust.Gdb.msbuild" Targets="DownloadGdb" Properties="MingwVersion=i686-5.1.0-release-posix-dwarf-rt_v4-rev0;MingwRootDir=mingw32;MingwArch=i686;MingwPath=https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/5.1.0/threads-posix/dwarf/i686-5.1.0-release-posix-dwarf-rt_v4-rev0.7z" />

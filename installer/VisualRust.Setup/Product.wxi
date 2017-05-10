@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <?define VSIXBootstrapperPath = "..\..\packages\VSIXBootstrapper.1.0.25\tools\VSIXBootstrapper.exe" ?>
+  <Bundle Name="Visual Rust for Visual Studio $(var.VsVersion)" Version="0.2.0.0" Manufacturer="The Piston Project" UpgradeCode="$(var.UpgradeCode)">
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+      <bal:WixStandardBootstrapperApplication
+        SuppressOptionsUI="yes"
+        LicenseFile="..\..\LICENSE.rtf"
+        ShowVersion="yes"
+        ShowFilesInUse="yes"/>
+    </BootstrapperApplicationRef>
+    <Chain>
+      <MsiPackage
+        Id="VisualRust.Setup.MSBuild.$(var.VsVersion)"
+        DisplayName="Visual Studio $(var.VsVersion) MSBuild targets and tasks"
+        SourceFile="$(var.VisualRust.Setup.MSBuild.TargetPath)"/>
+      <MsiPackage
+        Id="VisualRust.Setup.FileAssociation.$(var.VsVersion)"
+        DisplayName="File associations for Visual Studio $(var.VsVersion)"
+        SourceFile="$(var.VisualRust.Setup.FileAssociation.TargetPath)"/>
+      <ExePackage
+        Id="VSIXBootstrapper"
+        DisplayName="Visual Studio $(var.VsVersion) extension"
+        Description="Extension for Visual Studio $(var.VsVersion). Provides support for Rust projects."
+        SourceFile="$(var.VSIXBootstrapperPath)"
+        PerMachine="yes"
+        InstallCommand="/admin /logFile:&quot;[WixBundleLog_VSIXBootstrapper]&quot; &quot;[WixBundleExecutePackageCacheFolder]VisualRust.vsix&quot;"
+        UninstallCommand="/q /admin /logFile:&quot;[WixBundleLog_VSIXBootstrapper]&quot; /u:40c1d2b5-528b-4966-a7b1-1974e3568abe">
+        <PayloadGroupRef Id="VSIXBootstrapper"/>
+        <PayloadGroupRef Id="VisualRust.$(var.VsVersion).vsix"/>
+      </ExePackage>
+    </Chain>
+  </Bundle>
+  <Fragment>
+    <PayloadGroup Id="VSIXBootstrapper">
+      <Payload
+        SourceFile="$(var.VSIXBootstrapperPath)"
+        Compressed="yes"/>
+    </PayloadGroup>
+    <PayloadGroup Id="VisualRust.$(var.VsVersion).vsix">
+      <Payload
+        SourceFile="$(var.VisualRust.TargetDir)VisualRust.vsix"
+        Compressed="yes"/>
+    </PayloadGroup>
+  </Fragment>
+</Include>

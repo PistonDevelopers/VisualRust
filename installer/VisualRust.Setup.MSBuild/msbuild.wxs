@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Fragment>
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
-        <Directory Id="Dir_MSBuild" Name="MSBuild" >
-          <Directory Id="Dir_MSBuild_InstallLocation" Name="VisualRust">
-            <Directory Id="Dir_MSBuild_InstallLocation_Rules" Name="Rules" />
-          </Directory>
-        </Directory>
-      </Directory>
-    </Directory>
-
     <ComponentGroup Id="CmpGroup_MSBuild" Directory="Dir_MSBuild_InstallLocation">
       <Component Id="Cmp_VisualRust_Rust_Targets" Guid="*">
         <File Id="File_VisualRust_Rust_Targets" Source="$(var.VisualRust.Build.TargetDir)VisualRust.Rust.targets" KeyPath="yes" />
@@ -29,7 +19,7 @@
       </Component>
     </ComponentGroup>
 
-    <ComponentGroup Id="CmpGroup_MSBuild_Integration_XamlRules" Directory="Dir_MSBuild_InstallLocation_Rules">
+    <ComponentGroup Id="CmpGroup_MSBuild_Targets_XamlRules" Directory="Dir_MSBuild_InstallLocation_Rules">
       <Component Id="Cmp_VisualRust_Rules_Content" Guid="*">
         <File Id="File_VisualRust_Rules_Content" Source="$(var.VisualRust.Build.TargetDir)Rules\Content.xaml" KeyPath="yes"/>
       </Component>

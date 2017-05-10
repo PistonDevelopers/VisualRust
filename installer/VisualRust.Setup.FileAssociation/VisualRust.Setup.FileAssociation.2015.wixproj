@@ -1,48 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\WiX.3.11.0.1528-rc2\build\wix.props" Condition="Exists('..\packages\WiX.3.11.0.1528-rc2\build\wix.props')" />
+  <Import Project="..\..\packages\WiX.3.11.0.1528-rc2\build\wix.props" Condition="Exists('..\..\packages\WiX.3.11.0.1528-rc2\build\wix.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.10</ProductVersion>
-    <ProjectGuid>e6c06fdb-fe41-4068-99b5-6042c0c098f5</ProjectGuid>
+    <ProjectGuid>{1708E461-3369-4941-A390-6E6CB2C1A057}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>VisualRust.MSBuild.2017</OutputName>
+    <OutputName>VisualRust.Setup.FileAssociation.2015</OutputName>
     <OutputType>Package</OutputType>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <BaseIntermediateOutputPath>obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <OutputPath>bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="msbuild.wxs" />
-    <Compile Include="Product.wxs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\VisualRust.Build\VisualRust.Build.csproj">
-      <Name>VisualRust.Build</Name>
-      <Project>{9cf556ab-76fe-4c3d-ad0a-b64b3b9989b4}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WixExtension Include="WixVSExtension">
-      <HintPath>$(WixExtDir)\WixVSExtension.dll</HintPath>
-      <Name>WixVSExtension</Name>
-    </WixExtension>
+    <Compile Include="Product.2015.wxs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Product.wxi" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
@@ -53,7 +33,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\WiX.3.11.0.1528-rc2\build\wix.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WiX.3.11.0.1528-rc2\build\wix.props'))" />
+    <Error Condition="!Exists('..\..\packages\WiX.3.11.0.1528-rc2\build\wix.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WiX.3.11.0.1528-rc2\build\wix.props'))" />
   </Target>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

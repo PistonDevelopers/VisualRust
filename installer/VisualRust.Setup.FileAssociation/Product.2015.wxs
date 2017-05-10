@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define ProductId = {30F40A33-4FC2-47D9-9166-45FEE06CB0E7} ?>
+  <?define UpgradeCode = {35600007-42F0-47C8-972A-0A0275882274} ?> 
+  <?define RsRegistrationGuid = {46E1D5E8-0705-4BCB-8A68-BD9B06586797} ?>
+  <?define RsprojRegistrationGuid = {1DFC34CB-7AC5-4438-B54C-0726D9229CD9} ?>
+  <?define VsVersion = 2015 ?>
+  <?include Product.wxi ?>
+</Wix>

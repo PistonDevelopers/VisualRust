@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <Product Id="$(var.ProductId)"
+           Name="File associations for Visual Studio $(var.VsVersion)"
+           Language="1033"
+           Version="0.2.0.0"
+           Manufacturer="The Piston Project"
+           UpgradeCode="$(var.UpgradeCode)">
+    <Package InstallerVersion="400" Compressed="yes" InstallScope="perMachine" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Feature Id="Ftr_File_Association"
+             Title="File associations for Visual Studio $(var.VsVersion)"
+             Level="1"
+             Absent="disallow">
+      <ComponentGroupRef Id="CmpGroup_File_Association"/>
+    </Feature>
+
+    <Directory Id="TARGETDIR" Name="SourceDir"/>
+    <ComponentGroup Id="CmpGroup_File_Association" Directory="TARGETDIR">
+      <!-- Open .rsproj with VS launcher -->
+      <Component Id="Cmp_RsprojRegistration.$(var.VsVersion)" Guid="$(var.RsprojRegistrationGuid)">
+        <CreateFolder/>
+        <ProgId Id="VisualRust.Launcher" Description="Rust Project">
+          <Extension Id="rsproj" ContentType="text/plain">
+            <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
+          </Extension>
+        </ProgId>
+      </Component>
+      <!-- TODO: Is there a way to also associate Cargo.toml with VS launcher? -->
+      <!-- Open .rs with context menu  -->
+      <Component Id="Cmp_RsRegistration.$(var.VsVersion)" Guid="$(var.RsRegistrationGuid)">
+        <CreateFolder/>
+        <RegistryValue Root="HKCR" Key=".rs\OpenWithProgids" Name="VisualRust.Launcher" Type="string" Value="" />
+      </Component>
+    </ComponentGroup>
+  </Product>
+</Include>

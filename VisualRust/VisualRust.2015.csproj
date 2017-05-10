@@ -22,12 +22,12 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <CopyVsixManifestToOutput>true</CopyVsixManifestToOutput>
     <BaseIntermediateOutputPath>obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <OutputPath>bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\$(MSBuildProjectName)\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;VS14;CONTRACTS_FULL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -38,12 +38,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\$(MSBuildProjectName)\Release\</OutputPath>
     <DefineConstants>TRACE;VS14</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DeployExtension>false</DeployExtension>
-    <CreateVsixContainer>false</CreateVsixContainer>
+    <CreateVsixContainer>true</CreateVsixContainer>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>

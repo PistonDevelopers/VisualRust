@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <?define UpgradeCode = {CD6195BF-777B-4CB7-96E8-31729554F5BC} ?>
+  <?define VsVersion = 2017 ?>
+  <?define VisualRust.Setup.MSBuild.TargetPath = $(var.VisualRust.Setup.MSBuild.2017.TargetPath) ?>
+  <?define VisualRust.Setup.FileAssociation.TargetPath = $(var.VisualRust.Setup.FileAssociation.2017.TargetPath) ?>
+  <?define VisualRust.TargetDir = $(var.VisualRust.2017.TargetDir) ?>
+  <?include Product.wxi ?>
+</Wix>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\WiX.3.11.0.1528-rc2\build\wix.props" Condition="Exists('..\packages\WiX.3.11.0.1528-rc2\build\wix.props')" />
+  <Import Project="..\..\packages\WiX.3.11.0.1528-rc2\build\wix.props" Condition="Exists('..\..\packages\WiX.3.11.0.1528-rc2\build\wix.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -22,24 +22,20 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Bundle.wxs" />
-  </ItemGroup>
-  <ItemGroup>
     <WixExtension Include="WixBalExtension">
       <HintPath>$(WixExtDir)\WixBalExtension.dll</HintPath>
       <Name>WixBalExtension</Name>
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VisualRust.MSBuild.2017\VisualRust.MSBuild.2017.wixproj">
-      <Name>VisualRust.MSBuild.2017</Name>
-      <Project>{e6c06fdb-fe41-4068-99b5-6042c0c098f5}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\VisualRust\VisualRust.2017.csproj">
+    <Content Include="packages.config" />
+    <Content Include="Product.wxi" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Product.2017.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\VisualRust\VisualRust.2017.csproj">
       <Name>VisualRust.2017</Name>
       <Project>{ce4062fe-d6d2-43fa-ad8c-709f103f4722}</Project>
       <Private>True</Private>
@@ -47,9 +43,22 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="packages.config" />
+    <ProjectReference Include="..\VisualRust.Setup.FileAssociation\VisualRust.Setup.FileAssociation.2017.wixproj">
+      <Name>VisualRust.Setup.FileAssociation.2017</Name>
+      <Project>{0e441df2-6ac4-4a6e-a4b6-53d261fa707b}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualRust.Setup.MSBuild\VisualRust.Setup.MSBuild.2017.wixproj">
+      <Name>VisualRust.Setup.MSBuild.2017</Name>
+      <Project>{e6c06fdb-fe41-4068-99b5-6042c0c098f5}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
@@ -60,7 +69,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\WiX.3.11.0.1528-rc2\build\wix.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WiX.3.11.0.1528-rc2\build\wix.props'))" />
+    <Error Condition="!Exists('..\..\packages\WiX.3.11.0.1528-rc2\build\wix.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WiX.3.11.0.1528-rc2\build\wix.props'))" />
   </Target>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

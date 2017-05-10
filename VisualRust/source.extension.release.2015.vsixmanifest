@@ -20,7 +20,5 @@
   </Assets>
   <Prerequisites>
     <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[14.0, )" DisplayName="Visual Studio core editor" />
-    <!-- We don't actually need this component, but it's the easiest way to make sure Microsoft.VisualStudio.ProjectSystem is present -->
-    <Prerequisite Id="Microsoft.VisualStudio.Component.VC.CoreIde" Version="[15.0, 16.0)" DisplayName="Visual Studio C++ core features" />
   </Prerequisites>
 </PackageManifest>

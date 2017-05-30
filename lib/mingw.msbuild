@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <MinGW32Content Include="$(MSBuildThisFileDirectory)mingw32\bin\gdb.exe"/>
+    <MinGW32Content Include="$(MSBuildThisFileDirectory)mingw32\bin\gdborig.exe"/>
+    <MinGW32Content Include="$(MSBuildThisFileDirectory)mingw32\opt\bin\libgcc_s_dw2-1.dll"/>
+    <MinGW32Content Include="$(MSBuildThisFileDirectory)mingw32\opt\bin\libpython2.7.dll"/>
+    <MinGW32Content Include="$(MSBuildThisFileDirectory)mingw32\opt\bin\libwinpthread-1.dll"/>
+    <MinGW32Content Include="$(MSBuildThisFileDirectory)mingw32\opt\lib\python2.7\**"
+                 Exclude="$(MSBuildThisFileDirectory)mingw32\opt\lib\python2.7\**\*.pyc;$(MSBuildThisFileDirectory)mingw32\opt\lib\python2.7\**\*.pyo"/>
+    <MinGW32Content Include="@(MinGW32Content)">
+      <RelativePath>$([MSBuild]::MakeRelative($(MSBuildThisFileDirectory), %(Identity)))</RelativePath>
+    </MinGW32Content>
+  </ItemGroup>
+  <ItemGroup>
+    <MinGW64Content Include="$(MSBuildThisFileDirectory)mingw64\bin\gdb.exe"/>
+    <MinGW64Content Include="$(MSBuildThisFileDirectory)mingw64\bin\gdborig.exe"/>
+    <MinGW64Content Include="$(MSBuildThisFileDirectory)mingw64\opt\bin\libgcc_s_seh-1.dll"/>
+    <MinGW64Content Include="$(MSBuildThisFileDirectory)mingw64\opt\bin\libpython2.7.dll"/>
+    <MinGW64Content Include="$(MSBuildThisFileDirectory)mingw64\opt\bin\libwinpthread-1.dll"/>
+    <MinGW64Content Include="$(MSBuildThisFileDirectory)mingw64\opt\lib\python2.7\**"
+                 Exclude="$(MSBuildThisFileDirectory)mingw64\opt\lib\python2.7\**\*.pyc;$(MSBuildThisFileDirectory)mingw64\opt\lib\python2.7\**\*.pyo"/>
+    <MinGW64Content Include="@(MinGW64Content)">
+      <RelativePath>$([MSBuild]::MakeRelative($(MSBuildThisFileDirectory), %(Identity)))</RelativePath>
+    </MinGW64Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="@(MinGW32Content)"><IncludeInVSIX>true</IncludeInVSIX></Content>
+    <Content Include="@(MinGW64Content)"><IncludeInVSIX>true</IncludeInVSIX></Content>
+  </ItemGroup>
+</Project>

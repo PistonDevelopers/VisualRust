@@ -6,7 +6,7 @@
     <Description>Visual Studio integration for the Rust programming language (http://www.rust-lang.org/)</Description>
     <License>LICENSE.txt</License>
   </Metadata>
-  <Installation InstalledByMsi="true">
+  <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0, ]" />
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[15.0, ]" />
     <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[15.0, ]" />

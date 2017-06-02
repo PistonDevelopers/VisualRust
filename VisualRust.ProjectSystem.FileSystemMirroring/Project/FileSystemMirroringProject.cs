@@ -137,6 +137,7 @@ namespace VisualRust.ProjectSystem.FileSystemMirroring.Project {
             foreach (var configuredProject in _unconfiguredProject.LoadedConfiguredProjects) {
                 try {
                     var jsproj = await access.GetProjectAsync(configuredProject, cancellationToken);
+                    jsproj.MarkDirty();
                     jsproj.ReevaluateIfNecessary();
                 } catch (Exception ex) {
                     System.Diagnostics.Debug.Fail("We were unable to mark a configuration as dirty" + ex.Message, ex.StackTrace);

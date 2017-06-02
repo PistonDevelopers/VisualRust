@@ -13,6 +13,7 @@ using VisualRust.ProjectSystem.FileSystemMirroring.Utilities;
 using System.IO.Abstractions;
 using NotifyFilters = System.IO.NotifyFilters;
 using IOException = System.IO.IOException;
+using Win32Exception = System.ComponentModel.Win32Exception;
 using ErrorEventArgs = System.IO.ErrorEventArgs;
 
 #if VS14
@@ -222,10 +223,14 @@ namespace VisualRust.ProjectSystem.FileSystemMirroring.IO {
             shortRelativePath = null;
             if (fullPath.StartsWithIgnoreCase(rootDirectory)) {
                 relativePath = PathHelper.MakeRelative(rootDirectory, fullPath);
-                 try {
+                try
+                {
                     shortRelativePath = fileSystem.ToShortRelativePath(fullPath, rootDirectory);
                     return !string.IsNullOrEmpty(shortRelativePath) && filter.IsFileAllowed(relativePath, fileSystem.FileInfo.FromFileName(fullPath).Attributes);
-                } catch (IOException) { } catch (UnauthorizedAccessException) { } // File isn't allowed if it isn't accessible
+                }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { } // File isn't allowed if it isn't accessible
+                catch (Win32Exception) { } // ToShortPath can throw a Win32Exception if the file doesn't exist anymore, which isn't exceptional
             }
             return false;
         }

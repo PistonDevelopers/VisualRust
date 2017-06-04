@@ -90,22 +90,23 @@ namespace VisualRust.ProjectSystem
 
             return Path.Combine(
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    "gdb",
-                    GetArchitectureName(triple),
-                    "bin\\gdb");
+                    GetMingwName(triple),
+                    @"bin\gdb");
         }
 
         // We need to run the right gdb depending on the architecture of the debuggee
-        private string GetArchitectureName(TargetTriple triple)
+        private string GetMingwName(TargetTriple triple)
         {
             if (triple != null)
             {
-                if (triple.Arch == "i686" || triple.Arch == "x86_64")
-                    return triple.Arch;
+                if (triple.Arch == "i686")
+                    return "mingw32";
+                if (triple.Arch == "x86_64")
+                    return "mingw64";
             }
             if (System.Environment.Is64BitOperatingSystem)
-                return "x86_64";
-            return "i686";
+                return "mingw64";
+            return "mingw32";
         }
 
         private static string ToXmlString<T>(T obj)

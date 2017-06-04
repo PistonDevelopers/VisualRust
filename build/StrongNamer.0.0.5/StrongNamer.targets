@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="StrongNamer.AddStrongName" AssemblyFile="$(MSBuildThisFileDirectory)StrongNamer.dll" />
+  <Target Name="_FilterStrongNamerReferences"
+          BeforeTargets="StrongNamerTarget">
+    <ItemGroup>
+      <_StrongNamerReferences Include="@(ReferencePath)" Condition="'%(ReferencePath.SignAssembly)' == 'True'" />
+      <_StrongNamerOutputPaths Include="@(_StrongNamerReferences->'$(IntermediateOutputPath)SignedAssemblies\%(Filename)%(Extension)')"/>
+      <ReferencePath Remove="@(_StrongNamerReferences)" />
+      <ReferencePath Include="@(_StrongNamerOutputPaths)" />
+    </ItemGroup>
+  </Target>
+  <Target Name="StrongNamerTarget"
+          Inputs="@(_StrongNamerReferences)"
+          Outputs="@(_StrongNamerOutputPaths)"
+          AfterTargets="AfterResolveReferences"
+          Condition="'$(DisableStrongNamer)' != 'true'">
+
+    <StrongNamer.AddStrongName
+          Assemblies="@(_StrongNamerReferences)"
+          SignedAssemblyFolder="$(IntermediateOutputPath)SignedAssemblies"
+          KeyFile="$(MSBuildThisFileDirectory)SharedKey.snk">
+    </StrongNamer.AddStrongName>
+  </Target>
+
+  <PropertyGroup>
+    <ResolveReferencesDependsOn>$(ResolveReferencesDependsOn);StrongNamerTarget</ResolveReferencesDependsOn>
+  </PropertyGroup>
+
+</Project>

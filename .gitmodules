@@ -1,4 +1,4 @@
 [submodule "MIEngine"]
-	path = MIEngine
+	path = src/MIEngine
 	url = https://github.com/PistonDevelopers/MIEngine.git
 	branch = master

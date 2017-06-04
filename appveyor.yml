@@ -27,4 +27,5 @@ build:
   parallel: true
   verbosity: normal
 artifacts:
-- path: installer\VisualRust.Setup\bin\Release\*.exe
+- path: bin\VisualRust.Setup.2015\Release\*.exe
+- path: bin\VisualRust.Setup.2017\Release\*.exe

@@ -19,7 +19,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\VisualRust.Build\VisualRust.Build.csproj">
+    <ProjectReference Include="..\..\src\VisualRust.Build\VisualRust.Build.csproj">
       <Name>VisualRust.Build</Name>
       <Project>{9cf556ab-76fe-4c3d-ad0a-b64b3b9989b4}</Project>
       <Private>True</Private>

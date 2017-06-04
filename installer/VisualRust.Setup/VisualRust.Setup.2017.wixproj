@@ -35,7 +35,7 @@
     <Compile Include="Product.2017.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\VisualRust\VisualRust.2017.csproj">
+    <ProjectReference Include="..\..\src\VisualRust\VisualRust.2017.csproj">
       <Name>VisualRust.2017</Name>
       <Project>{ce4062fe-d6d2-43fa-ad8c-709f103f4722}</Project>
       <Private>True</Private>

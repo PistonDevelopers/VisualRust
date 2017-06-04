@@ -32,7 +32,7 @@
     <Content Include="Product.wxi" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\VisualRust\VisualRust.2015.csproj">
+    <ProjectReference Include="..\..\src\VisualRust\VisualRust.2015.csproj">
       <Name>VisualRust.2015</Name>
       <Project>{8b7b30f7-17c1-4ce8-baf4-88b086af7b25}</Project>
       <Private>True</Private>

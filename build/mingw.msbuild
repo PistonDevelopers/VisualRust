@@ -2,8 +2,8 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\lib\mingw.msbuild"/>
   <PropertyGroup>
-    <_MinGW32Archive>..\lib\i686-7.1.0-release-posix-dwarf-rt_v5-rev0.7z</_MinGW32Archive>
-    <_MinGW64Archive>..\lib\x86_64-7.1.0-release-posix-seh-rt_v5-rev0.7z</_MinGW64Archive>
+    <_MinGW32Archive>$(MSBuildThisFileDirectory)\..\lib\i686-7.1.0-release-posix-dwarf-rt_v5-rev0.7z</_MinGW32Archive>
+    <_MinGW64Archive>$(MSBuildThisFileDirectory)\..\lib\x86_64-7.1.0-release-posix-seh-rt_v5-rev0.7z</_MinGW64Archive>
   </PropertyGroup>
   <Target Name="ExtractMinGW"
           Inputs="$(_MinGW32Archive);$(_MinGW64Archive)"
@@ -18,10 +18,10 @@
     <CreateProperty Value="$([System.IO.Path]::GetTempFileName())">  
       <Output TaskParameter="Value" PropertyName="_TempFile64" />  
     </CreateProperty>
-    <WriteLinesToFile File="$(_TempFile32)" Lines="@(MinGW32Content->Metadata('RelativePath'));mingw32\opt\lib\python2.7\*"/>
-    <Exec Command="..\tools\7za.exe x -y -ir@$(_TempFile32) $(_MinGW32Archive)" WorkingDirectory="..\lib\"/>
-    <WriteLinesToFile File="$(_TempFile64)" Lines="@(MinGW64Content->Metadata('RelativePath'));mingw64\opt\lib\python2.7\*"/>
-    <Exec Command="..\tools\7za.exe x -y -ir@$(_TempFile64) $(_MinGW64Archive)" WorkingDirectory="..\lib\"/>
+    <WriteLinesToFile File="$(_TempFile32)" Lines="@(MinGW32Content->Metadata('TargetPath'));mingw32\opt\lib\python2.7\*"/>
+    <Exec Command="$(MSBuildThisFileDirectory)\7za.exe x -y -ir@$(_TempFile32) $(_MinGW32Archive)" WorkingDirectory="$(MSBuildThisFileDirectory)\..\lib\"/>
+    <WriteLinesToFile File="$(_TempFile64)" Lines="@(MinGW64Content->Metadata('TargetPath'));mingw64\opt\lib\python2.7\*"/>
+    <Exec Command="$(MSBuildThisFileDirectory)\7za.exe x -y -ir@$(_TempFile64) $(_MinGW64Archive)" WorkingDirectory="$(MSBuildThisFileDirectory)\..\lib\"/>
     <Delete Files="$(_TempFile32);$(_TempFile64)"/>
     <!--
         If it's the first build, neither @(MinGW32Content) nor @(MinGW64Content)
@@ -30,7 +30,7 @@
         We use CreateItem instead of ItemGroup, because ItemGroup evaluates
         even if the target was skipped.
     -->
-    <CreateItem Include="..\lib\mingw32\**\*;..\lib\mingw64\**\*" >
+    <CreateItem Include="$(MSBuildThisFileDirectory)\..\lib\mingw32\**\*;$(MSBuildThisFileDirectory)\..\lib\mingw64\**\*" >
       <Output TaskParameter="Include" ItemName="_MinGWTouch"/>  
     </CreateItem>
     <Touch Files="@(_MinGWTouch)" ForceTouch="true"/>

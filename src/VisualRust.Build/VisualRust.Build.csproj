@@ -4,16 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B99CC9EB-90F2-4040-9E66-418CC7042153}</ProjectGuid>
+    <ProjectGuid>{9CF556AB-76FE-4C3D-AD0A-B64B3B9989B4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VisualRust.Shared</RootNamespace>
-    <AssemblyName>VisualRust.Shared</AssemblyName>
+    <RootNamespace>VisualRust.Build</RootNamespace>
+    <AssemblyName>VisualRust.Build</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\VisualRust\Key.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,31 +30,46 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cargo.cs" />
-    <Compile Include="Message\CargoMessage.cs" />
-    <Compile Include="CommandHelper.cs" />
-    <Compile Include="Message\CargoMetadata.cs" />
-    <Compile Include="Message\RustcMessageHuman.cs" />
-    <Compile Include="Message\RustcMessageHumanParser.cs" />
-    <Compile Include="Message\RustcMessageJson.cs" />
-    <Compile Include="Message\RustcMessageJsonParser.cs" />
-    <Compile Include="Message\RustcMessageType.cs" />
-    <Compile Include="OptimizationLevel.cs" />
-    <Compile Include="BuildOutputType.cs" />
-    <Compile Include="Environment.cs" />
+    <Compile Include="CargoTask.cs" />
+    <Compile Include="CargoClean.cs" />
+    <Compile Include="CargoBuild.cs" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="VisualRust.Core.targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="VisualRust.Rust.targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
+    <Compile Include="Rustc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TargetTriple.cs" />
-    <Compile Include="ToolVersion.cs" />
+    <Compile Include="RustcFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\VisualRust.Shared\VisualRust.Shared.csproj">
+      <Project>{b99cc9eb-90f2-4040-9e66-418cc7042153}</Project>
+      <Name>VisualRust.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Copy all the rules into the output directory. We need them there since
+	     VisualRust.Rust.targets refers to them.  -->
+    <Content Include="..\VisualRust\Rules\*.xaml">
+      <Link>Rules\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

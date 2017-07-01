@@ -78,7 +78,7 @@ namespace VisualRust.Build
                     {
                         var reader = new JsonTextReader(new StringReader(e.Data));
                         var message = Cargo.JsonSerializer.Deserialize<CargoMessage>(reader);
-                        Rustc.LogRustcMessage(message.message, Manifest.Directory.FullName, Log);
+                        if (message != null) Rustc.LogRustcMessage(message.message, Manifest.Directory.FullName, Log);
                     }
                 };
 

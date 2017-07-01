@@ -369,6 +369,7 @@ namespace VisualRust.Build
 
         public static void LogRustcMessage(RustcMessageJson msg, string rootPath, TaskLoggingHelper log)
         {
+            if (msg == null) return;
             // todo multi span
             // todo all other fields
             // todo mb help key word is code.explanation

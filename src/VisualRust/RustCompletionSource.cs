@@ -9,6 +9,8 @@ using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Utilities;
+using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace VisualRust
 {
@@ -236,7 +238,7 @@ namespace VisualRust
                 var origPath = document?.FilePath ?? tmpFile.Path;
                 int lineNumber = point.GetContainingLine().LineNumber;
                 int charNumber = GetColumn(point);
-                string args = string.Format("complete {0} {1} \"{2}\" \"{3}\"", lineNumber + 1, charNumber, origPath, tmpFile.Path);
+                string args = string.Format("complete-with-snippet {0} {1} \"{2}\" \"{3}\"", lineNumber + 1, charNumber, origPath, tmpFile.Path);
                 return Racer.RacerSingleton.Run(args);
             }
         }
@@ -252,29 +254,54 @@ namespace VisualRust
             return GetCompletions(lines);
         }
 
+        static readonly Regex ReDocsCodeSection = new Regex(@"(?<=^|\n)```\n(?<code>.*?)\n```(?=\n|$)", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Singleline);
+        static readonly Regex ReDocsIdentifier = new Regex(@"`(?<code>.*?)`", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        static readonly Regex ReDocsEscape = new Regex(@"\\.", RegexOptions.Compiled);
+
+        static readonly Dictionary<string,string> ReUnescape = new Dictionary<string, string>() {
+            { @"\\", "\\" },
+            { @"\n", "\n" },
+            { @"\;", ";"  },
+            { @"\""","\"" },
+            { @"\'", "\'" },
+        };
+
         private IEnumerable<Completion> GetCompletions(string[] lines)
-        {            
+        {
+            // Emitting code: https://github.com/racer-rust/racer/blob/4d694e1e17f58bbf01e52fc152065d4bc06157e2/src/bin/main.rs#L216-L254
+
             var matches = lines.Where(l => l.StartsWith("MATCH")).Distinct(StringComparer.Ordinal);
 
             foreach (var matchLine in matches)
             {
-                var tokens = matchLine.Substring(6).Split(',');
-                var text = tokens[0];
-                var langElemText = tokens[4];
-                var descriptionStartIndex = tokens[0].Length + tokens[1].Length + tokens[2].Length + tokens[3].Length + tokens[4].Length + 11;
-                var description = matchLine.Substring(descriptionStartIndex);
-                CompletableLanguageElement elType;
+                var tokens = matchLine.Substring(6).Split(new[]{';'}, 8);
+                var identifier   = tokens[0]; // e.g. "read_line"
+                var shortSig     = tokens[1]; // e.g. "read_line(${1:buf})"
+                var lineNo       = tokens[2]; // e.g. "280"
+                var charNo       = tokens[3]; // e.g. "11"
+                var path         = tokens[4]; // e.g. "C:\Users\User\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\src\libstd\io\stdio.rs"
+                var langElemText = tokens[5]; // e.g. "Function"
+                var fullSig      = tokens[6]; // e.g. "pub fn read_line(&self, buf: &mut String) -> io::Result<usize>"
+                var escapedDocs  = tokens[7]; // e.g. "\"Locks this handle and reads a line of input into the specified buffer.\n\nFor detailed semantics of this method, ...\""
 
+                var docs = escapedDocs;
+                if (docs.StartsWith("\"") && docs.EndsWith("\"")) docs = docs.Substring(1, docs.Length-2); // strip quotes
+                docs = ReDocsCodeSection.Replace(docs, match => match.Groups["code"].Value);
+                docs = ReDocsIdentifier.Replace(docs, match => match.Groups["code"].Value);
+                docs = ReDocsEscape.Replace(docs, match => { string replacement; return ReUnescape.TryGetValue(match.Value, out replacement) ? replacement : match.Value; });
+
+                CompletableLanguageElement elType;
                 if (!Enum.TryParse(langElemText, out elType))
                 {
                     Utils.DebugPrintToOutput("Failed to parse language element found in racer autocomplete response: {0}", langElemText);
                     continue;
                 }
 
-                var insertionText = text;
+                var displayText = identifier;
+                var insertionText = identifier;
+                var description = fullSig+"\n"+docs;
                 var icon = GetCompletionIcon(elType);
-
-                yield return new Completion(text, insertionText, description, icon, "");
+                yield return new Completion(displayText, insertionText, description, icon, "");
             }
         }
 

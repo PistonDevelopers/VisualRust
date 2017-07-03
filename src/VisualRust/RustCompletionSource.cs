@@ -172,6 +172,7 @@ namespace VisualRust
             completions.AddRange(GetKeywordCompletions(prefix));
 
             completionSets.Add(new RustCompletionSet("All", "All", span, completions, null));
+
         }
 
         private static IToken GetActiveToken(int columnIndex, ITextSnapshotLine line)
@@ -299,7 +300,7 @@ namespace VisualRust
 
                 var displayText = identifier;
                 var insertionText = identifier;
-                var description = fullSig+"\n"+docs;
+                var description = string.IsNullOrWhiteSpace(docs) ? fullSig : fullSig+"\n"+docs;
                 var icon = GetCompletionIcon(elType);
                 yield return new Completion(displayText, insertionText, description, icon, "");
             }

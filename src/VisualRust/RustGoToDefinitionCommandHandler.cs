@@ -60,13 +60,13 @@ namespace VisualRust
             var dte = (EnvDTE.DTE)ServiceProvider.GetService(typeof(EnvDTE.DTE));
             string filepath = dte.ActiveDocument.FullName;
 
-            using (var tmpFile = new TemporaryFile(snapshot.GetText(), System.IO.Path.GetDirectoryName(filepath)))
+            using (var tmpFile = new TemporaryFile(snapshot.GetText()))
             {
                 var line = snapshotPoint.GetContainingLine();
                 // line.LineNumber uses 0 based indexing
                 int row = line.LineNumber + 1;
                 int column = snapshotPoint.Position - line.Start.Position;
-                var args = String.Format("find-definition {0} {1} \"{2}\"", row, column, tmpFile.Path);
+                var args = String.Format("find-definition {0} {1} \"{2}\" \"{3}\"", row, column, filepath, tmpFile.Path);
                 var findOutput = Racer.RacerSingleton.Run(args);
                 if (Regex.IsMatch(findOutput, "^MATCH"))
                 {

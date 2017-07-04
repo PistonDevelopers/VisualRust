@@ -30,13 +30,7 @@
         internal IStandardClassificationService StandardClassificationService = null;
 
         [Import]
-        readonly IRustLexer lexer;
-
-        [ImportingConstructor]
-        public RustClassifierProvider(IRustLexer lexer)
-        {
-            this.lexer = lexer;
-        }
+        internal IRustLexer lexer = null;
 
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {

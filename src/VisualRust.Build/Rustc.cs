@@ -382,19 +382,35 @@ namespace VisualRust.Build
             if (String.IsNullOrEmpty(code) && primarySpan == null && msg.message.Contains("aborting due to"))
                 return;
 
+            // primarySpan.file_name might not be legal (e.g. "file_name":"<println macros>" is common)
+            string logFile = null;
+            var logSpan = primarySpan;
+            for (;;)
+            {
+                try
+                {
+                    logFile = Path.Combine(rootPath, logSpan.file_name); // maybe checking for ".rs" extension is saner than trying this and seeing if it throws?
+                    break;
+                }
+                catch (ArgumentException) // "Illegal characters in path."
+                {
+                    logSpan = logSpan.expansion?.span; // see if expanding helps us find a real file
+                }
+            }
+
             if (type == RustcMessageType.Error)
             {
-                if (primarySpan == null)
+                if (logSpan == null)
                     log.LogError(msg.message);
                 else
-                    log.LogError(null, code, null, Path.Combine(rootPath, primarySpan.file_name), primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
+                    log.LogError(null, code, null, logFile, logSpan.line_start, logSpan.column_start, logSpan.line_end, logSpan.column_end, msg.message);
             }
             else
             {
-                if (primarySpan == null)
+                if (logSpan == null)
                     log.LogWarning(msg.message);
                 else
-                    log.LogWarning(null, code, null, Path.Combine(rootPath, primarySpan.file_name), primarySpan.line_start, primarySpan.column_start, primarySpan.line_end, primarySpan.column_end, msg.message);
+                    log.LogWarning(null, code, null, logFile, logSpan.line_start, logSpan.column_start, logSpan.line_end, logSpan.column_end, msg.message);
             }
 
         }

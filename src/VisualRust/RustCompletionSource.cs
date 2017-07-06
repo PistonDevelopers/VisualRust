@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Utilities;
 using System.Text.RegularExpressions;
 using System.Windows;
+using VisualRust.Racer;
 
 namespace VisualRust
 {
@@ -255,17 +256,8 @@ namespace VisualRust
             return GetCompletions(lines);
         }
 
-        static readonly Regex ReDocsCodeSection = new Regex(@"(?<=^|\n)```\n(?<code>.*?)\n```(?=\n|$)", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Singleline);
-        static readonly Regex ReDocsIdentifier = new Regex(@"`(?<code>.*?)`", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        static readonly Regex ReDocsEscape = new Regex(@"\\.", RegexOptions.Compiled);
-
-        static readonly Dictionary<string,string> ReUnescape = new Dictionary<string, string>() {
-            { @"\\", "\\" },
-            { @"\n", "\n" },
-            { @"\;", ";"  },
-            { @"\""","\"" },
-            { @"\'", "\'" },
-        };
+        static readonly Regex ReDocsCodeSection = new Regex(@"(?<=^|\n)```(?<type>[a-zA-Z_0-9]*)\n(?<code>.*?)\n```(?=\n|$)", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Singleline);
+        static readonly Regex ReDocsCodeInline = new Regex(@"`(?<code>.*?)`", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
         private IEnumerable<Completion> GetCompletions(string[] lines)
         {
@@ -275,32 +267,27 @@ namespace VisualRust
 
             foreach (var matchLine in matches)
             {
-                var tokens = matchLine.Substring(6).Split(new[]{';'}, 8);
-                var identifier   = tokens[0]; // e.g. "read_line"
-                var shortSig     = tokens[1]; // e.g. "read_line(${1:buf})"
-                var lineNo       = tokens[2]; // e.g. "280"
-                var charNo       = tokens[3]; // e.g. "11"
-                var path         = tokens[4]; // e.g. "C:\Users\User\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\src\libstd\io\stdio.rs"
-                var langElemText = tokens[5]; // e.g. "Function"
-                var fullSig      = tokens[6]; // e.g. "pub fn read_line(&self, buf: &mut String) -> io::Result<usize>"
-                var escapedDocs  = tokens[7]; // e.g. "\"Locks this handle and reads a line of input into the specified buffer.\n\nFor detailed semantics of this method, ...\""
-
-                var docs = escapedDocs;
-                if (docs.StartsWith("\"") && docs.EndsWith("\"")) docs = docs.Substring(1, docs.Length-2); // strip quotes
-                docs = ReDocsCodeSection.Replace(docs, match => match.Groups["code"].Value);
-                docs = ReDocsIdentifier.Replace(docs, match => match.Groups["code"].Value);
-                docs = ReDocsEscape.Replace(docs, match => { string replacement; return ReUnescape.TryGetValue(match.Value, out replacement) ? replacement : match.Value; });
-
-                CompletableLanguageElement elType;
-                if (!Enum.TryParse(langElemText, out elType))
+                RacerMatch racerMatch;
+                if (!RacerMatch.TryParse(matchLine, RacerMatch.Type.CompleteWithSnippet, RacerMatch.Interface.Default, out racerMatch))
                 {
-                    Utils.DebugPrintToOutput("Failed to parse language element found in racer autocomplete response: {0}", langElemText);
+                    Utils.DebugPrintToOutput("Failed to parse racer match line found in racer autocomplete resource: {0}", matchLine);
                     continue;
                 }
 
-                var displayText = identifier;
-                var insertionText = identifier;
-                var description = string.IsNullOrWhiteSpace(docs) ? fullSig : fullSig+"\n"+docs;
+                var docs = racerMatch.Documentation;
+                docs = ReDocsCodeSection.Replace(docs, codeSection => codeSection.Groups["code"].Value);
+                docs = ReDocsCodeInline .Replace(docs, codeInline  => codeInline .Groups["code"].Value);
+
+                CompletableLanguageElement elType;
+                if (!Enum.TryParse(racerMatch.MatchType, out elType))
+                {
+                    Utils.DebugPrintToOutput("Failed to parse language element found in racer autocomplete response: {0}", racerMatch.MatchType);
+                    continue;
+                }
+
+                var displayText = racerMatch.MatchString;
+                var insertionText = racerMatch.MatchString;
+                var description = string.IsNullOrWhiteSpace(docs) ? racerMatch.Context : racerMatch.Context+"\n"+docs;
                 var icon = GetCompletionIcon(elType);
                 yield return new Completion(displayText, insertionText, description, icon, "");
             }

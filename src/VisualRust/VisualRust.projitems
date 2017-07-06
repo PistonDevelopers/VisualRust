@@ -55,6 +55,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ProjectProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\ProjectTreeModifiers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProvideDebugEngineAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Racer\RacerMatch.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Racer\RacerSingleton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Resources.Designer.cs">

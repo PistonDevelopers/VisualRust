@@ -46,17 +46,7 @@ namespace VisualRust
         {
             var snapshot = Buffer.CurrentSnapshot;
             var snapshotPoint = TextView.Caret.Position.BufferPosition;
-            var tokens = Utils.GetTokensAtPosition(snapshotPoint);
 
-            // TODO: Taken from Execute in RustF1HelpCommandHandler
-            var leftToken = tokens.Item1;
-            var currentToken = tokens.Item2;
-            var findToken = currentToken ?? leftToken;
-            if (findToken == null)
-            {
-                return false;
-            }
-            
             var dte = (EnvDTE.DTE)ServiceProvider.GetService(typeof(EnvDTE.DTE));
             string filepath = dte.ActiveDocument.FullName;
 

@@ -27,11 +27,15 @@ namespace VisualRust
             //       especially for IDENTs we probably want the whole path.
             //       Ideally we would even use the path after resolution (incorporating imported modules, etc)
             var snapshot = Buffer.CurrentSnapshot;
-            var tokens = Utils.GetTokensAtPosition(TextView.Caret.Position.BufferPosition);
+            var tokens = Utils.GetTokensAt(TextView.Caret.Position.BufferPosition);
             var leftToken = tokens.Item1;
-            var currentToken = tokens.Item2;
+            var rightToken = tokens.Item2;
 
-            var searchToken = currentToken ?? leftToken;
+            return TryHelpToken(leftToken) || TryHelpToken(rightToken);
+        }
+
+        private bool TryHelpToken(IToken searchToken)
+        {
             if (searchToken == null)
             {
                 // TODO: By returning false we fall back to the default MSDN page if we don't have a valid token/context.
@@ -41,7 +45,7 @@ namespace VisualRust
 
             var type = Utils.LexerTokenToRustToken(searchToken.Text, searchToken.Type);
             var text = searchToken.Text;
-            String helpUrl;
+            string helpUrl;
 
             // TODO: This "translation" should be done by a web service, as is the case with MSDN,
             //       in order to decouple this plugin from the structure of the Rust documentation.
@@ -49,6 +53,8 @@ namespace VisualRust
             switch (type)
             {
                 case RustTokenTypes.IDENT:
+                case RustTokenTypes.TYPE:
+                case RustTokenTypes.PRIMITIVE_TYPE:
                     helpUrl = "https://doc.rust-lang.org/std/?search=" + text;
                     break;
                 case RustTokenTypes.LIFETIME:

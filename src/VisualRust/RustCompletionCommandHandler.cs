@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 using VSCommand = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
+using System.Diagnostics;
 
 namespace VisualRust
 {
@@ -73,27 +74,48 @@ namespace VisualRust
                 {
                     case VSConstants.VSStd2KCmdID.TYPECHAR:
                         char ch = GetTypeChar(pvaIn);
-                        var tokensAtCursor = Utils.GetTokensAtPosition(TextView.Caret.Position.BufferPosition);
+                        var tokens      = Utils.GetLineTokensUpTo(TextView.Caret.Position.BufferPosition);
+                        var tokenTypes  = tokens.Select(token => Utils.LexerTokenToRustToken(token.Text, token.Type)).ToList();
+                        int tokensCount = tokenTypes.Count;
+                        RustTokenTypes? currentTokenType  = tokensCount >= 1 ? (RustTokenTypes?)tokenTypes[tokensCount-1] : null; // the token we just helped type
+                        Trace("TYPECHAR: ch={0}, currentToken={1}", ch, currentTokenType);
 
-                        RustTokenTypes? leftTokenType = tokensAtCursor.Item1 != null ? (RustTokenTypes?)Utils.LexerTokenToRustToken(tokensAtCursor.Item1.Text, tokensAtCursor.Item1.Type) : null;
-                        RustTokenTypes? currentTokenType = tokensAtCursor.Item2 != null ? (RustTokenTypes?)Utils.LexerTokenToRustToken(tokensAtCursor.Item2.Text, tokensAtCursor.Item2.Type) : null;
-
-                        RustTokenTypes[] cancelTokens = { RustTokenTypes.COMMENT, RustTokenTypes.STRING, RustTokenTypes.DOC_COMMENT, RustTokenTypes.WHITESPACE };
-
-                        if (char.IsControl(ch)
-                            || ch == ';'
-                            || (leftTokenType.HasValue && cancelTokens.Contains(leftTokenType.Value))
-                            || (currentTokenType.HasValue && cancelTokens.Contains(currentTokenType.Value)))
+                        RustTokenTypes[] cancelTokens = { RustTokenTypes.COMMENT, RustTokenTypes.STRING, RustTokenTypes.DOC_COMMENT, RustTokenTypes.WHITESPACE, RustTokenTypes.STRUCTURAL };
+                        if (char.IsControl(ch) || (currentTokenType.HasValue && cancelTokens.Contains(currentTokenType.Value)))
                         {
                             Cancel();
                         }
-                        else if (leftTokenType == RustTokenTypes.STRUCTURAL)
+                        else if (currentTokenType == RustTokenTypes.IDENT)
                         {
-                            Cancel();
-                            StartSession();
-                        }
-                        else if (leftTokenType == RustTokenTypes.IDENT && currentTokenType == null)
-                        {
+                            Func<string, bool> isPreceededBy = (prefixStr) =>
+                            {
+                                var prefix = prefixStr.Split(' ');
+                                if (tokensCount-1 < 2*prefix.Length)
+                                    return false; // not enough tokens to be preceeded by all that
+                                for (int i=0; i<prefix.Length; ++i)
+                                {
+                                    if (tokens[tokensCount - 2*prefix.Length + 2*i - 1].Text != prefix[i]) return false; // mismatch
+                                    if (tokens[tokensCount - 2*prefix.Length + 2*i - 0].Type != RustLexer.RustLexer.WHITESPACE) return false; // TODO: Allow e.g. mixture of comments/whitespace
+                                }
+                                return true;
+                            };
+
+                            // Don't start a session when naming new things...
+                            if (isPreceededBy("fn")) break;
+                            // Note that "if let" and "while let" can do pattern matching which could benifit from intellisense
+                            if (isPreceededBy("let") && !isPreceededBy("if let") && !isPreceededBy("while let")) break;
+                            if (isPreceededBy("let mut") && !isPreceededBy("if let mut") && !isPreceededBy("while let mut")) break;
+                            if (isPreceededBy("const") || isPreceededBy("static") || isPreceededBy("static mut")) break; // shouldn't cull 'static lifetimes, only static vars
+                            if (isPreceededBy("struct")) break;
+                            if (isPreceededBy("trait")) break;
+                            if (isPreceededBy("enum")) break;
+                            if (isPreceededBy("type")) break;
+
+                            // Things we still allow to complete:
+                            // closure var names - need a full AST to properly disambugate those from identifiers after binary |s
+                            // impl s - these reference existing types, so this is by design
+                            // mod s - not always new modules, so this is also by design?
+
                             StartSession();
                         }
                         else if (IsSessionStarted)
@@ -119,6 +141,7 @@ namespace VisualRust
 
         private void RestartSession()
         {
+            Trace("RestartSession()");
             if (IsSessionStarted)
             {
                 currentSession.Dismiss();
@@ -128,6 +151,7 @@ namespace VisualRust
 
         private void Filter()
         {
+            Trace("Filter()");
             if (!IsSessionStarted)
                 return;
 
@@ -140,6 +164,7 @@ namespace VisualRust
 
         private bool Cancel()
         {
+            Trace("Cancel()");
             if (currentSession == null)
                 return false;
 
@@ -150,6 +175,7 @@ namespace VisualRust
 
         private bool Complete(bool force)
         {
+            Trace("Complete(force={0})", force);
             if (currentSession == null)
                 return false;
 
@@ -167,6 +193,7 @@ namespace VisualRust
 
         private bool StartSession()
         {
+            Trace("StartSession()");
             if (currentSession != null)
             {
                 Filter();
@@ -226,6 +253,18 @@ namespace VisualRust
         protected override uint ConvertFromCommand(VSCommand command)
         {
             return (uint)command;
+        }
+
+        [Conditional("DISABLED")]
+        private void Trace(string message, params object[] args)
+        {
+            SnapshotPoint caret = TextView.Caret.Position.BufferPosition;
+            ITextSnapshotLine line = caret.GetContainingLine();
+
+            var fmtMsg = string.Format(message, args);
+            var fmtSess = currentSession == null ? "null" : currentSession.IsDismissed ? "dismissed" : currentSession.IsStarted ? "started" : "...ready?";
+            var fmtText = line.GetText().Replace('\t',' ').Insert(caret.Position-line.Start, "@");
+            Utils.DebugPrintToOutput("RustCompletionCommandHandler: {0} session={1} text=[{2}]", fmtMsg.PadRight(25, ' '), fmtSess.PadRight("dismissed".Length, ' '), fmtText);
         }
     }
 }

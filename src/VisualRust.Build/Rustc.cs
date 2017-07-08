@@ -385,7 +385,7 @@ namespace VisualRust.Build
             // primarySpan.file_name might not be legal (e.g. "file_name":"<println macros>" is common)
             string logFile = null;
             var logSpan = primarySpan;
-            for (;;)
+            while (logSpan != null)
             {
                 try
                 {

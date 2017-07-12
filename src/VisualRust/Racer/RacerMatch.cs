@@ -59,6 +59,45 @@ namespace VisualRust.Racer
         /// </summary>
         public string Documentation;
 
+        static readonly Regex ReDocsCodeSection = new Regex(@"(?<=^|\n)```(?<type>[a-zA-Z_0-9]*)\n(?<code>.*?)\n```(?=\n|$)", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Singleline);
+        static readonly Regex ReDocsCodeInline = new Regex(@"`(?<code>.*?)`", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        static readonly Regex ReDocsSummaryLine = new Regex(@"^(?<docs>.*)", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        static readonly Regex ReDocsSummaryParas = new Regex(@"(?<docs>((^|(\r?\n))(?!#)(.*))*)", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+
+        /// <summary>
+        /// Documentation with some ancillary markdown such as ```code sections``` and `inline identifiers` stripped, for use in plaintext intellisense displays.
+        /// Other formatting such as # Headers will remain in place.
+        /// </summary>
+        public string PlainDocumentation
+        {
+            get
+            {
+                var d = Documentation ?? "";
+                d = ReDocsCodeSection.Replace(d, codeSection => codeSection.Groups["code"].Value);
+                d = ReDocsCodeInline .Replace(d, codeInline  => codeInline .Groups["code"].Value);
+                return d;
+            }
+        }
+
+        public string PlainSummaryLine
+        {
+            get
+            {
+                var m = ReDocsSummaryLine.Match(PlainDocumentation);
+                return m.Success ? m.Groups["docs"].Value : "";
+            }
+        }
+
+        public string PlainSummaryParagraphs
+        {
+            get
+            {
+                var docs = PlainDocumentation;
+                var m = ReDocsSummaryParas.Match(PlainDocumentation);
+                return m.Success ? m.Groups["docs"].Value.TrimEnd() : "";
+            }
+        }
+
 
 
         public enum Type

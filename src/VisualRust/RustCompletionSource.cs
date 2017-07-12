@@ -256,13 +256,8 @@ namespace VisualRust
             return GetCompletions(lines);
         }
 
-        static readonly Regex ReDocsCodeSection = new Regex(@"(?<=^|\n)```(?<type>[a-zA-Z_0-9]*)\n(?<code>.*?)\n```(?=\n|$)", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Singleline);
-        static readonly Regex ReDocsCodeInline = new Regex(@"`(?<code>.*?)`", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-
         private IEnumerable<Completion> GetCompletions(string[] lines)
         {
-            // Emitting code: https://github.com/racer-rust/racer/blob/4d694e1e17f58bbf01e52fc152065d4bc06157e2/src/bin/main.rs#L216-L254
-
             var matches = lines.Where(l => l.StartsWith("MATCH")).Distinct(StringComparer.Ordinal);
 
             foreach (var matchLine in matches)
@@ -274,10 +269,6 @@ namespace VisualRust
                     continue;
                 }
 
-                var docs = racerMatch.Documentation;
-                docs = ReDocsCodeSection.Replace(docs, codeSection => codeSection.Groups["code"].Value);
-                docs = ReDocsCodeInline .Replace(docs, codeInline  => codeInline .Groups["code"].Value);
-
                 CompletableLanguageElement elType;
                 if (!Enum.TryParse(racerMatch.MatchType, out elType))
                 {
@@ -287,6 +278,8 @@ namespace VisualRust
 
                 var displayText = racerMatch.MatchString;
                 var insertionText = racerMatch.MatchString;
+                var docs = racerMatch.PlainSummaryParagraphs;
+                //var docs = racerMatch.PlainSummaryLine;
                 var description = string.IsNullOrWhiteSpace(docs) ? racerMatch.Context : racerMatch.Context+"\n"+docs;
                 var icon = GetCompletionIcon(elType);
                 yield return new Completion(displayText, insertionText, description, icon, "");

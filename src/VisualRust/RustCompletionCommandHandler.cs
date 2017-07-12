@@ -80,10 +80,22 @@ namespace VisualRust
                         RustTokenTypes? currentTokenType  = tokensCount >= 1 ? (RustTokenTypes?)tokenTypes[tokensCount-1] : null; // the token we just helped type
                         Trace("TYPECHAR: ch={0}, currentToken={1}", ch, currentTokenType);
 
-                        RustTokenTypes[] cancelTokens = { RustTokenTypes.COMMENT, RustTokenTypes.STRING, RustTokenTypes.DOC_COMMENT, RustTokenTypes.WHITESPACE, RustTokenTypes.STRUCTURAL };
+                        RustTokenTypes[] cancelTokens = { RustTokenTypes.COMMENT, RustTokenTypes.STRING, RustTokenTypes.DOC_COMMENT, RustTokenTypes.WHITESPACE };
                         if (char.IsControl(ch) || (currentTokenType.HasValue && cancelTokens.Contains(currentTokenType.Value)))
                         {
                             Cancel();
+                        }
+                        else if (currentTokenType == RustTokenTypes.STRUCTURAL)
+                        {
+                            var subtype = tokens.Last().Type;
+                            if (subtype == RustLexer.RustLexer.DOT || subtype == RustLexer.RustLexer.MOD_SEP)
+                            {
+                                RestartSession();
+                            }
+                            else
+                            {
+                                Cancel();
+                            }
                         }
                         else if (currentTokenType == RustTokenTypes.IDENT)
                         {

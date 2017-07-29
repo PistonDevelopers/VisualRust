@@ -47,11 +47,16 @@ the time to spend coding.
 
 ### Code
 
-1. Fork the main repository
-2. Work on a feature in your own private branch
-3. Once you are finished with you work or want someone to you, open a pull
-   request
-4. Someone will review your code and merge it. Some fixes might be required on
+1. Fork the main repository on github.
+2. Check out the source code:
+   * Make sure [git lfs](https://git-lfs.github.com/) is installed **before**
+     cloning the repository or you'll need to delete and re-checkout some files.
+   * `git clone ...` your fork.
+   * `git submodule update --init` to grab MICore and MIDebugEngine.
+3. Work on a feature in your own private branch.
+4. Once you are finished with you work or want someone to you, open a pull
+   request.
+5. Someone will review your code and merge it. Some fixes might be required on
    your side.
 
 ## Prerequisites

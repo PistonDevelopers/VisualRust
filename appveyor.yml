@@ -5,7 +5,10 @@ branches:
 skip_tags: true
 image: Visual Studio 2017
 configuration:
+- Debug
 - Release
+platform:
+- All VS
 install:
 - ps: >-
     Start-FileDownload "https://static.rust-lang.org/dist/rust-nightly-i686-pc-windows-msvc.exe"

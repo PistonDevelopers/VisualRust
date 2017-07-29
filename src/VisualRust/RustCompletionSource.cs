@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using Antlr4.Runtime;
@@ -8,6 +9,9 @@ using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Utilities;
+using System.Text.RegularExpressions;
+using System.Windows;
+using VisualRust.Racer;
 
 namespace VisualRust
 {
@@ -169,6 +173,7 @@ namespace VisualRust
             completions.AddRange(GetKeywordCompletions(prefix));
 
             completionSets.Add(new RustCompletionSet("All", "All", span, completions, null));
+
         }
 
         private static IToken GetActiveToken(int columnIndex, ITextSnapshotLine line)
@@ -229,10 +234,13 @@ namespace VisualRust
         {
             using (var tmpFile = new TemporaryFile(snapshot.GetText()))
             {
-                // Build racer command line: "racer.exe complete lineNo columnNo rustfile
+                // Build racer command line: "racer.exe complete lineNo columnNo \"originalFile\" \"substituteFile\"
+                ITextDocument document = null;
+                snapshot?.TextBuffer?.Properties?.TryGetProperty(typeof(ITextDocument), out document);
+                var origPath = document?.FilePath ?? tmpFile.Path;
                 int lineNumber = point.GetContainingLine().LineNumber;
                 int charNumber = GetColumn(point);
-                string args = string.Format("complete {0} {1} {2}", lineNumber + 1, charNumber, tmpFile.Path);
+                string args = string.Format("complete-with-snippet {0} {1} \"{2}\" \"{3}\"", lineNumber + 1, charNumber, origPath, tmpFile.Path);
                 return Racer.RacerSingleton.Run(args);
             }
         }
@@ -249,28 +257,32 @@ namespace VisualRust
         }
 
         private IEnumerable<Completion> GetCompletions(string[] lines)
-        {            
+        {
             var matches = lines.Where(l => l.StartsWith("MATCH")).Distinct(StringComparer.Ordinal);
 
             foreach (var matchLine in matches)
             {
-                var tokens = matchLine.Substring(6).Split(',');
-                var text = tokens[0];
-                var langElemText = tokens[4];
-                var descriptionStartIndex = tokens[0].Length + tokens[1].Length + tokens[2].Length + tokens[3].Length + tokens[4].Length + 11;
-                var description = matchLine.Substring(descriptionStartIndex);
-                CompletableLanguageElement elType;
-
-                if (!Enum.TryParse(langElemText, out elType))
+                RacerMatch racerMatch;
+                if (!RacerMatch.TryParse(matchLine, RacerMatch.Type.CompleteWithSnippet, RacerMatch.Interface.Default, out racerMatch))
                 {
-                    Utils.DebugPrintToOutput("Failed to parse language element found in racer autocomplete response: {0}", langElemText);
+                    Utils.DebugPrintToOutput("Failed to parse racer match line found in racer autocomplete resource: {0}", matchLine);
                     continue;
                 }
 
-                var insertionText = text;
-                var icon = GetCompletionIcon(elType);
+                CompletableLanguageElement elType;
+                if (!Enum.TryParse(racerMatch.MatchType, out elType))
+                {
+                    Utils.DebugPrintToOutput("Failed to parse language element found in racer autocomplete response: {0}", racerMatch.MatchType);
+                    continue;
+                }
 
-                yield return new Completion(text, insertionText, description, icon, "");
+                var displayText = racerMatch.MatchString;
+                var insertionText = racerMatch.MatchString;
+                var docs = racerMatch.PlainSummaryParagraphs;
+                //var docs = racerMatch.PlainSummaryLine;
+                var description = string.IsNullOrWhiteSpace(docs) ? racerMatch.Context : racerMatch.Context+"\n"+docs;
+                var icon = GetCompletionIcon(elType);
+                yield return new Completion(displayText, insertionText, description, icon, "");
             }
         }
 

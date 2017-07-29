@@ -8,16 +8,16 @@
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>VisualRust</Import_RootNamespace>
   </PropertyGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <Content Include="$(MSBuildThisFileDirectory)..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\ApplicationProject.zip">
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\..\bin\VisualRust.Templates\$(Configuration)\ProjectTemplates\Rust\127\ApplicationProject.zip">
       <Link>ProjectTemplates\ApplicationProject.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="$(MSBuildThisFileDirectory)..\VisualRust.Templates\bin\$(Configuration)\ProjectTemplates\Rust\127\LibraryProject.zip">
+    <Content Include="$(MSBuildThisFileDirectory)..\..\bin\VisualRust.Templates\$(Configuration)\ProjectTemplates\Rust\127\LibraryProject.zip">
       <Link>ProjectTemplates\LibraryProject.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="$(MSBuildThisFileDirectory)..\VisualRust.Templates\bin\$(Configuration)\ItemTemplates\Rust\127\Module.zip">
+    <Content Include="$(MSBuildThisFileDirectory)..\..\bin\VisualRust.Templates\$(Configuration)\ItemTemplates\Rust\127\Module.zip">
       <Link>ItemTemplates\Module.zip</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -55,6 +55,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ProjectProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProjectSystem\ProjectTreeModifiers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProvideDebugEngineAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Racer\RacerMatch.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Racer\RacerSingleton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Resources.Designer.cs">

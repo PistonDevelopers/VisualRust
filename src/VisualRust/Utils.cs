@@ -262,7 +262,32 @@ namespace VisualRust
             pane.Activate();
         }
 
-        internal static Tuple<IToken, IToken> GetTokensAtPosition(SnapshotPoint snapshotPoint)
+        /// <summary>
+        /// This will return the tokens before the cursor, including any the cursor is in the middle of.
+        /// Given a cursor at '|' in the following strings...
+        /// 
+        /// <para>"let |foo = 42;"  will result in ["let", " "].</para>
+        /// <para>"let f|oo = 42;"  will result in ["let", " ", "foo"].</para>
+        /// <para>"let foo| = 42;"  will result in ["let", " ", "foo"].</para>
+        /// <para>"let foo |= 42;"  will result in ["let", " ", "foo", " "].</para>
+        /// </summary>
+        internal static IList<IToken> GetLineTokensUpTo(SnapshotPoint snapshotPoint)
+        {
+            var line = snapshotPoint.GetContainingLine();
+            int col = snapshotPoint.Position - line.Start.Position;
+            var tokens = Utils.LexString(line.GetText()).TakeWhile(token => token.StartIndex < col).ToList();
+            return tokens;
+        }
+
+        /// <summary>
+        /// This will return the tokens immediately adjacent to the cursor (often the same token for both left and right).
+        /// Given a cursor at '|' in the following strings...
+        /// 
+        /// <para>" |ident" will result in (" ","ident").</para>
+        /// <para>"id|ent"  will result in ("ident","ident").</para>
+        /// <para>"ident| " will result in ("ident"," ").</para>
+        /// </summary>
+        internal static Tuple<IToken, IToken> GetTokensAt(SnapshotPoint snapshotPoint)
         {
             var line = snapshotPoint.GetContainingLine();
             var tokens = Utils.LexString(line.GetText()).ToList();
@@ -272,22 +297,11 @@ namespace VisualRust
 
             int col = snapshotPoint.Position - line.Start.Position;
 
-            IToken leftToken;
-            IToken currentToken = tokens.FirstOrDefault(t => col > t.StartIndex && col <= t.StopIndex);
+            // Note: These are often the same token when e.g. the cursor is in the middle of an ident token.
+            IToken leftToken  = tokens.FirstOrDefault(t => col >= t.StartIndex && col <= t.StopIndex+1);
+            IToken rightToken = tokens.LastOrDefault (t => col >= t.StartIndex && col <= t.StopIndex+1);
 
-            if (currentToken != null)
-            {
-                if (currentToken == tokens.First())
-                    leftToken = null;
-                else
-                    leftToken = tokens[tokens.IndexOf(currentToken) - 1];
-            }
-            else
-            {
-                leftToken = tokens.Last();
-            }
-
-            return Tuple.Create(leftToken, currentToken);
+            return Tuple.Create(leftToken, rightToken);
         }
     }
 
